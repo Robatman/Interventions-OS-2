@@ -219,6 +219,10 @@ function goBriefing() {
 }
 
 function startPracticeFromBriefing() {
+  // Full reset
+  const msgsEl = document.getElementById('practice-msgs');
+  if (msgsEl) msgsEl.innerHTML = '';
+  stopSpeaking();
   const assumption = document.getElementById('reflect-assume').value.trim();
   preReflection = { assume: assumption || '(not answered)' };
 
