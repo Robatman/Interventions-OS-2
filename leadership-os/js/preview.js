@@ -8,23 +8,23 @@
 // ─── IMAGE PATHS ──────────────────────────
 const AX = {
   juan: {
-    neutral:  '/axolotls/juanjolote_neutral.png',
-    happy:    '/axolotls/juanjolote_happy.png',
-    sad:      '/axolotls/juanjolote_sad.png',
-    angry:    '/axolotls/juanjolote_angry.png',
-    open:     '/axolotls/juanjolote_open.png',
-    talking:  '/axolotls/juanjolote_talking.png',
-    thinking: '/axolotls/juanjolote_neutral.png'
+    neutral:  'assets/juanjolote_neutral.png',
+    happy:    'assets/juanjolote_happy.png',
+    sad:      'assets/juanjolote_sad.png',
+    angry:    'assets/juanjolote_angry.png',
+    open:     'assets/juanjolote_open.png',
+    talking:  'assets/juanjolote_talking.png',
+    thinking: 'assets/juanjolote_neutral.png'
   },
   ajolin: {
-    neutral:  '/axolotls/ajolin_neutral.png',
-    happy:    '/axolotls/ajolin_happy.png',
-    sad:      '/axolotls/ajolin_sad.png',
-    angry:    '/axolotls/ajolin_sad.png',
-    open:     '/axolotls/ajolin_open.png',
-    talking:  '/axolotls/ajolin_talking.png',
-    thinking: '/axolotls/ajolin_surprised.png',
-    surprised:'/axolotls/ajolin_surprised.png'
+    neutral:  'assets/ajolin_neutral.png',
+    happy:    'assets/ajolin_happy.png',
+    sad:      'assets/ajolin_sad.png',
+    angry:    'assets/ajolin_sad.png',
+    open:     'assets/ajolin_open.png',
+    talking:  'assets/ajolin_talking.png',
+    thinking: 'assets/ajolin_surprised.png',
+    surprised:'assets/ajolin_surprised.png'
   }
 };
 
