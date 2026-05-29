@@ -429,3 +429,21 @@ extraStyle.textContent = `
   #voice-indicator { transition: all .3s; }
 `;
 document.head.appendChild(extraStyle);
+
+// ─── PREVIEW ENTRY ────────────────────────
+
+function selectAndPreview(id) {
+  if (!setTechnique(id)) return;
+  updateModeScreen();
+  // Update preview pill
+  const pill = document.getElementById('preview-pill');
+  if (pill) pill.textContent = currentTechnique.label;
+  showTechniquePreview(id);
+}
+
+// ─── HISTORY ENTRY ────────────────────────
+
+// Called from welcome screen history button
+function goHistory() {
+  showHistory();
+}
