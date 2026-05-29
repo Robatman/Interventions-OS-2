@@ -408,3 +408,96 @@ p  { font-size: 14px; line-height: 1.65; color: var(--text2); }
 }
 .session-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text3); }
 .session-dot.synced { background: var(--teal); }
+
+/* ── PREVIEW SCREEN ── */
+.preview-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.preview-context {
+  font-size: 12px; color: var(--text2); margin-bottom: 12px;
+  padding: 8px 12px; background: var(--bg3); border-radius: var(--radius-sm);
+  line-height: 1.5;
+}
+.preview-scene {
+  background: var(--bg2); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
+}
+.preview-chars {
+  display: flex; justify-content: space-around; align-items: flex-end;
+  margin-bottom: 12px;
+}
+.preview-char { text-align: center; transition: opacity .3s; }
+.char-name { font-size: 11px; font-weight: 600; color: var(--text); margin-top: 4px; }
+.char-role { font-size: 10px; color: var(--text3); }
+
+.preview-bubble-wrap {
+  background: var(--bg3); border-radius: var(--radius);
+  padding: 12px 14px; font-size: 13px; line-height: 1.55;
+  border: 0.5px solid var(--border); min-height: 52px;
+  transition: all .3s;
+}
+.preview-bubble-wrap.from-juan { border-left: 2px solid var(--teal); }
+.preview-bubble-wrap.from-ajolin { border-left: 2px solid var(--coral); }
+.bubble-speaker { font-weight: 700; color: var(--teal); margin-right: 4px; }
+.from-ajolin .bubble-speaker { color: var(--coral); }
+
+.preview-insight {
+  background: var(--bg3); border-radius: var(--radius-sm);
+  padding: 10px 13px; font-size: 12px; color: var(--text2);
+  line-height: 1.55; gap: 8px; align-items: flex-start;
+  border: 0.5px solid var(--border2); margin-bottom: 10px;
+  animation: fadeIn .4s ease;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+
+.preview-nav { display: flex; justify-content: flex-end; }
+.preview-next-btn {
+  background: var(--teal); border: none; border-radius: var(--radius-sm);
+  padding: 10px 20px; font-size: 13px; font-weight: 600;
+  color: #071a12; cursor: pointer; transition: opacity .2s;
+}
+.preview-next-btn:hover { opacity: .85; }
+
+.preview-moves-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0 16px;
+}
+.preview-move-card {
+  background: var(--bg2); border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px;
+  animation: fadeIn .4s ease both;
+}
+.move-icon  { font-size: 22px; margin-bottom: 5px; }
+.move-label { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.move-desc  { font-size: 11px; color: var(--text2); line-height: 1.45; }
+
+/* preview step dots */
+.preview-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; }
+.pdot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--bg3); border: 0.5px solid var(--border); transition: all .3s;
+}
+.pdot.active { background: var(--teal); border-color: var(--teal); }
+.pdot.done   { background: var(--text3); border-color: var(--text3); }
+
+/* ── HISTORY SCREEN ── */
+.history-stats {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 16px;
+}
+.stat-card {
+  background: var(--bg2); border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px 8px; text-align: center;
+}
+.stat-num { font-size: 22px; font-weight: 700; color: var(--teal); }
+.stat-lbl { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+.history-row {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 12px 0; border-bottom: 0.5px solid var(--border);
+}
+.history-date    { font-size: 11px; color: var(--text3); min-width: 40px; margin-top: 2px; }
+.history-main    { flex: 1; }
+.history-context { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.history-meta    { display: flex; align-items: center; margin-bottom: 4px; }
+.history-insight { font-size: 11px; color: var(--text2); font-style: italic; line-height: 1.5; }
+.history-mood    { font-size: 14px; font-weight: 700; min-width: 36px; text-align: right; }
