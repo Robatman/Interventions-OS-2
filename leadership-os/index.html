@@ -51,7 +51,7 @@
   </div>
 
   <!-- MAIN MENU 1: INTERVENTIONS -->
-  <div class="menu-section-label">Intervenciones · Retention conversations</div>
+  <div class="menu-section-label">Interventions · Retention conversations</div>
   <div class="choice-grid" style="margin-bottom:20px;">
     <button class="choice-btn choice-intervention" onclick="goInterventionMenu()">
       <span class="choice-icon">🎯</span>
@@ -64,19 +64,24 @@
   </div>
 
   <!-- MAIN MENU 2: TECHNIQUES -->
-  <div class="menu-section-label">Técnicas · Build your toolkit</div>
+  <div class="menu-section-label">Techniques · Build your toolkit</div>
   <div class="choice-grid">
     <button class="choice-btn choice-technique" onclick="goTechniqueMenu()">
       <span class="choice-icon">🛠</span>
       <div class="choice-body">
-        <div class="choice-label">Técnicas y Herramientas</div>
+        <div class="choice-label">Techniques & Tools</div>
         <div class="choice-sub">Active Listening · Powerful Questions — desarrolla el músculo para trabajar cualquier intervención con más agilidad</div>
-        <span class="choice-badge bdg-purple">Entrenamiento de habilidades</span>
+        <span class="choice-badge bdg-purple">Skills training</span>
       </div>
     </button>
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════
+     SCREEN 1B: INTERVENTION SELECTOR
+══════════════════════════════════════ -->
+<div style="text-align:center;margin-top:16px;"><button class="btn-ghost" onclick="goHistory()" style="font-size:12px;padding:8px 16px;">📊 View my progress</button></div>
 
 <!-- ══════════════════════════════════════
      SCREEN 1B: INTERVENTION SELECTOR
@@ -88,8 +93,8 @@
   </div>
 
   <div style="margin-bottom:16px;">
-    <h2 style="font-size:16px;margin-bottom:4px;">¿Qué intervención quieres trabajar?</h2>
-    <p style="font-size:12px;">Cada una tiene su momento, su propietario y su objetivo.</p>
+    <h2 style="font-size:16px;margin-bottom:4px;">Which intervention do you want to work on?</h2>
+    <p style="font-size:12px;">Each has its own moment, owner, and objective.</p>
   </div>
 
   <div class="choice-grid">
@@ -139,12 +144,12 @@
   </div>
 
   <div style="margin-bottom:16px;">
-    <h2 style="font-size:16px;margin-bottom:4px;">¿Qué técnica quieres desarrollar?</h2>
-    <p style="font-size:12px;">Practica la técnica en cualquier escenario operativo — no solo en intervenciones.</p>
+    <h2 style="font-size:16px;margin-bottom:4px;">Which technique do you want to develop?</h2>
+    <p style="font-size:12px;">Practice the technique in any operational scenario — not just interventions.</p>
   </div>
 
   <div class="choice-grid">
-    <button class="choice-btn" onclick="selectTechnique('active_listening')">
+    <button class="choice-btn" onclick="selectAndPreview('active_listening')">
       <span class="choice-icon">👂</span>
       <div class="choice-body">
         <div class="choice-label">Active Listening</div>
@@ -157,7 +162,7 @@
       <div class="choice-body">
         <div class="choice-label">Powerful Questions</div>
         <div class="choice-sub">Preguntas que abren posibilidades · Co-Active Coaching</div>
-        <span class="choice-badge bdg-purple">Próximamente</span>
+        <span class="choice-badge bdg-purple">Coming soon</span>
       </div>
     </button>
   </div>
@@ -184,7 +189,7 @@
     <button class="choice-btn" onclick="goLearn()">
       <span class="choice-icon">📖</span>
       <div class="choice-body">
-        <div class="choice-label">Aprender</div>
+        <div class="choice-label">Learn</div>
         <div class="choice-sub">Alex te enseña el objetivo, el enfoque y cómo conducir esta conversación</div>
         <span class="choice-badge bdg-blue">~8 min · Conversacional</span>
       </div>
@@ -192,7 +197,7 @@
     <button class="choice-btn" onclick="goWork()">
       <span class="choice-icon">🤝</span>
       <div class="choice-body">
-        <div class="choice-label">Trabajar juntos</div>
+        <div class="choice-label">Work Together</div>
         <div class="choice-sub">Tienes un caso real — Alex te ayuda a pensar mejor la situación antes de entrar</div>
         <span class="choice-badge bdg-purple">Socrático · Tu caso · Tu ritmo</span>
       </div>
@@ -200,7 +205,7 @@
     <button class="choice-btn" onclick="goPractice()">
       <span class="choice-icon">🎯</span>
       <div class="choice-body">
-        <div class="choice-label">Practicar</div>
+        <div class="choice-label">Practice</div>
         <div class="choice-sub">Simula la conversación con un agente real — reacciona a lo que dices, no a un guión</div>
         <span class="choice-badge bdg-teal">Simulador · Voz · 3 niveles</span>
       </div>
@@ -215,7 +220,7 @@
 <div class="screen" id="s-learn">
   <div class="back-row">
     <button class="back-btn" onclick="show('s-mode')">← Back</button>
-    <span class="mode-pill mp-learn">Aprender</span>
+    <span class="mode-pill mp-learn">Learn</span>
   </div>
   <div class="chat-header">
     <div class="chat-av">📖</div>
@@ -257,7 +262,7 @@
 <div class="screen" id="s-work">
   <div class="back-row">
     <button class="back-btn" onclick="show('s-mode')">← Back</button>
-    <span class="mode-pill mp-work">Trabajar juntos</span>
+    <span class="mode-pill mp-work">Work Together</span>
   </div>
   <div class="chat-header">
     <div class="chat-av">🤝</div>
@@ -304,7 +309,7 @@
 <div class="screen" id="s-level">
   <div class="back-row">
     <button class="back-btn" onclick="show('s-mode')">← Back</button>
-    <span class="mode-pill mp-practice">Práctica</span>
+    <span class="mode-pill mp-practice">Practice</span>
   </div>
   <div class="avatar-wrap" style="margin-bottom:16px;">
     <div class="avatar-ring" style="width:56px;height:56px;font-size:22px;" id="level-screen-icon">👤</div>
@@ -470,7 +475,7 @@
   </div>
 </div>
 
-</div><!-- /app -->
+
 
 <div class="gloss-popup" id="gloss-popup">
   <div class="gloss-title" id="gloss-title"></div>
@@ -487,3 +492,57 @@
 <script src="js/app.js"></script>
 </body>
 </html>
+
+<!-- ══════════════════════════════════════
+     SCREEN: TECHNIQUE PREVIEW
+══════════════════════════════════════ -->
+<div class="screen" id="s-preview">
+  <div class="back-row">
+    <button class="back-btn" onclick="show('s-techniques')">← Back</button>
+    <span class="mode-pill mp-work" id="preview-pill">Preview</span>
+  </div>
+
+  <div class="preview-dots">
+    <div class="pdot" id="pdot-0"></div>
+    <div class="pdot" id="pdot-1"></div>
+    <div class="pdot" id="pdot-2"></div>
+    <div class="pdot" id="pdot-3"></div>
+  </div>
+
+  <div id="preview-stage"></div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN: SESSION HISTORY
+══════════════════════════════════════ -->
+<div class="screen" id="s-history">
+  <div class="back-row">
+    <button class="back-btn" onclick="goWelcome()">← Back</button>
+    <span class="mode-pill mp-learn">Progress</span>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <h2 style="font-size:16px;margin-bottom:4px;">Your progress</h2>
+    <p style="font-size:12px;">Every session saved locally. Connect Supabase to sync across devices.</p>
+  </div>
+
+  <div id="history-content"></div>
+</div>
+
+</div><!-- /app -->
+
+<div class="gloss-popup" id="gloss-popup">
+  <div class="gloss-title" id="gloss-title"></div>
+  <div id="gloss-body"></div>
+</div>
+
+<!-- JS load order matters -->
+<script src="js/interventions.js"></script>
+<script src="js/archetypes.js"></script>
+<script src="js/techniques.js"></script>
+<script src="js/prompts.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+<script src="js/preview.js"></script>
