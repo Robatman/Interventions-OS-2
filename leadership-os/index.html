@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interventions OS</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+
+<!-- ══════════════════════════════════════
+     SCREEN 0: SETUP
+══════════════════════════════════════ -->
+<div class="screen active" id="s-setup">
+  <div class="avatar-wrap">
+    <div class="avatar-ring">🧠</div>
+    <div class="avatar-name">Interventions OS</div>
+    <div class="avatar-status">Retention training · Powered by Groq</div>
+  </div>
+  <div class="card">
+    <div class="card-title">
+      <span class="status-dot sd-off" id="key-dot"></span>
+      Connect Groq — free, ultra-fast AI
+    </div>
+    <div class="card-desc" style="margin-bottom:10px;">Get your free key at <strong style="color:var(--teal)">console.groq.com/keys</strong></div>
+    <div class="key-row">
+      <input class="key-input" id="groq-input" type="password" placeholder="gsk_...">
+      <button class="key-save" onclick="saveKey()">Connect</button>
+    </div>
+    <div id="key-msg" style="font-size:11px;color:var(--text3);margin-top:6px;"></div>
+  </div>
+  <button class="btn-primary" id="enter-btn" onclick="goWelcome()" disabled>Enter →</button>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN 1: WELCOME — TWO MAIN MENUS
+══════════════════════════════════════ -->
+<div class="screen" id="s-welcome">
+  <div class="avatar-wrap">
+    <div class="avatar-ring" style="font-size:36px;">👤</div>
+    <div class="avatar-name">Alex — Your Learning Guide</div>
+    <div class="avatar-status">Interventions OS · Retention Training</div>
+  </div>
+
+  <div class="card" style="background:var(--bg3);border-color:var(--border2);margin-bottom:16px;">
+    <p style="color:var(--text);font-size:14px;line-height:1.7;">
+      "Two ways to train. Pick where you want to start."
+    </p>
+  </div>
+
+  <!-- MAIN MENU 1: INTERVENTIONS -->
+  <div class="menu-section-label">Intervenciones · Retention conversations</div>
+  <div class="choice-grid" style="margin-bottom:20px;">
+    <button class="choice-btn choice-intervention" onclick="goInterventionMenu()">
+      <span class="choice-icon">🎯</span>
+      <div class="choice-body">
+        <div class="choice-label">Intervenciones</div>
+        <div class="choice-sub">Pulse Check · Anchoring · Stay Interview · Tenure Renewal — practica las 4 conversaciones de retención con agentes reales</div>
+        <span class="choice-badge bdg-teal">Objetivo principal · Anti-attrition</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- MAIN MENU 2: TECHNIQUES -->
+  <div class="menu-section-label">Técnicas · Build your toolkit</div>
+  <div class="choice-grid">
+    <button class="choice-btn choice-technique" onclick="goTechniqueMenu()">
+      <span class="choice-icon">🛠</span>
+      <div class="choice-body">
+        <div class="choice-label">Técnicas y Herramientas</div>
+        <div class="choice-sub">Active Listening · Powerful Questions — desarrolla el músculo para trabajar cualquier intervención con más agilidad</div>
+        <span class="choice-badge bdg-purple">Entrenamiento de habilidades</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN 1B: INTERVENTION SELECTOR
+══════════════════════════════════════ -->
+<div class="screen" id="s-interventions">
+  <div class="back-row">
+    <button class="back-btn" onclick="goWelcome()">← Back</button>
+    <span class="mode-pill mp-practice">Intervenciones</span>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <h2 style="font-size:16px;margin-bottom:4px;">¿Qué intervención quieres trabajar?</h2>
+    <p style="font-size:12px;">Cada una tiene su momento, su propietario y su objetivo.</p>
+  </div>
+
+  <div class="choice-grid">
+    <button class="choice-btn" onclick="selectIntervention('pulse_check')">
+      <span class="choice-icon">💓</span>
+      <div class="choice-body">
+        <div class="choice-label">Pulse Check</div>
+        <div class="choice-sub">Primera revisión · Señales tempranas · ¿Cómo te sientes aquí?</div>
+        <span class="choice-badge bdg-teal">Día 30 · Recruiting · Training · Coach</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectIntervention('anchoring')">
+      <span class="choice-icon">⚓</span>
+      <div class="choice-body">
+        <div class="choice-label">Anchoring</div>
+        <div class="choice-sub">Pertenencia · Metas · Anclar el compromiso del agente</div>
+        <span class="choice-badge bdg-purple">Día 100 · Manager directo</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectIntervention('stay_interview')">
+      <span class="choice-icon">🎯</span>
+      <div class="choice-body">
+        <div class="choice-label">Stay Interview</div>
+        <div class="choice-sub">¿Por qué te quedas? · Antes de que piense en irse</div>
+        <span class="choice-badge bdg-amber">Día 121 · HR</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectIntervention('tenure_renewal')">
+      <span class="choice-icon">🏆</span>
+      <div class="choice-body">
+        <div class="choice-label">Tenure Renewal</div>
+        <div class="choice-sub">Reconocimiento anual · Celebración · Renovación del vínculo</div>
+        <span class="choice-badge bdg-amber" style="background:var(--coral-dim);color:var(--coral);border-color:rgba(255,107,107,.3);">Día 365 · Comité</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN 1C: TECHNIQUE SELECTOR
+══════════════════════════════════════ -->
+<div class="screen" id="s-techniques">
+  <div class="back-row">
+    <button class="back-btn" onclick="goWelcome()">← Back</button>
+    <span class="mode-pill mp-work">Técnicas</span>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <h2 style="font-size:16px;margin-bottom:4px;">¿Qué técnica quieres desarrollar?</h2>
+    <p style="font-size:12px;">Practica la técnica en cualquier escenario operativo — no solo en intervenciones.</p>
+  </div>
+
+  <div class="choice-grid">
+    <button class="choice-btn" onclick="selectTechnique('active_listening')">
+      <span class="choice-icon">👂</span>
+      <div class="choice-body">
+        <div class="choice-label">Active Listening</div>
+        <div class="choice-sub">La técnica que hace funcionar a todas las demás · Arbinger Institute</div>
+        <span class="choice-badge bdg-teal">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" style="opacity:0.45;cursor:not-allowed;">
+      <span class="choice-icon">❓</span>
+      <div class="choice-body">
+        <div class="choice-label">Powerful Questions</div>
+        <div class="choice-sub">Preguntas que abren posibilidades · Co-Active Coaching</div>
+        <span class="choice-badge bdg-purple">Próximamente</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN 1D: MODE SELECTOR
+     (after choosing intervention or technique)
+══════════════════════════════════════ -->
+<div class="screen" id="s-mode">
+  <div class="back-row">
+    <button class="back-btn" id="mode-back-btn" onclick="goBack()">← Back</button>
+    <span class="mode-pill mp-learn" id="mode-context-pill">Intervención</span>
+  </div>
+
+  <div class="avatar-wrap" style="margin-bottom:16px;">
+    <div class="avatar-ring" style="width:56px;height:56px;font-size:24px;" id="mode-icon">🎯</div>
+    <div class="avatar-name" id="mode-title">Pulse Check</div>
+    <div class="avatar-status" id="mode-subtitle">Día 30 · Primera revisión</div>
+  </div>
+
+  <div class="choice-grid">
+    <button class="choice-btn" onclick="goLearn()">
+      <span class="choice-icon">📖</span>
+      <div class="choice-body">
+        <div class="choice-label">Aprender</div>
+        <div class="choice-sub">Alex te enseña el objetivo, el enfoque y cómo conducir esta conversación</div>
+        <span class="choice-badge bdg-blue">~8 min · Conversacional</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="goWork()">
+      <span class="choice-icon">🤝</span>
+      <div class="choice-body">
+        <div class="choice-label">Trabajar juntos</div>
+        <div class="choice-sub">Tienes un caso real — Alex te ayuda a pensar mejor la situación antes de entrar</div>
+        <span class="choice-badge bdg-purple">Socrático · Tu caso · Tu ritmo</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="goPractice()">
+      <span class="choice-icon">🎯</span>
+      <div class="choice-body">
+        <div class="choice-label">Practicar</div>
+        <div class="choice-sub">Simula la conversación con un agente real — reacciona a lo que dices, no a un guión</div>
+        <span class="choice-badge bdg-teal">Simulador · Voz · 3 niveles</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN 2: LEARN MODE
+══════════════════════════════════════ -->
+<div class="screen" id="s-learn">
+  <div class="back-row">
+    <button class="back-btn" onclick="show('s-mode')">← Back</button>
+    <span class="mode-pill mp-learn">Aprender</span>
+  </div>
+  <div class="chat-header">
+    <div class="chat-av">📖</div>
+    <div class="chat-info">
+      <div class="chat-name" id="learn-technique-name">Alex</div>
+      <div class="chat-mode" id="learn-philosophy">Leadership coaching</div>
+    </div>
+  </div>
+  <div class="learn-steps" id="learn-steps">
+    <span class="learn-step active" id="ls-1">1. The why</span>
+    <span class="learn-step" id="ls-2">2. What it is</span>
+    <span class="learn-step" id="ls-3">3. How to do it</span>
+    <span class="learn-step" id="ls-4">4. Check understanding</span>
+  </div>
+  <div class="msgs" id="learn-msgs"></div>
+  <div class="input-area">
+    <button class="voice-btn" id="learn-voice" onclick="toggleVoice('learn')" title="Tap to speak">🎤</button>
+    <textarea class="chat-input" id="learn-input" placeholder="Ask a question or respond..." rows="1" onkeydown="handleKey(event,'learn')"></textarea>
+    <button class="send-btn" id="learn-send" onclick="sendLearn()">Send</button>
+  </div>
+  <div class="chat-actions">
+    <button class="act-btn" onclick="learnHint()">💡 Give me an example</button>
+    <button class="act-btn" onclick="startQuiz()">✓ Check my understanding</button>
+  </div>
+  <div class="pivot-card" id="learn-pivot">
+    <div class="pivot-title">What's next?</div>
+    <div class="pivot-grid">
+      <button class="pivot-btn" onclick="goPractice()">🎯 Practice this now</button>
+      <button class="pivot-btn" onclick="goWork()">🤝 Work through a real situation</button>
+      <button class="pivot-btn" onclick="saveForLater()">📌 Save for later</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN 3: WORK TOGETHER
+══════════════════════════════════════ -->
+<div class="screen" id="s-work">
+  <div class="back-row">
+    <button class="back-btn" onclick="show('s-mode')">← Back</button>
+    <span class="mode-pill mp-work">Trabajar juntos</span>
+  </div>
+  <div class="chat-header">
+    <div class="chat-av">🤝</div>
+    <div class="chat-info">
+      <div class="chat-name">Alex — Thinking Partner</div>
+      <div class="chat-mode" id="work-mode-label">Socratic mode · Alex asks, you discover</div>
+    </div>
+  </div>
+  <div class="submode-row" id="work-submode-row">
+    <button class="submode-btn active" id="submode-reflect" onclick="setWorkSubmode('reflect')">
+      <span class="submode-icon">🪞</span>
+      <span class="submode-label">Deep reflection</span>
+      <span class="submode-desc">Explore and discover</span>
+    </button>
+    <button class="submode-btn" id="submode-urgent" onclick="setWorkSubmode('urgent')">
+      <span class="submode-icon">⚡</span>
+      <span class="submode-label">Urgent situation</span>
+      <span class="submode-desc">Action fast</span>
+    </button>
+  </div>
+  <div class="time-row" id="work-time-row" style="display:none;">
+    <span style="font-size:11px;color:var(--text3);align-self:center;">Time available:</span>
+    <button class="time-chip active" id="tc-3" onclick="setTime(3)">3 min</button>
+    <button class="time-chip" id="tc-5" onclick="setTime(5)">5 min</button>
+    <button class="time-chip" id="tc-10" onclick="setTime(10)">10 min</button>
+    <button class="time-chip" id="tc-open" onclick="setTime(0)">Open</button>
+  </div>
+  <div class="msgs" id="work-msgs"></div>
+  <div class="input-area">
+    <button class="voice-btn" id="work-voice" onclick="toggleVoice('work')">🎤</button>
+    <textarea class="chat-input" id="work-input" placeholder="Describe your situation..." rows="1" onkeydown="handleKey(event,'work')"></textarea>
+    <button class="send-btn" id="work-send" onclick="sendWork()">Send</button>
+  </div>
+  <div class="chat-actions">
+    <button class="act-btn" onclick="workEnd()">✓ Give me my one thing</button>
+    <button class="act-btn" onclick="goPractice()">🎯 Now practice this</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN 4A: LEVEL SELECTOR
+══════════════════════════════════════ -->
+<div class="screen" id="s-level">
+  <div class="back-row">
+    <button class="back-btn" onclick="show('s-mode')">← Back</button>
+    <span class="mode-pill mp-practice">Práctica</span>
+  </div>
+  <div class="avatar-wrap" style="margin-bottom:16px;">
+    <div class="avatar-ring" style="width:56px;height:56px;font-size:22px;" id="level-screen-icon">👤</div>
+    <div class="avatar-name" id="level-screen-title">Choose your level</div>
+    <div class="avatar-status" id="level-screen-sub">The agent is waiting — you don't know how they're doing today</div>
+  </div>
+  <div id="level-cards">
+    <div class="level-card" id="lvl-novice" onclick="selectLevel('novice')">
+      <div class="level-icon">🌱</div>
+      <div class="level-body">
+        <div class="level-name">Novice</div>
+        <span class="level-tag tag-nov">Learning mode</span>
+        <div class="level-desc">The agent responds to genuine intent — even imperfect technique lands if it comes from real curiosity. Hints available. Mistakes are recoverable.</div>
+        <div class="level-signals">
+          <span class="level-sig">Hints available</span>
+          <span class="level-sig">Forgiving of errors</span>
+          <span class="level-sig">Box indicator visible</span>
+        </div>
+      </div>
+    </div>
+    <div class="level-card lvl-mid" id="lvl-mid" onclick="selectLevel('mid')">
+      <div class="level-icon">⚡</div>
+      <div class="level-body">
+        <div class="level-name">Practitioner</div>
+        <span class="level-tag tag-mid">Real friction</span>
+        <div class="level-desc">Good days and bad days — you won't always know which. Random emotional triggers. Mood can drop without warning. Hints cost you something.</div>
+        <div class="level-signals">
+          <span class="level-sig">Hints cost −5 mood</span>
+          <span class="level-sig">Random triggers</span>
+          <span class="level-sig">Hinge doors hidden</span>
+        </div>
+      </div>
+    </div>
+    <div class="level-card lvl-adv" id="lvl-adv" onclick="selectLevel('adv')">
+      <div class="level-icon">🔥</div>
+      <div class="level-body">
+        <div class="level-name">Fieldwork</div>
+        <span class="level-tag tag-adv">No safety net</span>
+        <div class="level-desc">No hints. No box indicator. The briefing may not tell you everything. The agent can shut down completely. This is as close to real as it gets.</div>
+        <div class="level-signals">
+          <span class="level-sig">No hints</span>
+          <span class="level-sig">No box indicator</span>
+          <span class="level-sig">Conversation can end early</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="btn-primary" id="level-next-btn" onclick="goBriefing()" disabled>Continue →</button>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN 4B: BRIEFING
+══════════════════════════════════════ -->
+<div class="screen" id="s-briefing">
+  <div class="back-row">
+    <button class="back-btn" onclick="show('s-level')">← Back</button>
+    <span class="mode-pill mp-practice">Briefing</span>
+  </div>
+
+  <!-- Intervention trap warning (only in intervention mode) -->
+  <div id="briefing-intent" style="display:none;margin-bottom:12px;">
+    <div class="card" style="background:var(--amber-dim);border-color:rgba(245,166,35,.3);padding:12px 14px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;">
+        <span class="intent-label">Intervención</span> · El trampón a evitar
+      </div>
+      <div class="intent-trap" style="font-size:12px;color:var(--text);line-height:1.6;"></div>
+    </div>
+  </div>
+
+  <div class="briefing-wrap">
+    <div class="briefing-label">📋 Situation briefing</div>
+    <div class="briefing-text" id="briefing-text">Loading...</div>
+    <div class="briefing-meta" id="briefing-meta"></div>
+  </div>
+
+  <div class="card" style="background:var(--bg3);border-color:var(--border2);margin-bottom:12px;">
+    <p style="color:var(--text);font-size:13px;line-height:1.7;">
+      "One thing before you go in — what are you assuming about this person right now?"
+    </p>
+  </div>
+  <div class="input-area" style="margin-bottom:12px;">
+    <textarea class="chat-input" id="reflect-assume" placeholder="Whatever comes to mind — one sentence is enough..." rows="2" style="min-height:52px;"></textarea>
+  </div>
+  <button class="btn-primary" onclick="startPracticeFromBriefing()">Enter the conversation →</button>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN 4C: PRACTICE
+══════════════════════════════════════ -->
+<div class="screen" id="s-practice">
+  <div class="back-row">
+    <button class="back-btn" onclick="goWelcome()">← End session</button>
+    <span class="mode-pill mp-practice" id="practice-level-pill">Practice · Novice</span>
+  </div>
+
+  <div class="chat-header">
+    <div class="chat-av" id="practice-av" style="background:linear-gradient(135deg,#ff6b6b,#f5a623);">😤</div>
+    <div class="chat-info">
+      <div class="chat-name" id="practice-avatar-name">Carlos Mendoza</div>
+      <div class="chat-mode" id="carlos-mode-label">Call Center Agent · 2 years</div>
+    </div>
+    <!-- Voice indicator -->
+    <div id="voice-indicator" style="width:8px;height:8px;border-radius:50%;background:var(--text3);margin-left:auto;flex-shrink:0;transition:background .3s;"></div>
+  </div>
+
+  <div class="mood-row" id="mood-row-wrap">
+    <div class="mood-lbl">Openness</div>
+    <div class="mood-track"><div class="mood-fill" id="mood-fill" style="width:30%;background:#ff6b6b;"></div></div>
+    <div class="mood-pct" id="mood-pct">30%</div>
+  </div>
+
+  <div class="box-meter" id="box-meter-wrap">
+    <div class="box-label" id="box-label">How you're showing up in this conversation</div>
+    <div class="box-indicator" id="box-indicator">— —</div>
+  </div>
+
+  <div style="margin:10px 0;"></div>
+  <div class="msgs" id="practice-msgs"></div>
+
+  <!-- VR: large voice button, no keyboard needed -->
+  <div class="input-area">
+    <button class="voice-btn" id="practice-voice" onclick="toggleVoice('practice')" title="Tap to speak">🎤</button>
+    <textarea class="chat-input" id="practice-input" placeholder="Respond as yourself..." rows="1" onkeydown="handleKey(event,'practice')"></textarea>
+    <button class="send-btn" id="practice-send" onclick="sendPractice()">Send</button>
+  </div>
+  <div class="chat-actions" id="practice-actions">
+    <button class="act-btn" id="hint-btn" onclick="practiceHint()">💡 Hint <span class="hint-cost" id="hint-cost-label"></span></button>
+    <button class="act-btn" onclick="goEval()">📊 End &amp; reflect</button>
+  </div>
+
+  <!-- Listen indicator for VR mode -->
+  <div id="listen-indicator" style="display:none;text-align:center;padding:8px;font-size:11px;color:var(--teal);">
+    🎤 Listening...
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN 5: EVALUATION
+══════════════════════════════════════ -->
+<div class="screen" id="s-eval">
+  <div class="eval-header">
+    <h2>Session reflection</h2>
+    <p>Not a score — a conversation about what happened</p>
+  </div>
+  <div class="progress-row">
+    <div class="prog-dot done"></div>
+    <div class="prog-dot done"></div>
+    <div class="prog-dot done"></div>
+    <div class="prog-dot active"></div>
+  </div>
+  <div id="eval-content">
+    <div class="insight-card ic-teal">
+      <div class="ic-label">Analyzing...</div>
+      <div>Reading the conversation...</div>
+    </div>
+  </div>
+  <div style="margin-top:16px;display:grid;gap:8px;">
+    <button class="btn-primary" style="margin-top:0;" onclick="goWelcome()">← New session</button>
+    <button class="btn-ghost" onclick="goPractice()" style="width:100%;">↺ Practice again</button>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<div class="gloss-popup" id="gloss-popup">
+  <div class="gloss-title" id="gloss-title"></div>
+  <div id="gloss-body"></div>
+</div>
+
+<!-- JS load order matters -->
+<script src="js/interventions.js"></script>
+<script src="js/archetypes.js"></script>
+<script src="js/techniques.js"></script>
+<script src="js/prompts.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
