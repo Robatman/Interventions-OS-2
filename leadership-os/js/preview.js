@@ -39,7 +39,6 @@ function axImg(character, mood, size = 90) {
 
 const TECHNIQUE_PREVIEWS = {
 
-  // ── 1. Active Listening ────────────────
   active_listening: {
     title: 'Active Listening',
     tagline: "It's not about hearing — it's about making them feel heard.",
@@ -75,7 +74,6 @@ const TECHNIQUE_PREVIEWS = {
     ]
   },
 
-  // ── 2. Powerful Questions ─────────────
   powerful_questions: {
     title: 'Powerful Questions',
     tagline: "The right question opens what the right answer never could.",
@@ -111,7 +109,6 @@ const TECHNIQUE_PREVIEWS = {
     ]
   },
 
-  // ── 3. Motivational Interviewing ──────
   motivational_interviewing: {
     title: 'Motivational Interviewing',
     tagline: "Their reasons for change are more powerful than yours.",
@@ -146,7 +143,6 @@ const TECHNIQUE_PREVIEWS = {
     ]
   },
 
-  // ── 4. Nonviolent Communication ───────
   nonviolent_communication: {
     title: 'Nonviolent Communication',
     tagline: "Feelings and needs — not accusations and demands.",
@@ -174,14 +170,13 @@ const TECHNIQUE_PREVIEWS = {
       insight: "Observation + feeling + need + request. No blame. Real resolution."
     },
     moves: [
-      { icon: '👁', label: 'Observe, Don\'t Evaluate', desc: 'Say what happened — no judgment, no interpretation' },
-      { icon: '💙', label: 'Name Your Feeling',         desc: 'An actual emotion — not a thought disguised as one' },
-      { icon: '🌱', label: 'State Your Need',           desc: 'The underlying need — not the specific action you want' },
-      { icon: '🙏', label: 'Make a Request',            desc: 'Specific, doable — and leave room for them to say no' }
+      { icon: '👁', label: "Observe, Don't Evaluate", desc: 'Say what happened — no judgment, no interpretation' },
+      { icon: '💙', label: 'Name Your Feeling',        desc: 'An actual emotion — not a thought disguised as one' },
+      { icon: '🌱', label: 'State Your Need',          desc: 'The underlying need — not the specific action you want' },
+      { icon: '🙏', label: 'Make a Request',           desc: 'Specific, doable — and leave room for them to say no' }
     ]
   },
 
-  // ── 5. Radical Candor ─────────────────
   radical_candor: {
     title: 'Radical Candor',
     tagline: "Care personally. Challenge directly. Both — at the same time.",
@@ -216,7 +211,6 @@ const TECHNIQUE_PREVIEWS = {
     ]
   },
 
-  // ── 6. Crucial Conversations ──────────
   crucial_conversations: {
     title: 'Crucial Conversations',
     tagline: "High stakes, strong emotions — stay in dialogue.",
@@ -244,14 +238,13 @@ const TECHNIQUE_PREVIEWS = {
       insight: "Safety first. Mutual purpose second. Then the truth can actually land."
     },
     moves: [
-      { icon: '❤️', label: 'Start With Heart',    desc: 'Know what you really want before you open your mouth' },
-      { icon: '🛡️', label: 'Restore Safety',      desc: 'When they go quiet or attack — step out of content, fix the container' },
-      { icon: '🗺️', label: 'STATE Your Path',     desc: 'Share facts, tell your story tentatively, ask for theirs' },
-      { icon: '🤝', label: 'Mutual Purpose',       desc: 'Find the goal you both share — that\'s the foundation' }
+      { icon: '❤️', label: 'Start With Heart',  desc: 'Know what you really want before you open your mouth' },
+      { icon: '🛡️', label: 'Restore Safety',    desc: 'When they go quiet or attack — step out of content, fix the container' },
+      { icon: '🗺️', label: 'STATE Your Path',   desc: 'Share facts, tell your story tentatively, ask for theirs' },
+      { icon: '🤝', label: 'Mutual Purpose',     desc: "Find the goal you both share — that's the foundation" }
     ]
   },
 
-  // ── 7. Tactical Empathy ───────────────
   tactical_empathy: {
     title: 'Tactical Empathy',
     tagline: "Name what they feel — and watch the walls come down.",
@@ -271,23 +264,22 @@ const TECHNIQUE_PREVIEWS = {
       label: "Tactical Empathy",
       context: "Same situation. Label first.",
       exchanges: [
-        { speaker: 'A', mood: 'neutral',  text: "It seems like you're feeling like none of this actually changes anything." },
-        { speaker: 'B', mood: 'surprised',text: "...Yeah. Kind of. I've seen people raise issues and nothing happens." },
-        { speaker: 'A', mood: 'open',     text: "That sounds exhausting — putting in the effort when it feels invisible." },
-        { speaker: 'B', mood: 'thinking', text: "It is. I used to care a lot more about this stuff." },
-        { speaker: 'A', mood: 'talking',  text: "What would need to change for you to want to care again?" }
+        { speaker: 'A', mood: 'neutral',   text: "It seems like you're feeling like none of this actually changes anything." },
+        { speaker: 'B', mood: 'surprised', text: "...Yeah. Kind of. I've seen people raise issues and nothing happens." },
+        { speaker: 'A', mood: 'open',      text: "That sounds exhausting — putting in the effort when it feels invisible." },
+        { speaker: 'B', mood: 'thinking',  text: "It is. I used to care a lot more about this stuff." },
+        { speaker: 'A', mood: 'talking',   text: "What would need to change for you to want to care again?" }
       ],
       insight: "Label the emotion first. They stopped defending. Now there's something real to work with."
     },
     moves: [
-      { icon: '🏷️', label: 'Label the Emotion',      desc: '"It seems like..." — name what you see, then let them confirm' },
-      { icon: '🪞', label: 'Mirror',                   desc: 'Repeat their last 2-3 words with a slight rise — let them keep going' },
-      { icon: '🛡️', label: 'Accusation Audit',        desc: 'Name the negatives they might be thinking — before they do' },
-      { icon: '❓', label: 'Calibrated Questions',     desc: '"What would need to change?" — not yes/no traps' }
+      { icon: '🏷️', label: 'Label the Emotion',    desc: '"It seems like..." — name what you see, then let them confirm' },
+      { icon: '🪞',  label: 'Mirror',                desc: 'Repeat their last 2-3 words with a slight rise — let them keep going' },
+      { icon: '🛡️', label: 'Accusation Audit',      desc: 'Name the negatives they might be thinking — before they do' },
+      { icon: '❓',  label: 'Calibrated Questions',  desc: '"What would need to change?" — not yes/no traps' }
     ]
   },
 
-  // ── 8. SCARF Model ────────────────────
   scarf_model: {
     title: 'SCARF Model',
     tagline: "Five triggers. One calm brain. Better conversations.",
@@ -316,14 +308,13 @@ const TECHNIQUE_PREVIEWS = {
       insight: "Status protected. Certainty given. Autonomy preserved. Brain stays open."
     },
     moves: [
-      { icon: '👑', label: 'Protect Status',    desc: 'Acknowledge their contribution before naming the problem' },
-      { icon: '🔦', label: 'Give Certainty',    desc: 'Ambiguity triggers threat — give as much clarity as you can' },
-      { icon: '🎮', label: 'Grant Autonomy',    desc: 'Give choices, not orders — even when the outcome is the same' },
-      { icon: '🤝', label: 'Signal Belonging',  desc: 'Make it clear you\'re on the same side — not auditing them' }
+      { icon: '👑', label: 'Protect Status',   desc: 'Acknowledge their contribution before naming the problem' },
+      { icon: '🔦', label: 'Give Certainty',   desc: 'Ambiguity triggers threat — give as much clarity as you can' },
+      { icon: '🎮', label: 'Grant Autonomy',   desc: 'Give choices, not orders — even when the outcome is the same' },
+      { icon: '🤝', label: 'Signal Belonging', desc: "Make it clear you're on the same side — not auditing them" }
     ]
   },
 
-  // ── 9. Immunity to Change ─────────────
   immunity_to_change: {
     title: 'Immunity to Change',
     tagline: "They're not resistant. They're immune. There's a difference.",
@@ -343,23 +334,22 @@ const TECHNIQUE_PREVIEWS = {
       label: "Immunity to Change",
       context: "Looking for what's underneath.",
       exchanges: [
-        { speaker: 'A', mood: 'neutral',  text: "What do you worry would happen if you actually did speak up?" },
-        { speaker: 'B', mood: 'thinking', text: "Honestly? That people would think I'm showing off. Or wrong." },
-        { speaker: 'A', mood: 'open',     text: "So part of you is committed to not looking bad in front of the group." },
-        { speaker: 'B', mood: 'surprised',text: "...I never thought of it that way. But yes." },
-        { speaker: 'A', mood: 'talking',  text: "That's not a weakness — it's a protection. What would it take to test that assumption, just once?" }
+        { speaker: 'A', mood: 'neutral',   text: "What do you worry would happen if you actually did speak up?" },
+        { speaker: 'B', mood: 'thinking',  text: "Honestly? That people would think I'm showing off. Or wrong." },
+        { speaker: 'A', mood: 'open',      text: "So part of you is committed to not looking bad in front of the group." },
+        { speaker: 'B', mood: 'surprised', text: "...I never thought of it that way. But yes." },
+        { speaker: 'A', mood: 'talking',   text: "That's not a weakness — it's a protection. What would it take to test that assumption, just once?" }
       ],
       insight: "The hidden commitment revealed itself. Now change is possible."
     },
     moves: [
-      { icon: '🎯', label: 'Name the Goal',             desc: 'What do they keep saying they\'ll do — but don\'t?' },
+      { icon: '🎯', label: 'Name the Goal',             desc: "What do they keep saying they'll do — but don't?" },
       { icon: '🔍', label: 'Find What They Do Instead', desc: 'Competing behaviors are clues, not failures' },
-      { icon: '🔒', label: 'Uncover Hidden Commitment', desc: 'What\'s the real thing they\'re protecting?' },
-      { icon: '🧪', label: 'Test the Big Assumption',   desc: 'Run a small experiment — don\'t just believe the story' }
+      { icon: '🔒', label: 'Uncover Hidden Commitment', desc: "What's the real thing they're protecting?" },
+      { icon: '🧪', label: 'Test the Big Assumption',   desc: "Run a small experiment — don't just believe the story" }
     ]
   },
 
-  // ── 10. Drama Triangle ────────────────
   drama_triangle: {
     title: 'Drama Triangle',
     tagline: "Victim. Rescuer. Persecutor. Don't play any of them.",
@@ -387,14 +377,13 @@ const TECHNIQUE_PREVIEWS = {
       insight: "No rescue. No verdict. The manager handed agency back. That's the real help."
     },
     moves: [
-      { icon: '🎭', label: 'Spot the Role',        desc: 'Notice which role you\'re being pulled into — before you play it' },
-      { icon: '⏸️', label: 'Pause the Pattern',    desc: '"What are you looking for from me?" — breaks the script' },
-      { icon: '🌟', label: 'Move to Creator',      desc: 'Shift from "what\'s wrong" to "what do you want"' },
-      { icon: '💪', label: 'Challenge Forward',    desc: 'Hold them to their stated want — believe in their capability' }
+      { icon: '🎭', label: 'Spot the Role',      desc: "Notice which role you're being pulled into — before you play it" },
+      { icon: '⏸️', label: 'Pause the Pattern',  desc: '"What are you looking for from me?" — breaks the script' },
+      { icon: '🌟', label: 'Move to Creator',    desc: 'Shift from "what\'s wrong" to "what do you want"' },
+      { icon: '💪', label: 'Challenge Forward',  desc: "Hold them to their stated want — believe in their capability" }
     ]
   },
 
-  // ── 11. GROW Model ────────────────────
   grow_model: {
     title: 'GROW Model',
     tagline: "Goal. Reality. Options. Will. In that order.",
@@ -424,13 +413,12 @@ const TECHNIQUE_PREVIEWS = {
     },
     moves: [
       { icon: '🎯', label: 'Goal',    desc: 'What do they want from this conversation — specifically?' },
-      { icon: '🗺️', label: 'Reality', desc: 'What\'s actually happening? What have they tried?' },
-      { icon: '💡', label: 'Options', desc: 'What could they do? Generate — don\'t prescribe' },
+      { icon: '🗺️', label: 'Reality', desc: "What's actually happening? What have they tried?" },
+      { icon: '💡', label: 'Options', desc: "What could they do? Generate — don't prescribe" },
       { icon: '🤝', label: 'Will',    desc: 'What will they actually do? By when? Commitment level?' }
     ]
   },
 
-  // ── 12. Strengths-Based Coaching ─────
   strengths_based_coaching: {
     title: 'Strengths-Based Coaching',
     tagline: "Build from what's working — not what's broken.",
@@ -458,14 +446,13 @@ const TECHNIQUE_PREVIEWS = {
       insight: "They found their own strategy — using a strength they already had. That's the lever."
     },
     moves: [
-      { icon: '🔦', label: 'Spot the Strength',      desc: 'What do they do naturally — especially what they take for granted?' },
-      { icon: '🪞', label: 'Name It Back',            desc: 'People don\'t see their own gifts — help them see it clearly' },
-      { icon: '🔗', label: 'Link to the Challenge',  desc: 'Connect their strength directly to the problem they\'re facing' },
-      { icon: '📈', label: 'Develop the Strength',   desc: 'Don\'t just recognize it — help them invest in it intentionally' }
+      { icon: '🔦', label: 'Spot the Strength',     desc: 'What do they do naturally — especially what they take for granted?' },
+      { icon: '🪞', label: 'Name It Back',           desc: "People don't see their own gifts — help them see it clearly" },
+      { icon: '🔗', label: 'Link to the Challenge', desc: 'Connect their strength directly to the problem they\'re facing' },
+      { icon: '📈', label: 'Develop the Strength',  desc: "Don't just recognize it — help them invest in it intentionally" }
     ]
   },
 
-  // ── 13. Growth Mindset ────────────────
   growth_mindset: {
     title: 'Growth Mindset',
     tagline: "Ability is not fixed. It's built — one attempt at a time.",
@@ -494,14 +481,13 @@ const TECHNIQUE_PREVIEWS = {
       insight: "From verdict to trajectory. Same person — different frame."
     },
     moves: [
-      { icon: '👂', label: 'Catch Fixed Language',  desc: '"I\'m not good at this" — is that permanent or just current?' },
-      { icon: '⏳', label: 'Add "Yet"',              desc: 'The simplest reframe. Not "can\'t" — "can\'t yet"' },
-      { icon: '⚙️', label: 'Praise the Process',    desc: 'Recognize effort and strategy — not talent or outcome' },
-      { icon: '📊', label: 'Reframe Failure',       desc: 'Setbacks are data. Ask what they learned — not what went wrong' }
+      { icon: '👂', label: 'Catch Fixed Language', desc: '"I\'m not good at this" — is that permanent or just current?' },
+      { icon: '⏳', label: 'Add "Yet"',             desc: 'The simplest reframe. Not "can\'t" — "can\'t yet"' },
+      { icon: '⚙️', label: 'Praise the Process',   desc: 'Recognize effort and strategy — not talent or outcome' },
+      { icon: '📊', label: 'Reframe Failure',      desc: 'Setbacks are data. Ask what they learned — not what went wrong' }
     ]
   },
 
-  // ── 14. Solution-Focused Coaching ─────
   solution_focused_coaching: {
     title: 'Solution-Focused Coaching',
     tagline: "What's already working? Start there.",
@@ -531,10 +517,10 @@ const TECHNIQUE_PREVIEWS = {
       insight: "The solution was hidden in the exception. They already knew how — they just didn't see it."
     },
     moves: [
-      { icon: '🔭', label: 'Define the Future',   desc: '"If this was resolved, what would be different?" — pull toward the goal' },
-      { icon: '🔍', label: 'Find Exceptions',     desc: '"When does the problem NOT happen?" — that\'s the blueprint' },
-      { icon: '📏', label: 'Scale Progress',      desc: '"Where are you 1-10? What would move it one step higher?"' },
-      { icon: '👣', label: 'Smallest Next Step',  desc: 'Tiny, specific, doable — momentum beats perfection' }
+      { icon: '🔭', label: 'Define the Future',  desc: '"If this was resolved, what would be different?" — pull toward the goal' },
+      { icon: '🔍', label: 'Find Exceptions',    desc: '"When does the problem NOT happen?" — that\'s the blueprint' },
+      { icon: '📏', label: 'Scale Progress',     desc: '"Where are you 1-10? What would move it one step higher?"' },
+      { icon: '👣', label: 'Smallest Next Step', desc: 'Tiny, specific, doable — momentum beats perfection' }
     ]
   }
 
@@ -649,7 +635,6 @@ function showExchange(exchanges) {
 function nextExchange() {
   if (!previewData) return;
 
-  // On moves or join step — go to next step directly
   if (previewStep >= 2) {
     previewStep++;
     if (previewStep > 3) previewStep = 3;
@@ -659,14 +644,12 @@ function nextExchange() {
 
   const exchanges = previewStep === 0 ? previewData.bad.exchanges : previewData.good.exchanges;
 
-  // Still have exchanges to show
   if (previewExIdx < exchanges.length) {
     previewExIdx++;
     showExchange(exchanges);
     return;
   }
 
-  // Exchanges done — move to next step
   previewStep++;
   previewExIdx = 0;
   renderPreviewStep();
@@ -741,22 +724,16 @@ function showHistory() {
   renderHistory();
 }
 
-function renderHistory() {
+async function renderHistory() {
   const el = document.getElementById('history-content');
   if (!el) return;
 
-  const sessions = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith('ldr_session_')) {
-      try {
-        const s = JSON.parse(localStorage.getItem(key));
-        if (s) sessions.push(s);
-      } catch(e) {}
-    }
-  }
+  el.innerHTML = `
+    <div style="text-align:center;padding:32px;color:var(--text3);font-size:13px;">
+      Loading sessions...
+    </div>`;
 
-  sessions.sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
+  const sessions = await getSessions(50);
 
   if (sessions.length === 0) {
     el.innerHTML = `
@@ -769,8 +746,8 @@ function renderHistory() {
   }
 
   const totalSessions = sessions.length;
-  const avgMood    = Math.round(sessions.reduce((s, x) => s + (x.moodFinal || 0), 0) / totalSessions);
-  const outOfBox   = sessions.filter(s => s.boxFinal === 'out').length;
+  const avgMood       = Math.round(sessions.reduce((s, x) => s + (x.mood_final || 0), 0) / totalSessions);
+  const outOfBox      = sessions.filter(s => s.box_final === 'out').length;
   const techniques    = [...new Set(sessions.map(s => s.technique).filter(Boolean))];
   const interventions = [...new Set(sessions.map(s => s.intervention).filter(Boolean))];
 
@@ -783,13 +760,13 @@ function renderHistory() {
     </div>
     <div style="margin:16px 0 8px;"><span class="label-sm">Recent sessions</span></div>
     ${sessions.slice(0, 10).map(s => {
-      const date    = s.completedAt ? new Date(s.completedAt).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : '—';
-      const context = s.intervention
+      const date      = s.completed_at ? new Date(s.completed_at).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : '—';
+      const context   = s.intervention
         ? (INTERVENTIONS[s.intervention]?.label || s.intervention)
-        : (TECHNIQUES[s.technique]?.label || s.technique || '—');
+        : (TECHNIQUES[s.technique]?.label       || s.technique || '—');
       const levelColors = { novice:'var(--teal)', mid:'var(--amber)', adv:'var(--coral)' };
       const levelColor  = levelColors[s.level] || 'var(--text3)';
-      const moodColor   = (s.moodFinal||0) < 35 ? 'var(--coral)' : (s.moodFinal||0) < 60 ? 'var(--amber)' : 'var(--teal)';
+      const moodColor   = (s.mood_final||0) < 35 ? 'var(--coral)' : (s.mood_final||0) < 60 ? 'var(--amber)' : 'var(--teal)';
       const agentName   = s.archetype ? (ARCHETYPES[s.archetype]?.name?.split(' ')[0] || s.archetype) : '—';
       return `
         <div class="history-row">
@@ -801,9 +778,9 @@ function renderHistory() {
               <span style="color:var(--text3);font-size:10px;margin:0 4px;">·</span>
               <span style="font-size:10px;color:var(--text3);">${agentName}</span>
             </div>
-            ${s.evalSummary ? `<div class="history-insight">"${s.evalSummary.substring(0,80)}${s.evalSummary.length>80?'...':''}"</div>` : ''}
+            ${s.eval_summary ? `<div class="history-insight">"${s.eval_summary.substring(0,80)}${s.eval_summary.length>80?'...':''}"</div>` : ''}
           </div>
-          <div class="history-mood" style="color:${moodColor};">${s.moodFinal||0}%</div>
+          <div class="history-mood" style="color:${moodColor};">${s.mood_final||0}%</div>
         </div>`;
     }).join('')}
     ${sessions.length > 10 ? `<div style="text-align:center;font-size:11px;color:var(--text3);margin-top:8px;">+ ${sessions.length - 10} more sessions</div>` : ''}`;
