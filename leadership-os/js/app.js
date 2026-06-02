@@ -404,6 +404,13 @@ async function goEval() {
          </div>`
       : '';
 
+    // Effectiveness color — coral if they avoided, teal if they achieved
+    const effectivenessColor = sections.effectiveness?.toLowerCase().includes('avoided') ||
+      sections.effectiveness?.toLowerCase().includes('conflict avoidance') ||
+      sections.effectiveness?.toLowerCase().includes('did not achieve') ||
+      sections.effectiveness?.toLowerCase().includes("didn't achieve")
+      ? 'var(--coral)' : 'var(--teal)';
+
     document.getElementById('eval-content').innerHTML = `
       ${interventionNote}
       <div class="insight-card ic-teal">
@@ -417,6 +424,13 @@ async function goEval() {
       <div class="insight-card" style="background:var(--purple-dim);border-left-color:var(--purple);">
         <div class="ic-label" style="color:var(--purple);">Assumption check</div>
         <div>${sections.assumption || 'Your pre-briefing assumptions were not clearly tested in this session.'}</div>
+      </div>
+      <div class="insight-card" style="background:${effectivenessColor === 'var(--coral)' ? 'var(--coral-dim)' : 'var(--teal-dim)'};border-left-color:${effectivenessColor};">
+        <div class="ic-label" style="color:${effectivenessColor};">Effectiveness — did you achieve the objective?</div>
+        <div>${sections.effectiveness || 'Not enough conversation data to assess effectiveness.'}</div>
+        <div style="margin-top:8px;font-size:11px;color:var(--text3);border-top:0.5px solid rgba(255,255,255,0.08);padding-top:6px;">
+          High openness ≠ effectiveness. Saying yes to everything keeps mood high but avoids the real conversation.
+        </div>
       </div>
       <div class="insight-card ic-blue">
         <div class="ic-label">One thing to carry forward</div>
@@ -482,15 +496,18 @@ function parseEval(raw) {
   const m1 = raw.match(/1[.)]\s*([\s\S]*?)(?=2[.)]|$)/i);
   const m2 = raw.match(/2[.)]\s*([\s\S]*?)(?=3[.)]|$)/i);
   const m3 = raw.match(/3[.)]\s*([\s\S]*?)(?=4[.)]|$)/i);
-  const m4 = raw.match(/4[.)]\s*([\s\S]*?)(?=MOVE:|TECHNIQUE|$)/i);
-  const landedMatch     = raw.match(/WHAT LANDED:?\s*([\s\S]*?)(?=WHAT TO LOOK|ASSUMPTION|ONE THING|2[.)]|$)/i);
-  const lookMatch       = raw.match(/WHAT TO LOOK.*?:?\s*([\s\S]*?)(?=ASSUMPTION|ONE THING|3[.)]|$)/i);
-  const assumptionMatch = raw.match(/ASSUMPTION CHECK:?\s*([\s\S]*?)(?=ONE THING|4[.)]|$)/i);
-  const carryMatch      = raw.match(/ONE THING.*?:?\s*([\s\S]*?)(?=MOVE:|TECHNIQUE|$)/i);
+  const m4 = raw.match(/4[.)]\s*([\s\S]*?)(?=5[.)]|$)/i);
+  const m5 = raw.match(/5[.)]\s*([\s\S]*?)(?=MOVE:|TECHNIQUE|$)/i);
+  const landedMatch        = raw.match(/WHAT LANDED:?\s*([\s\S]*?)(?=WHAT TO LOOK|ASSUMPTION|EFFECTIVENESS|ONE THING|2[.)]|$)/i);
+  const lookMatch          = raw.match(/WHAT TO LOOK.*?:?\s*([\s\S]*?)(?=ASSUMPTION|EFFECTIVENESS|ONE THING|3[.)]|$)/i);
+  const assumptionMatch    = raw.match(/ASSUMPTION CHECK:?\s*([\s\S]*?)(?=EFFECTIVENESS|ONE THING|4[.)]|$)/i);
+  const effectivenessMatch = raw.match(/EFFECTIVENESS:?\s*([\s\S]*?)(?=ONE THING|5[.)]|MOVE:|TECHNIQUE|$)/i);
+  const carryMatch         = raw.match(/ONE THING.*?:?\s*([\s\S]*?)(?=MOVE:|TECHNIQUE|$)/i);
   return {
-    landed:     (m1?.[1] || landedMatch?.[1] || '').replace(/^WHAT LANDED:?\s*/i,'').trim(),
-    look:       (m2?.[1] || lookMatch?.[1]   || '').replace(/^WHAT TO LOOK.*?:?\s*/i,'').trim(),
-    assumption: (m3?.[1] || assumptionMatch?.[1] || '').replace(/^ASSUMPTION CHECK:?\s*/i,'').trim(),
-    carry:      (m4?.[1] || carryMatch?.[1]  || '').replace(/^ONE THING.*?:?\s*/i,'').trim()
+    landed:        (m1?.[1] || landedMatch?.[1]        || '').replace(/^WHAT LANDED:?\s*/i,'').trim(),
+    look:          (m2?.[1] || lookMatch?.[1]           || '').replace(/^WHAT TO LOOK.*?:?\s*/i,'').trim(),
+    assumption:    (m3?.[1] || assumptionMatch?.[1]     || '').replace(/^ASSUMPTION CHECK:?\s*/i,'').trim(),
+    effectiveness: (m4?.[1] || effectivenessMatch?.[1]  || '').replace(/^EFFECTIVENESS:?\s*/i,'').trim(),
+    carry:         (m5?.[1] || carryMatch?.[1]          || '').replace(/^ONE THING.*?:?\s*/i,'').trim()
   };
 }
