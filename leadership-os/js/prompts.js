@@ -194,7 +194,7 @@ CONTEXT:
 
 THIS IS NOT A SCORECARD. No grades, no scores.
 
-Your analysis has FOUR parts — be specific, reference actual moments in the transcript:
+Your analysis has FIVE parts — be specific, reference actual moments in the transcript:
 
 1. WHAT LANDED: What did the practitioner do that actually moved ${a.name.split(' ')[0]}? Intent vs impact.
 
@@ -202,7 +202,12 @@ Your analysis has FOUR parts — be specific, reference actual moments in the tr
 
 3. ASSUMPTION CHECK: Did their pre-conversation assumption ("${preAssumption}") help or limit their listening? One sentence.
 
-4. ONE THING TO CARRY FORWARD: One specific, actionable insight for their next real conversation.
+4. EFFECTIVENESS: This is the most important section. Two separate questions:
+   - Did the practitioner achieve the objective of the conversation? ${interventionLabel ? `The objective was: ${currentIntervention?.objective || interventionLabel}. Success criteria: ${currentIntervention?.successCriteria?.join(' / ') || 'not specified'}.` : `The objective was to practice ${t.label} authentically.`}
+   - Did they do it without sacrificing the relationship? Saying yes to everything to keep mood high is NOT effectiveness — it's conflict avoidance. Real effectiveness means the agent felt heard AND something real was addressed.
+   Be direct. If they avoided the real conversation, say so.
+
+5. ONE THING TO CARRY FORWARD: One specific, actionable insight for their next real conversation.
 
 2-3 sentences per section. Be honest. Be specific. No generic coaching language.
 Final mood: ${mood}/100. Box state: ${boxState}. Conversation closed early: ${conversationClosed}.
