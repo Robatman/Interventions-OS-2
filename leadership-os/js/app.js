@@ -2,7 +2,8 @@
 //  app.js
 //  Core logic — Interventions OS v5
 //  Depends on: interventions.js, archetypes.js,
-//              techniques.js, prompts.js, api.js, ui.js
+//              techniques.js, prompts.js, api.js, ui.js,
+//              supabase.js
 // ═══════════════════════════════════════════
 
 // ─── GLOBAL STATE ─────────────────────────
@@ -102,7 +103,6 @@ async function startQuiz() {
     addMsg('learn-msgs', 'coach', reply);
     learnHistory.push({ role: 'assistant', content: reply });
     speakWithGroq(reply, 'coach');
-    // Show pivot
     setTimeout(() => {
       document.getElementById('learn-pivot')?.classList.add('show');
     }, 800);
@@ -178,7 +178,6 @@ async function workEnd() {
 function goBriefing() {
   if (!currentLevel) return;
 
-  // Get scenarios from intervention or technique mode
   let pool;
   if (activeMenu === 'interventions' && currentIntervention) {
     pool = getInterventionScenarios(currentLevel);
@@ -192,24 +191,21 @@ function goBriefing() {
   }
 
   currentScenario = pool[Math.floor(Math.random() * pool.length)];
-  currentBriefing = currentScenario; // backward compat
+  currentBriefing = currentScenario;
 
-  // Set archetype based on scenario
   if (currentScenario.agentName && ARCHETYPES[currentScenario.agentName]) {
     currentArchetype = ARCHETYPES[currentScenario.agentName];
   }
 
-  // Populate briefing screen
   document.getElementById('briefing-text').textContent = currentScenario.text;
   const meta = document.getElementById('briefing-meta');
   meta.innerHTML = currentScenario.tags.map(t => `<span class="briefing-tag">${t}</span>`).join('');
 
-  // Show intervention context if applicable
   const intentEl = document.getElementById('briefing-intent');
   if (intentEl && activeMenu === 'interventions' && currentIntervention) {
     intentEl.style.display = 'block';
     intentEl.querySelector('.intent-label').textContent = currentIntervention.label;
-    intentEl.querySelector('.intent-trap').textContent = currentIntervention.trap;
+    intentEl.querySelector('.intent-trap').textContent  = currentIntervention.trap;
   } else if (intentEl) {
     intentEl.style.display = 'none';
   }
@@ -219,15 +215,14 @@ function goBriefing() {
 }
 
 function startPracticeFromBriefing() {
-  // Full reset
   const msgsEl = document.getElementById('practice-msgs');
   if (msgsEl) msgsEl.innerHTML = '';
   stopSpeaking();
   const assumption = document.getElementById('reflect-assume').value.trim();
   preReflection = { assume: assumption || '(not answered)' };
 
-  practiceHistory = [];
-  hingeDoorsOpened = [];
+  practiceHistory    = [];
+  hingeDoorsOpened   = [];
   conversationClosed = false;
   mood = currentScenario.startMood ?? 40;
 
@@ -250,8 +245,6 @@ async function initPractice() {
   addMsg('practice-msgs', 'agent', opener);
   practiceHistory.push({ role: 'assistant', content: opener });
   updateBox('neutral');
-
-  // Speak with archetype voice
   await speakWithGroq(opener, currentArchetype.id);
 }
 
@@ -271,7 +264,6 @@ async function sendPractice() {
   setLoading('practice-send', true);
   showTyping('practice-msgs');
 
-  // Build prompt with full context
   const scenarioContext = currentScenario
     ? `\n\nSITUATION: ${currentScenario.text}\nYour visible state: ${currentScenario.agentState}\nYour hidden inner state (never say this directly, but let it color your responses): ${currentScenario.agentHiddenState}`
     : '';
@@ -289,7 +281,6 @@ async function sendPractice() {
     practiceHistory.push({ role: 'assistant', content: raw });
     addMsg('practice-msgs', 'agent', msg);
 
-    // Hinge moment detection
     const hingePhrases = currentArchetype.hingePhrases || [];
     const newHinge = hingePhrases.find(p => msg.toLowerCase().includes(p) && !hingeDoorsOpened.includes(p));
     if (newHinge) {
@@ -301,7 +292,6 @@ async function sendPractice() {
       }
     }
 
-    // Random trigger (mid only)
     if (currentLevel === 'mid' && trigger && trigger !== 'none') {
       const triggerMsg = trigger === 'positive'
         ? `Something you said unexpectedly landed well.`
@@ -309,7 +299,6 @@ async function sendPractice() {
       setTimeout(() => addMsg('practice-msgs', 'system', triggerMsg), 800);
     }
 
-    // Fieldwork: conversation can close
     if (currentLevel === 'adv' && closed) {
       conversationClosed = true;
       const name = currentArchetype.name.split(' ')[0];
@@ -320,8 +309,6 @@ async function sendPractice() {
 
     updateMood(newMood);
     if (currentLevel !== 'adv') updateBox(box);
-
-    // Speak with archetype voice
     await speakWithGroq(msg, currentArchetype.id);
 
   } catch (e) {
@@ -336,10 +323,10 @@ function parsePractice(raw) {
   const boxMatch     = raw.match(/\[BOX:(in|out)\]/);
   const closedMatch  = raw.match(/\[CLOSED:(true|false)\]/);
   const triggerMatch = raw.match(/\[TRIGGER:(none|positive|negative)\]/);
-  const newMood  = moodMatch    ? parseInt(moodMatch[1])  : mood;
-  const box      = boxMatch     ? boxMatch[1]             : 'neutral';
+  const newMood  = moodMatch    ? parseInt(moodMatch[1])    : mood;
+  const box      = boxMatch     ? boxMatch[1]               : 'neutral';
   const closed   = closedMatch  ? closedMatch[1] === 'true' : false;
-  const trigger  = triggerMatch ? triggerMatch[1]         : 'none';
+  const trigger  = triggerMatch ? triggerMatch[1]           : 'none';
   const msg = raw
     .replace(/\[MOOD:\d+\]/g, '')
     .replace(/\[BOX:(in|out)\]/g, '')
@@ -394,7 +381,7 @@ async function goEval() {
       [{ role: 'user', content: `Transcript:\n${transcript}\n\nAnalyze this session.` }],
       evalPrompt, 0.4
     );
-    const sections = parseEval(raw);
+    const sections  = parseEval(raw);
     const recapHTML = buildRecapHTML(raw);
 
     const interventionNote = interventionLabel
@@ -404,7 +391,6 @@ async function goEval() {
          </div>`
       : '';
 
-    // Effectiveness color — coral if they avoided, teal if they achieved
     const effectivenessColor = sections.effectiveness?.toLowerCase().includes('avoided') ||
       sections.effectiveness?.toLowerCase().includes('conflict avoidance') ||
       sections.effectiveness?.toLowerCase().includes('did not achieve') ||
@@ -450,15 +436,17 @@ async function goEval() {
         <div class="recap-points" id="recap-points">${recapHTML}</div>
       </div>`;
 
+    // ── SAVE SESSION ──────────────────────
+    // Persiste en Supabase + mantiene localStorage como fallback local.
     saveSessionProgress({
       intervention: currentIntervention?.id || null,
-      archetype: currentArchetype.id,
-      technique: currentTechnique.id,
-      level: currentLevel,
-      moodFinal: mood,
-      boxFinal: boxState,
-      evalSummary: sections.carry,
-      completedAt: Date.now()
+      archetype:    currentArchetype.id,
+      technique:    currentTechnique.id,
+      level:        currentLevel,
+      moodFinal:    mood,
+      boxFinal:     boxState,
+      evalSummary:  sections.carry,
+      completedAt:  Date.now()
     });
 
   } catch (e) {
@@ -478,7 +466,7 @@ async function goEval() {
 function buildRecapHTML(raw) {
   return currentTechnique.evalMoves.map(move => {
     const pattern = new RegExp(`MOVE:\\s*${move.key}[\\s\\S]*?WHAT IT IS:\\s*([^\\n]+)[\\s\\S]*?IN YOUR CONVERSATION:\\s*([^\\n]+)[\\s\\S]*?EXAMPLE:\\s*([^\\n]+)`, 'i');
-    const match = raw.match(pattern);
+    const match   = raw.match(pattern);
     const whatItIs = match ? match[1].trim() : move.defaultDef;
     const inConvo  = match ? match[2].trim() : 'Not enough data from this session.';
     const example  = match ? match[3].trim() : move.defaultExample;
@@ -510,4 +498,21 @@ function parseEval(raw) {
     effectiveness: (m4?.[1] || effectivenessMatch?.[1]  || '').replace(/^EFFECTIVENESS:?\s*/i,'').trim(),
     carry:         (m5?.[1] || carryMatch?.[1]          || '').replace(/^ONE THING.*?:?\s*/i,'').trim()
   };
+}
+
+// ─── SESSION PERSISTENCE ──────────────────
+// Guarda en localStorage (fallback) Y en Supabase.
+
+function saveSessionProgress(data) {
+  // localStorage — mantiene compatibilidad con historial local existente
+  const key = `ldr_session_${Date.now()}`;
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    console.warn('localStorage saveSession failed:', e);
+  }
+
+  // Supabase — persistencia real entre dispositivos
+  // saveSession está definida en supabase.js
+  saveSession(data);
 }
