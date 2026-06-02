@@ -91,7 +91,7 @@ const ARCHETYPES = {
     gradient: 'linear-gradient(135deg,#8b7cf8,#4a9eff)',
     trait: 'Withdrawn',
     traitDesc: 'High performer going quiet. Hard to read.',
-    available: false, // Unlocks in v4.1
+    available: true,
 
     backstory: `4 years at the company. Top performer two years running. Lately she's been doing the minimum — still hitting metrics but not the Valeria everyone knows. She has a toddler and just moved apartments. She's the kind of person who says "I'm fine" and means the opposite.`,
 
@@ -144,7 +144,7 @@ const ARCHETYPES = {
     gradient: 'linear-gradient(135deg,#1ec99a,#4a9eff)',
     trait: 'Anxious',
     traitDesc: 'Eager to please. Afraid to fail. Hard to get real answers from.',
-    available: false,
+    available: true,
 
     backstory: `4 months in. His first real job. He's trying hard — maybe too hard. He's visibly nervous when called into conversations. He has a tendency to agree with everything and then not follow through, not out of dishonesty but because he doesn't want to disappoint. He has student loans and lives alone.`,
 
@@ -197,7 +197,7 @@ const ARCHETYPES = {
     gradient: 'linear-gradient(135deg,#f5a623,#ff6b6b)',
     trait: 'Burned out',
     traitDesc: 'High experience, low trust. Has been let down before.',
-    available: false,
+    available: true,
 
     backstory: `6 years in. She's done everything right — mentored new hires, covered extra shifts, never complained. She's been overlooked for senior leadership twice. She's started to question whether the company deserves her loyalty. She is sharp, articulate, and not easily fooled.`,
 
