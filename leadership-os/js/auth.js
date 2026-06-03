@@ -23,7 +23,7 @@ function validateGameId(gameId) {
   if (!gameId || typeof gameId !== 'string') return false;
   const upper = gameId.toUpperCase().trim();
   // Regex: 1 role letter + 1 name initial + dot + 2+ uppercase letters
-  const pattern = /^[ARCQTM][A-Z]\.[A-Z]{2,}$/;
+  const pattern = /^[ARCQTMH][A-Z]\.[A-Z]{2,}$/;
   return pattern.test(upper);
 }
 
