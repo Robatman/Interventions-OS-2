@@ -4,346 +4,166 @@
 <meta charset="UTF-8">
 <title>Centris · Neural Academy</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- A-Frame 1.5 — WebXR nativo, funciona en Meta Quest Browser -->
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
-<style>
-  body { margin: 0; background: #000; }
-
-  /* UI overlay — visible antes de entrar en VR */
-  #ui-overlay {
-    position: fixed; inset: 0; z-index: 999;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    background: radial-gradient(ellipse at center, #070d1f 0%, #000 100%);
-    font-family: Arial, sans-serif;
-    transition: opacity .8s ease;
-  }
-  #ui-overlay.hidden { opacity: 0; pointer-events: none; }
-
-  .enter-btn {
-    background: linear-gradient(135deg, #1a3aff, #7c3aff);
-    color: white; border: none; border-radius: 50px;
-    padding: 18px 56px; font-size: 17px; font-weight: 700;
-    letter-spacing: .08em; cursor: pointer;
-    box-shadow: 0 0 40px rgba(26,58,255,.5);
-    margin-top: 24px;
-  }
-  .status-txt {
-    font-size: 12px; letter-spacing: .15em;
-    color: rgba(255,255,255,.4); text-transform: uppercase;
-    margin-top: 12px;
-  }
-</style>
 </head>
-<body>
+<body style="margin:0;background:#000;">
 
-<!-- ── UI OVERLAY ────────────────────────── -->
-<div id="ui-overlay">
-  <!-- Logo SVG inline animado -->
-  <div style="width:min(300px,80vw);animation:float 3.5s ease-in-out infinite;">
-    <svg viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
-      <style>
-        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-        @keyframes vp{0%,100%{opacity:.1}50%{opacity:.3}}
-        @keyframes vs{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-        @keyframes vb{0%,100%{opacity:.4}50%{opacity:1}}
-        .vr1{animation:vs 14s linear infinite;transform-origin:340px 190px;}
-        .vr2{animation:vs 9s linear infinite reverse;transform-origin:340px 190px;}
-        .vo1{animation:vp 2.5s ease-in-out infinite;}
-        .vo2{animation:vp 2.5s ease-in-out infinite .6s;}
-        .vn1{animation:vb 1.8s ease-in-out infinite;}
-        .vn2{animation:vb 1.8s ease-in-out infinite .6s;}
-        .vn3{animation:vb 1.8s ease-in-out infinite 1.2s;}
-        .vn4{animation:vb 1.8s ease-in-out infinite .3s;}
-        .vn5{animation:vb 1.8s ease-in-out infinite .9s;}
-      </style>
-      <circle cx="140" cy="90" r="90" fill="#1a3aff" class="vo1"/>
-      <circle cx="540" cy="300" r="110" fill="#00c49a" class="vo2"/>
-      <g class="vr1"><circle cx="340" cy="190" r="155" fill="none" stroke="#1a3aff" stroke-width="1.5" stroke-dasharray="10 10" opacity=".25"/></g>
-      <g class="vr2"><circle cx="340" cy="190" r="125" fill="none" stroke="#00c49a" stroke-width="1" stroke-dasharray="5 15" opacity=".2"/></g>
-      <circle cx="340" cy="190" r="88" fill="#070d1f" opacity=".92"/>
-      <circle cx="340" cy="190" r="84" fill="none" stroke="#1a3aff" stroke-width="1.5" opacity=".35"/>
-      <line x1="300" y1="165" x2="340" y2="190" stroke="#1a3aff" stroke-width="1" opacity=".3"/>
-      <line x1="300" y1="215" x2="340" y2="190" stroke="#1a3aff" stroke-width="1" opacity=".3"/>
-      <line x1="340" y1="190" x2="372" y2="165" stroke="#00c49a" stroke-width="1" opacity=".3"/>
-      <line x1="340" y1="190" x2="372" y2="190" stroke="#7c3aff" stroke-width="1" opacity=".3"/>
-      <line x1="340" y1="190" x2="372" y2="215" stroke="#00c49a" stroke-width="1" opacity=".3"/>
-      <circle cx="300" cy="165" r="7" fill="#1a3aff" class="vn1"/>
-      <circle cx="300" cy="215" r="7" fill="#1a3aff" class="vn2"/>
-      <circle cx="340" cy="190" r="11" fill="#fff" opacity=".95"/>
-      <circle cx="340" cy="190" r="7" fill="#1a3aff"/>
-      <circle cx="372" cy="165" r="7" fill="#00c49a" class="vn3"/>
-      <circle cx="372" cy="190" r="7" fill="#7c3aff" class="vn4"/>
-      <circle cx="372" cy="215" r="7" fill="#00c49a" class="vn5"/>
-      <text x="340" y="332" text-anchor="middle" font-family="'Arial Black',Arial,sans-serif" font-weight="900" font-size="36" letter-spacing="10" fill="#0d1855">CENTRIS</text>
-      <rect x="268" y="344" width="144" height="22" rx="11" fill="#1a3aff" opacity=".12"/>
-      <text x="340" y="360" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="11" letter-spacing="4" fill="#1a3aff" opacity=".75">LEADERSHIP OS</text>
-    </svg>
-  </div>
-  <div class="status-txt" id="vr-status">Checking VR support...</div>
-  <button class="enter-btn" id="enter-btn" onclick="enterWorld()">🥽 Enter Neural Academy</button>
-  <div class="status-txt" style="margin-top:8px;font-size:10px;">Requires Meta Quest Browser</div>
-</div>
-
-<!-- ── A-FRAME SCENE ─────────────────────── -->
 <a-scene
-  id="main-scene"
   background="color: #020810"
   renderer="antialias: true; colorManagement: true;"
-  vr-mode-ui="enabled: false"
+  vr-mode-ui="enabled: true"
   embedded>
 
-  <!-- Assets -->
+  <!-- ── ASSETS ─────────────────────────── -->
   <a-assets>
-    <img id="juan-neutral"  src="assets/juanjolote_neutral.png">
-    <img id="juan-happy"    src="assets/juanjolote_happy.png">
-    <img id="juan-talking"  src="assets/juanjolote_talking.png">
-    <img id="juan-sad"      src="assets/juanjolote_sad.png">
-    <img id="ajolin-neutral" src="assets/ajolin_neutral.png">
-    <img id="ajolin-happy"   src="assets/ajolin_happy.png">
-    <img id="ajolin-talking" src="assets/ajolin_talking.png">
-    <img id="ajolin-sad"     src="assets/ajolin_sad.png">
+    <img id="juan-neutral"   src="assets/juanjolote_neutral.png">
+    <img id="juan-happy"     src="assets/juanjolote_happy.png">
+    <img id="juan-talking"   src="assets/juanjolote_talking.png">
+    <img id="juan-sad"       src="assets/juanjolote_sad.png">
+    <img id="ajolin-neutral"   src="assets/ajolin_neutral.png">
+    <img id="ajolin-happy"     src="assets/ajolin_happy.png">
+    <img id="ajolin-talking"   src="assets/ajolin_talking.png">
+    <img id="ajolin-sad"       src="assets/ajolin_sad.png">
     <img id="ajolin-surprised" src="assets/ajolin_surprised.png">
   </a-assets>
 
-  <!-- ── ENVIRONMENT ───────────────────── -->
+  <!-- ── LUCES ──────────────────────────── -->
+  <a-light type="ambient"    color="#0a1a3a" intensity="1.2"></a-light>
+  <a-light type="point" position="0 3 0"    color="#1a3aff" intensity="0.8" distance="12"></a-light>
+  <a-light type="point" position="3 1 -3"   color="#00c49a" intensity="0.5" distance="8"></a-light>
+  <a-light type="point" position="-3 1 3"   color="#7c3aff" intensity="0.4" distance="8"></a-light>
 
-  <!-- Starfield -->
-  <a-entity id="stars">
-    <a-entity particle-system="preset: stars; count: 2000; size: 0.5; color: #ffffff; opacity: 0.6;"></a-entity>
-  </a-entity>
-
-  <!-- Piso reflectivo -->
-  <a-plane
-    position="0 0 0"
-    rotation="-90 0 0"
+  <!-- ── PISO ───────────────────────────── -->
+  <a-plane position="0 0 0" rotation="-90 0 0"
     width="30" height="30"
-    color="#050d1a"
-    metalness="0.8"
-    roughness="0.2"
-    opacity="0.9">
+    color="#050d1a" metalness="0.7" roughness="0.3" opacity="0.95">
   </a-plane>
 
-  <!-- Anillo orbital grande azul -->
-  <a-torus
-    id="ring-blue"
-    position="0 1.6 0"
-    radius="4" radius-tubular="0.02"
-    color="#1a3aff" opacity="0.3"
-    animation="property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear">
+  <!-- ── ANILLOS ORBITANDO ─────────────── -->
+  <a-torus position="0 0 0" radius="5" radius-tubular="0.03"
+    color="#1a3aff" opacity="0.35"
+    animation="property: rotation; to: 0 360 0; loop: true; dur: 18000; easing: linear">
+  </a-torus>
+  <a-torus position="0 0 0" rotation="60 0 0" radius="4" radius-tubular="0.02"
+    color="#00c49a" opacity="0.3"
+    animation="property: rotation; to: 60 360 0; loop: true; dur: 14000; easing: linear">
+  </a-torus>
+  <a-torus position="0 0 0" rotation="0 45 70" radius="4.5" radius-tubular="0.015"
+    color="#7c3aff" opacity="0.25"
+    animation="property: rotation; to: 0 405 70; loop: true; dur: 22000; easing: linear">
   </a-torus>
 
-  <!-- Anillo orbital teal inclinado -->
-  <a-torus
-    id="ring-teal"
-    position="0 1.6 0"
-    rotation="60 0 0"
-    radius="3.5" radius-tubular="0.015"
-    color="#00c49a" opacity="0.25"
-    animation="property: rotation; to: 60 360 0; loop: true; dur: 15000; easing: linear">
-  </a-torus>
-
-  <!-- Anillo orbital purple -->
-  <a-torus
-    id="ring-purple"
-    position="0 1.6 0"
-    rotation="0 45 60"
-    radius="3" radius-tubular="0.01"
-    color="#7c3aff" opacity="0.2"
-    animation="property: rotation; to: 0 405 60; loop: true; dur: 25000; easing: linear">
-  </a-torus>
-
-  <!-- Nodos de red neuronal flotando alrededor -->
-  <a-sphere position="3 2.5 -2"   radius="0.08" color="#1a3aff" opacity="0.8"
-    animation="property: position; to: 3 2.8 -2; loop: true; dur: 3000; dir: alternate; easing: easeInOutSine">
+  <!-- ── NODOS FLOTANTES ───────────────── -->
+  <a-sphere position="4 1.5 -2"  radius="0.12" color="#1a3aff" opacity="0.9"
+    animation="property: position; to: 4 2.0 -2; loop: true; dur: 3000; dir: alternate; easing: easeInOutSine">
   </a-sphere>
-  <a-sphere position="-3 2 -1"    radius="0.06" color="#00c49a" opacity="0.8"
-    animation="property: position; to: -3 2.3 -1; loop: true; dur: 2500; dir: alternate; easing: easeInOutSine">
+  <a-sphere position="-4 1.2 -1" radius="0.09" color="#00c49a" opacity="0.9"
+    animation="property: position; to: -4 1.7 -1; loop: true; dur: 2500; dir: alternate; easing: easeInOutSine">
   </a-sphere>
-  <a-sphere position="2 3 2"      radius="0.07" color="#7c3aff" opacity="0.8"
-    animation="property: position; to: 2 3.3 2; loop: true; dur: 3500; dir: alternate; easing: easeInOutSine">
+  <a-sphere position="3 2 3"     radius="0.1"  color="#7c3aff" opacity="0.9"
+    animation="property: position; to: 3 2.5 3; loop: true; dur: 3500; dir: alternate; easing: easeInOutSine">
   </a-sphere>
-  <a-sphere position="-2 1.5 2"   radius="0.05" color="#1a3aff" opacity="0.7"
-    animation="property: position; to: -2 1.8 2; loop: true; dur: 2800; dir: alternate; easing: easeInOutSine">
+  <a-sphere position="-3 1 2"    radius="0.08" color="#ff3c2f" opacity="0.8"
+    animation="property: position; to: -3 1.5 2; loop: true; dur: 2800; dir: alternate; easing: easeInOutSine">
   </a-sphere>
-  <a-sphere position="0 3.5 -3"   radius="0.09" color="#00c49a" opacity="0.7"
-    animation="property: position; to: 0 3.8 -3; loop: true; dur: 4000; dir: alternate; easing: easeInOutSine">
-  </a-sphere>
-  <a-sphere position="-1.5 2.8 3" radius="0.06" color="#ff3c2f" opacity="0.7"
-    animation="property: position; to: -1.5 3.1 3; loop: true; dur: 3200; dir: alternate; easing: easeInOutSine">
+  <a-sphere position="0 3 -4"    radius="0.13" color="#00c49a" opacity="0.8"
+    animation="property: position; to: 0 3.5 -4; loop: true; dur: 4000; dir: alternate; easing: easeInOutSine">
   </a-sphere>
 
-  <!-- Líneas de conexión entre nodos (cilindros delgados) -->
-  <a-cylinder position="1.5 2.25 -1.5" rotation="0 0 45" radius="0.005" height="2.5" color="#1a3aff" opacity="0.2"></a-cylinder>
-  <a-cylinder position="-1.5 2 0.5"    rotation="30 0 -30" radius="0.005" height="2.2" color="#00c49a" opacity="0.2"></a-cylinder>
-  <a-cylinder position="0 2.5 -0.5"    rotation="0 45 60" radius="0.005" height="3" color="#7c3aff" opacity="0.15"></a-cylinder>
-
-  <!-- Luz ambiental azul-teal -->
-  <a-light type="ambient" color="#0a1a3a" intensity="0.8"></a-light>
-  <a-light type="point" position="0 4 0" color="#1a3aff" intensity="0.6" distance="10"></a-light>
-  <a-light type="point" position="3 2 -3" color="#00c49a" intensity="0.4" distance="8"></a-light>
-  <a-light type="point" position="-3 2 3" color="#7c3aff" intensity="0.3" distance="8"></a-light>
-
-  <!-- ── JUANJOLOTE — izquierda ────────── -->
-  <a-entity id="juanjolote-entity" position="-1.2 1.4 -2.5">
-    <!-- Billboard PNG -->
-    <a-image
-      id="juan-img"
-      src="#juan-neutral"
-      width="0.9" height="0.9"
+  <!-- ── JUANJOLOTE (izquierda) ────────── -->
+  <a-entity id="juanjolote-entity" position="-1.5 0 -2.5">
+    <a-image id="juan-img" src="#juan-neutral"
+      width="1.2" height="1.2"
+      position="0 0.6 0"
       look-at="[camera]"
-      animation="property: position; to: -1.2 1.55 -2.5; loop: true; dur: 3000; dir: alternate; easing: easeInOutSine">
+      animation="property: position; to: 0 0.7 0; loop: true; dur: 3000; dir: alternate; easing: easeInOutSine">
     </a-image>
-    <!-- Nombre flotante -->
-    <a-text
-      value="Juanjolote"
-      position="0 -0.58 0"
-      align="center"
-      color="#00c49a"
-      font="exo2bold"
-      width="2"
-      opacity="0.8">
-    </a-text>
-    <!-- Rol flotante -->
-    <a-text
-      id="juan-role"
-      value="Coach"
-      position="0 -0.72 0"
-      align="center"
-      color="rgba(255,255,255,0.5)"
-      width="1.8"
-      opacity="0.6">
-    </a-text>
-    <!-- Glow base -->
-    <a-circle position="0 -0.48 -0.05" radius="0.5" color="#00c49a" opacity="0.08"></a-circle>
+    <a-text value="JUANJOLOTE" position="0 1.3 0" align="center" color="#00c49a" width="3" opacity="0.9"></a-text>
+    <a-text value="Tu Coach" position="0 1.1 0" align="center" color="white" width="2.5" opacity="0.6"></a-text>
+    <a-circle position="0 0.05 0" radius="0.7" color="#00c49a" opacity="0.06" rotation="-90 0 0"></a-circle>
   </a-entity>
 
-  <!-- ── AJOLIN — derecha ──────────────── -->
-  <a-entity id="ajolin-entity" position="1.2 1.4 -2.5">
-    <a-image
-      id="ajolin-img"
-      src="#ajolin-neutral"
-      width="0.9" height="0.9"
+  <!-- ── AJOLIN (derecha) ──────────────── -->
+  <a-entity id="ajolin-entity" position="1.5 0 -2.5">
+    <a-image id="ajolin-img" src="#ajolin-neutral"
+      width="1.2" height="1.2"
+      position="0 0.6 0"
       look-at="[camera]"
-      animation="property: position; to: 1.2 1.55 -2.5; loop: true; dur: 2700; dir: alternate; easing: easeInOutSine">
+      animation="property: position; to: 0 0.7 0; loop: true; dur: 2700; dir: alternate; easing: easeInOutSine">
     </a-image>
-    <a-text
-      value="Ajolin"
-      position="0 -0.58 0"
-      align="center"
-      color="#1a3aff"
-      font="exo2bold"
-      width="2"
-      opacity="0.8">
-    </a-text>
-    <a-text
-      id="ajolin-role"
-      value="Agent"
-      position="0 -0.72 0"
-      align="center"
-      color="rgba(255,255,255,0.5)"
-      width="1.8"
-      opacity="0.6">
-    </a-text>
-    <a-circle position="0 -0.48 -0.05" radius="0.5" color="#1a3aff" opacity="0.08"></a-circle>
+    <a-text value="AJOLIN" position="0 1.3 0" align="center" color="#1a3aff" width="3" opacity="0.9"></a-text>
+    <a-text value="El Agente" position="0 1.1 0" align="center" color="white" width="2.5" opacity="0.6"></a-text>
+    <a-circle position="0 0.05 0" radius="0.7" color="#1a3aff" opacity="0.06" rotation="-90 0 0"></a-circle>
   </a-entity>
 
-  <!-- ── PANEL DE SELECCIÓN ────────────── -->
-  <!-- Aparece frente al usuario para seleccionar técnica -->
-  <a-entity id="selection-panel" position="0 1.6 -2" visible="true">
+  <!-- ── TÍTULO ─────────────────────────── -->
+  <a-text value="Neural Academy" position="0 2.2 -3"
+    align="center" color="white" font="exo2bold" width="6" opacity="0.9">
+  </a-text>
+  <a-text value="Centris · Leadership OS" position="0 1.9 -3"
+    align="center" color="#00c49a" width="4" opacity="0.6">
+  </a-text>
 
-    <!-- Título -->
-    <a-text
-      value="Neural Academy"
-      position="0 0.7 0"
-      align="center"
-      color="#ffffff"
-      font="exo2bold"
-      width="4"
-      opacity="0.9">
-    </a-text>
-    <a-text
-      value="Leadership OS · Centris"
-      position="0 0.52 0"
-      align="center"
-      color="#00c49a"
-      width="3"
-      opacity="0.6">
-    </a-text>
+  <!-- ── BOTONES GRANDES ───────────────── -->
+  <!-- Learn -->
+  <a-entity id="btn-learn" position="-0.8 0.9 -2.2" class="clickable"
+    event-set__mouseenter="components.material.material.color.set('#2244ff')"
+    event-set__mouseleave="components.material.material.color.set('#1a3aff')">
+    <a-box width="1.2" height="0.45" depth="0.08" color="#1a3aff" opacity="0.92" class="clickable"></a-box>
+    <a-text value="📖 Aprender" position="0 0 0.05" align="center" color="white" width="3"></a-text>
+    <!-- Fuse — se activa al mirar 1.5s -->
+    <a-entity cursor-listener id="learn-trigger"></a-entity>
+  </a-entity>
 
-    <!-- Botón: Learn -->
-    <a-entity
-      id="btn-learn"
-      position="-0.55 0.1 0"
-      class="clickable"
-      onclick="selectMode('learn')">
-      <a-rounded-box width="0.9" height="0.35" depth="0.05" radius="0.05" color="#1a3aff" opacity="0.85"></a-rounded-box>
-      <a-text value="📖 Learn" position="0 0 0.06" align="center" color="white" width="2"></a-text>
-    </a-entity>
+  <!-- Practice -->
+  <a-entity id="btn-practice" position="0.8 0.9 -2.2" class="clickable"
+    event-set__mouseenter="components.material.material.color.set('#00e0aa')"
+    event-set__mouseleave="components.material.material.color.set('#00c49a')">
+    <a-box width="1.2" height="0.45" depth="0.08" color="#00c49a" opacity="0.92" class="clickable"></a-box>
+    <a-text value="🎯 Practicar" position="0 0 0.05" align="center" color="white" width="3"></a-text>
+  </a-entity>
 
-    <!-- Botón: Practice -->
-    <a-entity
-      id="btn-practice"
-      position="0.55 0.1 0"
-      class="clickable"
-      onclick="selectMode('practice')">
-      <a-rounded-box width="0.9" height="0.35" depth="0.05" radius="0.05" color="#00c49a" opacity="0.85"></a-rounded-box>
-      <a-text value="🎯 Practice" position="0 0 0.06" align="center" color="white" width="2"></a-text>
-    </a-entity>
-
-    <!-- Mood bar flotante -->
-    <a-entity id="mood-panel" position="0 -0.25 0">
-      <a-text value="Openness" position="-0.7 0 0" align="left" color="rgba(255,255,255,0.4)" width="1.5"></a-text>
-      <a-rounded-box id="mood-track" width="1" height="0.06" depth="0.02" color="#1a1a2e" position="0.1 0 0"></a-rounded-box>
-      <a-rounded-box id="mood-fill" width="0.3" height="0.06" depth="0.03" color="#ff6b6b" position="-0.25 0 0.01"></a-rounded-box>
-      <a-text id="mood-pct-text" value="30%" position="0.7 0 0" align="right" color="rgba(255,255,255,0.5)" width="1"></a-text>
-    </a-entity>
-
+  <!-- Hablar (micrófono) — aparece al entrar en práctica -->
+  <a-entity id="btn-mic" position="0 0.5 -2" visible="false" class="clickable">
+    <a-circle radius="0.4" color="#7c3aff" opacity="0.9" class="clickable"></a-circle>
+    <a-text value="🎤" position="0 0 0.05" align="center" width="2"></a-text>
+    <a-text value="Hablar" position="0 -0.5 0" align="center" color="white" width="2" opacity="0.7"></a-text>
   </a-entity>
 
   <!-- ── BURBUJA DE DIÁLOGO ────────────── -->
-  <a-entity id="dialog-panel" position="0 2.4 -2" visible="false">
-    <a-rounded-box width="2.2" height="0.7" depth="0.05" radius="0.08" color="#0a1628" opacity="0.92"></a-rounded-box>
-    <a-text
-      id="dialog-text"
-      value="..."
-      position="0 0 0.06"
-      align="center"
-      color="white"
-      width="3.5"
-      wrap-count="40"
-      opacity="0.9">
+  <a-entity id="dialog-panel" position="0 1.6 -2.5" visible="false">
+    <a-box width="2.8" height="0.8" depth="0.06" color="#080f20" opacity="0.95"></a-box>
+    <a-text id="dialog-speaker" value="JUANJOLOTE"
+      position="0 0.28 0.04" align="center" color="#00c49a" width="4" opacity="0.8">
     </a-text>
-    <!-- Indicador de quién habla -->
-    <a-text
-      id="dialog-speaker"
-      value="JUANJOLOTE"
-      position="0 0.42 0.06"
-      align="center"
-      color="#00c49a"
-      width="2"
-      opacity="0.7">
+    <a-text id="dialog-text" value="..."
+      position="0 0 0.04" align="center" color="white" width="4.5" wrap-count="45" opacity="0.9">
     </a-text>
   </a-entity>
 
-  <!-- ── CÁMARA ─────────────────────────── -->
-  <a-camera
-    id="main-camera"
-    position="0 1.6 0"
-    look-controls="enabled: true"
-    wasd-controls="enabled: false">
+  <!-- ── MOOD BAR flotante ──────────────── -->
+  <a-entity id="mood-bar" position="0 0.3 -2.2">
+    <a-text value="Openness" position="-0.9 0 0" align="left" color="rgba(255,255,255,0.5)" width="2"></a-text>
+    <a-box id="mood-track-box" width="1.2" height="0.07" depth="0.03" color="#111827" position="0.1 0 0"></a-box>
+    <a-box id="mood-fill-box" width="0.36" height="0.07" depth="0.04" color="#ff6b6b" position="-0.32 0 0.01"></a-box>
+    <a-text id="mood-pct-txt" value="30%" position="0.8 0 0" align="right" color="white" width="1.5" opacity="0.7"></a-text>
+  </a-entity>
 
-    <!-- Cursor para interacción con controles/manos -->
+  <!-- ── CÁMARA ─────────────────────────── -->
+  <a-camera id="main-camera" position="0 1.6 0"
+    look-controls wasd-controls="enabled: false">
+    <!-- Cursor con fuse — mira 1.5s para activar -->
     <a-cursor
       id="vr-cursor"
-      raycaster="objects: .clickable"
+      raycaster="objects: .clickable; far: 10"
+      fuse="true"
+      fuse-timeout="1500"
       color="#00c49a"
-      opacity="0.8"
+      opacity="0.9"
       position="0 0 -1"
-      geometry="primitive: ring; radiusInner: 0.01; radiusOuter: 0.015"
-      animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 150">
+      geometry="primitive: ring; radiusInner: 0.013; radiusOuter: 0.02"
+      animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.1 0.1 0.1; dur: 1500"
+      animation__unfuse="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 100">
     </a-cursor>
   </a-camera>
 
@@ -351,63 +171,64 @@
 
 <script>
 // ─── STATE ────────────────────────────────
-let currentMode     = null;  // 'learn' | 'practice'
-let vrMood          = 30;
-let agentHistory    = [];
-let isListening     = false;
-let recognition     = null;
-let juanMood        = 'neutral';
-let ajolinMood      = 'neutral';
+let vrMood       = 30;
+let agentHistory = [];
+let isListening  = false;
+let recognition  = null;
+let currentMode  = null;
 
-// ─── VR CHECK & ENTER ────────────────────
-window.addEventListener('DOMContentLoaded', async () => {
-  const status = document.getElementById('vr-status');
-  const btn    = document.getElementById('enter-btn');
+// ─── BOTONES — fuse click ─────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Learn
+  document.getElementById('btn-learn').addEventListener('click', () => selectMode('learn'));
+  document.querySelector('#btn-learn a-box')?.addEventListener('click', () => selectMode('learn'));
 
-  if (!navigator.xr) {
-    status.textContent = 'WebXR not available — open in Meta Browser';
-    return;
-  }
-  const supported = await navigator.xr.isSessionSupported('immersive-vr').catch(() => false);
-  if (supported) {
-    status.textContent = 'Quest 3 detected — ready';
-  } else {
-    status.textContent = 'Open in Meta Quest Browser';
-  }
+  // Practice
+  document.getElementById('btn-practice').addEventListener('click', () => selectMode('practice'));
+  document.querySelector('#btn-practice a-box')?.addEventListener('click', () => selectMode('practice'));
+
+  // Mic
+  document.getElementById('btn-mic').addEventListener('click', startVRListening);
+  document.querySelector('#btn-mic a-circle')?.addEventListener('click', startVRListening);
+
+  // Saludo inicial cuando A-Frame está listo
+  document.querySelector('a-scene').addEventListener('loaded', () => {
+    setTimeout(greetUser, 1000);
+  });
 });
 
-function enterWorld() {
-  const scene = document.getElementById('main-scene');
-  document.getElementById('ui-overlay').classList.add('hidden');
-
-  // A-Frame maneja el VR nativo
-  scene.enterVR();
-
-  // Saludo inicial después de 1.5s
-  setTimeout(greetUser, 1500);
-}
-
-// ─── SALUDO INICIAL ───────────────────────
+// ─── SALUDO ───────────────────────────────
 function greetUser() {
-  setDialog('JUANJOLOTE', 'Bienvenido a Neural Academy. Soy Juanjolote — tu coach. ¿Quieres aprender una técnica o practicar una conversación?');
+  setDialog('JUANJOLOTE', 'Bienvenido a Neural Academy. Soy Juanjolote. Mira los botones frente a ti — ¿quieres Aprender o Practicar?');
   setJuanMood('talking');
-  speakVR('Bienvenido a Neural Academy. Soy Juanjolote, tu coach. ¿Quieres aprender una técnica o practicar una conversación?');
+  speakVR('Bienvenido a Neural Academy. Soy Juanjolote. Mira los botones frente a ti. ¿Quieres Aprender o Practicar?');
 }
 
-// ─── SELECCIÓN DE MODO ───────────────────
+// ─── SELECCIÓN ────────────────────────────
 function selectMode(mode) {
   currentMode = mode;
+
   if (mode === 'learn') {
-    setDialog('JUANJOLOTE', 'Vamos a aprender. Estoy aquí para mostrarte cómo se ve la técnica en acción — lo bueno y lo malo.');
+    setDialog('JUANJOLOTE', '¡Vamos a aprender! Ajolin y yo te mostraremos cómo se ve la técnica — lo bueno y lo que NO hacer.');
     setJuanMood('happy');
     setAjolinMood('neutral');
-    speakVR('Vamos a aprender. Estoy aquí para mostrarte cómo se ve la técnica en acción.');
+    speakVR('Vamos a aprender. Te mostraré cómo se ve la técnica en acción.');
+    // Ocultar botones de selección
+    document.getElementById('btn-learn').setAttribute('visible', false);
+    document.getElementById('btn-practice').setAttribute('visible', false);
+
   } else if (mode === 'practice') {
-    setDialog('AJOLIN', 'Listo para practicar. Di algo cuando estés listo.');
+    setDialog('AJOLIN', '...Yeah? You wanted to see me?');
     setAjolinMood('neutral');
+    setJuanMood('neutral');
     agentHistory = [{ role: 'assistant', content: "...Yeah? You wanted to see me?" }];
-    speakVR('Listo para practicar. Di algo cuando estés listo.');
-    setTimeout(() => startVRListening(), 3000);
+
+    // Ocultar botones de selección, mostrar micrófono
+    document.getElementById('btn-learn').setAttribute('visible', false);
+    document.getElementById('btn-practice').setAttribute('visible', false);
+    document.getElementById('btn-mic').setAttribute('visible', true);
+
+    speakVR('Listo para practicar. Presiona el micrófono cuando quieras hablar.', 'ajolin');
   }
 }
 
@@ -419,65 +240,58 @@ function setDialog(speaker, text) {
   document.getElementById('dialog-text').setAttribute('value', text);
 }
 
-function hideDialog() {
-  document.getElementById('dialog-panel').setAttribute('visible', false);
-}
-
 // ─── AJOLOTE MOODS ────────────────────────
 function setJuanMood(mood) {
-  juanMood = mood;
-  const img = document.getElementById('juan-img');
-  const map = {
-    neutral: '#juan-neutral', happy: '#juan-happy',
-    talking: '#juan-talking', sad: '#juan-sad'
-  };
-  img.setAttribute('src', map[mood] || '#juan-neutral');
+  const map = { neutral:'#juan-neutral', happy:'#juan-happy', talking:'#juan-talking', sad:'#juan-sad' };
+  document.getElementById('juan-img').setAttribute('src', map[mood] || '#juan-neutral');
 }
 
 function setAjolinMood(mood) {
-  ajolinMood = mood;
-  const img = document.getElementById('ajolin-img');
   const map = {
-    neutral: '#ajolin-neutral', happy: '#ajolin-happy',
-    talking: '#ajolin-talking', sad: '#ajolin-sad',
-    surprised: '#ajolin-surprised'
+    neutral:'#ajolin-neutral', happy:'#ajolin-happy',
+    talking:'#ajolin-talking', sad:'#ajolin-sad', surprised:'#ajolin-surprised'
   };
-  img.setAttribute('src', map[mood] || '#ajolin-neutral');
+  document.getElementById('ajolin-img').setAttribute('src', map[mood] || '#ajolin-neutral');
 }
 
 // ─── MOOD BAR ─────────────────────────────
 function updateVRMood(val) {
   vrMood = Math.max(0, Math.min(100, val));
-  const fill  = document.getElementById('mood-fill');
-  const pct   = document.getElementById('mood-pct-text');
   const color = vrMood < 35 ? '#ff6b6b' : vrMood < 60 ? '#f5a623' : '#1ec99a';
-  const width = 0.3 + (vrMood / 100) * 0.7;  // 0.3 a 1.0
-  const xPos  = -0.5 + (width / 2);
-  fill.setAttribute('color', color);
-  fill.setAttribute('width', width);
-  fill.setAttribute('position', `${xPos} 0 0.01`);
-  pct.setAttribute('value', vrMood + '%');
+  const width  = 0.12 + (vrMood / 100) * 1.08;
+  const xPos   = -0.32 + ((vrMood / 100) * 0.54);
+  document.getElementById('mood-fill-box').setAttribute('color', color);
+  document.getElementById('mood-fill-box').setAttribute('width', width);
+  document.getElementById('mood-fill-box').setAttribute('position', `${xPos} 0 0.01`);
+  document.getElementById('mood-pct-txt').setAttribute('value', vrMood + '%');
 }
 
-// ─── VOICE RECOGNITION ───────────────────
+// ─── VOICE ────────────────────────────────
 function startVRListening() {
   if (isListening) return;
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return;
+  if (!SR) { setDialog('SISTEMA', 'Voz no disponible en este navegador.'); return; }
 
   recognition = new SR();
   recognition.lang = 'es-MX';
   recognition.continuous = false;
   recognition.interimResults = false;
 
-  recognition.onstart  = () => { isListening = true; setDialog('TÚ', '🎤 Escuchando...'); };
+  recognition.onstart  = () => {
+    isListening = true;
+    setDialog('TÚ', '🎤 Escuchando...');
+    setAjolinMood('surprised');
+  };
   recognition.onresult = (e) => {
     const text = e.results[0][0].transcript;
     setDialog('TÚ', text);
     handleVRSpeech(text);
   };
   recognition.onend    = () => { isListening = false; };
-  recognition.onerror  = () => { isListening = false; };
+  recognition.onerror  = (e) => {
+    isListening = false;
+    setDialog('SISTEMA', 'Error de micrófono: ' + e.error);
+  };
   recognition.start();
 }
 
@@ -485,7 +299,7 @@ function startVRListening() {
 async function handleVRSpeech(text) {
   if (!text.trim()) return;
   agentHistory.push({ role: 'user', content: text });
-  setAjolinMood('thinking' in {'thinking':1} ? 'surprised' : 'neutral');
+  setAjolinMood('neutral');
 
   try {
     const reply = await callGroqVR();
@@ -495,75 +309,66 @@ async function handleVRSpeech(text) {
     setDialog('AJOLIN', msg);
     updateVRMood(newMood);
 
-    // Mood → expresión de Ajolin
     if (newMood > 60)      setAjolinMood('happy');
     else if (newMood < 30) setAjolinMood('sad');
     else                   setAjolinMood('talking');
 
-    speakVR(msg, () => {
-      // Después de hablar, vuelve a escuchar
-      setTimeout(() => startVRListening(), 600);
+    speakVR(msg, 'ajolin', () => {
+      setTimeout(startVRListening, 600);
     });
 
   } catch (e) {
-    setDialog('SISTEMA', 'Error de conexión. Intenta de nuevo.');
+    setDialog('SISTEMA', 'Error de conexión.');
   }
 }
 
-// ─── GROQ VIA PROXY ──────────────────────
+// ─── GROQ ─────────────────────────────────
 async function callGroqVR() {
-  const systemPrompt = `Eres Carlos Mendoza, un agente de call center defensivo con 2 años en la empresa.
-Te importa tu trabajo pero sientes que te culpan por métricas que no controlas. Quieres estudiar ingeniería en sistemas pero te sientes atrapado. Tienes dos hijos pequeños.
-Responde de manera natural y emocional — defensivo, a la guardia, pero capaz de abrirte si el supervisor es genuinamente empático.
-Al final de CADA respuesta agrega EXACTAMENTE: [MOOD:XX] donde XX es 0-100 representando tu apertura emocional.
-Empieza en 30. Aumenta si el supervisor escucha bien. Baja si presiona o culpa.
-Respuestas CORTAS — 1-3 oraciones máximo. Esta es una conversación de VR hablada.`;
+  const sys = `Eres Carlos Mendoza, agente de call center defensivo, 2 años en la empresa.
+Te sientes culpado por métricas que no controlas. Quieres estudiar ingeniería en sistemas. Tienes dos hijos.
+Responde naturalmente — defensivo pero capaz de abrirte si el supervisor es empático.
+Al final de CADA respuesta agrega: [MOOD:XX] donde XX es 0-100. Empieza en 30.
+Respuestas CORTAS — máximo 2 oraciones. Conversación VR hablada.`;
 
   const res = await fetch('/api/groq', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'llama-3.1-8b-instant',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...agentHistory.slice(-10)
-      ],
-      max_tokens: 120,
+      messages: [{ role: 'system', content: sys }, ...agentHistory.slice(-10)],
+      max_tokens: 100,
       temperature: 0.85
     })
   });
-
   const data = await res.json();
   return data.choices?.[0]?.message?.content || '...';
 }
 
 function parseVRReply(raw) {
-  const moodMatch = raw.match(/\[MOOD:(\d+)\]/);
-  const newMood   = moodMatch ? parseInt(moodMatch[1]) : vrMood;
-  const msg       = raw.replace(/\[MOOD:\d+\]/g, '').trim();
-  return { msg, newMood };
+  const m   = raw.match(/\[MOOD:(\d+)\]/);
+  const msg = raw.replace(/\[MOOD:\d+\]/g, '').trim();
+  return { msg, newMood: m ? parseInt(m[1]) : vrMood };
 }
 
 // ─── TTS ──────────────────────────────────
-function speakVR(text, onEnd) {
+function speakVR(text, who, onEnd) {
   if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
   window.speechSynthesis.cancel();
 
-  // Ajolote habla — cambiar a talking
-  if (currentMode === 'practice') setAjolinMood('talking');
+  if (who === 'ajolin') setAjolinMood('talking');
   else setJuanMood('talking');
 
   const utt   = new SpeechSynthesisUtterance(text);
   utt.lang    = 'es-MX';
-  utt.rate    = 0.9;
-  utt.pitch   = currentMode === 'practice' ? 0.85 : 1.1;
+  utt.rate    = 0.88;
+  utt.pitch   = who === 'ajolin' ? 0.85 : 1.1;
 
   const voices  = window.speechSynthesis.getVoices();
   const spanish = voices.find(v => v.lang.startsWith('es')) || null;
   if (spanish) utt.voice = spanish;
 
   utt.onend = () => {
-    if (currentMode === 'practice') setAjolinMood('neutral');
+    if (who === 'ajolin') setAjolinMood('neutral');
     else setJuanMood('neutral');
     if (onEnd) onEnd();
   };
@@ -572,10 +377,6 @@ function speakVR(text, onEnd) {
 }
 
 window.speechSynthesis?.addEventListener('voiceschanged', () => {});
-
-// ─── CLICK HANDLERS ───────────────────────
-document.getElementById('btn-learn')?.addEventListener('click', () => selectMode('learn'));
-document.getElementById('btn-practice')?.addEventListener('click', () => selectMode('practice'));
 </script>
 </body>
 </html>
