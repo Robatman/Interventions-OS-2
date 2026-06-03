@@ -3,17 +3,194 @@
 //  UI helpers — Interventions OS v5
 //  Navigation, chat rendering, mood/box,
 //  voice indicators, glossary, VR helpers
+//  + Auth flow (login / register / admin)
 // ═══════════════════════════════════════════
+
+// ─── APP INIT ─────────────────────────────
+// Runs on load — checks for existing session
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const loggedIn = await initAuth();
+  if (loggedIn) {
+    // Already authenticated — go straight to Groq setup or welcome
+    const groqKey = localStorage.getItem('groq_key') || '';
+    if (groqKey) {
+      GROQ_KEY = groqKey;
+      goWelcome();
+    } else {
+      showAuthenticatedSetup();
+    }
+  } else {
+    // Not authenticated — show login
+    show('s-login');
+  }
+});
+
+// ─── AUTH SCREENS ─────────────────────────
+
+function showLoginScreen() {
+  show('s-login');
+  document.getElementById('login-error').textContent = '';
+  document.getElementById('login-gameid').value  = '';
+  document.getElementById('login-password').value = '';
+}
+
+function showRegisterScreen() {
+  show('s-register');
+  document.getElementById('register-error').textContent = '';
+  document.getElementById('register-gameid').value    = '';
+  document.getElementById('register-password').value  = '';
+  document.getElementById('register-password2').value = '';
+  document.getElementById('register-preview').textContent = '';
+}
+
+// Live format + preview for Game ID input
+function onGameIdInput(inputEl, previewId) {
+  const raw       = inputEl.value;
+  const formatted = formatGameId(raw);
+  inputEl.value   = formatted;
+
+  const preview = document.getElementById(previewId);
+  if (!preview) return;
+
+  if (formatted.length >= 4 && validateGameId(formatted)) {
+    const parsed = parseGameId(formatted);
+    preview.textContent = `${parsed.roleName} · ${parsed.nameInitial}. ${parsed.lastName}`;
+    preview.style.color = 'var(--teal)';
+    inputEl.classList.remove('error');
+  } else if (formatted.length > 1) {
+    preview.textContent = 'Format: RoleInitial.LASTNAME — e.g. CM.RODRIGUEZ';
+    preview.style.color = 'var(--text3)';
+  } else {
+    preview.textContent = '';
+  }
+}
+
+async function submitLogin() {
+  const gameId   = document.getElementById('login-gameid').value.trim().toUpperCase();
+  const password = document.getElementById('login-password').value;
+  const errEl    = document.getElementById('login-error');
+  const btn      = document.getElementById('login-btn');
+
+  errEl.textContent = '';
+
+  if (!validateGameId(gameId)) {
+    errEl.textContent = 'Invalid Game ID format. Example: CM.RODRIGUEZ';
+    return;
+  }
+  if (!password) {
+    errEl.textContent = 'Enter your password.';
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = 'Connecting...';
+
+  try {
+    await loginUser(gameId, password);
+
+    // Check if account is active
+    if (currentProfile && currentProfile.is_active === false) {
+      await logoutUser();
+      errEl.textContent = 'Your account has been disabled. Contact your admin.';
+      btn.disabled    = false;
+      btn.textContent = 'Enter →';
+      return;
+    }
+
+    showAuthenticatedSetup();
+  } catch (e) {
+    errEl.textContent = 'Incorrect Game ID or password.';
+    btn.disabled    = false;
+    btn.textContent = 'Enter →';
+  }
+}
+
+async function submitRegister() {
+  const gameId   = document.getElementById('register-gameid').value.trim().toUpperCase();
+  const password = document.getElementById('register-password').value;
+  const password2= document.getElementById('register-password2').value;
+  const errEl    = document.getElementById('register-error');
+  const btn      = document.getElementById('register-btn');
+
+  errEl.textContent = '';
+
+  if (!validateGameId(gameId)) {
+    errEl.textContent = 'Invalid Game ID. Format: RoleInitial.LASTNAME — e.g. CM.RODRIGUEZ';
+    return;
+  }
+  if (password.length < 6) {
+    errEl.textContent = 'Password must be at least 6 characters.';
+    return;
+  }
+  if (password !== password2) {
+    errEl.textContent = 'Passwords do not match.';
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = 'Creating account...';
+
+  try {
+    await registerUser(gameId, password);
+    showAuthenticatedSetup();
+  } catch (e) {
+    const msg = e.message || '';
+    if (msg.includes('already') || msg.includes('duplicate')) {
+      errEl.textContent = 'That Game ID is already registered. Try logging in.';
+    } else {
+      errEl.textContent = msg || 'Registration failed. Try again.';
+    }
+    btn.disabled    = false;
+    btn.textContent = 'Create account →';
+  }
+}
+
+// After auth — check if Groq key is saved
+function showAuthenticatedSetup() {
+  const groqKey = localStorage.getItem('groq_key') || '';
+  if (groqKey) {
+    GROQ_KEY = groqKey;
+    goWelcome();
+  } else {
+    // Show Groq setup with user info
+    const gameId = getGameId();
+    const setupStatus = document.getElementById('auth-status-bar');
+    if (setupStatus) {
+      setupStatus.textContent = `Signed in as ${gameId}`;
+      setupStatus.style.display = 'block';
+    }
+    show('s-setup');
+  }
+}
+
+async function submitLogout() {
+  await logoutUser();
+  GROQ_KEY = '';
+  show('s-login');
+}
 
 // ─── SCREEN NAVIGATION ────────────────────
 
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
   window.scrollTo(0, 0);
 }
 
 function goWelcome() {
+  // Update welcome header with user info
+  const gameId   = getGameId();
+  const statusEl = document.getElementById('welcome-user-status');
+  if (statusEl && gameId) {
+    statusEl.textContent = `${gameId} · ${currentProfile?.display_name || ''}`;
+  }
+
+  // Show admin button only for admins
+  const adminBtn = document.getElementById('welcome-admin-btn');
+  if (adminBtn) adminBtn.style.display = isAdmin() ? 'block' : 'none';
+
   show('s-welcome');
   activeMode = null;
   activeMenu = null;
@@ -42,7 +219,7 @@ function selectIntervention(id) {
 }
 
 function selectTechnique(id) {
-  if (!setTechnique(id)) return; // locked
+  if (!setTechnique(id)) return;
   updateModeScreen();
   show('s-mode');
 }
@@ -108,14 +285,14 @@ function goPractice() {
 
 function updateLearnHeader() {
   const isIntervention = activeMenu === 'interventions' && currentIntervention;
-  const nameEl = document.getElementById('learn-technique-name');
-  const philEl = document.getElementById('learn-philosophy');
+  const nameEl  = document.getElementById('learn-technique-name');
+  const philEl  = document.getElementById('learn-philosophy');
   const stepsEl = document.getElementById('learn-steps');
 
   if (isIntervention) {
     nameEl.textContent = `Alex — Teaching ${currentIntervention.label}`;
     philEl.textContent = `${currentIntervention.dayLabel} · ${currentIntervention.ownerLabel}`;
-    stepsEl.innerHTML = `
+    stepsEl.innerHTML  = `
       <span class="learn-step active" id="ls-1">1. Por qué importa</span>
       <span class="learn-step" id="ls-2">2. Cómo se ve bien</span>
       <span class="learn-step" id="ls-3">3. El trampón</span>
@@ -124,7 +301,7 @@ function updateLearnHeader() {
     const t = currentTechnique;
     nameEl.textContent = `Alex — Teaching ${t.label}`;
     philEl.textContent = `Based on ${t.philosophy}`;
-    stepsEl.innerHTML = t.stages.map(s =>
+    stepsEl.innerHTML  = t.stages.map(s =>
       `<span class="learn-step" id="${s.id}">${s.label}</span>`
     ).join('');
     document.getElementById(t.stages[0].id)?.classList.add('active');
@@ -161,7 +338,7 @@ function selectLevel(level) {
 }
 
 function configurePracticeUI() {
-  const levelLabels = { novice: 'Novice', mid: 'Practitioner', adv: 'Fieldwork' };
+  const levelLabels  = { novice: 'Novice', mid: 'Practitioner', adv: 'Fieldwork' };
   const contextLabel = activeMenu === 'interventions' && currentIntervention
     ? currentIntervention.label
     : currentTechnique.label;
@@ -175,17 +352,17 @@ function configurePracticeUI() {
     hintBtn.style.display = 'none';
   } else if (currentLevel === 'mid') {
     hintBtn.style.display = '';
-    hintCost.textContent = '(−5 mood)';
+    hintCost.textContent  = '(−5 mood)';
   } else {
     hintBtn.style.display = '';
-    hintCost.textContent = '';
+    hintCost.textContent  = '';
   }
   updatePracticeHeader();
 }
 
 function updatePracticeHeader() {
-  const a  = currentArchetype;
-  const av = document.getElementById('practice-av');
+  const a      = currentArchetype;
+  const av     = document.getElementById('practice-av');
   const nameEl = document.getElementById('practice-avatar-name');
   const modeEl = document.getElementById('carlos-mode-label');
   if (av)     { av.style.background = a.gradient; av.textContent = a.emoji; }
@@ -262,8 +439,8 @@ function setLoading(btnId, loading) {
 function handleKey(e, mode) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
-    if (mode === 'learn') sendLearn();
-    if (mode === 'work')  sendWork();
+    if (mode === 'learn')    sendLearn();
+    if (mode === 'work')     sendWork();
     if (mode === 'practice') sendPractice();
   }
 }
@@ -302,8 +479,6 @@ function updateBox(state) {
 
 // ─── VOICE INDICATOR ──────────────────────
 
-// voice-indicator dot: green when agent is speaking
-// listen-indicator: visible when mic is active
 const voiceIndicatorStyle = document.createElement('style');
 voiceIndicatorStyle.textContent = `
   #voice-indicator.speaking { background: var(--teal) !important; box-shadow: 0 0 6px rgba(30,201,154,.5); }
@@ -337,7 +512,7 @@ function setTime(mins) {
 // ─── LEARN PROGRESS ───────────────────────
 
 function updateLearnProgress(reply) {
-  if (activeMenu === 'interventions') return; // stages handled differently
+  if (activeMenu === 'interventions') return;
   const t  = currentTechnique;
   const r  = reply.toLowerCase();
   const kw = t.stageKeywords;
@@ -414,6 +589,7 @@ document.addEventListener('click', (e) => {
 });
 
 // ─── CSS ADDITIONS ────────────────────────
+
 const extraStyle = document.createElement('style');
 extraStyle.textContent = `
   .menu-section-label {
@@ -427,6 +603,15 @@ extraStyle.textContent = `
   .vr-mode .send-btn   { display: none; }
   .vr-mode .voice-btn  { flex: 1; padding: 16px; font-size: 28px; }
   #voice-indicator { transition: all .3s; }
+  #auth-status-bar {
+    display: none;
+    font-size: 11px; color: var(--teal);
+    text-align: center; margin-bottom: 8px;
+  }
+  #welcome-user-status {
+    font-size: 11px; color: var(--text3);
+    margin-top: 2px;
+  }
 `;
 document.head.appendChild(extraStyle);
 
@@ -435,7 +620,6 @@ document.head.appendChild(extraStyle);
 function selectAndPreview(id) {
   if (!setTechnique(id)) return;
   updateModeScreen();
-  // Update preview pill
   const pill = document.getElementById('preview-pill');
   if (pill) pill.textContent = currentTechnique.label;
   showTechniquePreview(id);
@@ -443,7 +627,6 @@ function selectAndPreview(id) {
 
 // ─── HISTORY ENTRY ────────────────────────
 
-// Called from welcome screen history button
 function goHistory() {
   showHistory();
 }
