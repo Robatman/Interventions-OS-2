@@ -1,32 +1,18 @@
 // ═══════════════════════════════════════════
-//  supabase.js — Leadership OS v4
-//  Persistencia de sesiones, técnicas y arquetipos.
-//  Reemplaza localStorage para historial y progreso.
+//  supabase.js — Leadership OS
+//  Constantes y persistencia de sesiones.
+//  NOTA: getUserId() viene de auth.js que carga primero.
 // ═══════════════════════════════════════════
 
-const SUPABASE_URL    = 'https://biebfwwkukmxulzwpjya.supabase.co';
-const SUPABASE_KEY    = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
+const SUPABASE_URL     = 'https://biebfwwkukmxulzwpjya.supabase.co';
+const SUPABASE_KEY     = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
 const SUPABASE_HEADERS = {
   'Content-Type':  'application/json',
   'apikey':        SUPABASE_KEY,
   'Authorization': `Bearer ${SUPABASE_KEY}`
 };
 
-// ─── USER ID ──────────────────────────────
-// Sin auth: usamos un ID anónimo persistido en localStorage.
-// Cuando agregues Supabase Auth, reemplaza esto con el user.id real.
-
-function getUserId() {
-  let uid = localStorage.getItem('ldr_uid');
-  if (!uid) {
-    uid = 'u_' + Math.random().toString(36).slice(2, 11);
-    localStorage.setItem('ldr_uid', uid);
-  }
-  return uid;
-}
-
 // ─── SAVE SESSION ─────────────────────────
-// Llama esto al terminar cada sesión de práctica o learn.
 
 async function saveSession(data) {
   const payload = {
@@ -42,9 +28,14 @@ async function saveSession(data) {
   };
 
   try {
+    const token = getSessionToken();
+    const headers = token
+      ? { ...SUPABASE_HEADERS, 'Authorization': `Bearer ${token}` }
+      : SUPABASE_HEADERS;
+
     const res = await fetch(`${SUPABASE_URL}/rest/v1/sessions`, {
       method:  'POST',
-      headers: { ...SUPABASE_HEADERS, 'Prefer': 'return=minimal' },
+      headers: { ...headers, 'Prefer': 'return=minimal' },
       body:    JSON.stringify(payload)
     });
     if (!res.ok) console.error('saveSession error:', await res.text());
@@ -52,19 +43,22 @@ async function saveSession(data) {
     console.error('saveSession fetch failed:', e);
   }
 
-  // También actualiza progreso de técnica y arquetipo en paralelo
   if (data.technique) updateTechniqueProgress(data.technique, data.moodFinal);
-  if (data.archetype)  updateArchetypeProgress(data.archetype, data.level);
+  if (data.archetype) updateArchetypeProgress(data.archetype, data.level);
 }
 
 // ─── GET SESSIONS ─────────────────────────
-// Devuelve las últimas N sesiones del usuario, ordenadas por fecha desc.
 
 async function getSessions(limit = 50) {
   try {
+    const token = getSessionToken();
+    const headers = token
+      ? { ...SUPABASE_HEADERS, 'Authorization': `Bearer ${token}` }
+      : SUPABASE_HEADERS;
+
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/sessions?user_id=eq.${getUserId()}&order=completed_at.desc&limit=${limit}`,
-      { headers: SUPABASE_HEADERS }
+      { headers }
     );
     if (!res.ok) { console.error('getSessions error:', await res.text()); return []; }
     return await res.json();
@@ -75,12 +69,9 @@ async function getSessions(limit = 50) {
 }
 
 // ─── UPDATE TECHNIQUE PROGRESS ────────────
-// Upsert: si ya existe la fila, incrementa contadores.
 
 async function updateTechniqueProgress(techniqueId, moodFinal) {
   const uid = getUserId();
-
-  // Primero intenta leer la fila existente
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/technique_progress?user_id=eq.${uid}&technique_id=eq.${techniqueId}`,
@@ -94,15 +85,15 @@ async function updateTechniqueProgress(techniqueId, moodFinal) {
       best_mood:       Math.max(existing.best_mood || 0, moodFinal || 0),
       last_used:       new Date().toISOString()
     } : {
-      user_id:          uid,
-      technique_id:     techniqueId,
-      times_practiced:  1,
-      best_mood:        moodFinal || 0,
-      last_used:        new Date().toISOString()
+      user_id:         uid,
+      technique_id:    techniqueId,
+      times_practiced: 1,
+      best_mood:       moodFinal || 0,
+      last_used:       new Date().toISOString()
     };
 
-    const method  = existing ? 'PATCH' : 'POST';
-    const url     = existing
+    const method = existing ? 'PATCH' : 'POST';
+    const url    = existing
       ? `${SUPABASE_URL}/rest/v1/technique_progress?user_id=eq.${uid}&technique_id=eq.${techniqueId}`
       : `${SUPABASE_URL}/rest/v1/technique_progress`;
 
