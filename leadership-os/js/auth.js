@@ -11,7 +11,8 @@ const ROLE_MAP = {
   C: 'Coach',
   Q: 'QA',
   T: 'Trainer',
-  M: 'Manager'
+  M: 'Manager',
+  H: 'HR'
 };
 
 // ─── GAME ID VALIDATION ───────────────────
