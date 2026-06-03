@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centris Leadership OS · VR</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; overflow: hidden; font-family: Arial, sans-serif; }
+  canvas { display: block; }
+
+  /* 2D overlay UI — visible before entering VR */
+  #overlay {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at center, #070d1f 0%, #000 100%);
+    z-index: 10;
+    transition: opacity .8s ease;
+  }
+  #overlay.hidden { opacity: 0; pointer-events: none; }
+
+  .overlay-logo {
+    width: min(380px, 90vw);
+    margin-bottom: 32px;
+    animation: float 3.5s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+  .overlay-status {
+    font-size: 13px; letter-spacing: .15em;
+    color: rgba(255,255,255,.4);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .vr-btn {
+    background: linear-gradient(135deg, #1a3aff, #7c3aff);
+    color: white; border: none; border-radius: 50px;
+    padding: 16px 48px; font-size: 16px; font-weight: 700;
+    letter-spacing: .08em; cursor: pointer;
+    box-shadow: 0 0 40px rgba(26,58,255,.4);
+    transition: transform .2s, box-shadow .2s;
+    margin-bottom: 16px;
+  }
+  .vr-btn:hover { transform: scale(1.04); box-shadow: 0 0 60px rgba(26,58,255,.6); }
+  .vr-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  .no-vr-btn {
+    background: none; border: 1px solid rgba(255,255,255,.2);
+    color: rgba(255,255,255,.5); border-radius: 50px;
+    padding: 10px 32px; font-size: 13px; cursor: pointer;
+    transition: all .2s;
+  }
+  .no-vr-btn:hover { border-color: rgba(255,255,255,.5); color: white; }
+
+  /* VR voice interface — shown in flat mode fallback */
+  #flat-mode {
+    display: none; position: fixed; inset: 0;
+    background: #070d1f;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 24px;
+  }
+  #flat-mode.active { display: flex; }
+
+  .agent-bubble {
+    max-width: 480px; width: 90%;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 20px; padding: 20px 24px;
+    font-size: 15px; line-height: 1.7; color: rgba(255,255,255,.85);
+    min-height: 80px;
+  }
+
+  .agent-name {
+    font-size: 11px; letter-spacing: .12em;
+    color: #00c49a; text-transform: uppercase; margin-bottom: 8px;
+  }
+
+  .mic-btn {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, #1a3aff, #7c3aff);
+    border: none; cursor: pointer; font-size: 32px;
+    box-shadow: 0 0 30px rgba(26,58,255,.5);
+    transition: all .2s; display: flex; align-items: center; justify-content: center;
+  }
+  .mic-btn.listening {
+    background: linear-gradient(135deg, #ff3c2f, #ff7c2f);
+    box-shadow: 0 0 40px rgba(255,60,47,.6);
+    animation: pulse-mic .8s ease-in-out infinite;
+  }
+  @keyframes pulse-mic { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+  .mood-bar-wrap {
+    width: min(360px, 88vw);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .mood-label { font-size: 11px; color: rgba(255,255,255,.4); letter-spacing:.08em; width:64px; }
+  .mood-track {
+    flex: 1; height: 6px; background: rgba(255,255,255,.1); border-radius: 3px; overflow: hidden;
+  }
+  .mood-fill { height: 100%; border-radius: 3px; transition: width .6s ease, background .6s ease; }
+  .mood-pct { font-size: 12px; color: rgba(255,255,255,.5); width: 36px; text-align: right; }
+
+  .exit-btn {
+    position: fixed; top: 20px; left: 20px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+    color: rgba(255,255,255,.5); border-radius: 20px;
+    padding: 8px 16px; font-size: 12px; cursor: pointer;
+  }
+
+  .transcript {
+    width: min(360px, 88vw); font-size: 13px;
+    color: rgba(255,255,255,.35); font-style: italic;
+    text-align: center; min-height: 20px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── ENTRY OVERLAY ───────────────────── -->
+<div id="overlay">
+  <img class="overlay-logo" src="assets/centris-logo.svg" alt="Centris Leadership OS">
+  <div class="overlay-status" id="overlay-status">Ready to enter</div>
+  <button class="vr-btn" id="enter-vr-btn" onclick="enterVR()">
+    🥽 Enter VR
+  </button>
+  <button class="no-vr-btn" onclick="enterFlat()">
+    Continue without VR
+  </button>
+</div>
+
+<!-- ── FLAT MODE FALLBACK ─────────────── -->
+<div id="flat-mode">
+  <button class="exit-btn" onclick="exitToOverlay()">← Exit</button>
+
+  <div style="text-align:center;">
+    <div style="font-size:28px;margin-bottom:4px;" id="archetype-emoji">😤</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.4);letter-spacing:.08em;" id="archetype-name">CARLOS MENDOZA</div>
+  </div>
+
+  <div class="agent-bubble">
+    <div class="agent-name" id="agent-label">Agent</div>
+    <div id="agent-text">...</div>
+  </div>
+
+  <div class="transcript" id="user-transcript"></div>
+
+  <button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤</button>
+
+  <div class="mood-bar-wrap">
+    <span class="mood-label">Openness</span>
+    <div class="mood-track">
+      <div class="mood-fill" id="vr-mood-fill" style="width:30%;background:#ff6b6b;"></div>
+    </div>
+    <span class="mood-pct" id="vr-mood-pct">30%</span>
+  </div>
+</div>
+
+<!-- ── THREE.JS CANVAS (VR mode) ─────── -->
+<canvas id="vr-canvas" style="display:none;"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ─── STATE ────────────────────────────────
+let vrSession    = null;
+let renderer     = null;
+let scene        = null;
+let camera       = null;
+let logoMesh     = null;
+let isListening  = false;
+let recognition  = null;
+let vrMood       = 30;
+let agentHistory = [];
+let GROQ_KEY     = localStorage.getItem('groq_key') || '';
+
+// ─── VR CHECK ─────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  const btn = document.getElementById('enter-vr-btn');
+  const status = document.getElementById('overlay-status');
+
+  if (!navigator.xr) {
+    status.textContent = 'WebXR not supported in this browser';
+    btn.disabled = true;
+    return;
+  }
+
+  const supported = await navigator.xr.isSessionSupported('immersive-vr').catch(() => false);
+  if (!supported) {
+    status.textContent = 'VR headset not detected — use flat mode';
+    btn.disabled = true;
+  } else {
+    status.textContent = 'Quest 3 detected — ready';
+  }
+
+  // Check Groq key
+  if (!GROQ_KEY) {
+    GROQ_KEY = prompt('Enter your Groq API key:') || '';
+    if (GROQ_KEY) localStorage.setItem('groq_key', GROQ_KEY);
+  }
+});
+
+// ─── ENTER VR ─────────────────────────────
+async function enterVR() {
+  try {
+    // Init Three.js renderer
+    const canvas = document.getElementById('vr-canvas');
+    canvas.style.display = 'block';
+
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.xr.enabled = true;
+
+    scene  = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+
+    // Ambient light
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dirLight = new THREE.DirectionalLight(0x4466ff, 1);
+    dirLight.position.set(2, 4, 3);
+    scene.add(dirLight);
+
+    // Background starfield
+    buildStars();
+
+    // Floating logo plane
+    buildLogoPlane();
+
+    // Floating text
+    buildFloatingText();
+
+    // Request VR session
+    vrSession = await navigator.xr.requestSession('immersive-vr', {
+      optionalFeatures: ['hand-tracking', 'bounded-floor']
+    });
+
+    renderer.xr.setSession(vrSession);
+
+    // Hide overlay
+    document.getElementById('overlay').classList.add('hidden');
+
+    // Render loop
+    renderer.setAnimationLoop(vrRenderLoop);
+
+    // Auto-transition to practice after 4s
+    setTimeout(startVRPractice, 4000);
+
+  } catch (e) {
+    console.error('VR error:', e);
+    alert('Could not start VR: ' + e.message);
+  }
+}
+
+// ─── STARFIELD ────────────────────────────
+function buildStars() {
+  const geo = new THREE.BufferGeometry();
+  const count = 800;
+  const pos = new Float32Array(count * 3);
+  for (let i = 0; i < count * 3; i++) {
+    pos[i] = (Math.random() - 0.5) * 40;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.04, transparent: true, opacity: 0.6 });
+  scene.add(new THREE.Points(geo, mat));
+}
+
+// ─── LOGO PLANE ───────────────────────────
+function buildLogoPlane() {
+  const loader = new THREE.TextureLoader();
+  loader.load('assets/centris-logo.svg', (tex) => {
+    const geo = new THREE.PlaneGeometry(2.4, 1.4);
+    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide });
+    logoMesh = new THREE.Mesh(geo, mat);
+    logoMesh.position.set(0, 0, -3);
+    scene.add(logoMesh);
+  });
+
+  // Glow ring behind logo
+  const ringGeo = new THREE.TorusGeometry(0.9, 0.008, 16, 100);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0x1a3aff, transparent: true, opacity: 0.4 });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.position.set(0, 0, -3.05);
+  ring.userData.spin = 0.003;
+  scene.add(ring);
+
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(0.75, 0.005, 16, 100),
+    new THREE.MeshBasicMaterial({ color: 0x00c49a, transparent: true, opacity: 0.3 })
+  );
+  ring2.position.set(0, 0, -3.05);
+  ring2.rotation.x = Math.PI / 3;
+  ring2.userData.spin = -0.005;
+  scene.add(ring2);
+}
+
+// ─── FLOATING TEXT ────────────────────────
+function buildFloatingText() {
+  // Simple loading dots as spheres
+  const dotMat = new THREE.MeshBasicMaterial({ color: 0x00c49a, transparent: true, opacity: 0.7 });
+  [-0.12, 0, 0.12].forEach((x, i) => {
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 8), dotMat.clone());
+    dot.position.set(x, -0.9, -3);
+    dot.userData.pulse = i * (Math.PI * 2 / 3);
+    scene.add(dot);
+  });
+}
+
+// ─── VR RENDER LOOP ───────────────────────
+let vrClock = 0;
+function vrRenderLoop(t) {
+  vrClock += 0.016;
+
+  // Float logo
+  if (logoMesh) {
+    logoMesh.position.y = Math.sin(vrClock * 0.5) * 0.06;
+    logoMesh.rotation.y = Math.sin(vrClock * 0.2) * 0.04;
+  }
+
+  // Spin rings
+  scene.children.forEach(obj => {
+    if (obj.userData.spin) obj.rotation.z += obj.userData.spin;
+    if (obj.userData.pulse !== undefined) {
+      obj.material.opacity = 0.4 + Math.sin(vrClock * 2 + obj.userData.pulse) * 0.3;
+    }
+  });
+
+  renderer.render(scene, camera);
+}
+
+// ─── START VR PRACTICE ────────────────────
+function startVRPractice() {
+  // For now transition to flat voice mode inside VR
+  // In full implementation: render 3D agent avatars
+  initVoicePractice();
+}
+
+// ─── ENTER FLAT MODE ──────────────────────
+function enterFlat() {
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('flat-mode').classList.add('active');
+  initVoicePractice();
+}
+
+function exitToOverlay() {
+  document.getElementById('flat-mode').classList.remove('active');
+  document.getElementById('overlay').classList.remove('hidden');
+  stopListening();
+  agentHistory = [];
+}
+
+// ─── VOICE PRACTICE ───────────────────────
+async function initVoicePractice() {
+  // Opening line from agent
+  const opener = "...Yeah? You wanted to see me?";
+  showAgentText(opener);
+  agentHistory = [{ role: 'assistant', content: opener }];
+  speakText(opener);
+}
+
+function showAgentText(text) {
+  document.getElementById('agent-text').textContent = text;
+}
+
+function updateVRMood(val) {
+  vrMood = Math.max(0, Math.min(100, val));
+  const fill = document.getElementById('vr-mood-fill');
+  fill.style.width = vrMood + '%';
+  fill.style.background = vrMood < 35 ? '#ff6b6b' : vrMood < 60 ? '#f5a623' : '#1ec99a';
+  document.getElementById('vr-mood-pct').textContent = vrMood + '%';
+}
+
+// ─── MIC / SPEECH RECOGNITION ────────────
+function toggleMic() {
+  if (isListening) {
+    stopListening();
+  } else {
+    startListening();
+  }
+}
+
+function startListening() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Speech recognition not supported in this browser.'); return; }
+
+  recognition = new SR();
+  recognition.lang = 'es-MX'; // Spanish MX — change to 'en-US' if needed
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onstart = () => {
+    isListening = true;
+    document.getElementById('mic-btn').classList.add('listening');
+    document.getElementById('user-transcript').textContent = 'Listening...';
+  };
+
+  recognition.onresult = (e) => {
+    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+    document.getElementById('user-transcript').textContent = transcript;
+    if (e.results[e.results.length - 1].isFinal) {
+      handleUserSpeech(transcript);
+    }
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    document.getElementById('mic-btn').classList.remove('listening');
+  };
+
+  recognition.onerror = (e) => {
+    isListening = false;
+    document.getElementById('mic-btn').classList.remove('listening');
+    console.error('Speech error:', e.error);
+  };
+
+  recognition.start();
+}
+
+function stopListening() {
+  if (recognition) recognition.stop();
+  isListening = false;
+  document.getElementById('mic-btn').classList.remove('listening');
+}
+
+// ─── HANDLE USER SPEECH ───────────────────
+async function handleUserSpeech(text) {
+  if (!text.trim()) return;
+  document.getElementById('user-transcript').textContent = `You: ${text}`;
+  agentHistory.push({ role: 'user', content: text });
+
+  showAgentText('...');
+
+  try {
+    const reply = await callGroq(text);
+    const { msg, newMood } = parseVRReply(reply);
+    agentHistory.push({ role: 'assistant', content: reply });
+    showAgentText(msg);
+    updateVRMood(newMood);
+    speakText(msg);
+  } catch (e) {
+    showAgentText('(Connection error — check your Groq key)');
+  }
+}
+
+// ─── GROQ API ─────────────────────────────
+async function callGroq(userText) {
+  const systemPrompt = `You are Carlos Mendoza, a defensive call center agent with 2 years at the company.
+You care about your work but feel blamed for metrics you can't control. You want to study systems engineering but feel trapped. You have two young kids.
+Respond naturally and emotionally — defensive, guarded, but capable of opening up if the supervisor is genuinely empathetic.
+At the end of EVERY response, add EXACTLY: [MOOD:XX] where XX is a number 0-100 representing your emotional openness.
+Start at 30. Increase if the supervisor listens well. Decrease if they pressure or blame.
+Keep responses SHORT — 1-3 sentences max. This is a spoken VR conversation.`;
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'llama3-8b-8192',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...agentHistory.slice(-10)
+      ],
+      max_tokens: 120,
+      temperature: 0.85
+    })
+  });
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '...';
+}
+
+function parseVRReply(raw) {
+  const moodMatch = raw.match(/\[MOOD:(\d+)\]/);
+  const newMood   = moodMatch ? parseInt(moodMatch[1]) : vrMood;
+  const msg       = raw.replace(/\[MOOD:\d+\]/g, '').trim();
+  return { msg, newMood };
+}
+
+// ─── TEXT TO SPEECH ───────────────────────
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+
+  const utt  = new SpeechSynthesisUtterance(text);
+  utt.lang   = 'es-MX';
+  utt.rate   = 0.92;
+  utt.pitch  = 0.9;
+
+  // Pick a voice
+  const voices = window.speechSynthesis.getVoices();
+  const spanish = voices.find(v => v.lang.startsWith('es') && v.name.toLowerCase().includes('male'))
+    || voices.find(v => v.lang.startsWith('es'))
+    || null;
+  if (spanish) utt.voice = spanish;
+
+  window.speechSynthesis.speak(utt);
+}
+
+// Load voices on ready
+window.speechSynthesis?.addEventListener('voiceschanged', () => {});
+</script>
+</body>
+</html>
