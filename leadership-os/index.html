@@ -35,7 +35,7 @@
 
 
 <!-- ══════════════════════════════════════
-     SCREEN 1: WELCOME — TWO MAIN MENUS
+     SCREEN 1: WELCOME
 ══════════════════════════════════════ -->
 <div class="screen" id="s-welcome">
   <div class="avatar-wrap">
@@ -50,7 +50,6 @@
     </p>
   </div>
 
-  <!-- MAIN MENU 1: INTERVENTIONS -->
   <div class="menu-section-label">Interventions · Retention conversations</div>
   <div class="choice-grid" style="margin-bottom:20px;">
     <button class="choice-btn choice-intervention" onclick="goInterventionMenu()">
@@ -63,7 +62,6 @@
     </button>
   </div>
 
-  <!-- MAIN MENU 2: TECHNIQUES -->
   <div class="menu-section-label">Techniques · Build your toolkit</div>
   <div class="choice-grid">
     <button class="choice-btn choice-technique" onclick="goTechniqueMenu()">
@@ -78,10 +76,8 @@
 </div>
 
 
-<!-- ══════════════════════════════════════
-     SCREEN 1B: INTERVENTION SELECTOR
-══════════════════════════════════════ -->
 <div style="text-align:center;margin-top:16px;"><button class="btn-ghost" onclick="goHistory()" style="font-size:12px;padding:8px 16px;">📊 View my progress</button></div>
+
 
 <!-- ══════════════════════════════════════
      SCREEN 1B: INTERVENTION SELECTOR
@@ -91,12 +87,10 @@
     <button class="back-btn" onclick="goWelcome()">← Back</button>
     <span class="mode-pill mp-practice">Intervenciones</span>
   </div>
-
   <div style="margin-bottom:16px;">
     <h2 style="font-size:16px;margin-bottom:4px;">Which intervention do you want to work on?</h2>
     <p style="font-size:12px;">Each has its own moment, owner, and objective.</p>
   </div>
-
   <div class="choice-grid">
     <button class="choice-btn" onclick="selectIntervention('pulse_check')">
       <span class="choice-icon">💓</span>
@@ -142,12 +136,10 @@
     <button class="back-btn" onclick="goWelcome()">← Back</button>
     <span class="mode-pill mp-work">Técnicas</span>
   </div>
-
   <div style="margin-bottom:16px;">
     <h2 style="font-size:16px;margin-bottom:4px;">Which technique do you want to develop?</h2>
     <p style="font-size:12px;">Practice the technique in any operational scenario — not just interventions.</p>
   </div>
-
   <div class="choice-grid">
     <button class="choice-btn" onclick="selectAndPreview('active_listening')">
       <span class="choice-icon">👂</span>
@@ -157,12 +149,108 @@
         <span class="choice-badge bdg-teal">Disponible</span>
       </div>
     </button>
-    <button class="choice-btn" style="opacity:0.45;cursor:not-allowed;">
+    <button class="choice-btn" onclick="selectAndPreview('powerful_questions')">
       <span class="choice-icon">❓</span>
       <div class="choice-body">
         <div class="choice-label">Powerful Questions</div>
         <div class="choice-sub">Preguntas que abren posibilidades · Co-Active Coaching</div>
-        <span class="choice-badge bdg-purple">Coming soon</span>
+        <span class="choice-badge bdg-teal">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectAndPreview('motivational_interviewing')">
+      <span class="choice-icon">🔥</span>
+      <div class="choice-body">
+        <div class="choice-label">Motivational Interviewing</div>
+        <div class="choice-sub">Elicita motivación interna · Miller & Rollnick</div>
+        <span class="choice-badge bdg-teal">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectAndPreview('nonviolent_communication')">
+      <span class="choice-icon">🕊️</span>
+      <div class="choice-body">
+        <div class="choice-label">Nonviolent Communication</div>
+        <div class="choice-sub">Observación · Sentimiento · Necesidad · Petición · Rosenberg</div>
+        <span class="choice-badge bdg-teal">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectAndPreview('radical_candor')">
+      <span class="choice-icon">💬</span>
+      <div class="choice-body">
+        <div class="choice-label">Radical Candor</div>
+        <div class="choice-sub">Care personally. Challenge directly · Kim Scott</div>
+        <span class="choice-badge bdg-teal">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectAndPreview('crucial_conversations')">
+      <span class="choice-icon">⚡</span>
+      <div class="choice-body">
+        <div class="choice-label">Crucial Conversations</div>
+        <div class="choice-sub">Alto riesgo, emociones fuertes — mantén el diálogo · Patterson et al.</div>
+        <span class="choice-badge bdg-teal">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectAndPreview('tactical_empathy')">
+      <span class="choice-icon">🎯</span>
+      <div class="choice-body">
+        <div class="choice-label">Tactical Empathy</div>
+        <div class="choice-sub">Etiqueta emociones, espeja, pregunta calibrado · Chris Voss</div>
+        <span class="choice-badge bdg-purple">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectAndPreview('scarf_model')">
+      <span class="choice-icon">🧠</span>
+      <div class="choice-body">
+        <div class="choice-label">SCARF Model</div>
+        <div class="choice-sub">Status · Certainty · Autonomy · Relatedness · Fairness · David Rock</div>
+        <span class="choice-badge bdg-purple">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectAndPreview('immunity_to_change')">
+      <span class="choice-icon">🔄</span>
+      <div class="choice-body">
+        <div class="choice-label">Immunity to Change</div>
+        <div class="choice-sub">Compromisos ocultos que bloquean el crecimiento · Kegan & Lahey</div>
+        <span class="choice-badge bdg-purple">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectAndPreview('drama_triangle')">
+      <span class="choice-icon">🎭</span>
+      <div class="choice-body">
+        <div class="choice-label">Drama Triangle</div>
+        <div class="choice-sub">Víctima · Rescatador · Perseguidor — sal del triángulo · Karpman</div>
+        <span class="choice-badge bdg-purple">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectAndPreview('grow_model')">
+      <span class="choice-icon">🌱</span>
+      <div class="choice-body">
+        <div class="choice-label">GROW Model</div>
+        <div class="choice-sub">Goal → Reality → Options → Will · Whitmore</div>
+        <span class="choice-badge bdg-amber">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectAndPreview('strengths_based_coaching')">
+      <span class="choice-icon">💪</span>
+      <div class="choice-body">
+        <div class="choice-label">Strengths-Based Coaching</div>
+        <div class="choice-sub">Construye desde lo que ya funciona · Gallup + Seligman</div>
+        <span class="choice-badge bdg-amber">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectAndPreview('growth_mindset')">
+      <span class="choice-icon">🌀</span>
+      <div class="choice-body">
+        <div class="choice-label">Growth Mindset</div>
+        <div class="choice-sub">De fijo a fluido — la habilidad como práctica · Carol Dweck</div>
+        <span class="choice-badge bdg-amber">Disponible</span>
+      </div>
+    </button>
+    <button class="choice-btn" onclick="selectAndPreview('solution_focused_coaching')">
+      <span class="choice-icon">🔭</span>
+      <div class="choice-body">
+        <div class="choice-label">Solution-Focused Coaching</div>
+        <div class="choice-sub">¿Qué ya está funcionando? Haz más de eso · de Shazer</div>
+        <span class="choice-badge bdg-amber">Disponible</span>
       </div>
     </button>
   </div>
@@ -171,20 +259,17 @@
 
 <!-- ══════════════════════════════════════
      SCREEN 1D: MODE SELECTOR
-     (after choosing intervention or technique)
 ══════════════════════════════════════ -->
 <div class="screen" id="s-mode">
   <div class="back-row">
     <button class="back-btn" id="mode-back-btn" onclick="goBack()">← Back</button>
     <span class="mode-pill mp-learn" id="mode-context-pill">Intervención</span>
   </div>
-
   <div class="avatar-wrap" style="margin-bottom:16px;">
     <div class="avatar-ring" style="width:56px;height:56px;font-size:24px;" id="mode-icon">🎯</div>
     <div class="avatar-name" id="mode-title">Pulse Check</div>
     <div class="avatar-status" id="mode-subtitle">Día 30 · Primera revisión</div>
   </div>
-
   <div class="choice-grid">
     <button class="choice-btn" onclick="goLearn()">
       <span class="choice-icon">📖</span>
@@ -369,8 +454,6 @@
     <button class="back-btn" onclick="show('s-level')">← Back</button>
     <span class="mode-pill mp-practice">Briefing</span>
   </div>
-
-  <!-- Intervention trap warning (only in intervention mode) -->
   <div id="briefing-intent" style="display:none;margin-bottom:12px;">
     <div class="card" style="background:var(--amber-dim);border-color:rgba(245,166,35,.3);padding:12px 14px;">
       <div style="font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;">
@@ -379,13 +462,11 @@
       <div class="intent-trap" style="font-size:12px;color:var(--text);line-height:1.6;"></div>
     </div>
   </div>
-
   <div class="briefing-wrap">
     <div class="briefing-label">📋 Situation briefing</div>
     <div class="briefing-text" id="briefing-text">Loading...</div>
     <div class="briefing-meta" id="briefing-meta"></div>
   </div>
-
   <div class="card" style="background:var(--bg3);border-color:var(--border2);margin-bottom:12px;">
     <p style="color:var(--text);font-size:13px;line-height:1.7;">
       "One thing before you go in — what are you assuming about this person right now?"
@@ -406,32 +487,25 @@
     <button class="back-btn" onclick="goWelcome()">← End session</button>
     <span class="mode-pill mp-practice" id="practice-level-pill">Practice · Novice</span>
   </div>
-
   <div class="chat-header">
     <div class="chat-av" id="practice-av" style="background:linear-gradient(135deg,#ff6b6b,#f5a623);">😤</div>
     <div class="chat-info">
       <div class="chat-name" id="practice-avatar-name">Carlos Mendoza</div>
       <div class="chat-mode" id="carlos-mode-label">Call Center Agent · 2 years</div>
     </div>
-    <!-- Voice indicator -->
     <div id="voice-indicator" style="width:8px;height:8px;border-radius:50%;background:var(--text3);margin-left:auto;flex-shrink:0;transition:background .3s;"></div>
   </div>
-
   <div class="mood-row" id="mood-row-wrap">
     <div class="mood-lbl">Openness</div>
     <div class="mood-track"><div class="mood-fill" id="mood-fill" style="width:30%;background:#ff6b6b;"></div></div>
     <div class="mood-pct" id="mood-pct">30%</div>
   </div>
-
   <div class="box-meter" id="box-meter-wrap">
     <div class="box-label" id="box-label">How you're showing up in this conversation</div>
     <div class="box-indicator" id="box-indicator">— —</div>
   </div>
-
   <div style="margin:10px 0;"></div>
   <div class="msgs" id="practice-msgs"></div>
-
-  <!-- VR: large voice button, no keyboard needed -->
   <div class="input-area">
     <button class="voice-btn" id="practice-voice" onclick="toggleVoice('practice')" title="Tap to speak">🎤</button>
     <textarea class="chat-input" id="practice-input" placeholder="Respond as yourself..." rows="1" onkeydown="handleKey(event,'practice')"></textarea>
@@ -441,8 +515,6 @@
     <button class="act-btn" id="hint-btn" onclick="practiceHint()">💡 Hint <span class="hint-cost" id="hint-cost-label"></span></button>
     <button class="act-btn" onclick="goEval()">📊 End &amp; reflect</button>
   </div>
-
-  <!-- Listen indicator for VR mode -->
   <div id="listen-indicator" style="display:none;text-align:center;padding:8px;font-size:11px;color:var(--teal);">
     🎤 Listening...
   </div>
@@ -476,24 +548,6 @@
 </div>
 
 
-
-<div class="gloss-popup" id="gloss-popup">
-  <div class="gloss-title" id="gloss-title"></div>
-  <div id="gloss-body"></div>
-</div>
-
-<!-- JS load order matters -->
-<script src="js/interventions.js"></script>
-<script src="js/archetypes.js"></script>
-<script src="js/techniques.js"></script>
-<script src="js/prompts.js"></script>
-<script src="js/api.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/supabase.js"></script>
-<script src="js/app.js"></script>
-</body>
-</html>
-
 <!-- ══════════════════════════════════════
      SCREEN: TECHNIQUE PREVIEW
 ══════════════════════════════════════ -->
@@ -502,14 +556,12 @@
     <button class="back-btn" onclick="show('s-techniques')">← Back</button>
     <span class="mode-pill mp-work" id="preview-pill">Preview</span>
   </div>
-
   <div class="preview-dots">
     <div class="pdot" id="pdot-0"></div>
     <div class="pdot" id="pdot-1"></div>
     <div class="pdot" id="pdot-2"></div>
     <div class="pdot" id="pdot-3"></div>
   </div>
-
   <div id="preview-stage"></div>
 </div>
 
@@ -522,12 +574,10 @@
     <button class="back-btn" onclick="goWelcome()">← Back</button>
     <span class="mode-pill mp-learn">Progress</span>
   </div>
-
   <div style="margin-bottom:16px;">
     <h2 style="font-size:16px;margin-bottom:4px;">Your progress</h2>
-    <p style="font-size:12px;">Every session saved locally. Connect Supabase to sync across devices.</p>
+    <p style="font-size:12px;">Sessions synced across devices.</p>
   </div>
-
   <div id="history-content"></div>
 </div>
 
@@ -548,3 +598,5 @@
 <script src="js/supabase.js"></script>
 <script src="js/app.js"></script>
 <script src="js/preview.js"></script>
+</body>
+</html>
