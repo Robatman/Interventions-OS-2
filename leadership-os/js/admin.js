@@ -4,6 +4,18 @@
 //  Only accessible when role_code === 'A'
 // ═══════════════════════════════════════════
 
+// Helper local para headers con token de sesión
+function adminHeaders() {
+  const token = getSessionToken();
+  return {
+    'Content-Type':  'application/json',
+    'apikey':        'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu',
+    'Authorization': `Bearer ${token}`
+  };
+}
+
+const ADMIN_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
+
 // ─── ENTRY POINT ──────────────────────────
 
 async function goAdmin() {
@@ -19,9 +31,9 @@ async function goAdmin() {
 // ─── NAV ──────────────────────────────────
 
 function renderAdminNav(active) {
-  const tabs = ['users', 'sessions', 'trends'];
+  const tabs   = ['users', 'sessions', 'trends'];
   const labels = { users: '👥 Users', sessions: '📋 Sessions', trends: '📊 Trends' };
-  const el = document.getElementById('admin-nav');
+  const el     = document.getElementById('admin-nav');
   if (!el) return;
   el.innerHTML = tabs.map(t => `
     <button class="admin-tab ${t === active ? 'active' : ''}" onclick="adminTab('${t}')">
@@ -45,8 +57,8 @@ async function loadAdminUsers() {
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/user_profiles?select=*&order=created_at.desc`,
-      { headers: { ...SUPABASE_HEADERS, 'Authorization': `Bearer ${getSessionToken()}` } }
+      `${ADMIN_URL}/rest/v1/user_profiles?select=*&order=created_at.desc`,
+      { headers: adminHeaders() }
     );
     const users = await res.json();
 
@@ -86,10 +98,10 @@ async function loadAdminUsers() {
 async function adminToggleUser(userId, currentlyActive) {
   try {
     await fetch(
-      `${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${userId}`,
+      `${ADMIN_URL}/rest/v1/user_profiles?id=eq.${userId}`,
       {
         method:  'PATCH',
-        headers: { ...SUPABASE_HEADERS, 'Authorization': `Bearer ${getSessionToken()}`, 'Prefer': 'return=minimal' },
+        headers: { ...adminHeaders(), 'Prefer': 'return=minimal' },
         body:    JSON.stringify({ is_active: !currentlyActive })
       }
     );
@@ -106,15 +118,10 @@ async function adminResetPassword(userId, gameId) {
     return;
   }
   try {
-    // Supabase Admin API to update password
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${userId}`, {
+    const res = await fetch(`${ADMIN_URL}/auth/v1/admin/users/${userId}`, {
       method:  'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey':        SUPABASE_KEY,
-        'Authorization': `Bearer ${getSessionToken()}`
-      },
-      body: JSON.stringify({ password: newPwd })
+      headers: adminHeaders(),
+      body:    JSON.stringify({ password: newPwd })
     });
     if (res.ok) {
       alert(`Password reset for ${gameId}.`);
@@ -136,31 +143,25 @@ async function loadAdminSessions() {
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/admin_sessions?select=*&order=completed_at.desc&limit=100`,
-      { headers: { ...SUPABASE_HEADERS, 'Authorization': `Bearer ${getSessionToken()}` } }
+      `${ADMIN_URL}/rest/v1/admin_sessions?select=*&order=completed_at.desc&limit=100`,
+      { headers: adminHeaders() }
     );
     const sessions = await res.json();
 
-    // Group by technique
-    const byTechnique = {};
+    const byTechnique    = {};
     const byIntervention = {};
     sessions.forEach(s => {
-      if (s.technique) {
-        byTechnique[s.technique] = (byTechnique[s.technique] || 0) + 1;
-      }
-      if (s.intervention) {
-        byIntervention[s.intervention] = (byIntervention[s.intervention] || 0) + 1;
-      }
+      if (s.technique)    byTechnique[s.technique]       = (byTechnique[s.technique]    || 0) + 1;
+      if (s.intervention) byIntervention[s.intervention] = (byIntervention[s.intervention] || 0) + 1;
     });
 
     const techSorted = Object.entries(byTechnique).sort((a,b) => b[1]-a[1]);
     const intSorted  = Object.entries(byIntervention).sort((a,b) => b[1]-a[1]);
     const maxTech    = techSorted[0]?.[1] || 1;
-    const maxInt     = intSorted[0]?.[1] || 1;
+    const maxInt     = intSorted[0]?.[1]  || 1;
 
     el.innerHTML = `
       <div class="admin-section-title">Sessions <span class="admin-count">${sessions.length}</span></div>
-
       <div class="admin-split">
         <div>
           <div class="admin-subsection">By Technique</div>
@@ -185,7 +186,6 @@ async function loadAdminSessions() {
             </div>`).join('') || '<div class="admin-empty">No intervention sessions yet</div>'}
         </div>
       </div>
-
       <div class="admin-subsection" style="margin-top:20px;">Recent sessions</div>
       <div class="admin-table">
         <div class="admin-row admin-header">
@@ -195,12 +195,10 @@ async function loadAdminSessions() {
           <span>Mood</span>
           <span>Date</span>
         </div>
-        ${sessions.slice(0, 30).map(s => {
-          const topic = s.intervention
-            ? (INTERVENTIONS[s.intervention]?.label || s.intervention)
-            : (TECHNIQUES[s.technique]?.label       || s.technique || '—');
+        ${sessions.slice(0,30).map(s => {
+          const topic     = s.intervention ? (INTERVENTIONS[s.intervention]?.label || s.intervention) : (TECHNIQUES[s.technique]?.label || s.technique || '—');
           const moodColor = (s.mood_final||0) < 35 ? 'var(--coral)' : (s.mood_final||0) < 60 ? 'var(--amber)' : 'var(--teal)';
-          const date = s.completed_at ? new Date(s.completed_at).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : '—';
+          const date      = s.completed_at ? new Date(s.completed_at).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : '—';
           return `
             <div class="admin-row">
               <span class="admin-gameid">${s.game_id || '—'}</span>
@@ -225,17 +223,14 @@ async function loadAdminTrends() {
 
   try {
     const [sessionsRes, workRes] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/admin_sessions?select=*&order=completed_at.desc&limit=500`,
-        { headers: { ...SUPABASE_HEADERS, 'Authorization': `Bearer ${getSessionToken()}` } }),
-      fetch(`${SUPABASE_URL}/rest/v1/work_sessions?select=*&order=created_at.desc&limit=200`,
-        { headers: { ...SUPABASE_HEADERS, 'Authorization': `Bearer ${getSessionToken()}` } })
+      fetch(`${ADMIN_URL}/rest/v1/admin_sessions?select=*&order=completed_at.desc&limit=500`, { headers: adminHeaders() }),
+      fetch(`${ADMIN_URL}/rest/v1/work_sessions?select=*&order=created_at.desc&limit=200`,   { headers: adminHeaders() })
     ]);
 
-    const sessions  = await sessionsRes.json();
-    const workSess  = await workRes.json();
+    const sessions = await sessionsRes.json();
+    const workSess = await workRes.json();
 
-    // Weekly sessions last 8 weeks
-    const now = Date.now();
+    const now   = Date.now();
     const weeks = Array.from({ length: 8 }, (_, i) => {
       const start = now - (i + 1) * 7 * 24 * 3600 * 1000;
       const end   = now - i * 7 * 24 * 3600 * 1000;
@@ -249,7 +244,6 @@ async function loadAdminTrends() {
 
     const maxWeek = Math.max(...weeks.map(w => w.count), 1);
 
-    // Avg mood per technique
     const techMoods = {};
     sessions.forEach(s => {
       if (!s.technique || !s.mood_final) return;
@@ -262,7 +256,6 @@ async function loadAdminTrends() {
       avg:   Math.round(moods.reduce((a,b) => a+b, 0) / moods.length)
     })).sort((a,b) => b.avg - a.avg);
 
-    // Work Together topic classifications
     const topicCounts = {};
     workSess.forEach(w => {
       if (w.topic_classification) {
@@ -273,7 +266,6 @@ async function loadAdminTrends() {
 
     el.innerHTML = `
       <div class="admin-section-title">Trends</div>
-
       <div class="admin-subsection">Sessions per week</div>
       <div class="admin-week-chart">
         ${weeks.map(w => `
@@ -283,7 +275,6 @@ async function loadAdminTrends() {
             <div class="admin-week-label">${w.label}</div>
           </div>`).join('')}
       </div>
-
       <div class="admin-subsection" style="margin-top:20px;">Avg openness by technique</div>
       ${techAvg.map(t => {
         const color = t.avg < 35 ? 'var(--coral)' : t.avg < 60 ? 'var(--amber)' : 'var(--teal)';
@@ -296,7 +287,6 @@ async function loadAdminTrends() {
             <span class="admin-bar-count" style="color:${color};">${t.avg}%</span>
           </div>`;
       }).join('') || '<div class="admin-empty">No data yet</div>'}
-
       <div class="admin-subsection" style="margin-top:20px;">Work Together — what people bring</div>
       ${topicSorted.length ? `
         <div class="admin-tags">
@@ -306,7 +296,6 @@ async function loadAdminTrends() {
               <span class="admin-tag-count">${count}</span>
             </div>`).join('')}
         </div>` : '<div class="admin-empty">No Work Together sessions classified yet</div>'}
-
       <div class="admin-stats-grid" style="margin-top:20px;">
         <div class="admin-stat">
           <div class="admin-stat-num">${sessions.length}</div>
