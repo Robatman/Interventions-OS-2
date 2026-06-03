@@ -252,11 +252,12 @@ async function enterVR() {
     canvas.style.display = 'block';
 
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(window.devicePixelRatio || 1);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
-
     scene  = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 1.6, 0);
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
     const dirLight = new THREE.DirectionalLight(0x4466ff, 1);
@@ -271,6 +272,7 @@ async function enterVR() {
       optionalFeatures: ['hand-tracking', 'bounded-floor']
     });
     renderer.xr.setSession(vrSession);
+    renderer.xr.setReferenceSpaceType("local-floor");
 
     document.getElementById('overlay').classList.add('hidden');
     renderer.setAnimationLoop(vrRenderLoop);
@@ -294,7 +296,7 @@ function buildStars() {
 // ─── LOGO 3D NATIVO ───────────────────────
 function buildLogoPlane() {
   const group = new THREE.Group();
-  group.position.set(0, 0, -3);
+  group.position.set(0, 1.6, -3);
   scene.add(group);
   logoMesh = group;
 
