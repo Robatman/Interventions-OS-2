@@ -51,7 +51,7 @@ function formatGameId(raw) {
 // We use Game ID as the "email" field in Supabase Auth
 // by appending a fixed domain. This avoids needing real emails.
 
-const FAKE_DOMAIN = '@leadershipos.internal';
+const FAKE_DOMAIN = '@leadershipos.app';
 
 function gameIdToEmail(gameId) {
   return gameId.toUpperCase().trim() + FAKE_DOMAIN;
