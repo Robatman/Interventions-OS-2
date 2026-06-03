@@ -9,7 +9,6 @@
   body { background: #000; overflow: hidden; font-family: Arial, sans-serif; }
   canvas { display: block; }
 
-  /* 2D overlay UI — visible before entering VR */
   #overlay {
     position: fixed; inset: 0;
     display: flex; flex-direction: column;
@@ -20,18 +19,12 @@
   }
   #overlay.hidden { opacity: 0; pointer-events: none; }
 
-  .overlay-logo {
-    width: min(380px, 90vw);
-    margin-bottom: 32px;
-    animation: float 3.5s ease-in-out infinite;
-  }
-  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-
   .overlay-status {
     font-size: 13px; letter-spacing: .15em;
     color: rgba(255,255,255,.4);
     text-transform: uppercase;
     margin-bottom: 32px;
+    margin-top: 16px;
   }
 
   .vr-btn {
@@ -54,7 +47,6 @@
   }
   .no-vr-btn:hover { border-color: rgba(255,255,255,.5); color: white; }
 
-  /* VR voice interface — shown in flat mode fallback */
   #flat-mode {
     display: none; position: fixed; inset: 0;
     background: #070d1f;
@@ -96,9 +88,7 @@
     display: flex; align-items: center; gap: 12px;
   }
   .mood-label { font-size: 11px; color: rgba(255,255,255,.4); letter-spacing:.08em; width:64px; }
-  .mood-track {
-    flex: 1; height: 6px; background: rgba(255,255,255,.1); border-radius: 3px; overflow: hidden;
-  }
+  .mood-track { flex: 1; height: 6px; background: rgba(255,255,255,.1); border-radius: 3px; overflow: hidden; }
   .mood-fill { height: 100%; border-radius: 3px; transition: width .6s ease, background .6s ease; }
   .mood-pct { font-size: 12px; color: rgba(255,255,255,.5); width: 36px; text-align: right; }
 
@@ -114,23 +104,72 @@
     color: rgba(255,255,255,.35); font-style: italic;
     text-align: center; min-height: 20px;
   }
+
+  /* Logo SVG inline en overlay */
+  .overlay-logo-wrap {
+    width: min(320px, 80vw);
+    margin-bottom: 8px;
+    animation: float 3.5s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 </style>
 </head>
 <body>
 
 <!-- ── ENTRY OVERLAY ───────────────────── -->
 <div id="overlay">
-  <img class="overlay-logo" src="assets/centris-logo.svg" alt="Centris Leadership OS">
+  <!-- Logo SVG inline — no depende de carga de archivo -->
+  <div class="overlay-logo-wrap">
+    <svg viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+      <style>
+        @keyframes vp { 0%,100%{opacity:.1} 50%{opacity:.3} }
+        @keyframes vs { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes vb { 0%,100%{opacity:.4} 50%{opacity:1} }
+        .vr1{animation:vs 14s linear infinite;transform-origin:340px 190px;}
+        .vr2{animation:vs 9s linear infinite reverse;transform-origin:340px 190px;}
+        .vo1{animation:vp 2.5s ease-in-out infinite;}
+        .vo2{animation:vp 2.5s ease-in-out infinite .6s;}
+        .vo3{animation:vp 2.5s ease-in-out infinite 1.2s;}
+        .vn1{animation:vb 1.8s ease-in-out infinite;}
+        .vn2{animation:vb 1.8s ease-in-out infinite .6s;}
+        .vn3{animation:vb 1.8s ease-in-out infinite 1.2s;}
+        .vn4{animation:vb 1.8s ease-in-out infinite .3s;}
+        .vn5{animation:vb 1.8s ease-in-out infinite .9s;}
+      </style>
+      <circle cx="140" cy="90" r="90" fill="#1a3aff" class="vo1"/>
+      <circle cx="540" cy="300" r="110" fill="#00c49a" class="vo2"/>
+      <circle cx="340" cy="360" r="70" fill="#7c3aff" class="vo3"/>
+      <g class="vr1"><circle cx="340" cy="190" r="155" fill="none" stroke="#1a3aff" stroke-width="1.5" stroke-dasharray="10 10" opacity=".25"/></g>
+      <g class="vr2"><circle cx="340" cy="190" r="125" fill="none" stroke="#00c49a" stroke-width="1" stroke-dasharray="5 15" opacity=".2"/></g>
+      <circle cx="340" cy="190" r="88" fill="#070d1f" opacity=".92"/>
+      <circle cx="340" cy="190" r="84" fill="none" stroke="#1a3aff" stroke-width="1.5" opacity=".35"/>
+      <line x1="300" y1="165" x2="340" y2="190" stroke="#1a3aff" stroke-width="1" opacity=".3"/>
+      <line x1="300" y1="215" x2="340" y2="190" stroke="#1a3aff" stroke-width="1" opacity=".3"/>
+      <line x1="340" y1="190" x2="372" y2="165" stroke="#00c49a" stroke-width="1" opacity=".3"/>
+      <line x1="340" y1="190" x2="372" y2="190" stroke="#7c3aff" stroke-width="1" opacity=".3"/>
+      <line x1="340" y1="190" x2="372" y2="215" stroke="#00c49a" stroke-width="1" opacity=".3"/>
+      <circle cx="300" cy="165" r="7" fill="#1a3aff" class="vn1"/>
+      <circle cx="300" cy="215" r="7" fill="#1a3aff" class="vn2"/>
+      <circle cx="340" cy="190" r="11" fill="#ffffff" opacity=".95"/>
+      <circle cx="340" cy="190" r="7" fill="#1a3aff"/>
+      <circle cx="372" cy="165" r="7" fill="#00c49a" class="vn3"/>
+      <circle cx="372" cy="190" r="7" fill="#7c3aff" class="vn4"/>
+      <circle cx="372" cy="215" r="7" fill="#00c49a" class="vn5"/>
+      <line x1="325" y1="148" x2="355" y2="148" stroke="white" stroke-width="2" opacity=".5"/>
+      <polygon points="340,138 328,148 352,148" fill="white" opacity=".4"/>
+      <text x="340" y="332" text-anchor="middle" font-family="'Arial Black',Arial,sans-serif" font-weight="900" font-size="36" letter-spacing="10" fill="#0d1855">CENTRIS</text>
+      <rect x="268" y="344" width="144" height="22" rx="11" fill="#1a3aff" opacity=".12"/>
+      <text x="340" y="360" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="11" letter-spacing="4" fill="#1a3aff" opacity=".75">LEADERSHIP OS</text>
+    </svg>
+  </div>
+
   <div class="overlay-status" id="overlay-status">Ready to enter</div>
-  <button class="vr-btn" id="enter-vr-btn" onclick="enterVR()">
-    🥽 Enter VR
-  </button>
-  <button class="no-vr-btn" onclick="enterFlat()">
-    Continue without VR
-  </button>
+  <button class="vr-btn" id="enter-vr-btn" onclick="enterVR()">🥽 Enter VR</button>
+  <button class="no-vr-btn" onclick="enterFlat()">Continue without VR</button>
 </div>
 
-<!-- ── FLAT MODE FALLBACK ─────────────── -->
+
+<!-- ── FLAT MODE ──────────────────────── -->
 <div id="flat-mode">
   <button class="exit-btn" onclick="exitToOverlay()">← Exit</button>
 
@@ -140,24 +179,22 @@
   </div>
 
   <div class="agent-bubble">
-    <div class="agent-name" id="agent-label">Agent</div>
+    <div class="agent-name">Agent</div>
     <div id="agent-text">...</div>
   </div>
 
   <div class="transcript" id="user-transcript"></div>
 
-  <!-- Text fallback when no mic available -->
   <div style="display:flex;gap:8px;width:min(360px,88vw);">
-    <input id="text-input"
-      type="text"
-      placeholder="Type your response here..."
+    <input id="text-input" type="text" placeholder="Type your response here..."
       style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
              border-radius:24px;padding:10px 18px;color:white;font-size:14px;outline:none;"
       onkeydown="if(event.key==='Enter') sendText()">
     <button onclick="sendText()"
       style="background:linear-gradient(135deg,#1a3aff,#7c3aff);border:none;
-             border-radius:24px;padding:10px 20px;color:white;font-size:13px;
-             font-weight:700;cursor:pointer;">Send</button>
+             border-radius:24px;padding:10px 20px;color:white;font-size:13px;font-weight:700;cursor:pointer;">
+      Send
+    </button>
   </div>
 
   <button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤</button>
@@ -171,7 +208,7 @@
   </div>
 </div>
 
-<!-- ── THREE.JS CANVAS (VR mode) ─────── -->
+<!-- ── THREE.JS CANVAS ────────────────── -->
 <canvas id="vr-canvas" style="display:none;"></canvas>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -186,11 +223,11 @@ let isListening  = false;
 let recognition  = null;
 let vrMood       = 30;
 let agentHistory = [];
-let GROQ_KEY = localStorage.getItem('groq_key') || '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';
+let GROQ_KEY     = localStorage.getItem('groq_key') || '';
 
 // ─── VR CHECK ─────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
-  const btn = document.getElementById('enter-vr-btn');
+  const btn    = document.getElementById('enter-vr-btn');
   const status = document.getElementById('overlay-status');
 
   if (!navigator.xr) {
@@ -206,18 +243,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   } else {
     status.textContent = 'Quest 3 detected — ready';
   }
-
-  // Check Groq key
-  if (!GROQ_KEY) {
-    GROQ_KEY = prompt('Enter your Groq API key:') || '';
-    if (GROQ_KEY) localStorage.setItem('groq_key', GROQ_KEY);
-  }
 });
 
 // ─── ENTER VR ─────────────────────────────
 async function enterVR() {
   try {
-    // Init Three.js renderer
     const canvas = document.getElementById('vr-canvas');
     canvas.style.display = 'block';
 
@@ -228,35 +258,22 @@ async function enterVR() {
     scene  = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
 
-    // Ambient light
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
     const dirLight = new THREE.DirectionalLight(0x4466ff, 1);
     dirLight.position.set(2, 4, 3);
     scene.add(dirLight);
 
-    // Background starfield
     buildStars();
-
-    // Floating logo plane
     buildLogoPlane();
+    buildFloatingDots();
 
-    // Floating text
-    buildFloatingText();
-
-    // Request VR session
     vrSession = await navigator.xr.requestSession('immersive-vr', {
       optionalFeatures: ['hand-tracking', 'bounded-floor']
     });
-
     renderer.xr.setSession(vrSession);
 
-    // Hide overlay
     document.getElementById('overlay').classList.add('hidden');
-
-    // Render loop
     renderer.setAnimationLoop(vrRenderLoop);
-
-    // Auto-transition to practice after 4s
     setTimeout(startVRPractice, 4000);
 
   } catch (e) {
@@ -268,51 +285,102 @@ async function enterVR() {
 // ─── STARFIELD ────────────────────────────
 function buildStars() {
   const geo = new THREE.BufferGeometry();
-  const count = 800;
-  const pos = new Float32Array(count * 3);
-  for (let i = 0; i < count * 3; i++) {
-    pos[i] = (Math.random() - 0.5) * 40;
-  }
+  const pos = new Float32Array(800 * 3);
+  for (let i = 0; i < pos.length; i++) pos[i] = (Math.random() - 0.5) * 40;
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.04, transparent: true, opacity: 0.6 });
-  scene.add(new THREE.Points(geo, mat));
+  scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.04, transparent: true, opacity: 0.6 })));
 }
 
-// ─── LOGO PLANE ───────────────────────────
+// ─── LOGO 3D NATIVO ───────────────────────
 function buildLogoPlane() {
-  const loader = new THREE.TextureLoader();
-  loader.load('assets/centris-logo.svg', (tex) => {
-    const geo = new THREE.PlaneGeometry(2.4, 1.4);
-    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide });
-    logoMesh = new THREE.Mesh(geo, mat);
-    logoMesh.position.set(0, 0, -3);
-    scene.add(logoMesh);
+  const group = new THREE.Group();
+  group.position.set(0, 0, -3);
+  scene.add(group);
+  logoMesh = group;
+
+  // Fondo oscuro
+  group.add(new THREE.Mesh(
+    new THREE.CircleGeometry(0.55, 64),
+    new THREE.MeshBasicMaterial({ color: 0x070d1f, transparent: true, opacity: 0.92 })
+  ));
+
+  // Nodos
+  const positions = [
+    { p: [-0.25,  0.12, 0.01], c: 0x1a3aff, tag: 'n1' },
+    { p: [-0.25, -0.12, 0.01], c: 0x1a3aff, tag: 'n2' },
+    { p: [ 0.25,  0.15, 0.01], c: 0x00c49a, tag: 'n3' },
+    { p: [ 0.25,  0,    0.01], c: 0x7c3aff, tag: 'n4' },
+    { p: [ 0.25, -0.15, 0.01], c: 0x00c49a, tag: 'n5' },
+  ];
+  positions.forEach((n, i) => {
+    const mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.045, 12, 12),
+      new THREE.MeshBasicMaterial({ color: n.c, transparent: true, opacity: 0.8 })
+    );
+    mesh.position.set(...n.p);
+    mesh.userData.pulse = i * (Math.PI * 2 / 5);
+    mesh.userData.isNode = true;
+    group.add(mesh);
   });
 
-  // Glow ring behind logo
-  const ringGeo = new THREE.TorusGeometry(0.9, 0.008, 16, 100);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0x1a3aff, transparent: true, opacity: 0.4 });
-  const ring = new THREE.Mesh(ringGeo, ringMat);
-  ring.position.set(0, 0, -3.05);
-  ring.userData.spin = 0.003;
-  scene.add(ring);
+  // Centro blanco + azul
+  const cw = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+  cw.position.set(0, 0, 0.01);
+  group.add(cw);
+  const cb = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 12), new THREE.MeshBasicMaterial({ color: 0x1a3aff }));
+  cb.position.set(0, 0, 0.02);
+  group.add(cb);
 
-  const ring2 = new THREE.Mesh(
-    new THREE.TorusGeometry(0.75, 0.005, 16, 100),
-    new THREE.MeshBasicMaterial({ color: 0x00c49a, transparent: true, opacity: 0.3 })
-  );
-  ring2.position.set(0, 0, -3.05);
-  ring2.rotation.x = Math.PI / 3;
-  ring2.userData.spin = -0.005;
-  scene.add(ring2);
+  // Conexiones
+  const conns = [
+    [[-0.25, 0.12, 0], [0, 0, 0], 0x1a3aff],
+    [[-0.25,-0.12, 0], [0, 0, 0], 0x1a3aff],
+    [[0, 0, 0], [ 0.25,  0.15, 0], 0x00c49a],
+    [[0, 0, 0], [ 0.25,  0,    0], 0x7c3aff],
+    [[0, 0, 0], [ 0.25, -0.15, 0], 0x00c49a],
+  ];
+  conns.forEach(([a, b, c]) => {
+    const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a), new THREE.Vector3(...b)]);
+    group.add(new THREE.Line(geo, new THREE.LineBasicMaterial({ color: c, transparent: true, opacity: 0.35 })));
+  });
+
+  // Anillos
+  const rings = [
+    { r: 0.58, t: 0.008, c: 0x1a3aff, op: 0.5,  spin:  0.004, rx: 0,           ry: 0 },
+    { r: 0.48, t: 0.005, c: 0x00c49a, op: 0.35, spin: -0.006, rx: Math.PI/3,   ry: 0 },
+    { r: 0.52, t: 0.004, c: 0x7c3aff, op: 0.25, spin:  0.003, rx: 0,           ry: Math.PI/4 },
+  ];
+  rings.forEach(r => {
+    const mesh = new THREE.Mesh(
+      new THREE.TorusGeometry(r.r, r.t, 16, 80),
+      new THREE.MeshBasicMaterial({ color: r.c, transparent: true, opacity: r.op })
+    );
+    mesh.rotation.x = r.rx;
+    mesh.rotation.y = r.ry;
+    mesh.userData.spin = r.spin;
+    group.add(mesh);
+  });
+
+  // Puntos orbitando
+  [0x1a3aff, 0x00c49a, 0x7c3aff, 0xff3c2f].forEach((color, i) => {
+    const dot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.025, 8, 8),
+      new THREE.MeshBasicMaterial({ color })
+    );
+    const angle = (i / 4) * Math.PI * 2;
+    dot.position.set(Math.cos(angle) * 0.65, Math.sin(angle) * 0.65, 0);
+    dot.userData.orbit = { radius: 0.65, speed: 0.008, offset: angle };
+    group.add(dot);
+  });
 }
 
-// ─── FLOATING TEXT ────────────────────────
-function buildFloatingText() {
-  // Simple loading dots as spheres
-  const dotMat = new THREE.MeshBasicMaterial({ color: 0x00c49a, transparent: true, opacity: 0.7 });
+// ─── FLOATING DOTS ────────────────────────
+function buildFloatingDots() {
   [-0.12, 0, 0.12].forEach((x, i) => {
-    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 8), dotMat.clone());
+    const dot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.018, 8, 8),
+      new THREE.MeshBasicMaterial({ color: 0x00c49a, transparent: true, opacity: 0.7 })
+    );
     dot.position.set(x, -0.9, -3);
     dot.userData.pulse = i * (Math.PI * 2 / 3);
     scene.add(dot);
@@ -321,19 +389,28 @@ function buildFloatingText() {
 
 // ─── VR RENDER LOOP ───────────────────────
 let vrClock = 0;
-function vrRenderLoop(t) {
+function vrRenderLoop() {
   vrClock += 0.016;
 
-  // Float logo
   if (logoMesh) {
     logoMesh.position.y = Math.sin(vrClock * 0.5) * 0.06;
     logoMesh.rotation.y = Math.sin(vrClock * 0.2) * 0.04;
+
+    logoMesh.children.forEach(obj => {
+      if (obj.userData.spin)   obj.rotation.z += obj.userData.spin;
+      if (obj.userData.isNode && obj.material) {
+        obj.material.opacity = 0.5 + Math.sin(vrClock * 2 + (obj.userData.pulse || 0)) * 0.4;
+      }
+      if (obj.userData.orbit) {
+        obj.userData.orbit.offset += obj.userData.orbit.speed;
+        obj.position.x = Math.cos(obj.userData.orbit.offset) * obj.userData.orbit.radius;
+        obj.position.y = Math.sin(obj.userData.orbit.offset) * obj.userData.orbit.radius;
+      }
+    });
   }
 
-  // Spin rings
   scene.children.forEach(obj => {
-    if (obj.userData.spin) obj.rotation.z += obj.userData.spin;
-    if (obj.userData.pulse !== undefined) {
+    if (obj.userData.pulse !== undefined && !logoMesh?.children.includes(obj)) {
       obj.material.opacity = 0.4 + Math.sin(vrClock * 2 + obj.userData.pulse) * 0.3;
     }
   });
@@ -343,8 +420,6 @@ function vrRenderLoop(t) {
 
 // ─── START VR PRACTICE ────────────────────
 function startVRPractice() {
-  // For now transition to flat voice mode inside VR
-  // In full implementation: render 3D agent avatars
   initVoicePractice();
 }
 
@@ -364,7 +439,6 @@ function exitToOverlay() {
 
 // ─── VOICE PRACTICE ───────────────────────
 async function initVoicePractice() {
-  // Opening line from agent
   const opener = "...Yeah? You wanted to see me?";
   showAgentText(opener);
   agentHistory = [{ role: 'assistant', content: opener }];
@@ -378,7 +452,7 @@ function showAgentText(text) {
 function updateVRMood(val) {
   vrMood = Math.max(0, Math.min(100, val));
   const fill = document.getElementById('vr-mood-fill');
-  fill.style.width = vrMood + '%';
+  fill.style.width      = vrMood + '%';
   fill.style.background = vrMood < 35 ? '#ff6b6b' : vrMood < 60 ? '#f5a623' : '#1ec99a';
   document.getElementById('vr-mood-pct').textContent = vrMood + '%';
 }
@@ -393,49 +467,28 @@ function sendText() {
   handleUserSpeech(text);
 }
 
-// ─── MIC / SPEECH RECOGNITION ────────────
+// ─── MIC ──────────────────────────────────
 function toggleMic() {
-  if (isListening) {
-    stopListening();
-  } else {
-    startListening();
-  }
+  isListening ? stopListening() : startListening();
 }
 
 function startListening() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Speech recognition not supported in this browser.'); return; }
+  if (!SR) { alert('Speech recognition not supported.'); return; }
 
   recognition = new SR();
-  recognition.lang = 'es-MX'; // Spanish MX — change to 'en-US' if needed
+  recognition.lang = 'es-MX';
   recognition.continuous = false;
   recognition.interimResults = true;
 
-  recognition.onstart = () => {
-    isListening = true;
-    document.getElementById('mic-btn').classList.add('listening');
-    document.getElementById('user-transcript').textContent = 'Listening...';
-  };
-
+  recognition.onstart  = () => { isListening = true; document.getElementById('mic-btn').classList.add('listening'); document.getElementById('user-transcript').textContent = 'Listening...'; };
   recognition.onresult = (e) => {
-    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
-    document.getElementById('user-transcript').textContent = transcript;
-    if (e.results[e.results.length - 1].isFinal) {
-      handleUserSpeech(transcript);
-    }
+    const t = Array.from(e.results).map(r => r[0].transcript).join('');
+    document.getElementById('user-transcript').textContent = t;
+    if (e.results[e.results.length - 1].isFinal) handleUserSpeech(t);
   };
-
-  recognition.onend = () => {
-    isListening = false;
-    document.getElementById('mic-btn').classList.remove('listening');
-  };
-
-  recognition.onerror = (e) => {
-    isListening = false;
-    document.getElementById('mic-btn').classList.remove('listening');
-    console.error('Speech error:', e.error);
-  };
-
+  recognition.onend    = () => { isListening = false; document.getElementById('mic-btn').classList.remove('listening'); };
+  recognition.onerror  = (e) => { isListening = false; document.getElementById('mic-btn').classList.remove('listening'); };
   recognition.start();
 }
 
@@ -445,41 +498,36 @@ function stopListening() {
   document.getElementById('mic-btn').classList.remove('listening');
 }
 
-// ─── HANDLE USER SPEECH ───────────────────
+// ─── HANDLE SPEECH ────────────────────────
 async function handleUserSpeech(text) {
   if (!text.trim()) return;
-  document.getElementById('user-transcript').textContent = `You: ${text}`;
   agentHistory.push({ role: 'user', content: text });
-
   showAgentText('...');
 
   try {
-    const reply = await callGroq(text);
+    const reply = await callGroq();
     const { msg, newMood } = parseVRReply(reply);
     agentHistory.push({ role: 'assistant', content: reply });
     showAgentText(msg);
     updateVRMood(newMood);
     speakText(msg);
   } catch (e) {
-    showAgentText('(Connection error — check your Groq key)');
+    showAgentText('(Connection error)');
   }
 }
 
-// ─── GROQ API ─────────────────────────────
-async function callGroq(userText) {
+// ─── GROQ via proxy /api/groq ─────────────
+async function callGroq() {
   const systemPrompt = `You are Carlos Mendoza, a defensive call center agent with 2 years at the company.
 You care about your work but feel blamed for metrics you can't control. You want to study systems engineering but feel trapped. You have two young kids.
 Respond naturally and emotionally — defensive, guarded, but capable of opening up if the supervisor is genuinely empathetic.
-At the end of EVERY response, add EXACTLY: [MOOD:XX] where XX is a number 0-100 representing your emotional openness.
-Start at 30. Increase if the supervisor listens well. Decrease if they pressure or blame.
+At the end of EVERY response add EXACTLY: [MOOD:XX] where XX is 0-100 representing emotional openness.
+Start at 30. Increase if supervisor listens well. Decrease if they pressure or blame.
 Keep responses SHORT — 1-3 sentences max. This is a spoken VR conversation.`;
 
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  const res = await fetch('/api/groq', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${GROQ_KEY}`
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'llama-3.1-8b-instant',
       messages: [
@@ -502,27 +550,20 @@ function parseVRReply(raw) {
   return { msg, newMood };
 }
 
-// ─── TEXT TO SPEECH ───────────────────────
+// ─── TTS ──────────────────────────────────
 function speakText(text) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-
   const utt  = new SpeechSynthesisUtterance(text);
   utt.lang   = 'es-MX';
   utt.rate   = 0.92;
   utt.pitch  = 0.9;
-
-  // Pick a voice
-  const voices = window.speechSynthesis.getVoices();
+  const voices  = window.speechSynthesis.getVoices();
   const spanish = voices.find(v => v.lang.startsWith('es') && v.name.toLowerCase().includes('male'))
-    || voices.find(v => v.lang.startsWith('es'))
-    || null;
+    || voices.find(v => v.lang.startsWith('es')) || null;
   if (spanish) utt.voice = spanish;
-
   window.speechSynthesis.speak(utt);
 }
-
-// Load voices on ready
 window.speechSynthesis?.addEventListener('voiceschanged', () => {});
 </script>
 </body>
