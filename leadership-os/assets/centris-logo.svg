@@ -1,0 +1,113 @@
+<svg width="100%" viewBox="0 0 680 420" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Centris Leadership OS</title>
+  <desc>Logo animado de Centris con red neuronal para pantalla de entrada VR</desc>
+
+  <style>
+    @keyframes pulse  { 0%,100%{opacity:.1} 50%{opacity:.3} }
+    @keyframes spin   { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    @keyframes float  { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-7px)} }
+    @keyframes travel {
+      0%   { stroke-dashoffset: 200; opacity: 0; }
+      20%  { opacity: 1; }
+      80%  { opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+    @keyframes blink  { 0%,100%{opacity:.4} 50%{opacity:1} }
+    .ring1 { animation: spin 14s linear infinite; transform-origin: 340px 190px; }
+    .ring2 { animation: spin 9s linear infinite reverse; transform-origin: 340px 190px; }
+    .logo-g { animation: float 3.5s ease-in-out infinite; }
+    .orb    { animation: pulse 2.5s ease-in-out infinite; }
+    .orb2   { animation: pulse 2.5s ease-in-out infinite .6s; }
+    .orb3   { animation: pulse 2.5s ease-in-out infinite 1.2s; }
+    .sig1   { animation: travel 2.4s ease-in-out infinite; stroke-dasharray: 40 200; }
+    .sig2   { animation: travel 2.4s ease-in-out infinite .8s; stroke-dasharray: 40 200; }
+    .sig3   { animation: travel 2.4s ease-in-out infinite 1.6s; stroke-dasharray: 40 200; }
+    .nd     { animation: blink 1.8s ease-in-out infinite; }
+    .nd2    { animation: blink 1.8s ease-in-out infinite .6s; }
+    .nd3    { animation: blink 1.8s ease-in-out infinite 1.2s; }
+    .nd4    { animation: blink 1.8s ease-in-out infinite .3s; }
+    .nd5    { animation: blink 1.8s ease-in-out infinite .9s; }
+  </style>
+
+  <!-- Background orbs -->
+  <circle cx="140" cy="90"  r="90"  fill="#1a3aff" class="orb"/>
+  <circle cx="540" cy="300" r="110" fill="#00c49a" class="orb2"/>
+  <circle cx="340" cy="360" r="70"  fill="#7c3aff" class="orb3"/>
+
+  <!-- Orbiting rings -->
+  <g class="ring1">
+    <circle cx="340" cy="190" r="155" fill="none" stroke="#1a3aff"
+      stroke-width="1.5" stroke-dasharray="10 10" opacity=".25"/>
+  </g>
+  <g class="ring2">
+    <circle cx="340" cy="190" r="125" fill="none" stroke="#00c49a"
+      stroke-width="1" stroke-dasharray="5 15" opacity=".2"/>
+  </g>
+
+  <!-- Floating logo group -->
+  <g class="logo-g" style="transform-origin:340px 190px;">
+    <circle cx="340" cy="190" r="88" fill="#070d1f" opacity=".92"/>
+    <circle cx="340" cy="190" r="84" fill="none" stroke="#1a3aff" stroke-width="1.5" opacity=".35"/>
+
+    <!-- Connection lines static -->
+    <line x1="300" y1="165" x2="340" y2="190" stroke="#1a3aff" stroke-width="1" opacity=".3"/>
+    <line x1="300" y1="215" x2="340" y2="190" stroke="#1a3aff" stroke-width="1" opacity=".3"/>
+    <line x1="310" y1="190" x2="340" y2="190" stroke="#00c49a" stroke-width="1" opacity=".2"/>
+    <line x1="340" y1="190" x2="372" y2="165" stroke="#00c49a" stroke-width="1" opacity=".3"/>
+    <line x1="340" y1="190" x2="372" y2="190" stroke="#7c3aff" stroke-width="1" opacity=".3"/>
+    <line x1="340" y1="190" x2="372" y2="215" stroke="#00c49a" stroke-width="1" opacity=".3"/>
+    <line x1="300" y1="165" x2="300" y2="215" stroke="#1a3aff" stroke-width="1" opacity=".2"/>
+    <line x1="372" y1="165" x2="372" y2="215" stroke="#00c49a" stroke-width="1" opacity=".2"/>
+
+    <!-- Animated signals -->
+    <line x1="300" y1="165" x2="340" y2="190" stroke="#1a3aff" stroke-width="2" class="sig1" opacity=".9"/>
+    <line x1="340" y1="190" x2="372" y2="215" stroke="#00c49a" stroke-width="2" class="sig2" opacity=".9"/>
+    <line x1="300" y1="215" x2="372" y2="165" stroke="#7c3aff" stroke-width="1.5" class="sig3" opacity=".8"/>
+
+    <!-- Input nodes -->
+    <circle cx="300" cy="165" r="7" fill="#1a3aff" class="nd"/>
+    <circle cx="300" cy="215" r="7" fill="#1a3aff" class="nd2"/>
+
+    <!-- Center node -->
+    <circle cx="340" cy="190" r="11" fill="#ffffff" opacity=".95"/>
+    <circle cx="340" cy="190" r="7"  fill="#1a3aff"/>
+
+    <!-- Output nodes -->
+    <circle cx="372" cy="165" r="7" fill="#00c49a" class="nd3"/>
+    <circle cx="372" cy="190" r="7" fill="#7c3aff" class="nd4"/>
+    <circle cx="372" cy="215" r="7" fill="#00c49a" class="nd5"/>
+
+    <!-- Graduation cap -->
+    <line x1="325" y1="148" x2="355" y2="148" stroke="white" stroke-width="2" opacity=".5"/>
+    <polygon points="340,138 328,148 352,148" fill="white" opacity=".4"/>
+    <line x1="352" y1="148" x2="355" y2="156" stroke="white" stroke-width="1.5" opacity=".4"/>
+    <circle cx="355" cy="158" r="2.5" fill="white" opacity=".4"/>
+  </g>
+
+  <!-- Corner dots -->
+  <circle cx="225" cy="72"  r="3" fill="#1a3aff" opacity=".5" class="nd"/>
+  <circle cx="455" cy="72"  r="3" fill="#00c49a" opacity=".5" class="nd2"/>
+  <circle cx="205" cy="308" r="3" fill="#7c3aff" opacity=".4" class="nd3"/>
+  <circle cx="475" cy="308" r="3" fill="#1a3aff" opacity=".4" class="nd4"/>
+
+  <!-- Wordmark -->
+  <text x="340" y="332"
+    text-anchor="middle"
+    font-family="'Arial Black', Arial, sans-serif"
+    font-weight="900" font-size="36" letter-spacing="10"
+    fill="#0d1855">CENTRIS</text>
+
+  <!-- Tag -->
+  <rect x="268" y="344" width="144" height="22" rx="11"
+    fill="#1a3aff" opacity=".12"/>
+  <text x="340" y="360"
+    text-anchor="middle"
+    font-family="Arial, sans-serif"
+    font-weight="700" font-size="11" letter-spacing="4"
+    fill="#1a3aff" opacity=".75">LEADERSHIP OS</text>
+
+  <!-- Divider -->
+  <line x1="40"  y1="388" x2="270" y2="388" stroke="#1a3aff" stroke-width=".5" opacity=".18"/>
+  <line x1="410" y1="388" x2="640" y2="388" stroke="#1a3aff" stroke-width=".5" opacity=".18"/>
+  <circle cx="340" cy="388" r="3" fill="#00c49a" opacity=".4"/>
+</svg>
