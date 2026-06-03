@@ -501,3 +501,414 @@ p  { font-size: 14px; line-height: 1.65; color: var(--text2); }
 .history-meta    { display: flex; align-items: center; margin-bottom: 4px; }
 .history-insight { font-size: 11px; color: var(--text2); font-style: italic; line-height: 1.5; }
 .history-mood    { font-size: 14px; font-weight: 700; min-width: 36px; text-align: right; }
+
+/* ═══════════════════════════════════════════
+   ADMIN PANEL STYLES — Leadership OS
+   Pegar al final de css/styles.css
+   ═══════════════════════════════════════════ */
+
+/* ─── Auth screens ─────────────────────── */
+
+.auth-wrap {
+  padding: 24px 0 8px;
+  text-align: center;
+}
+
+.auth-logo {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+
+.auth-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.auth-sub {
+  font-size: 12px;
+  color: var(--text3);
+  margin-bottom: 24px;
+}
+
+.auth-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+}
+
+.auth-field {
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.auth-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.auth-input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: 'SF Mono', monospace;
+  letter-spacing: .05em;
+  box-sizing: border-box;
+  transition: border-color .2s;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: var(--teal);
+}
+
+.auth-input.error {
+  border-color: var(--coral);
+}
+
+.auth-hint {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+.auth-error {
+  font-size: 12px;
+  color: var(--coral);
+  text-align: center;
+  margin: 8px 0;
+  min-height: 16px;
+}
+
+.auth-toggle {
+  font-size: 12px;
+  color: var(--text3);
+  text-align: center;
+  margin-top: 12px;
+}
+
+.auth-toggle button {
+  background: none;
+  border: none;
+  color: var(--teal);
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.game-id-preview {
+  font-size: 11px;
+  color: var(--teal);
+  font-family: 'SF Mono', monospace;
+  margin-top: 4px;
+  min-height: 14px;
+}
+
+/* ─── Admin panel ───────────────────────── */
+
+#s-admin .back-row {
+  margin-bottom: 8px;
+}
+
+.admin-nav {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.admin-tab {
+  flex: 1;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 4px;
+  color: var(--text2);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.admin-tab.active {
+  background: var(--teal-dim);
+  border-color: var(--teal);
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.admin-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-count {
+  font-size: 11px;
+  background: var(--bg3);
+  border-radius: 20px;
+  padding: 2px 8px;
+  color: var(--text3);
+}
+
+.admin-subsection {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  margin-bottom: 8px;
+}
+
+.admin-loading {
+  text-align: center;
+  padding: 32px;
+  color: var(--text3);
+  font-size: 13px;
+}
+
+.admin-error {
+  color: var(--coral);
+  font-size: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.admin-empty {
+  color: var(--text3);
+  font-size: 12px;
+  padding: 8px 0;
+}
+
+/* Table */
+.admin-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.admin-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 0.8fr 0.7fr 1.2fr;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  background: var(--bg2);
+  border-radius: 8px;
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.admin-row.admin-header {
+  background: transparent;
+  color: var(--text3);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding-bottom: 4px;
+}
+
+.admin-row.inactive {
+  opacity: 0.5;
+}
+
+.admin-gameid {
+  font-family: 'SF Mono', monospace;
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.admin-role {
+  color: var(--text2);
+}
+
+.admin-status.active  { color: var(--teal); }
+.admin-status.disabled { color: var(--text3); }
+
+.admin-date {
+  color: var(--text3);
+  font-size: 10px;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.admin-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 7px;
+  font-size: 10px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.admin-btn:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.admin-btn-reset:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* Bars */
+.admin-bar-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.admin-bar-label {
+  font-size: 11px;
+  color: var(--text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-bar-track {
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.admin-bar-fill {
+  height: 100%;
+  background: var(--teal);
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+
+.admin-bar-purple { background: var(--purple) !important; }
+
+.admin-bar-count {
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 600;
+  min-width: 24px;
+  text-align: right;
+}
+
+/* Split layout */
+.admin-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Week chart */
+.admin-week-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 100px;
+  padding: 8px 0;
+}
+
+.admin-week-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-week-bar {
+  width: 100%;
+  background: var(--teal);
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height .4s ease;
+}
+
+.admin-week-count {
+  font-size: 10px;
+  color: var(--text3);
+}
+
+.admin-week-label {
+  font-size: 9px;
+  color: var(--text3);
+  text-align: center;
+}
+
+/* Tags */
+.admin-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.admin-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.admin-tag-count {
+  background: var(--teal-dim);
+  color: var(--teal);
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Stats grid */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.admin-stat {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.admin-stat-num {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--teal);
+  margin-bottom: 4px;
+}
+
+.admin-stat-lbl {
+  font-size: 10px;
+  color: var(--text3);
+}
