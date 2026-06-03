@@ -146,6 +146,20 @@
 
   <div class="transcript" id="user-transcript"></div>
 
+  <!-- Text fallback when no mic available -->
+  <div style="display:flex;gap:8px;width:min(360px,88vw);">
+    <input id="text-input"
+      type="text"
+      placeholder="Type your response here..."
+      style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+             border-radius:24px;padding:10px 18px;color:white;font-size:14px;outline:none;"
+      onkeydown="if(event.key==='Enter') sendText()">
+    <button onclick="sendText()"
+      style="background:linear-gradient(135deg,#1a3aff,#7c3aff);border:none;
+             border-radius:24px;padding:10px 20px;color:white;font-size:13px;
+             font-weight:700;cursor:pointer;">Send</button>
+  </div>
+
   <button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤</button>
 
   <div class="mood-bar-wrap">
@@ -367,6 +381,16 @@ function updateVRMood(val) {
   fill.style.width = vrMood + '%';
   fill.style.background = vrMood < 35 ? '#ff6b6b' : vrMood < 60 ? '#f5a623' : '#1ec99a';
   document.getElementById('vr-mood-pct').textContent = vrMood + '%';
+}
+
+// ─── TEXT FALLBACK ────────────────────────
+function sendText() {
+  const input = document.getElementById('text-input');
+  const text  = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  document.getElementById('user-transcript').textContent = `You: ${text}`;
+  handleUserSpeech(text);
 }
 
 // ─── MIC / SPEECH RECOGNITION ────────────
