@@ -10,14 +10,87 @@
 <div class="app">
 
 <!-- ══════════════════════════════════════
-     SCREEN 0: SETUP
+     SCREEN: LOGIN
 ══════════════════════════════════════ -->
-<div class="screen active" id="s-setup">
+<div class="screen" id="s-login">
+  <div class="auth-wrap">
+    <div class="auth-logo">🧠</div>
+    <div class="auth-title">Leadership OS</div>
+    <div class="auth-sub">Retention training · Powered by Groq</div>
+  </div>
+  <div class="auth-card">
+    <div class="auth-field">
+      <label class="auth-label">Game ID</label>
+      <input class="auth-input" id="login-gameid" type="text"
+        placeholder="e.g. CM.RODRIGUEZ"
+        oninput="onGameIdInput(this,'login-preview')"
+        onkeydown="if(event.key==='Enter') submitLogin()">
+      <div class="game-id-preview" id="login-preview"></div>
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">Password</label>
+      <input class="auth-input" id="login-password" type="password"
+        placeholder="Your password"
+        onkeydown="if(event.key==='Enter') submitLogin()">
+    </div>
+    <div class="auth-error" id="login-error"></div>
+    <button class="btn-primary" id="login-btn" onclick="submitLogin()">Enter →</button>
+  </div>
+  <div class="auth-toggle">
+    New here? <button onclick="showRegisterScreen()">Create account</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN: REGISTER
+══════════════════════════════════════ -->
+<div class="screen" id="s-register">
+  <div class="auth-wrap">
+    <div class="auth-logo">🧠</div>
+    <div class="auth-title">Create account</div>
+    <div class="auth-sub">Use your Game ID from the gamification app</div>
+  </div>
+  <div class="auth-card">
+    <div class="auth-field">
+      <label class="auth-label">Game ID</label>
+      <input class="auth-input" id="register-gameid" type="text"
+        placeholder="e.g. CM.RODRIGUEZ"
+        oninput="onGameIdInput(this,'register-preview')"
+        onkeydown="if(event.key==='Tab') event.preventDefault()">
+      <div class="game-id-preview" id="register-preview"></div>
+      <div class="auth-hint">Format: Role + Initial + . + LASTNAME &nbsp;·&nbsp; A=Admin, C=Coach, M=Manager, Q=QA, T=Trainer, R=Recruiting</div>
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">Password</label>
+      <input class="auth-input" id="register-password" type="password"
+        placeholder="Min. 6 characters">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">Confirm password</label>
+      <input class="auth-input" id="register-password2" type="password"
+        placeholder="Repeat password"
+        onkeydown="if(event.key==='Enter') submitRegister()">
+    </div>
+    <div class="auth-error" id="register-error"></div>
+    <button class="btn-primary" id="register-btn" onclick="submitRegister()">Create account →</button>
+  </div>
+  <div class="auth-toggle">
+    Already have an account? <button onclick="showLoginScreen()">Sign in</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN 0: GROQ SETUP
+══════════════════════════════════════ -->
+<div class="screen" id="s-setup">
   <div class="avatar-wrap">
     <div class="avatar-ring">🧠</div>
     <div class="avatar-name">Interventions OS</div>
     <div class="avatar-status">Retention training · Powered by Groq</div>
   </div>
+  <div id="auth-status-bar"></div>
   <div class="card">
     <div class="card-title">
       <span class="status-dot sd-off" id="key-dot"></span>
@@ -41,7 +114,7 @@
   <div class="avatar-wrap">
     <div class="avatar-ring" style="font-size:36px;">👤</div>
     <div class="avatar-name">Alex — Your Learning Guide</div>
-    <div class="avatar-status">Interventions OS · Retention Training</div>
+    <div id="welcome-user-status" class="avatar-status"></div>
   </div>
 
   <div class="card" style="background:var(--bg3);border-color:var(--border2);margin-bottom:16px;">
@@ -63,20 +136,36 @@
   </div>
 
   <div class="menu-section-label">Techniques · Build your toolkit</div>
-  <div class="choice-grid">
+  <div class="choice-grid" style="margin-bottom:20px;">
     <button class="choice-btn choice-technique" onclick="goTechniqueMenu()">
       <span class="choice-icon">🛠</span>
       <div class="choice-body">
         <div class="choice-label">Techniques & Tools</div>
-        <div class="choice-sub">Active Listening · Powerful Questions — desarrolla el músculo para trabajar cualquier intervención con más agilidad</div>
-        <span class="choice-badge bdg-purple">Skills training</span>
+        <div class="choice-sub">Active Listening · Powerful Questions · NVC · Radical Candor y más — desarrolla el músculo para trabajar cualquier intervención</div>
+        <span class="choice-badge bdg-purple">Skills training · 14 técnicas</span>
       </div>
     </button>
+  </div>
+
+  <div style="display:flex;gap:8px;">
+    <button class="btn-ghost" onclick="goHistory()" style="flex:1;font-size:12px;padding:8px;">📊 My progress</button>
+    <button class="btn-ghost" id="welcome-admin-btn" onclick="goAdmin()" style="flex:1;font-size:12px;padding:8px;display:none;">⚙️ Admin</button>
+    <button class="btn-ghost" onclick="submitLogout()" style="flex:1;font-size:12px;padding:8px;">← Sign out</button>
   </div>
 </div>
 
 
-<div style="text-align:center;margin-top:16px;"><button class="btn-ghost" onclick="goHistory()" style="font-size:12px;padding:8px 16px;">📊 View my progress</button></div>
+<!-- ══════════════════════════════════════
+     SCREEN: ADMIN PANEL
+══════════════════════════════════════ -->
+<div class="screen" id="s-admin">
+  <div class="back-row">
+    <button class="back-btn" onclick="goWelcome()">← Back</button>
+    <span class="mode-pill mp-learn">Admin</span>
+  </div>
+  <div class="admin-nav" id="admin-nav"></div>
+  <div id="admin-content"></div>
+</div>
 
 
 <!-- ══════════════════════════════════════
@@ -594,9 +683,9 @@
 <script src="js/techniques.js"></script>
 <script src="js/prompts.js"></script>
 <script src="js/api.js"></script>
-<script src="js/ui.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/admin.js"></script>
+<script src="js/ui.js"></script>
 <script src="js/supabase.js"></script>
 <script src="js/app.js"></script>
 <script src="js/preview.js"></script>
