@@ -1,8 +1,9 @@
 // ═══════════════════════════════════════════
 //  auth.js — Leadership OS
 //  Game ID authentication via Supabase Auth
+//  Carga ANTES de supabase.js — define getUserId()
 //  Roles: A=Admin, R=Reclutamiento, C=Coach,
-//         Q=QA, T=Trainer, M=Manager
+//         Q=QA, T=Trainer, M=Manager, H=HR
 // ═══════════════════════════════════════════
 
 const ROLE_MAP = {
@@ -16,13 +17,10 @@ const ROLE_MAP = {
 };
 
 // ─── GAME ID VALIDATION ───────────────────
-// Format: [Role][Initial].[LASTNAME]
-// Example: AA.JIMENEZ, CM.RODRIGUEZ, TL.GARCIA
 
 function validateGameId(gameId) {
   if (!gameId || typeof gameId !== 'string') return false;
   const upper = gameId.toUpperCase().trim();
-  // Regex: 1 role letter + 1 name initial + dot + 2+ uppercase letters
   const pattern = /^[ARCQTMH][A-Z]\.[A-Z]{2,}$/;
   return pattern.test(upper);
 }
@@ -39,7 +37,6 @@ function parseGameId(gameId) {
 }
 
 function formatGameId(raw) {
-  // Auto-format as user types: uppercase, insert dot at position 2
   let v = raw.toUpperCase().replace(/[^A-Z.]/g, '');
   if (v.length >= 3 && v[2] !== '.') {
     v = v.slice(0, 2) + '.' + v.slice(2);
@@ -48,8 +45,6 @@ function formatGameId(raw) {
 }
 
 // ─── SUPABASE AUTH ────────────────────────
-// We use Game ID as the "email" field in Supabase Auth
-// by appending a fixed domain. This avoids needing real emails.
 
 const FAKE_DOMAIN = '@leadershipos.app';
 
@@ -57,37 +52,16 @@ function gameIdToEmail(gameId) {
   return gameId.toUpperCase().trim() + FAKE_DOMAIN;
 }
 
-// ─── CURRENT USER ─────────────────────────
-
-let currentUser     = null;  // Supabase auth user
-let currentProfile  = null;  // user_profiles row
-
-async function getCurrentUser() {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      headers: {
-        'apikey':        SUPABASE_KEY,
-        'Authorization': `Bearer ${getSessionToken()}`
-      }
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (e) {
-    return null;
-  }
-}
+// ─── SESSION TOKEN ────────────────────────
 
 function getSessionToken() {
-  try {
-    const raw = localStorage.getItem('ldr_session_token');
-    return raw || '';
-  } catch (e) { return ''; }
+  try { return localStorage.getItem('ldr_session_token') || ''; }
+  catch (e) { return ''; }
 }
 
 function setSessionToken(token) {
-  try {
-    localStorage.setItem('ldr_session_token', token);
-  } catch (e) {}
+  try { localStorage.setItem('ldr_session_token', token); }
+  catch (e) {}
 }
 
 function clearSessionToken() {
@@ -97,39 +71,58 @@ function clearSessionToken() {
   } catch (e) {}
 }
 
+// ─── CURRENT USER ─────────────────────────
+
+let currentUser    = null;
+let currentProfile = null;
+
+// ─── GET USER ID ──────────────────────────
+// Esta función es usada por supabase.js — debe estar aquí.
+
+function getUserId() {
+  if (currentUser?.id) return currentUser.id;
+  let uid = localStorage.getItem('ldr_uid');
+  if (!uid) {
+    uid = 'anon_' + Math.random().toString(36).slice(2, 11);
+    localStorage.setItem('ldr_uid', uid);
+  }
+  return uid;
+}
+
 // ─── REGISTER ─────────────────────────────
 
 async function registerUser(gameId, password) {
-  const email = gameIdToEmail(gameId);
+  // Bloquear registro con rol A
+  if (gameId.toUpperCase()[0] === 'A') {
+    throw new Error('El rol Admin no está disponible para registro.');
+  }
+
+  const email  = gameIdToEmail(gameId);
   const parsed = parseGameId(gameId);
 
-  // 1. Create auth user
-  const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+  const supaUrl = 'https://biebfwwkukmxulzwpjya.supabase.co';
+  const supaKey = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
+
+  const res = await fetch(`${supaUrl}/auth/v1/signup`, {
     method:  'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey':        SUPABASE_KEY
-    },
-    body: JSON.stringify({ email, password })
+    headers: { 'Content-Type': 'application/json', 'apikey': supaKey },
+    body:    JSON.stringify({ email, password })
   });
 
   const data = await res.json();
-
   if (!res.ok || data.error) {
     throw new Error(data.error?.message || data.msg || 'Registration failed');
   }
 
   const userId = data.user?.id;
   const token  = data.access_token;
-
   if (!userId) throw new Error('No user ID returned');
 
-  // 2. Create profile
-  await fetch(`${SUPABASE_URL}/rest/v1/user_profiles`, {
+  await fetch(`${supaUrl}/rest/v1/user_profiles`, {
     method:  'POST',
     headers: {
       'Content-Type':  'application/json',
-      'apikey':         SUPABASE_KEY,
+      'apikey':         supaKey,
       'Authorization': `Bearer ${token}`,
       'Prefer':        'return=minimal'
     },
@@ -142,12 +135,14 @@ async function registerUser(gameId, password) {
   });
 
   setSessionToken(token);
-  if (data.refresh_token) {
-    localStorage.setItem('ldr_refresh_token', data.refresh_token);
-  }
+  if (data.refresh_token) localStorage.setItem('ldr_refresh_token', data.refresh_token);
 
   currentUser    = data.user;
-  currentProfile = { game_id: gameId.toUpperCase(), role_code: parsed.roleCode, display_name: `${parsed.nameInitial}. ${parsed.lastName}` };
+  currentProfile = {
+    game_id:      gameId.toUpperCase(),
+    role_code:    parsed.roleCode,
+    display_name: `${parsed.nameInitial}. ${parsed.lastName}`
+  };
 
   return { user: data.user, profile: currentProfile };
 }
@@ -155,31 +150,25 @@ async function registerUser(gameId, password) {
 // ─── LOGIN ────────────────────────────────
 
 async function loginUser(gameId, password) {
-  const email = gameIdToEmail(gameId);
+  const email   = gameIdToEmail(gameId);
+  const supaUrl = 'https://biebfwwkukmxulzwpjya.supabase.co';
+  const supaKey = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
 
-  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+  const res = await fetch(`${supaUrl}/auth/v1/token?grant_type=password`, {
     method:  'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey':        SUPABASE_KEY
-    },
-    body: JSON.stringify({ email, password })
+    headers: { 'Content-Type': 'application/json', 'apikey': supaKey },
+    body:    JSON.stringify({ email, password })
   });
 
   const data = await res.json();
-
   if (!res.ok || data.error) {
     throw new Error(data.error_description || data.error || 'Login failed');
   }
 
   setSessionToken(data.access_token);
-  if (data.refresh_token) {
-    localStorage.setItem('ldr_refresh_token', data.refresh_token);
-  }
+  if (data.refresh_token) localStorage.setItem('ldr_refresh_token', data.refresh_token);
 
   currentUser = data.user;
-
-  // Load profile
   await loadProfile(data.access_token);
 
   return { user: data.user, profile: currentProfile };
@@ -188,18 +177,15 @@ async function loginUser(gameId, password) {
 // ─── LOAD PROFILE ─────────────────────────
 
 async function loadProfile(token) {
+  const supaUrl = 'https://biebfwwkukmxulzwpjya.supabase.co';
+  const supaKey = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
   try {
-    const t = token || getSessionToken();
+    const t   = token || getSessionToken();
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/user_profiles?select=*&limit=1`,
-      {
-        headers: {
-          'apikey':        SUPABASE_KEY,
-          'Authorization': `Bearer ${t}`
-        }
-      }
+      `${supaUrl}/rest/v1/user_profiles?select=*&limit=1`,
+      { headers: { 'apikey': supaKey, 'Authorization': `Bearer ${t}` } }
     );
-    const rows = await res.json();
+    const rows     = await res.json();
     currentProfile = rows[0] || null;
   } catch (e) {
     currentProfile = null;
@@ -209,13 +195,12 @@ async function loadProfile(token) {
 // ─── LOGOUT ───────────────────────────────
 
 async function logoutUser() {
+  const supaUrl = 'https://biebfwwkukmxulzwpjya.supabase.co';
+  const supaKey = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
   try {
-    await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+    await fetch(`${supaUrl}/auth/v1/logout`, {
       method:  'POST',
-      headers: {
-        'apikey':        SUPABASE_KEY,
-        'Authorization': `Bearer ${getSessionToken()}`
-      }
+      headers: { 'apikey': supaKey, 'Authorization': `Bearer ${getSessionToken()}` }
     });
   } catch (e) {}
   clearSessionToken();
@@ -226,17 +211,16 @@ async function logoutUser() {
 // ─── REFRESH TOKEN ────────────────────────
 
 async function refreshSession() {
+  const supaUrl      = 'https://biebfwwkukmxulzwpjya.supabase.co';
+  const supaKey      = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
   const refreshToken = localStorage.getItem('ldr_refresh_token');
   if (!refreshToken) return false;
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+    const res = await fetch(`${supaUrl}/auth/v1/token?grant_type=refresh_token`, {
       method:  'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey':        SUPABASE_KEY
-      },
-      body: JSON.stringify({ refresh_token: refreshToken })
+      headers: { 'Content-Type': 'application/json', 'apikey': supaKey },
+      body:    JSON.stringify({ refresh_token: refreshToken })
     });
     const data = await res.json();
     if (!res.ok || data.error) return false;
@@ -250,26 +234,23 @@ async function refreshSession() {
   }
 }
 
-// ─── INIT — check existing session ────────
+// ─── INIT ─────────────────────────────────
 
 async function initAuth() {
-  const token = getSessionToken();
+  const supaUrl = 'https://biebfwwkukmxulzwpjya.supabase.co';
+  const supaKey = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
+  const token   = getSessionToken();
   if (!token) return false;
 
-  // Try to load user with existing token
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      headers: {
-        'apikey':        SUPABASE_KEY,
-        'Authorization': `Bearer ${token}`
-      }
+    const res = await fetch(`${supaUrl}/auth/v1/user`, {
+      headers: { 'apikey': supaKey, 'Authorization': `Bearer ${token}` }
     });
     if (res.ok) {
       currentUser = await res.json();
       await loadProfile(token);
       return true;
     }
-    // Token expired — try refresh
     return await refreshSession();
   } catch (e) {
     return await refreshSession();
@@ -284,16 +265,4 @@ function isAdmin() {
 
 function getGameId() {
   return currentProfile?.game_id || '';
-}
-
-function getUserId() {
-  // Override supabase.js getUserId with real auth user id
-  if (currentUser?.id) return currentUser.id;
-  // Fallback to anonymous
-  let uid = localStorage.getItem('ldr_uid');
-  if (!uid) {
-    uid = 'anon_' + Math.random().toString(36).slice(2, 11);
-    localStorage.setItem('ldr_uid', uid);
-  }
-  return uid;
 }
