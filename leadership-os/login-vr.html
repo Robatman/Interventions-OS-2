@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Centris Leadership OS — VR Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; background: #0d1628; overflow: hidden; }
+    #loading {
+      position: fixed; inset: 0;
+      background: #0d1628;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #e8eeff; font-family: monospace;
+      font-size: 1.2rem; z-index: 999;
+      transition: opacity 0.8s;
+    }
+    #loading .logo { font-size: 2rem; color: #00e5a0; letter-spacing: 0.3em; margin-bottom: 1rem; }
+    #loading .sub { color: #3d6bff; letter-spacing: 0.15em; }
+  </style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="logo">CENTRIS</div>
+  <div class="sub">Leadership OS — VR Login</div>
+  <div style="margin-top:2rem;color:#9d5cff;font-size:0.85rem;">Iniciando Neural Academy…</div>
+</div>
+
+<a-scene
+  vr-mode-ui="enabled: true"
+  background="color: #0d1628"
+  fog="type: linear; color: #0d1628; near: 15; far: 40"
+  renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true"
+>
+
+  <!-- === ASSETS === -->
+  <a-assets>
+    <!-- Fuente para todo el texto VR -->
+    <a-mixin id="panel"
+      geometry="primitive: plane"
+      material="color: #162040; opacity: 0.95; transparent: true; shader: flat; side: double"
+    ></a-mixin>
+    <a-mixin id="btn-normal"
+      geometry="primitive: plane; width: 0.18; height: 0.18"
+      material="color: #162040; opacity: 0.9; transparent: true; shader: flat; side: double"
+    ></a-mixin>
+    <a-mixin id="btn-special"
+      geometry="primitive: plane; width: 0.42; height: 0.18"
+      material="color: #1a2850; opacity: 0.9; transparent: true; shader: flat; side: double"
+    ></a-mixin>
+    <a-mixin id="key-text"
+      text="align: center; color: #e8eeff; width: 0.5; font: mozillavr"
+    ></a-mixin>
+  </a-assets>
+
+  <!-- === ENTORNO: Suelo y partículas === -->
+
+  <!-- Suelo con grid sutil -->
+  <a-entity
+    geometry="primitive: plane; width: 80; height: 80"
+    material="color: #0d1628; opacity: 1; shader: flat"
+    rotation="-90 0 0"
+    position="0 -0.5 0"
+  ></a-entity>
+
+  <!-- Grid lines en el suelo -->
+  <a-entity id="grid" position="0 -0.48 0">
+    <a-entity
+      geometry="primitive: plane; width: 80; height: 80"
+      material="color: #2a4080; opacity: 0.15; transparent: true; shader: flat; wireframe: false"
+      rotation="-90 0 0"
+      position="0 0 0"
+    ></a-entity>
+  </a-entity>
+
+  <!-- Estrellas / partículas de fondo como esferas pequeñas distribuidas -->
+  <a-entity id="stars">
+    <a-sphere position="-8 6 -15"  radius="0.03" color="#00e5a0" opacity="0.7" material="shader:flat"></a-sphere>
+    <a-sphere position="5 8 -18"   radius="0.02" color="#3d6bff" opacity="0.8" material="shader:flat"></a-sphere>
+    <a-sphere position="-12 4 -20" radius="0.04" color="#9d5cff" opacity="0.6" material="shader:flat"></a-sphere>
+    <a-sphere position="10 5 -14"  radius="0.03" color="#00e5a0" opacity="0.5" material="shader:flat"></a-sphere>
+    <a-sphere position="-6 10 -16" radius="0.02" color="#e8eeff" opacity="0.4" material="shader:flat"></a-sphere>
+    <a-sphere position="14 7 -19"  radius="0.03" color="#3d6bff" opacity="0.7" material="shader:flat"></a-sphere>
+    <a-sphere position="-3 12 -22" radius="0.02" color="#9d5cff" opacity="0.5" material="shader:flat"></a-sphere>
+    <a-sphere position="7 9 -20"   radius="0.04" color="#00e5a0" opacity="0.4" material="shader:flat"></a-sphere>
+    <a-sphere position="-15 5 -18" radius="0.03" color="#e8eeff" opacity="0.6" material="shader:flat"></a-sphere>
+    <a-sphere position="3 14 -25"  radius="0.02" color="#3d6bff" opacity="0.5" material="shader:flat"></a-sphere>
+    <a-sphere position="-9 3 -12"  radius="0.03" color="#9d5cff" opacity="0.7" material="shader:flat"></a-sphere>
+    <a-sphere position="11 11 -24" radius="0.02" color="#00e5a0" opacity="0.3" material="shader:flat"></a-sphere>
+    <a-sphere position="0 15 -28"  radius="0.04" color="#3d6bff" opacity="0.4" material="shader:flat"></a-sphere>
+    <a-sphere position="-18 6 -22" radius="0.03" color="#e8eeff" opacity="0.5" material="shader:flat"></a-sphere>
+    <a-sphere position="16 4 -16"  radius="0.02" color="#9d5cff" opacity="0.6" material="shader:flat"></a-sphere>
+    <a-sphere position="-4 8 -10"  radius="0.03" color="#00e5a0" opacity="0.8" material="shader:flat"></a-sphere>
+    <a-sphere position="6 6 -11"   radius="0.02" color="#3d6bff" opacity="0.6" material="shader:flat"></a-sphere>
+    <a-sphere position="-11 13 -26" radius="0.03" color="#9d5cff" opacity="0.4" material="shader:flat"></a-sphere>
+    <a-sphere position="18 2 -20"  radius="0.04" color="#e8eeff" opacity="0.3" material="shader:flat"></a-sphere>
+    <a-sphere position="-7 7 -13"  radius="0.02" color="#00e5a0" opacity="0.6" material="shader:flat"></a-sphere>
+  </a-entity>
+
+  <!-- Anillo decorativo en el horizonte -->
+  <a-torus
+    position="0 0.5 -20"
+    radius="8" radius-tubular="0.05"
+    color="#2a4080"
+    material="opacity: 0.4; transparent: true; shader: flat"
+    rotation="90 0 0"
+  ></a-torus>
+
+  <!-- === PANEL PRINCIPAL DE LOGIN === -->
+  <!-- Posicionado frente al usuario a 1.8m de distancia -->
+  <a-entity id="login-panel" position="0 1.4 -1.8">
+
+    <!-- Fondo del panel principal -->
+    <a-plane
+      width="1.4" height="0.9"
+      color="#162040"
+      material="opacity: 0.97; transparent: true; shader: flat; side: double"
+      position="0 0.05 -0.01"
+    ></a-plane>
+
+    <!-- Borde decorativo teal del panel -->
+    <a-plane
+      width="1.44" height="0.94"
+      color="#2a4080"
+      material="opacity: 0.8; transparent: true; shader: flat; side: double"
+      position="0 0.05 -0.02"
+    ></a-plane>
+
+    <!-- Logo CENTRIS -->
+    <a-text
+      value="CENTRIS"
+      color="#00e5a0"
+      align="center"
+      width="4"
+      position="0 0.72 0"
+      font="mozillavr"
+    ></a-text>
+
+    <!-- Subtítulo -->
+    <a-text
+      value="Leadership OS — Neural Academy"
+      color="#3d6bff"
+      align="center"
+      width="2.5"
+      position="0 0.58 0"
+      font="mozillavr"
+    ></a-text>
+
+    <!-- Línea separadora -->
+    <a-plane
+      width="1.2" height="0.004"
+      color="#2a4080"
+      material="shader: flat"
+      position="0 0.52 0"
+    ></a-plane>
+
+    <!-- Label Game ID -->
+    <a-text
+      value="GAME ID"
+      color="#9d5cff"
+      align="left"
+      width="1.5"
+      position="-0.55 0.44 0"
+      font="mozillavr"
+    ></a-text>
+
+    <!-- Campo de texto del Game ID -->
+    <a-plane
+      id="input-bg"
+      width="1.2" height="0.13"
+      color="#0d1628"
+      material="opacity: 1; shader: flat; side: double"
+      position="0 0.33 0"
+    ></a-plane>
+
+    <!-- Borde del input -->
+    <a-plane
+      width="1.22" height="0.135"
+      color="#3d6bff"
+      material="opacity: 0.7; transparent: true; shader: flat"
+      position="0 0.33 -0.005"
+    ></a-plane>
+
+    <!-- Texto del input (se actualiza por JS) -->
+    <a-text
+      id="input-display"
+      value="▌"
+      color="#00e5a0"
+      align="left"
+      width="3.5"
+      position="-0.55 0.33 0.01"
+      font="mozillavr"
+    ></a-text>
+
+    <!-- Instrucción -->
+    <a-text
+      value="Apunta con el control • Trigger para seleccionar"
+      color="#e8eeff"
+      align="center"
+      width="2.2"
+      opacity="0.6"
+      position="0 0.20 0"
+      font="mozillavr"
+    ></a-text>
+
+    <!-- Botón INGRESAR -->
+    <a-plane
+      id="btn-login"
+      width="0.55" height="0.13"
+      color="#3d6bff"
+      material="opacity: 0.95; shader: flat; side: double"
+      position="0.3 0.06 0"
+      class="interactive"
+    >
+      <a-text
+        value="INGRESAR"
+        color="#e8eeff"
+        align="center"
+        width="2.2"
+        position="0 0 0.01"
+        font="mozillavr"
+      ></a-text>
+    </a-plane>
+
+    <!-- Botón BORRAR -->
+    <a-plane
+      id="btn-clear"
+      width="0.35" height="0.13"
+      color="#ff5c5c"
+      material="opacity: 0.85; shader: flat; side: double"
+      position="-0.43 0.06 0"
+      class="interactive"
+    >
+      <a-text
+        value="BORRAR"
+        color="#e8eeff"
+        align="center"
+        width="1.8"
+        position="0 0 0.01"
+        font="mozillavr"
+      ></a-text>
+    </a-plane>
+
+    <!-- Mensaje de estado -->
+    <a-text
+      id="status-msg"
+      value=""
+      color="#ff5c5c"
+      align="center"
+      width="2.5"
+      position="0 -0.08 0"
+      font="mozillavr"
+    ></a-text>
+
+  </a-entity>
+
+  <!-- === TECLADO SEMICIRCULAR === -->
+  <!-- El teclado se curva en semicírculo alrededor del usuario -->
+  <!-- Radio: 1.6m, altura: 1.0m, ángulo total: 140 grados -->
+  <!-- 10 teclas por fila, 4 filas: números, QWERTY, ASDF, ZXCV + especiales -->
+
+  <a-entity id="keyboard" position="0 0.9 0">
+
+    <!-- =================== FILA 0: Números 1–0 =================== -->
+    <!-- 11 teclas en arco de -70° a +70°, step ~14° -->
+
+    <!-- 1 -->
+    <a-entity keyboard-key="char: 1" position="-1.505 0.52 -0.548" rotation="0 65 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="1">
+        <a-text value="1" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- 2 -->
+    <a-entity position="-1.368 0.52 -0.920" rotation="0 50 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="2">
+        <a-text value="2" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- 3 -->
+    <a-entity position="-1.111 0.52 -1.236" rotation="0 35 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="3">
+        <a-text value="3" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- 4 -->
+    <a-entity position="-0.771 0.52 -1.471" rotation="0 20 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="4">
+        <a-text value="4" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- 5 -->
+    <a-entity position="-0.390 0.52 -1.552" rotation="0 10 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="5">
+        <a-text value="5" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- 6 -->
+    <a-entity position="0 0.52 -1.6" rotation="0 0 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="6">
+        <a-text value="6" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- 7 -->
+    <a-entity position="0.390 0.52 -1.552" rotation="0 -10 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="7">
+        <a-text value="7" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- 8 -->
+    <a-entity position="0.771 0.52 -1.471" rotation="0 -20 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="8">
+        <a-text value="8" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- 9 -->
+    <a-entity position="1.111 0.52 -1.236" rotation="0 -35 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="9">
+        <a-text value="9" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- 0 -->
+    <a-entity position="1.368 0.52 -0.920" rotation="0 -50 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="0">
+        <a-text value="0" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- . (punto) -->
+    <a-entity position="1.505 0.52 -0.548" rotation="0 -65 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char=".">
+        <a-text value="." color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- =================== FILA 1: Q W E R T Y U I O P =================== -->
+    <!-- Radio 1.55, altura 0.30 -->
+
+    <a-entity position="-1.459 0.30 -0.531" rotation="0 65 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="Q">
+        <a-text value="Q" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="-1.325 0.30 -0.892" rotation="0 50 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="W">
+        <a-text value="W" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="-1.078 0.30 -1.198" rotation="0 35 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="E">
+        <a-text value="E" color="#00e5a0" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="-0.748 0.30 -1.427" rotation="0 20 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="R">
+        <a-text value="R" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="-0.378 0.30 -1.505" rotation="0 10 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="T">
+        <a-text value="T" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="0 0.30 -1.55" rotation="0 0 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="Y">
+        <a-text value="Y" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="0.378 0.30 -1.505" rotation="0 -10 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="U">
+        <a-text value="U" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="0.748 0.30 -1.427" rotation="0 -20 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="I">
+        <a-text value="I" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="1.078 0.30 -1.198" rotation="0 -35 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="O">
+        <a-text value="O" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="1.325 0.30 -0.892" rotation="0 -50 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="P">
+        <a-text value="P" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- =================== FILA 2: A S D F G H J K L =================== -->
+    <!-- Radio 1.5, altura 0.08 -->
+
+    <a-entity position="-1.302 0.08 -0.974" rotation="0 57 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="A">
+        <a-text value="A" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="-1.024 0.08 -1.213" rotation="0 43 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="S">
+        <a-text value="S" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="-0.707 0.08 -1.393" rotation="0 28 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="D">
+        <a-text value="D" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="-0.362 0.08 -1.458" rotation="0 14 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="F">
+        <a-text value="F" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="0 0.08 -1.5" rotation="0 0 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="G">
+        <a-text value="G" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="0.362 0.08 -1.458" rotation="0 -14 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="H">
+        <a-text value="H" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="0.707 0.08 -1.393" rotation="0 -28 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="J">
+        <a-text value="J" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="1.024 0.08 -1.213" rotation="0 -43 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="K">
+        <a-text value="K" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="1.302 0.08 -0.974" rotation="0 -57 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="L">
+        <a-text value="L" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- =================== FILA 3: Z X C V B N M ⌫ =================== -->
+    <!-- Radio 1.45, altura -0.14 -->
+
+    <a-entity position="-1.109 -0.14 -0.883" rotation="0 50 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="Z">
+        <a-text value="Z" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="-0.831 -0.14 -1.111" rotation="0 35 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="X">
+        <a-text value="X" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="-0.497 -0.14 -1.273" rotation="0 21 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="C">
+        <a-text value="C" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="-0.249 -0.14 -1.428" rotation="0 10 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="V">
+        <a-text value="V" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="0 -0.14 -1.45" rotation="0 0 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="B">
+        <a-text value="B" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="0.249 -0.14 -1.428" rotation="0 -10 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="N">
+        <a-text value="N" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <a-entity position="0.497 -0.14 -1.273" rotation="0 -21 0">
+      <a-plane width="0.18" height="0.18" color="#1a2850" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="M">
+        <a-text value="M" color="#e8eeff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- Tecla BACKSPACE (más ancha) -->
+    <a-entity position="0.900 -0.14 -1.050" rotation="0 -40 0">
+      <a-plane width="0.38" height="0.18" color="#ff5c5c" material="opacity:0.85;shader:flat;side:double" class="interactive key-btn" data-char="BACKSPACE">
+        <a-text value="⌫" color="#e8eeff" align="center" width="1.5" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- =================== FILA 4: ESPACIO centrado =================== -->
+    <!-- Radio 1.4, altura -0.36 -->
+
+    <!-- - (guión) -->
+    <a-entity position="-0.700 -0.36 -1.224" rotation="0 30 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="-">
+        <a-text value="-" color="#9d5cff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- ESPACIO (ancho) -->
+    <a-entity position="0 -0.36 -1.4" rotation="0 0 0">
+      <a-plane width="0.80" height="0.18" color="#3d6bff" material="opacity:0.85;shader:flat;side:double" class="interactive key-btn" data-char=" ">
+        <a-text value="ESPACIO" color="#e8eeff" align="center" width="2.0" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- _ (guión bajo) -->
+    <a-entity position="0.700 -0.36 -1.224" rotation="0 -30 0">
+      <a-plane width="0.18" height="0.18" color="#162040" material="opacity:0.9;shader:flat;side:double" class="interactive key-btn" data-char="_">
+        <a-text value="_" color="#9d5cff" align="center" width="1.2" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+
+  </a-entity>
+  <!-- /keyboard -->
+
+  <!-- === CURSOR / RAYCASTER en la cámara === -->
+  <a-entity id="rig" position="0 0 0">
+    <a-camera
+      id="cam"
+      position="0 1.6 0"
+      look-controls="pointerLockEnabled: false"
+      wasd-controls="enabled: false"
+    >
+      <!-- Cursor de punto para desktop/fallback -->
+      <a-cursor
+        id="cursor"
+        color="#00e5a0"
+        opacity="0.9"
+        fuse="false"
+        raycaster="objects: .interactive; far: 8"
+        animation__click="property: scale; from: 0.8 0.8 0.8; to: 1 1 1; dur: 150"
+        position="0 0 -0.5"
+        geometry="primitive: ring; radiusInner: 0.006; radiusOuter: 0.01"
+        material="color: #00e5a0; shader: flat"
+      ></a-cursor>
+    </a-camera>
+  </a-entity>
+
+  <!-- Luz ambiental suave -->
+  <a-light type="ambient" color="#162040" intensity="2"></a-light>
+  <a-light type="directional" color="#3d6bff" intensity="0.3" position="-1 2 -1"></a-light>
+  <a-light type="point" color="#00e5a0" intensity="0.5" position="0 3 -2" distance="8"></a-light>
+
+</a-scene>
+
+<script>
+// =============================================
+//  CENTRIS VR LOGIN — Lógica del teclado
+// =============================================
+
+let gameId = '';
+const MAX_LENGTH = 20;
+
+// Espera a que A-Frame esté listo
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const loading = document.getElementById('loading');
+    loading.style.opacity = '0';
+    setTimeout(() => { loading.style.display = 'none'; }, 800);
+  }, 1200);
+
+  setupKeyboard();
+  setupSpecialButtons();
+  setupControllerRaycaster();
+});
+
+// =============================================
+// Actualizar el display del input
+// =============================================
+function updateDisplay() {
+  const display = document.getElementById('input-display');
+  if (!display) return;
+  const shown = gameId.length > 16 ? '…' + gameId.slice(-15) : gameId;
+  display.setAttribute('text', 'value', shown + '▌');
+}
+
+// =============================================
+// Teclas del teclado semicircular
+// =============================================
+function setupKeyboard() {
+  const keys = document.querySelectorAll('.key-btn');
+  keys.forEach(keyEl => {
+    const char = keyEl.getAttribute('data-char');
+    if (!char) return;
+
+    keyEl.addEventListener('click', () => handleKey(char, keyEl));
+
+    // Hover visual (highlight azul)
+    keyEl.addEventListener('mouseenter', () => {
+      const isSpecial = char === 'BACKSPACE' || char === ' ';
+      if (!isSpecial) {
+        keyEl.setAttribute('material', 'color: #3d6bff; opacity: 0.95; shader: flat; side: double');
+      }
+    });
+    keyEl.addEventListener('mouseleave', () => {
+      const origColor = getOrigColor(char);
+      keyEl.setAttribute('material', `color: ${origColor}; opacity: 0.9; shader: flat; side: double`);
+    });
+  });
+}
+
+function getOrigColor(char) {
+  if (char === 'BACKSPACE') return '#ff5c5c';
+  if (char === ' ') return '#3d6bff';
+  const row1 = ['Q','W','E','R','T','Y','U','I','O','P'];
+  const row3 = ['Z','X','C','V','B','N','M'];
+  if (row1.includes(char) || row3.includes(char)) return '#1a2850';
+  return '#162040';
+}
+
+function handleKey(char, el) {
+  if (char === 'BACKSPACE') {
+    gameId = gameId.slice(0, -1);
+    flashKey(el, '#ff5c5c');
+  } else if (char === ' ') {
+    if (gameId.length < MAX_LENGTH) { gameId += char; }
+    flashKey(el, '#9d5cff');
+  } else {
+    if (gameId.length < MAX_LENGTH) { gameId += char; }
+    flashKey(el, '#00e5a0');
+  }
+  updateDisplay();
+  clearStatus();
+}
+
+function flashKey(el, color) {
+  const original = el.getAttribute('material').color || '#162040';
+  el.setAttribute('material', `color: ${color}; opacity: 1; shader: flat; side: double`);
+  setTimeout(() => {
+    el.setAttribute('material', `color: ${original}; opacity: 0.9; shader: flat; side: double`);
+  }, 120);
+}
+
+// =============================================
+// Botones especiales (INGRESAR / BORRAR)
+// =============================================
+function setupSpecialButtons() {
+  const btnLogin = document.getElementById('btn-login');
+  const btnClear = document.getElementById('btn-clear');
+
+  if (btnLogin) {
+    btnLogin.addEventListener('click', () => doLogin());
+    btnLogin.addEventListener('mouseenter', () => {
+      btnLogin.setAttribute('material', 'color: #5580ff; opacity: 1; shader: flat; side: double');
+    });
+    btnLogin.addEventListener('mouseleave', () => {
+      btnLogin.setAttribute('material', 'color: #3d6bff; opacity: 0.95; shader: flat; side: double');
+    });
+  }
+
+  if (btnClear) {
+    btnClear.addEventListener('click', () => {
+      gameId = '';
+      updateDisplay();
+      clearStatus();
+    });
+    btnClear.addEventListener('mouseenter', () => {
+      btnClear.setAttribute('material', 'color: #ff7070; opacity: 1; shader: flat; side: double');
+    });
+    btnClear.addEventListener('mouseleave', () => {
+      btnClear.setAttribute('material', 'color: #ff5c5c; opacity: 0.85; shader: flat; side: double');
+    });
+  }
+}
+
+// =============================================
+// Lógica de login contra Supabase
+// =============================================
+async function doLogin() {
+  const id = gameId.trim();
+  if (!id) {
+    showStatus('Ingresa tu Game ID');
+    return;
+  }
+
+  showStatus('Verificando…');
+
+  try {
+    // Formato: GAMEID@leadershipos.app
+    const email = id.toUpperCase() + '@leadershipos.app';
+    const SUPABASE_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
+
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY
+      },
+      body: JSON.stringify({ email, password: id.toUpperCase() })
+    });
+
+    const data = await res.json();
+
+    if (data.access_token) {
+      // Guardar sesión
+      sessionStorage.setItem('vr_token', data.access_token);
+      sessionStorage.setItem('vr_user_id', data.user?.id || '');
+      sessionStorage.setItem('vr_game_id', id.toUpperCase());
+
+      showStatus('¡Bienvenido!');
+      // Redirigir a Neural Academy
+      setTimeout(() => {
+        window.location.href = 'world.html';
+      }, 1200);
+    } else {
+      showStatus('Game ID no encontrado');
+    }
+  } catch (err) {
+    showStatus('Error de conexión');
+    console.error('Login error:', err);
+  }
+}
+
+function showStatus(msg) {
+  const el = document.getElementById('status-msg');
+  if (el) el.setAttribute('text', 'value', msg);
+}
+
+function clearStatus() {
+  const el = document.getElementById('status-msg');
+  if (el) el.setAttribute('text', 'value', '');
+}
+
+// =============================================
+// Raycaster para controladores Quest (XR)
+// =============================================
+function setupControllerRaycaster() {
+  const scene = document.querySelector('a-scene');
+  if (!scene) return;
+
+  scene.addEventListener('loaded', () => {
+    // Controlador derecho con raycaster
+    const rightController = document.createElement('a-entity');
+    rightController.setAttribute('id', 'right-controller');
+    rightController.setAttribute('oculus-touch-controls', 'hand: right');
+    rightController.setAttribute('raycaster', 'objects: .interactive; far: 8; showLine: true; lineColor: #00e5a0; lineOpacity: 0.6');
+    rightController.setAttribute('laser-controls', 'hand: right');
+    scene.appendChild(rightController);
+
+    // Controlador izquierdo
+    const leftController = document.createElement('a-entity');
+    leftController.setAttribute('id', 'left-controller');
+    leftController.setAttribute('oculus-touch-controls', 'hand: left');
+    leftController.setAttribute('raycaster', 'objects: .interactive; far: 8; showLine: true; lineColor: #9d5cff; lineOpacity: 0.4');
+    scene.appendChild(leftController);
+
+    // Manejar trigger del controlador derecho
+    rightController.addEventListener('triggerdown', () => {
+      const intersectedEl = rightController.components.raycaster.intersectedEls[0];
+      if (intersectedEl) {
+        intersectedEl.click();
+      }
+    });
+
+    // Manejar trigger del controlador izquierdo
+    leftController.addEventListener('triggerdown', () => {
+      const intersectedEl = leftController.components.raycaster.intersectedEls[0];
+      if (intersectedEl) {
+        intersectedEl.click();
+      }
+    });
+
+    // Hover con controlador
+    rightController.addEventListener('raycaster-intersection', (evt) => {
+      const els = evt.detail.els;
+      els.forEach(el => el.dispatchEvent(new Event('mouseenter')));
+    });
+
+    rightController.addEventListener('raycaster-intersection-cleared', (evt) => {
+      const els = evt.detail.clearedEls;
+      if (els) els.forEach(el => el.dispatchEvent(new Event('mouseleave')));
+    });
+  });
+}
+
+// =============================================
+// Rotación suave del teclado hacia la cámara
+// (tick animation loop)
+// =============================================
+const sceneEl = document.querySelector('a-scene');
+if (sceneEl) {
+  sceneEl.addEventListener('loaded', () => {
+    // Animar estrellas con rotación lenta
+    const stars = document.getElementById('stars');
+    if (stars) {
+      stars.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 120000; easing: linear');
+    }
+
+    // Pulse suave en el panel principal
+    const panel = document.getElementById('login-panel');
+    if (panel) {
+      panel.setAttribute('animation__float',
+        'property: position; to: 0 1.45 -1.8; from: 0 1.4 -1.8; dir: alternate; loop: true; dur: 3000; easing: easeInOutSine'
+      );
+    }
+  });
+}
+</script>
+
+</body>
+</html>
