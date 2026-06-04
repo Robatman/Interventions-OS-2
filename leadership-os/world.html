@@ -1,86 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <title>Centris · Neural Academy</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 <style>
-  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;}
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#060818;}
   a-scene{width:100%;height:100%;}
 
-  /* ── INDICADOR DE VOZ (HUD sobre el canvas) ── */
-  #voice-hud {
-    position: fixed;
-    bottom: 32px; left: 50%;
-    transform: translateX(-50%);
-    z-index: 50;
-    display: flex; align-items: center; gap: 12px;
-    background: rgba(22,32,64,0.92);
-    border: 1px solid #2a4080;
-    border-radius: 40px;
-    padding: 10px 24px;
-    font-family: monospace;
-    font-size: 0.85rem;
-    color: #e8eeff;
-    transition: opacity 0.3s;
-    pointer-events: none;
+  /* HUD VOZ */
+  #voice-hud{
+    position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+    z-index:50;display:flex;align-items:center;gap:10px;
+    background:rgba(15,20,50,0.85);border:1px solid #2a3a7a;
+    border-radius:40px;padding:9px 22px;font-family:monospace;
+    font-size:0.8rem;color:#c8d8ff;pointer-events:none;
+    backdrop-filter:blur(8px);
   }
-  #voice-dot {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: #2a4080;
-    transition: background 0.2s, box-shadow 0.2s;
-  }
-  #voice-dot.idle     { background: #2a4080; }
-  #voice-dot.ready    { background: #00e5a0; box-shadow: 0 0 8px #00e5a0; }
-  #voice-dot.rec      { background: #ff5c5c; box-shadow: 0 0 12px #ff5c5c;
-                         animation: pulse 0.8s infinite alternate; }
-  #voice-dot.thinking { background: #9d5cff; box-shadow: 0 0 10px #9d5cff;
-                         animation: pulse 1.2s infinite alternate; }
-  @keyframes pulse { from { opacity:1; } to { opacity:0.4; } }
-  #voice-label { color: #e8eeff; opacity: 0.85; }
+  #voice-dot{width:11px;height:11px;border-radius:50%;background:#1a2a6a;transition:all 0.2s;}
+  #voice-dot.ready   {background:#00e5c0;box-shadow:0 0 10px #00e5c0;}
+  #voice-dot.rec     {background:#ff5ca0;box-shadow:0 0 14px #ff5ca0;animation:pulse 0.8s infinite alternate;}
+  #voice-dot.thinking{background:#9d5cff;box-shadow:0 0 12px #9d5cff;animation:pulse 1.2s infinite alternate;}
+  @keyframes pulse{from{opacity:1}to{opacity:0.3}}
 
-  /* Botón mic (desktop fallback) */
-  #mic-btn {
-    position: fixed; bottom: 90px; left: 50%;
-    transform: translateX(-50%);
-    z-index: 51;
-    background: #3d6bff; color: #e8eeff;
-    border: none; border-radius: 50%;
-    width: 56px; height: 56px;
-    font-size: 1.4rem;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(61,107,255,0.4);
-    transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center;
+  /* BTN MIC DESKTOP */
+  #mic-btn{
+    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+    z-index:51;background:linear-gradient(135deg,#3d6bff,#9d5cff);
+    color:#fff;border:none;border-radius:50%;width:54px;height:54px;
+    font-size:1.3rem;cursor:pointer;box-shadow:0 4px 24px rgba(100,100,255,0.5);
+    display:flex;align-items:center;justify-content:center;transition:all 0.15s;
   }
-  #mic-btn:hover { background: #5580ff; transform: translateX(-50%) scale(1.08); }
-  #mic-btn.recording { background: #ff5c5c; box-shadow: 0 0 20px #ff5c5c; }
+  #mic-btn:hover{transform:translateX(-50%) scale(1.1);}
+  #mic-btn.recording{background:linear-gradient(135deg,#ff5ca0,#ff3c6b);box-shadow:0 0 24px #ff5ca0;}
 </style>
 </head>
-<body style="margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;">
+<body>
 
 <!-- Verificar sesión -->
 <script>
-(function() {
-  const token = localStorage.getItem('ldr_session_token');
-  if (!token) window.location.href = 'login-vr.html';
+(function(){
+  const t = localStorage.getItem('ldr_session_token');
+  if(!t) window.location.href = 'login-vr.html';
 })();
 </script>
 
-<!-- HUD de voz -->
+<!-- Scripts de la app principal — misma lógica -->
+<script src="js/interventions.js"></script>
+<script src="js/archetypes.js"></script>
+<script src="js/techniques.js"></script>
+<script src="js/prompts.js"></script>
+
 <div id="voice-hud">
   <div id="voice-dot" class="idle"></div>
-  <span id="voice-label">Iniciando micrófono…</span>
+  <span id="voice-label">Iniciando Neural Academy…</span>
 </div>
-
-<!-- Botón mic (desktop / fallback) -->
 <button id="mic-btn" title="Hablar">🎤</button>
 
-<a-scene background="color: #020810" vr-mode-ui="enabled: true">
+<a-scene
+  vr-mode-ui="enabled:true"
+  background="color:#060818"
+  renderer="antialias:true;colorManagement:true;alpha:true"
+  fog="type:exponential;color:#060818;density:0.018">
 
-  <!-- ── ASSETS ── -->
   <a-assets>
     <img id="juan-neutral"    src="assets/juanjolote_neutral.png">
     <img id="juan-happy"      src="assets/juanjolote_happy.png">
@@ -93,145 +76,513 @@
     <img id="ajolin-surprised" src="assets/ajolin_surprised.png">
   </a-assets>
 
-  <!-- ── LUCES ── -->
-  <a-light type="ambient"  color="#0a1a3a" intensity="1.2"></a-light>
-  <a-light type="point" position="0 3 0"   color="#1a3aff" intensity="0.8" distance="12"></a-light>
-  <a-light type="point" position="3 1 -3"  color="#00c49a" intensity="0.5" distance="8"></a-light>
-  <a-light type="point" position="-3 1 3"  color="#7c3aff" intensity="0.4" distance="8"></a-light>
+  <!-- ══ LUCES ══ -->
+  <a-light type="ambient"     color="#1a1050" intensity="1.5"></a-light>
+  <a-light type="point" position="0 5 0"    color="#4466ff" intensity="1.2" distance="20"></a-light>
+  <a-light type="point" position="-4 2 -4"  color="#00e5c0" intensity="0.7" distance="12"></a-light>
+  <a-light type="point" position="4 2 -4"   color="#9d5cff" intensity="0.6" distance="12"></a-light>
+  <a-light type="point" position="0 1 3"    color="#ff5ca0" intensity="0.3" distance="8"></a-light>
 
-  <!-- ── PISO ── -->
-  <a-plane position="0 0 0" rotation="-90 0 0"
-    width="30" height="30" color="#050d1a"
-    metalness="0.7" roughness="0.3" opacity="0.95">
+  <!-- ══ PISO — GRID LUMINOSO ══ -->
+  <a-plane position="0 0 0" rotation="-90 0 0" width="40" height="40"
+    color="#080c1f" material="shader:flat;opacity:1">
   </a-plane>
-
-  <!-- ── ANILLOS ORBITANDO ── -->
-  <a-torus position="0 0 0" radius="5" radius-tubular="0.03"
-    color="#1a3aff" opacity="0.35"
-    animation="property:rotation;to:0 360 0;loop:true;dur:18000;easing:linear">
-  </a-torus>
-  <a-torus position="0 0 0" rotation="60 0 0" radius="4" radius-tubular="0.02"
-    color="#00c49a" opacity="0.3"
-    animation="property:rotation;to:60 360 0;loop:true;dur:14000;easing:linear">
-  </a-torus>
-  <a-torus position="0 0 0" rotation="0 45 70" radius="4.5" radius-tubular="0.015"
-    color="#7c3aff" opacity="0.25"
-    animation="property:rotation;to:0 405 70;loop:true;dur:22000;easing:linear">
-  </a-torus>
-
-  <!-- ── NODOS FLOTANTES ── -->
-  <a-sphere position="4 1.5 -2"  radius="0.12" color="#1a3aff" opacity="0.9"
-    animation="property:position;to:4 2.0 -2;loop:true;dur:3000;dir:alternate;easing:easeInOutSine">
-  </a-sphere>
-  <a-sphere position="-4 1.2 -1" radius="0.09" color="#00c49a" opacity="0.9"
-    animation="property:position;to:-4 1.7 -1;loop:true;dur:2500;dir:alternate;easing:easeInOutSine">
-  </a-sphere>
-  <a-sphere position="3 2 3"     radius="0.1"  color="#7c3aff" opacity="0.9"
-    animation="property:position;to:3 2.5 3;loop:true;dur:3500;dir:alternate;easing:easeInOutSine">
-  </a-sphere>
-  <a-sphere position="-3 1 2"    radius="0.08" color="#ff3c2f" opacity="0.8"
-    animation="property:position;to:-3 1.5 2;loop:true;dur:2800;dir:alternate;easing:easeInOutSine">
-  </a-sphere>
-
-  <!-- ── JUANJOLOTE (izquierda) ── -->
-  <a-entity id="juanjolote-entity" position="-1.5 0 -2.5">
-    <a-image id="juan-img" src="#juan-neutral"
-      width="1.2" height="1.2" position="0 0.6 0" look-at="[camera]"
-      animation="property:position;to:0 0.7 0;loop:true;dur:3000;dir:alternate;easing:easeInOutSine">
-    </a-image>
-    <a-text value="JUANJOLOTE" position="0 1.3 0" align="center" color="#00c49a" width="3" opacity="0.9"></a-text>
-    <a-text value="Tu Coach"   position="0 1.1 0" align="center" color="white"   width="2.5" opacity="0.6"></a-text>
-    <a-circle position="0 0.05 0" radius="0.7" color="#00c49a" opacity="0.06" rotation="-90 0 0"></a-circle>
+  <!-- Grid lines -->
+  <a-entity position="0 0.01 0">
+    <a-plane rotation="-90 0 0" width="40" height="40"
+      material="color:#1a2a6a;opacity:0.25;transparent:true;shader:flat;wireframe:true">
+    </a-plane>
   </a-entity>
 
-  <!-- ── AJOLIN (derecha) ── -->
-  <a-entity id="ajolin-entity" position="1.5 0 -2.5">
-    <a-image id="ajolin-img" src="#ajolin-neutral"
-      width="1.2" height="1.2" position="0 0.6 0" look-at="[camera]"
-      animation="property:position;to:0 0.7 0;loop:true;dur:2700;dir:alternate;easing:easeInOutSine">
-    </a-image>
-    <a-text value="AJOLIN"     position="0 1.3 0" align="center" color="#1a3aff" width="3" opacity="0.9"></a-text>
-    <a-text value="El Agente"  position="0 1.1 0" align="center" color="white"   width="2.5" opacity="0.6"></a-text>
-    <a-circle position="0 0.05 0" radius="0.7" color="#1a3aff" opacity="0.06" rotation="-90 0 0"></a-circle>
+  <!-- ══ NEBULOSAS DE FONDO ══ -->
+  <!-- Gran esfera de atmósfera -->
+  <a-sphere radius="30" color="#0a0a2a"
+    material="opacity:1;shader:flat;side:back">
+  </a-sphere>
+
+  <!-- Nubes de color -->
+  <a-sphere position="-8 4 -18" radius="5" color="#1a0a4a"
+    material="opacity:0.6;transparent:true;shader:flat">
+  </a-sphere>
+  <a-sphere position="10 3 -20" radius="6" color="#0a1a3a"
+    material="opacity:0.5;transparent:true;shader:flat">
+  </a-sphere>
+  <a-sphere position="0 8 -22" radius="7" color="#0a2a2a"
+    material="opacity:0.4;transparent:true;shader:flat">
+  </a-sphere>
+
+  <!-- ══ ESTRELLAS ══ -->
+  <a-entity id="stars-1">
+    <a-sphere position="-7 5 -14"   radius="0.04" color="#00e5c0" material="shader:flat;opacity:0.9"></a-sphere>
+    <a-sphere position="5 7 -16"    radius="0.03" color="#9d5cff" material="shader:flat;opacity:0.8"></a-sphere>
+    <a-sphere position="-12 4 -18"  radius="0.05" color="#4466ff" material="shader:flat;opacity:0.7"></a-sphere>
+    <a-sphere position="9 6 -13"    radius="0.03" color="#00e5c0" material="shader:flat;opacity:0.6"></a-sphere>
+    <a-sphere position="-5 9 -15"   radius="0.04" color="#ff5ca0" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="13 5 -17"   radius="0.03" color="#4466ff" material="shader:flat;opacity:0.7"></a-sphere>
+    <a-sphere position="-3 11 -20"  radius="0.04" color="#9d5cff" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="7 8 -19"    radius="0.05" color="#00e5c0" material="shader:flat;opacity:0.4"></a-sphere>
+    <a-sphere position="-14 6 -16"  radius="0.03" color="#c8d8ff" material="shader:flat;opacity:0.6"></a-sphere>
+    <a-sphere position="3 13 -23"   radius="0.04" color="#4466ff" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="-9 2 -11"   radius="0.03" color="#9d5cff" material="shader:flat;opacity:0.8"></a-sphere>
+    <a-sphere position="11 10 -22"  radius="0.04" color="#00e5c0" material="shader:flat;opacity:0.3"></a-sphere>
+    <a-sphere position="0 14 -26"   radius="0.05" color="#4466ff" material="shader:flat;opacity:0.4"></a-sphere>
+    <a-sphere position="-17 5 -20"  radius="0.03" color="#c8d8ff" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="15 3 -14"   radius="0.04" color="#9d5cff" material="shader:flat;opacity:0.6"></a-sphere>
+    <a-sphere position="-6 6 -9"    radius="0.03" color="#00e5c0" material="shader:flat;opacity:0.9"></a-sphere>
+    <a-sphere position="6 4 -10"    radius="0.04" color="#4466ff" material="shader:flat;opacity:0.7"></a-sphere>
+    <a-sphere position="-10 12 -24" radius="0.03" color="#ff5ca0" material="shader:flat;opacity:0.4"></a-sphere>
+    <a-sphere position="17 2 -18"   radius="0.05" color="#c8d8ff" material="shader:flat;opacity:0.3"></a-sphere>
+    <a-sphere position="-2 7 -12"   radius="0.03" color="#9d5cff" material="shader:flat;opacity:0.7"></a-sphere>
+    <a-sphere position="8 11 -21"   radius="0.04" color="#00e5c0" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="-13 8 -25"  radius="0.03" color="#4466ff" material="shader:flat;opacity:0.4"></a-sphere>
+    <a-sphere position="4 15 -28"   radius="0.05" color="#9d5cff" material="shader:flat;opacity:0.3"></a-sphere>
   </a-entity>
 
-  <!-- ── TÍTULO ── -->
-  <a-text value="Neural Academy" position="0 2.2 -3"
-    align="center" color="white" font="exo2bold" width="6" opacity="0.9">
-  </a-text>
-  <a-text value="Centris · Leadership OS" position="0 1.9 -3"
-    align="center" color="#00c49a" width="4" opacity="0.6">
-  </a-text>
+  <!-- ══ ANILLOS ORBITALES ══ -->
+  <a-torus position="0 1 0" radius="6" radius-tubular="0.035"
+    color="#2a3aaa" material="opacity:0.5;transparent:true;shader:flat"
+    animation="property:rotation;to:0 360 0;loop:true;dur:25000;easing:linear">
+  </a-torus>
+  <a-torus position="0 1 0" rotation="65 0 0" radius="5" radius-tubular="0.025"
+    color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat"
+    animation="property:rotation;to:65 360 0;loop:true;dur:18000;easing:linear">
+  </a-torus>
+  <a-torus position="0 1 0" rotation="0 30 75" radius="7" radius-tubular="0.02"
+    color="#9d5cff" material="opacity:0.2;transparent:true;shader:flat"
+    animation="property:rotation;to:0 390 75;loop:true;dur:32000;easing:linear">
+  </a-torus>
+  <a-torus position="0 1 0" rotation="45 15 0" radius="4" radius-tubular="0.018"
+    color="#ff5ca0" material="opacity:0.2;transparent:true;shader:flat"
+    animation="property:rotation;to:405 15 0;loop:true;dur:22000;easing:linear">
+  </a-torus>
 
-  <!-- ── BURBUJA DE DIÁLOGO ── -->
-  <a-entity id="dialog-panel" position="0 1.6 -2.5" visible="false">
-    <a-box width="2.8" height="0.8" depth="0.06" color="#080f20" opacity="0.95"></a-box>
-    <a-text id="dialog-speaker" value="JUANJOLOTE"
-      position="0 0.28 0.04" align="center" color="#00c49a" width="4" opacity="0.8">
+  <!-- ══ NODOS FLOTANTES ══ -->
+  <a-sphere position="4.5 1.8 -3"  radius="0.15" color="#4466ff"
+    material="opacity:0.85;shader:flat"
+    animation="property:position;to:4.5 2.4 -3;loop:true;dur:3200;dir:alternate;easing:easeInOutSine">
+  </a-sphere>
+  <a-sphere position="-4.5 1.5 -2" radius="0.12" color="#00e5c0"
+    material="opacity:0.85;shader:flat"
+    animation="property:position;to:-4.5 2.1 -2;loop:true;dur:2700;dir:alternate;easing:easeInOutSine">
+  </a-sphere>
+  <a-sphere position="3.5 2.2 3.5"   radius="0.10" color="#9d5cff"
+    material="opacity:0.85;shader:flat"
+    animation="property:position;to:3.5 2.8 3.5;loop:true;dur:3800;dir:alternate;easing:easeInOutSine">
+  </a-sphere>
+  <a-sphere position="-3 1.2 2.5"    radius="0.09" color="#ff5ca0"
+    material="opacity:0.8;shader:flat"
+    animation="property:position;to:-3 1.8 2.5;loop:true;dur:2900;dir:alternate;easing:easeInOutSine">
+  </a-sphere>
+  <a-sphere position="0 3.5 -5"    radius="0.14" color="#00e5c0"
+    material="opacity:0.7;shader:flat"
+    animation="property:position;to:0 4.2 -5;loop:true;dur:4200;dir:alternate;easing:easeInOutSine">
+  </a-sphere>
+
+  <!-- ══════════════════════════════════════
+       SCREEN: WELCOME — Juanjolote + Ajolin
+  ══════════════════════════════════════ -->
+  <a-entity id="screen-welcome">
+
+    <!-- JUANJOLOTE -->
+    <a-entity id="juanjolote-entity" position="-1.6 0 -2.8">
+      <a-image id="juan-img" src="#juan-neutral"
+        width="1.3" height="1.3" position="0 0.65 0" look-at="[camera]"
+        animation="property:position;to:0 0.75 0;loop:true;dur:3000;dir:alternate;easing:easeInOutSine">
+      </a-image>
+      <!-- Halo -->
+      <a-circle position="0 0.06 0" radius="0.8" rotation="-90 0 0"
+        color="#00e5c0" material="opacity:0.08;transparent:true;shader:flat">
+      </a-circle>
+      <a-torus position="0 0.06 0" radius="0.85" radius-tubular="0.012" rotation="-90 0 0"
+        color="#00e5c0" material="opacity:0.35;transparent:true;shader:flat"
+        animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:8000;easing:linear">
+      </a-torus>
+      <a-text value="JUANJOLOTE" position="0 1.40 0" align="center" color="#00e5c0" width="3.2" font="mozillavr"></a-text>
+      <a-text value="Tu Coach" position="0 1.20 0" align="center" color="#c8d8ff" width="2.5" opacity="0.65" font="mozillavr"></a-text>
+    </a-entity>
+
+    <!-- AJOLIN -->
+    <a-entity id="ajolin-entity" position="1.6 0 -2.8">
+      <a-image id="ajolin-img" src="#ajolin-neutral"
+        width="1.3" height="1.3" position="0 0.65 0" look-at="[camera]"
+        animation="property:position;to:0 0.75 0;loop:true;dur:2700;dir:alternate;easing:easeInOutSine">
+      </a-image>
+      <a-circle position="0 0.06 0" radius="0.8" rotation="-90 0 0"
+        color="#9d5cff" material="opacity:0.08;transparent:true;shader:flat">
+      </a-circle>
+      <a-torus position="0 0.06 0" radius="0.85" radius-tubular="0.012" rotation="-90 0 0"
+        color="#9d5cff" material="opacity:0.35;transparent:true;shader:flat"
+        animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:6000;easing:linear">
+      </a-torus>
+      <a-text value="AJOLIN" position="0 1.40 0" align="center" color="#9d5cff" width="3.2" font="mozillavr"></a-text>
+      <a-text value="El Agente" position="0 1.20 0" align="center" color="#c8d8ff" width="2.5" opacity="0.65" font="mozillavr"></a-text>
+    </a-entity>
+
+    <!-- TÍTULO NEURAL ACADEMY -->
+    <a-entity position="0 2.5 -3.2"
+      animation="property:position;to:0 2.58 -3.2;loop:true;dur:4000;dir:alternate;easing:easeInOutSine">
+      <a-text value="NEURAL ACADEMY" align="center" color="#c8d8ff" font="exo2bold" width="7" opacity="0.95"></a-text>
+    </a-entity>
+    <a-text value="Centris · Leadership OS" position="0 2.18 -3.2"
+      align="center" color="#00e5c0" width="4.5" opacity="0.7" font="mozillavr">
     </a-text>
-    <a-text id="dialog-text" value="..."
-      position="0 0 0.04" align="center" color="white" width="4.5" wrap-count="45" opacity="0.9">
-    </a-text>
-  </a-entity>
 
-  <!-- ── MOOD BAR ── -->
-  <a-entity id="mood-bar" position="0 0.3 -2.2">
-    <a-text value="Openness" position="-0.9 0 0" align="left" color="#ffffff" opacity="0.5" width="2"></a-text>
-    <a-box id="mood-track" width="1.2" height="0.07" depth="0.03" color="#111827" position="0.1 0 0"></a-box>
-    <a-box id="mood-fill"  width="0.36" height="0.07" depth="0.04" color="#ff6b6b" position="-0.32 0 0.01"></a-box>
-    <a-text id="mood-pct"  value="30%" position="0.8 0 0" align="right" color="white" width="1.5" opacity="0.7"></a-text>
-  </a-entity>
-
-  <!-- ── BOTÓN LOGOUT (lado izquierdo, gira cabeza) ── -->
-  <a-entity position="-2.5 1.8 -2" rotation="0 35 0">
-    <a-plane id="btn-logout" width="0.7" height="0.2"
-      color="#ff5c5c" material="opacity:0.8;shader:flat;side:double"
-      class="clickable">
-      <a-text value="Cerrar sesión" color="#e8eeff" align="center"
-        width="3" position="0 0 0.01" font="mozillavr">
+    <!-- MENÚ PRINCIPAL — 2 opciones flotantes -->
+    <!-- Intervenciones (izquierda) -->
+    <a-entity id="btn-interventions" position="-1.0 1.15 -2.4" class="clickable"
+      animation__hover="property:position;to:-1.0 1.22 -2.4;startEvents:mouseenter;dur:200"
+      animation__unhover="property:position;to:-1.0 1.15 -2.4;startEvents:mouseleave;dur:200">
+      <!-- Fondo del botón -->
+      <a-plane width="1.4" height="0.55" color="#0d2060"
+        material="opacity:0.92;shader:flat;side:double">
+      </a-plane>
+      <!-- Borde teal -->
+      <a-plane width="1.44" height="0.59" color="#00e5c0"
+        material="opacity:0.4;transparent:true;shader:flat;side:double" position="0 0 -0.005">
+      </a-plane>
+      <a-text value="🎯  INTERVENCIONES" align="center" color="#00e5c0"
+        width="4.5" position="0 0.08 0.01" font="mozillavr">
       </a-text>
-    </a-plane>
-  </a-entity>
+      <a-text value="4 conversaciones de retención" align="center" color="#c8d8ff"
+        width="3.2" position="0 -0.10 0.01" opacity="0.7" font="mozillavr">
+      </a-text>
+    </a-entity>
 
-  <!-- ── INDICADOR DE GRABACIÓN VR (visible en headset) ── -->
-  <a-entity id="vr-voice-indicator" position="0 0.5 -2.2" visible="false">
-    <a-plane width="2.0" height="0.22" color="#080f20"
-      material="opacity:0.9;shader:flat;side:double">
-    </a-plane>
-    <a-circle id="vr-dot" radius="0.07" color="#2a4080"
-      material="shader:flat" position="-0.82 0 0.01">
-    </a-circle>
-    <a-text id="vr-voice-label" value="Listo para escuchar"
-      color="#e8eeff" align="left" width="3.5"
-      position="-0.65 0 0.01" font="mozillavr">
+    <!-- Técnicas (derecha) -->
+    <a-entity id="btn-techniques" position="1.0 1.15 -2.4" class="clickable"
+      animation__hover="property:position;to:1.0 1.22 -2.4;startEvents:mouseenter;dur:200"
+      animation__unhover="property:position;to:1.0 1.15 -2.4;startEvents:mouseleave;dur:200">
+      <a-plane width="1.4" height="0.55" color="#150d40"
+        material="opacity:0.92;shader:flat;side:double">
+      </a-plane>
+      <a-plane width="1.44" height="0.59" color="#9d5cff"
+        material="opacity:0.4;transparent:true;shader:flat;side:double" position="0 0 -0.005">
+      </a-plane>
+      <a-text value="🛠  TÉCNICAS" align="center" color="#9d5cff"
+        width="4.5" position="0 0.08 0.01" font="mozillavr">
+      </a-text>
+      <a-text value="14 herramientas de comunicación" align="center" color="#c8d8ff"
+        width="3.2" position="0 -0.10 0.01" opacity="0.7" font="mozillavr">
+      </a-text>
+    </a-entity>
+
+    <!-- Logout (arriba izquierda, discreto) -->
+    <a-entity position="-2.8 2.2 -2.5" rotation="0 30 0">
+      <a-plane id="btn-logout" width="0.75" height="0.22" color="#1a0a30"
+        material="opacity:0.8;shader:flat;side:double" class="clickable">
+        <a-plane width="0.77" height="0.24" color="#ff5ca0"
+          material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005">
+        </a-plane>
+        <a-text value="← Salir" color="#ff5ca0" align="center"
+          width="2.5" position="0 0 0.01" font="mozillavr">
+        </a-text>
+      </a-plane>
+    </a-entity>
+
+  </a-entity>
+  <!-- /screen-welcome -->
+
+  <!-- ══════════════════════════════════════
+       SCREEN: MODE SELECTOR
+       (aparece tras seleccionar intervención o técnica)
+  ══════════════════════════════════════ -->
+  <a-entity id="screen-mode" visible="false">
+
+    <!-- Título del modo -->
+    <a-text id="mode-title" value="" position="0 2.3 -2.5"
+      align="center" color="#c8d8ff" font="exo2bold" width="6" opacity="0.95">
     </a-text>
-  </a-entity>
 
-  <!-- ── CÁMARA ── -->
+    <!-- 3 botones de modo -->
+    <!-- LEARN -->
+    <a-entity id="btn-learn" position="-1.6 1.3 -2.2" class="clickable"
+      animation__hover="property:position;to:-1.6 1.38 -2.2;startEvents:mouseenter;dur:200"
+      animation__unhover="property:position;to:-1.6 1.3 -2.2;startEvents:mouseleave;dur:200">
+      <a-plane width="1.0" height="0.70" color="#0a1840"
+        material="opacity:0.93;shader:flat;side:double">
+      </a-plane>
+      <a-plane width="1.04" height="0.74" color="#4466ff"
+        material="opacity:0.4;transparent:true;shader:flat;side:double" position="0 0 -0.005">
+      </a-plane>
+      <a-text value="📖" align="center" color="#4466ff"
+        width="2" position="0 0.18 0.01" font="mozillavr">
+      </a-text>
+      <a-text value="APRENDER" align="center" color="#4466ff"
+        width="3.2" position="0 0.00 0.01" font="mozillavr">
+      </a-text>
+      <a-text value="Juanjolote te enseña" align="center" color="#c8d8ff"
+        width="2.8" position="0 -0.18 0.01" opacity="0.65" font="mozillavr">
+      </a-text>
+    </a-entity>
+
+    <!-- WORK TOGETHER -->
+    <a-entity id="btn-work" position="0 1.3 -2.2" class="clickable"
+      animation__hover="property:position;to:0 1.38 -2.2;startEvents:mouseenter;dur:200"
+      animation__unhover="property:position;to:0 1.3 -2.2;startEvents:mouseleave;dur:200">
+      <a-plane width="1.0" height="0.70" color="#100d40"
+        material="opacity:0.93;shader:flat;side:double">
+      </a-plane>
+      <a-plane width="1.04" height="0.74" color="#9d5cff"
+        material="opacity:0.4;transparent:true;shader:flat;side:double" position="0 0 -0.005">
+      </a-plane>
+      <a-text value="🤝" align="center" color="#9d5cff"
+        width="2" position="0 0.18 0.01" font="mozillavr">
+      </a-text>
+      <a-text value="REFLEXIONAR" align="center" color="#9d5cff"
+        width="3.2" position="0 0.00 0.01" font="mozillavr">
+      </a-text>
+      <a-text value="Conversa con tu coach" align="center" color="#c8d8ff"
+        width="2.8" position="0 -0.18 0.01" opacity="0.65" font="mozillavr">
+      </a-text>
+    </a-entity>
+
+    <!-- PRACTICE -->
+    <a-entity id="btn-practice" position="1.6 1.3 -2.2" class="clickable"
+      animation__hover="property:position;to:1.6 1.38 -2.2;startEvents:mouseenter;dur:200"
+      animation__unhover="property:position;to:1.6 1.38 -2.2;startEvents:mouseleave;dur:200">
+      <a-plane width="1.0" height="0.70" color="#0d2a20"
+        material="opacity:0.93;shader:flat;side:double">
+      </a-plane>
+      <a-plane width="1.04" height="0.74" color="#00e5c0"
+        material="opacity:0.4;transparent:true;shader:flat;side:double" position="0 0 -0.005">
+      </a-plane>
+      <a-text value="🎯" align="center" color="#00e5c0"
+        width="2" position="0 0.18 0.01" font="mozillavr">
+      </a-text>
+      <a-text value="PRACTICAR" align="center" color="#00e5c0"
+        width="3.2" position="0 0.00 0.01" font="mozillavr">
+      </a-text>
+      <a-text value="Agente random · Voz" align="center" color="#c8d8ff"
+        width="2.8" position="0 -0.18 0.01" opacity="0.65" font="mozillavr">
+      </a-text>
+    </a-entity>
+
+    <!-- BACK -->
+    <a-entity id="btn-mode-back" position="0 0.55 -2.2" class="clickable">
+      <a-plane width="0.6" height="0.22" color="#1a1030"
+        material="opacity:0.8;shader:flat;side:double">
+      </a-plane>
+      <a-text value="← Volver" color="#c8d8ff" align="center"
+        width="2.5" position="0 0 0.01" opacity="0.7" font="mozillavr">
+      </a-text>
+    </a-entity>
+
+  </a-entity>
+  <!-- /screen-mode -->
+
+  <!-- ══════════════════════════════════════
+       SCREEN: PRACTICE — Agente + Voz
+  ══════════════════════════════════════ -->
+  <a-entity id="screen-practice" visible="false">
+
+    <!-- Avatar del agente -->
+    <a-entity id="agent-entity" position="0 0 -2.5">
+      <a-image id="agent-img" src="#ajolin-neutral"
+        width="1.5" height="1.5" position="0 0.75 0" look-at="[camera]"
+        animation="property:position;to:0 0.85 0;loop:true;dur:3000;dir:alternate;easing:easeInOutSine">
+      </a-image>
+      <!-- Halo del agente -->
+      <a-circle position="0 0.06 0" radius="1.0" rotation="-90 0 0"
+        id="agent-halo" color="#9d5cff" material="opacity:0.06;transparent:true;shader:flat">
+      </a-circle>
+      <a-torus position="0 0.06 0" id="agent-ring" radius="1.05" radius-tubular="0.015" rotation="-90 0 0"
+        color="#9d5cff" material="opacity:0.3;transparent:true;shader:flat"
+        animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:7000;easing:linear">
+      </a-torus>
+      <a-text id="agent-name" value="Carlos Mendoza" position="0 1.65 0"
+        align="center" color="#c8d8ff" width="3.5" font="mozillavr">
+      </a-text>
+      <a-text id="agent-role" value="Agente · 2 años" position="0 1.45 0"
+        align="center" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr">
+      </a-text>
+    </a-entity>
+
+    <!-- BURBUJA DE DIÁLOGO -->
+    <a-entity id="dialog-panel" position="0 2.35 -2.5" visible="false">
+      <!-- Fondo -->
+      <a-plane width="3.2" height="0.85" color="#080e2a"
+        material="opacity:0.95;shader:flat;side:double">
+      </a-plane>
+      <a-plane width="3.24" height="0.89" id="dialog-border" color="#9d5cff"
+        material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005">
+      </a-plane>
+      <a-text id="dialog-speaker" value="CARLOS"
+        position="-1.45 0.28 0.01" align="left" color="#9d5cff" width="2.5" font="mozillavr">
+      </a-text>
+      <a-text id="dialog-text" value="..."
+        position="0 0 0.01" align="center" color="#e8eeff" width="5.5"
+        wrap-count="55" font="mozillavr">
+      </a-text>
+    </a-entity>
+
+    <!-- MOOD BAR — flotante a la derecha -->
+    <a-entity position="2.4 1.6 -2.2" rotation="0 -25 0">
+      <a-plane width="0.9" height="0.65" color="#080e2a"
+        material="opacity:0.88;shader:flat;side:double">
+      </a-plane>
+      <a-plane width="0.92" height="0.67" color="#2a3a7a"
+        material="opacity:0.5;transparent:true;shader:flat" position="0 0 -0.005">
+      </a-plane>
+      <a-text value="OPENNESS" position="0 0.22 0.01"
+        align="center" color="#c8d8ff" width="2.2" opacity="0.6" font="mozillavr">
+      </a-text>
+      <!-- Track -->
+      <a-plane width="0.7" height="0.07" color="#0d1530"
+        material="shader:flat" position="0 0.02 0.01">
+      </a-plane>
+      <!-- Fill -->
+      <a-plane id="mood-fill" width="0.21" height="0.07" color="#ff5ca0"
+        material="shader:flat" position="-0.245 0.02 0.015">
+      </a-plane>
+      <a-text id="mood-pct" value="30%" position="0 -0.16 0.01"
+        align="center" color="#c8d8ff" width="1.8" font="mozillavr">
+      </a-text>
+    </a-entity>
+
+    <!-- INDICADOR DE VOZ VR -->
+    <a-entity id="vr-voice-bar" position="0 0.45 -2.2" visible="false">
+      <a-plane width="2.2" height="0.22" color="#080e2a"
+        material="opacity:0.9;shader:flat;side:double">
+      </a-plane>
+      <a-circle id="vr-voice-dot" radius="0.07" color="#1a2a6a"
+        material="shader:flat" position="-0.9 0 0.01">
+      </a-circle>
+      <a-text id="vr-voice-label" value="Listo · Trigger para hablar"
+        color="#c8d8ff" align="left" width="3.5"
+        position="-0.75 0 0.01" font="mozillavr">
+      </a-text>
+    </a-entity>
+
+    <!-- BTN TERMINAR -->
+    <a-entity position="-2.5 2.0 -2.0" rotation="0 30 0">
+      <a-plane id="btn-end-practice" width="0.8" height="0.24" color="#1a0a20"
+        material="opacity:0.85;shader:flat;side:double" class="clickable">
+        <a-plane width="0.82" height="0.26" color="#ff5ca0"
+          material="opacity:0.35;transparent:true;shader:flat" position="0 0 -0.005">
+        </a-plane>
+        <a-text value="📊 Terminar" color="#ff5ca0" align="center"
+          width="3" position="0 0 0.01" font="mozillavr">
+        </a-text>
+      </a-plane>
+    </a-entity>
+
+  </a-entity>
+  <!-- /screen-practice -->
+
+  <!-- ══════════════════════════════════════
+       SCREEN: EVALUACIÓN
+  ══════════════════════════════════════ -->
+  <a-entity id="screen-eval" visible="false">
+
+    <!-- Juanjolote evaluando -->
+    <a-entity position="-1.4 0 -2.5">
+      <a-image id="juan-eval-img" src="#juan-talking"
+        width="1.2" height="1.2" position="0 0.6 0" look-at="[camera]"
+        animation="property:position;to:0 0.7 0;loop:true;dur:3000;dir:alternate;easing:easeInOutSine">
+      </a-image>
+      <a-torus position="0 0.06 0" radius="0.75" radius-tubular="0.012" rotation="-90 0 0"
+        color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat"
+        animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:8000;easing:linear">
+      </a-torus>
+    </a-entity>
+
+    <!-- Panel de evaluación -->
+    <a-entity position="0.8 1.5 -2.5">
+      <a-plane width="2.8" height="2.2" color="#080e2a"
+        material="opacity:0.96;shader:flat;side:double">
+      </a-plane>
+      <a-plane width="2.84" height="2.24" color="#00e5c0"
+        material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005">
+      </a-plane>
+      <a-text value="SESIÓN COMPLETADA" position="0 0.95 0.01"
+        align="center" color="#00e5c0" width="4.5" font="mozillavr">
+      </a-text>
+      <!-- Mood final -->
+      <a-text value="Openness final:" position="-1.25 0.65 0.01"
+        align="left" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr">
+      </a-text>
+      <a-text id="eval-mood" value="--%" position="1.1 0.65 0.01"
+        align="right" color="#00e5c0" width="2" font="mozillavr">
+      </a-text>
+      <!-- Separador -->
+      <a-plane width="2.4" height="0.004" color="#2a3a7a"
+        material="shader:flat" position="0 0.48 0.01">
+      </a-plane>
+      <!-- Feedback texto -->
+      <a-text id="eval-feedback" value="Analizando conversación..."
+        position="0 0.1 0.01" align="center" color="#e8eeff"
+        width="4.8" wrap-count="50" font="mozillavr">
+      </a-text>
+      <!-- Botones -->
+      <a-plane id="btn-new-session" width="1.1" height="0.22" color="#0d2060"
+        material="opacity:0.9;shader:flat;side:double" position="-0.65 -0.88 0.01"
+        class="clickable">
+        <a-plane width="1.12" height="0.24" color="#4466ff"
+          material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005">
+        </a-plane>
+        <a-text value="← Nueva sesión" color="#4466ff" align="center"
+          width="3.5" position="0 0 0.01" font="mozillavr">
+        </a-text>
+      </a-plane>
+      <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20"
+        material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01"
+        class="clickable">
+        <a-plane width="1.12" height="0.24" color="#00e5c0"
+          material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005">
+        </a-plane>
+        <a-text value="↺ Practicar de nuevo" color="#00e5c0" align="center"
+          width="3.5" position="0 0 0.01" font="mozillavr">
+        </a-text>
+      </a-plane>
+    </a-entity>
+
+  </a-entity>
+  <!-- /screen-eval -->
+
+  <!-- ══ CÁMARA ══ -->
   <a-camera id="main-camera" position="0 1.6 0"
     look-controls wasd-controls="enabled:false">
+    <!-- Punto de mira -->
+    <a-entity
+      geometry="primitive:ring;radiusInner:0.007;radiusOuter:0.012"
+      material="color:#00e5c0;shader:flat;opacity:0.85"
+      position="0 0 -1.0">
+    </a-entity>
     <a-cursor id="vr-cursor"
-      raycaster="objects:.clickable;far:10"
-      fuse="true" fuse-timeout="1500"
-      color="#00c49a" opacity="0.9"
-      position="0 0 -1"
-      geometry="primitive:ring;radiusInner:0.013;radiusOuter:0.02"
-      animation__fuse="property:scale;startEvents:fusing;from:1 1 1;to:0.1 0.1 0.1;dur:1500"
-      animation__unfuse="property:scale;startEvents:mouseleave;to:1 1 1;dur:100">
+      raycaster="objects:.clickable;far:6"
+      fuse="false"
+      color="#00e5c0" opacity="0"
+      position="0 0 -1.0"
+      geometry="primitive:ring;radiusInner:0.009;radiusOuter:0.014"
+      material="color:#00e5c0;shader:flat;opacity:0">
     </a-cursor>
   </a-camera>
 
 </a-scene>
 
+<!-- ══════════════════════════════════════════
+     LÓGICA COMPLETA
+══════════════════════════════════════════ -->
 <script>
-// ══════════════════════════════════════════════════════════
-//  CENTRIS · NEURAL ACADEMY — world.html
-//  Voz: MediaRecorder → /api/groq-whisper → Groq LLM
-// ══════════════════════════════════════════════════════════
+// ─── CONSTANTES ──────────────────────────────────────────
+const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
+const SUPA_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
 
-// ─── STATE ───────────────────────────────────────────────
-let vrMood        = 30;
-let agentHistory  = [];
+// ─── ESTADO GLOBAL ───────────────────────────────────────
+let appState = {
+  screen:          'welcome',   // welcome | mode | practice | eval
+  activeMenu:      null,        // 'interventions' | 'techniques'
+  currentArchetype: null,
+  currentScenario:  null,
+  currentLevel:     'novice',
+  agentHistory:    [],
+  vrMood:          30,
+  boxState:        'out',
+  conversationClosed: false,
+  hingesOpened:    []
+};
+
+// ─── VOZ ─────────────────────────────────────────────────
 let isRecording   = false;
 let isProcessing  = false;
 let mediaRecorder = null;
@@ -240,341 +591,509 @@ let audioStream   = null;
 let audioContext  = null;
 let analyser      = null;
 let silenceTimer  = null;
-let currentMode   = null;
 
-const SILENCE_THRESHOLD = 40;   // 0-255, nivel mínimo de audio
-const SILENCE_DURATION  = 1800; // ms de silencio para auto-stop
-const MAX_REC_TIME      = 25000; // ms máximo de grabación
+const SILENCE_THRESHOLD = 38;
+const SILENCE_DURATION  = 1900;
 
-// ─── HUD HELPERS ─────────────────────────────────────────
+// ─── HUD ─────────────────────────────────────────────────
 function setHUD(state, label) {
   const dot = document.getElementById('voice-dot');
   const lbl = document.getElementById('voice-label');
-  if (dot) { dot.className = ''; dot.classList.add(state); }
-  if (lbl) lbl.textContent = label;
+  if(dot){ dot.className=''; dot.classList.add(state); }
+  if(lbl) lbl.textContent = label;
 
-  // Espejo en VR
-  const vDot = document.getElementById('vr-dot');
+  const vDot = document.getElementById('vr-voice-dot');
   const vLbl = document.getElementById('vr-voice-label');
-  const vInd = document.getElementById('vr-voice-indicator');
-  const colorMap = { idle:'#2a4080', ready:'#00e5a0', rec:'#ff5c5c', thinking:'#9d5cff' };
-  if (vDot) vDot.setAttribute('color', colorMap[state] || '#2a4080');
-  if (vLbl) vLbl.setAttribute('text', 'value', label);
-  if (vInd) vInd.setAttribute('visible', state !== 'idle');
+  const vBar = document.getElementById('vr-voice-bar');
+  const colors = {idle:'#1a2a6a',ready:'#00e5c0',rec:'#ff5ca0',thinking:'#9d5cff'};
+  if(vDot) vDot.setAttribute('color', colors[state]||'#1a2a6a');
+  if(vLbl) vLbl.setAttribute('text','value',label);
+  if(vBar) vBar.setAttribute('visible', state!=='idle');
 }
 
-// ─── SETUP MICRÓFONO ────────────────────────────────────
-async function setupMic() {
-  try {
-    audioStream = await navigator.mediaDevices.getUserMedia({
-      audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:true }
-    });
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    analyser     = audioContext.createAnalyser();
-    analyser.fftSize = 2048;
-    const source = audioContext.createMediaStreamSource(audioStream);
-    source.connect(analyser);
+// ─── ALEATORIDAD — el corazón del sistema ────────────────
+function pickRandomArchetype() {
+  const ids = Object.keys(ARCHETYPES).filter(id => ARCHETYPES[id].available);
+  return ARCHETYPES[ids[Math.floor(Math.random() * ids.length)]];
+}
 
-    setHUD('ready', 'Listo · Presiona para hablar');
-    console.log('[Voice] Micrófono listo');
-  } catch(e) {
-    setHUD('idle', 'Sin acceso al micrófono');
-    console.error('[Voice] Mic error:', e);
+function pickRandomScenario(archetype, level) {
+  const pool = archetype.briefings[level] || archetype.briefings['novice'] || [];
+  if(!pool.length) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function pickRandomOpener(archetype, scenario) {
+  const state = scenario?.carlosState || scenario?.agentState || 'guarded-tired';
+  if(archetype.openers && archetype.openers[state]) {
+    return archetype.openers[state];
   }
+  const openerVals = Object.values(archetype.openers||{});
+  return openerVals[Math.floor(Math.random()*openerVals.length)] || '...';
 }
 
-// ─── INICIAR GRABACIÓN ──────────────────────────────────
-function startRecording() {
-  if (isRecording || isProcessing || !audioStream) return;
-
-  audioChunks  = [];
-  isRecording  = true;
-
-  // Formato compatible con Quest
-  const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-    ? 'audio/webm;codecs=opus' : 'audio/webm';
-
-  mediaRecorder = new MediaRecorder(audioStream, { mimeType });
-  mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
-  mediaRecorder.onstop = onRecordingStop;
-  mediaRecorder.start();
-
-  setHUD('rec', '🔴 Grabando… habla ahora');
-  document.getElementById('mic-btn')?.classList.add('recording');
-
-  // Auto-stop por silencio
-  startSilenceDetection();
-
-  // Auto-stop por tiempo máximo
-  setTimeout(() => { if(isRecording) stopRecording(); }, MAX_REC_TIME);
+// ─── NAVEGACIÓN DE PANTALLAS ─────────────────────────────
+function showScreen(name) {
+  ['welcome','mode','practice','eval'].forEach(s => {
+    document.getElementById('screen-'+s)?.setAttribute('visible', s===name);
+  });
+  appState.screen = name;
 }
 
-// ─── DETENER GRABACIÓN ──────────────────────────────────
-function stopRecording() {
-  if (!isRecording || !mediaRecorder) return;
-  isRecording = false;
-  if (silenceTimer) { cancelAnimationFrame(silenceTimer); silenceTimer = null; }
-  mediaRecorder.stop();
-  document.getElementById('mic-btn')?.classList.remove('recording');
-  setHUD('thinking', 'Procesando…');
+function goWelcome() {
+  showScreen('welcome');
+  appState.agentHistory = [];
+  appState.vrMood = 30;
 }
 
-// ─── DETECCIÓN DE SILENCIO ──────────────────────────────
-function startSilenceDetection() {
-  const data      = new Uint8Array(analyser.frequencyBinCount);
-  let silenceMs   = 0;
-  let lastTime    = performance.now();
+function goMode(menuType) {
+  appState.activeMenu = menuType;
+  const label = menuType === 'interventions' ? '🎯 Intervenciones' : '🛠 Técnicas';
+  document.getElementById('mode-title')?.setAttribute('text','value',label);
+  showScreen('mode');
+}
 
-  function check() {
-    if (!isRecording) return;
-    analyser.getByteFrequencyData(data);
-    const avg = data.reduce((a,b)=>a+b,0) / data.length;
-    const now = performance.now();
-    const dt  = now - lastTime;
-    lastTime  = now;
+function goLearn() {
+  // Juanjolote enseña — conversación por voz
+  appState.agentHistory = [];
+  const intro = appState.activeMenu === 'interventions'
+    ? `Vamos a explorar las intervenciones de retención. ¿Con cuál quieres empezar — Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?`
+    : `Vamos a explorar las técnicas de comunicación. ¿Cuál te interesa practicar hoy?`;
+  showScreen('practice');
+  // En modo Learn, Juanjolote es el "agente"
+  setJuanMood('happy');
+  setDialog('JUANJOLOTE', intro);
+  speakVR(intro, 'juan', () => setHUD('ready','Listo · Trigger para responder'));
+  appState.agentHistory.push({role:'assistant', content: intro});
+}
 
-    if (avg < SILENCE_THRESHOLD) {
-      silenceMs += dt;
-      if (silenceMs >= SILENCE_DURATION) { stopRecording(); return; }
-    } else {
-      silenceMs = 0;
-    }
-    silenceTimer = requestAnimationFrame(check);
+function goWork() {
+  appState.agentHistory = [];
+  const intro = `Cuéntame — ¿qué situación tienes con un agente ahora mismo?`;
+  showScreen('practice');
+  setJuanMood('talking');
+  setDialog('JUANJOLOTE', intro);
+  speakVR(intro, 'juan', () => setHUD('ready','Listo · Trigger para responder'));
+  appState.agentHistory.push({role:'assistant', content: intro});
+}
+
+function goPractice() {
+  // Seleccionar agente y escenario aleatorios
+  const arch     = pickRandomArchetype();
+  const scenario = pickRandomScenario(arch, appState.currentLevel);
+  appState.currentArchetype = arch;
+  appState.currentScenario  = scenario;
+  appState.agentHistory     = [];
+  appState.vrMood           = scenario?.startMood ?? 30;
+  appState.hingesOpened     = [];
+  appState.conversationClosed = false;
+
+  currentArchetype = arch; // para que prompts.js lo use
+
+  // Actualizar avatar del agente
+  updateAgentAvatar(arch);
+  updateVRMood(appState.vrMood);
+
+  // Opener aleatorio
+  const opener = pickRandomOpener(arch, scenario);
+  appState.agentHistory.push({role:'assistant', content: opener});
+
+  showScreen('practice');
+  setDialog(arch.name.toUpperCase(), opener);
+  speakVR(opener, 'agent', () => setHUD('ready','Listo · Trigger para hablar'));
+}
+
+// ─── AVATAR DEL AGENTE ───────────────────────────────────
+function updateAgentAvatar(arch) {
+  const nameEl = document.getElementById('agent-name');
+  const roleEl = document.getElementById('agent-role');
+  const imgEl  = document.getElementById('agent-img');
+  const halo   = document.getElementById('agent-halo');
+  const ring   = document.getElementById('agent-ring');
+
+  if(nameEl) nameEl.setAttribute('text','value', arch.name);
+  if(roleEl) roleEl.setAttribute('text','value', arch.role);
+
+  // Colores por arquetipo
+  const colors = {
+    carlos:  '#ff5ca0',
+    valeria: '#9d5cff',
+    miguel:  '#00e5c0',
+    sandra:  '#f5a623'
+  };
+  const col = colors[arch.id] || '#9d5cff';
+  if(halo) halo.setAttribute('color', col);
+  if(ring) ring.setAttribute('color', col);
+
+  // Imagen — usar ajolin como base si no hay imagen específica del arquetipo
+  if(imgEl) imgEl.setAttribute('src','#ajolin-neutral');
+}
+
+// ─── DIALOG ──────────────────────────────────────────────
+function setDialog(speaker, text) {
+  const panel = document.getElementById('dialog-panel');
+  if(panel) panel.setAttribute('visible',true);
+  const sp = document.getElementById('dialog-speaker');
+  const tx = document.getElementById('dialog-text');
+  if(sp) sp.setAttribute('text','value', speaker);
+  if(tx) tx.setAttribute('text','value', text);
+}
+
+// ─── MOODS ───────────────────────────────────────────────
+function setJuanMood(mood) {
+  const map = {neutral:'#juan-neutral',happy:'#juan-happy',talking:'#juan-talking',sad:'#juan-sad'};
+  const el = document.getElementById('juan-img') || document.getElementById('juan-eval-img');
+  if(el) el.setAttribute('src', map[mood]||'#juan-neutral');
+}
+function setAjolinMood(mood) {
+  const map = {neutral:'#ajolin-neutral',happy:'#ajolin-happy',
+               talking:'#ajolin-talking',sad:'#ajolin-sad',surprised:'#ajolin-surprised'};
+  const el = document.getElementById('agent-img');
+  if(el) el.setAttribute('src', map[mood]||'#ajolin-neutral');
+}
+
+// ─── MOOD BAR ────────────────────────────────────────────
+function updateVRMood(val) {
+  appState.vrMood = Math.max(0, Math.min(100, val));
+  const pct   = appState.vrMood / 100;
+  const color = appState.vrMood < 35 ? '#ff5ca0' : appState.vrMood < 60 ? '#f5a623' : '#00e5c0';
+  const w     = 0.07 + pct * 0.63;
+  const x     = -0.315 + pct * 0.315;
+  const fill  = document.getElementById('mood-fill');
+  const pctEl = document.getElementById('mood-pct');
+  if(fill){
+    fill.setAttribute('color', color);
+    fill.setAttribute('width', w);
+    fill.setAttribute('position', `${x} 0.02 0.015`);
   }
-  check();
+  if(pctEl) pctEl.setAttribute('text','value', appState.vrMood+'%');
 }
 
-// ─── CUANDO TERMINA LA GRABACIÓN ────────────────────────
-async function onRecordingStop() {
-  const blob = new Blob(audioChunks, { type: 'audio/webm' });
-  if (blob.size < 1000) {
-    setHUD('ready', 'No te escuché · intenta de nuevo');
-    return;
+// ─── LLAMADA AL LLM ──────────────────────────────────────
+async function callGroqLLM(mode) {
+  let systemPrompt;
+
+  if(mode === 'practice') {
+    systemPrompt = PROMPTS.avatar(appState.currentLevel);
+  } else if(mode === 'learn') {
+    // Juanjolote enseña
+    systemPrompt = `Eres Juanjolote, coach de liderazgo cálido y directo en Centris Neural Academy.
+Estás enseñando sobre ${appState.activeMenu === 'interventions' ? 'intervenciones de retención' : 'técnicas de comunicación'}.
+Habla en español. Conversacional, máximo 3 oraciones. Haz preguntas. Nunca des conferencias.
+Conecta todo a situaciones reales de call center.`;
+  } else if(mode === 'work') {
+    systemPrompt = `Eres Juanjolote, coach socrático en Centris Neural Academy.
+Tu rol es hacer preguntas que ayuden al manager a descubrir sus propios insights.
+NUNCA des consejos directos. Haz UNA pregunta a la vez. Máximo 2 oraciones.
+Habla en español. Sé cálido pero directo.`;
   }
-
-  isProcessing = true;
-  setHUD('thinking', '🔮 Transcribiendo…');
-
-  try {
-    // 1. Transcribir con Groq Whisper
-    const text = await transcribeAudio(blob);
-    if (!text || text.trim().length < 2) {
-      setHUD('ready', 'No entendí · intenta de nuevo');
-      isProcessing = false;
-      return;
-    }
-
-    console.log('[Voice] Transcripción:', text);
-    setDialog('TÚ', text);
-    setHUD('thinking', '🤔 Pensando…');
-
-    // 2. Procesar con Groq LLM
-    await handleVRSpeech(text);
-
-  } catch(e) {
-    console.error('[Voice] Error:', e);
-    setHUD('ready', 'Error · intenta de nuevo');
-  } finally {
-    isProcessing = false;
-  }
-}
-
-// ─── TRANSCRIBIR CON GROQ WHISPER ───────────────────────
-async function transcribeAudio(blob) {
-  const form = new FormData();
-  // Groq Whisper espera: file, model, language
-  form.append('file', blob, 'recording.webm');
-  form.append('model', 'whisper-large-v3-turbo');
-  form.append('language', 'es');
-  form.append('response_format', 'json');
-
-  const res  = await fetch('/api/groq-whisper', { method:'POST', body: form });
-  const data = await res.json();
-  return data.text || '';
-}
-
-// ─── HANDLE SPEECH (LLM) ─────────────────────────────────
-async function handleVRSpeech(text) {
-  if (!text.trim()) return;
-  agentHistory.push({ role:'user', content: text });
-  setAjolinMood('neutral');
-
-  try {
-    const reply = await callGroqVR();
-    const { msg, newMood } = parseVRReply(reply);
-    agentHistory.push({ role:'assistant', content: reply });
-
-    setDialog('AJOLIN', msg);
-    updateVRMood(newMood);
-
-    if      (newMood > 60) setAjolinMood('happy');
-    else if (newMood < 30) setAjolinMood('sad');
-    else                   setAjolinMood('talking');
-
-    speakVR(msg, 'ajolin', () => {
-      setHUD('ready', 'Listo · presiona para hablar');
-    });
-
-  } catch(e) {
-    setDialog('SISTEMA', 'Error de conexión.');
-    setHUD('ready', 'Error · intenta de nuevo');
-  }
-}
-
-// ─── GROQ LLM ────────────────────────────────────────────
-async function callGroqVR() {
-  const sys = `Eres Carlos Mendoza, agente de call center defensivo, 2 años en la empresa.
-Te sientes culpado por métricas que no controlas. Quieres estudiar ingeniería en sistemas. Tienes dos hijos.
-Responde naturalmente — defensivo pero capaz de abrirte si el supervisor es empático.
-Al final de CADA respuesta agrega: [MOOD:XX] donde XX es 0-100. Empieza en 30.
-Respuestas CORTAS — máximo 2 oraciones. Conversación VR hablada.`;
 
   const res  = await fetch('/api/groq', {
-    method:  'POST',
-    headers: { 'Content-Type':'application/json' },
-    body:    JSON.stringify({
-      model:       'llama-3.1-8b-instant',
-      messages:    [{ role:'system', content:sys }, ...agentHistory.slice(-10)],
-      max_tokens:  120,
-      temperature: 0.85
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      model:       'llama-3.3-70b-versatile',
+      messages:    [{role:'system',content:systemPrompt}, ...appState.agentHistory.slice(-12)],
+      max_tokens:  150,
+      temperature: 0.88
     })
   });
   const data = await res.json();
   return data.choices?.[0]?.message?.content || '...';
 }
 
-function parseVRReply(raw) {
-  const m   = raw.match(/\[MOOD:(\d+)\]/);
-  const msg = raw.replace(/\[MOOD:\d+\]/g,'').trim();
-  return { msg, newMood: m ? parseInt(m[1]) : vrMood };
+// ─── PARSEAR RESPUESTA DEL AGENTE ────────────────────────
+function parseAgentReply(raw) {
+  const moodMatch = raw.match(/\[MOOD:(\d+)\]/);
+  const boxMatch  = raw.match(/\[BOX:(in|out)\]/);
+  const msg = raw.replace(/\[MOOD:\d+\]/g,'')
+                  .replace(/\[BOX:(in|out)\]/g,'')
+                  .replace(/\[TRIGGER:\w+\]/g,'')
+                  .replace(/\[CLOSED:(true|false)\]/g,'')
+                  .trim();
+  return {
+    msg,
+    newMood: moodMatch ? parseInt(moodMatch[1]) : appState.vrMood,
+    boxState: boxMatch ? boxMatch[1] : appState.boxState
+  };
+}
+
+// ─── HANDLE SPEECH ───────────────────────────────────────
+async function handleVRSpeech(text) {
+  if(!text.trim()) return;
+
+  const mode = appState.screen === 'practice' ? (
+    appState.currentArchetype ? 'practice' :
+    appState.agentHistory[0]?.content?.includes('técnica') ? 'learn' : 'learn'
+  ) : 'learn';
+
+  appState.agentHistory.push({role:'user', content: text});
+
+  try {
+    const reply = await callGroqLLM(mode === 'practice' ? 'practice' :
+      appState.activeMenu ? 'learn' : 'work');
+    const parsed = mode === 'practice' ? parseAgentReply(reply) : {msg: reply, newMood: appState.vrMood, boxState: 'out'};
+
+    appState.agentHistory.push({role:'assistant', content: reply});
+
+    if(mode === 'practice') {
+      updateVRMood(parsed.newMood);
+      appState.boxState = parsed.boxState;
+      if(parsed.newMood > 60)       setAjolinMood('happy');
+      else if(parsed.newMood < 30)  setAjolinMood('sad');
+      else                          setAjolinMood('talking');
+      setDialog(appState.currentArchetype.name.toUpperCase(), parsed.msg);
+    } else {
+      setJuanMood('talking');
+      setDialog('JUANJOLOTE', parsed.msg);
+    }
+
+    speakVR(parsed.msg, mode === 'practice' ? 'agent' : 'juan', () => {
+      setHUD('ready','Listo · Trigger para hablar');
+      if(mode === 'practice') setAjolinMood('neutral');
+      else setJuanMood('neutral');
+    });
+
+  } catch(e) {
+    console.error('[LLM]',e);
+    setHUD('ready','Error · intenta de nuevo');
+  }
+}
+
+// ─── EVALUACIÓN ──────────────────────────────────────────
+async function goEval() {
+  showScreen('eval');
+  document.getElementById('eval-mood')?.setAttribute('text','value', appState.vrMood+'%');
+  setJuanMood('talking');
+
+  const evalText = `Analiza esta conversación de práctica.
+Agente: ${appState.currentArchetype?.name || 'Agente'} (${appState.currentArchetype?.trait || ''})
+Mood final: ${appState.vrMood}/100
+Historial: ${appState.agentHistory.length} turnos
+
+Da feedback en 3 puntos concretos en español, máximo 4 oraciones total. 
+Sé directo y específico. No uses lenguaje genérico de coaching.`;
+
+  try {
+    const res  = await fetch('/api/groq',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages:[
+          {role:'system', content:'Eres Juanjolote, coach directo y honesto. Evalúa conversaciones de práctica de liderazgo. Español. Concreto. Sin formalidades.'},
+          {role:'user', content: evalText},
+          ...appState.agentHistory.slice(-8)
+        ],
+        max_tokens: 200, temperature: 0.7
+      })
+    });
+    const data = await res.json();
+    const feedback = data.choices?.[0]?.message?.content || 'Sesión completada.';
+    document.getElementById('eval-feedback')?.setAttribute('text','value', feedback);
+    speakVR(feedback, 'juan');
+  } catch(e) {
+    document.getElementById('eval-feedback')?.setAttribute('text','value','Sesión completada. Buen trabajo.');
+  }
 }
 
 // ─── TTS ─────────────────────────────────────────────────
 function speakVR(text, who, onEnd) {
-  if (!window.speechSynthesis) { if(onEnd) onEnd(); return; }
+  if(!window.speechSynthesis){ if(onEnd) onEnd(); return; }
   window.speechSynthesis.cancel();
 
-  if (who==='ajolin') setAjolinMood('talking');
-  else                setJuanMood('talking');
+  if(who==='agent') setAjolinMood('talking');
+  else              setJuanMood('talking');
 
   const utt   = new SpeechSynthesisUtterance(text);
   utt.lang    = 'es-MX';
-  utt.rate    = 0.88;
-  utt.pitch   = who==='ajolin' ? 0.85 : 1.1;
-  const voices = window.speechSynthesis.getVoices();
-  const es     = voices.find(v=>v.lang.startsWith('es')) || null;
-  if (es) utt.voice = es;
+  utt.rate    = 0.87;
+  utt.pitch   = who==='agent' ? 0.85 : 1.1;
+
+  const voices  = window.speechSynthesis.getVoices();
+  const esVoice = voices.find(v=>v.lang.startsWith('es'))||null;
+  if(esVoice) utt.voice = esVoice;
 
   utt.onend = () => {
-    if (who==='ajolin') setAjolinMood('neutral');
-    else                setJuanMood('neutral');
-    if (onEnd) onEnd();
+    if(who==='agent') setAjolinMood('neutral');
+    else              setJuanMood('neutral');
+    if(onEnd) onEnd();
   };
   window.speechSynthesis.speak(utt);
 }
 
-// ─── DIALOG ──────────────────────────────────────────────
-function setDialog(speaker, text) {
-  const panel = document.getElementById('dialog-panel');
-  panel.setAttribute('visible', true);
-  document.getElementById('dialog-speaker').setAttribute('text', 'value', speaker);
-  document.getElementById('dialog-text').setAttribute('text', 'value', text);
+// ─── MICRÓFONO ───────────────────────────────────────────
+async function setupMic() {
+  try {
+    audioStream  = await navigator.mediaDevices.getUserMedia({
+      audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}
+    });
+    audioContext = new (window.AudioContext||window.webkitAudioContext)();
+    analyser     = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    audioContext.createMediaStreamSource(audioStream).connect(analyser);
+    setHUD('ready','Listo · Trigger para hablar');
+  } catch(e) {
+    setHUD('idle','Sin micrófono — modo texto');
+    console.error('[Mic]',e);
+  }
 }
 
-// ─── MOODS ───────────────────────────────────────────────
-function setJuanMood(mood) {
-  const map = { neutral:'#juan-neutral', happy:'#juan-happy', talking:'#juan-talking', sad:'#juan-sad' };
-  document.getElementById('juan-img').setAttribute('src', map[mood]||'#juan-neutral');
-}
-function setAjolinMood(mood) {
-  const map = { neutral:'#ajolin-neutral', happy:'#ajolin-happy',
-                talking:'#ajolin-talking', sad:'#ajolin-sad', surprised:'#ajolin-surprised' };
-  document.getElementById('ajolin-img').setAttribute('src', map[mood]||'#ajolin-neutral');
+function startRecording() {
+  if(isRecording||isProcessing||!audioStream) return;
+  audioChunks = [];
+  isRecording = true;
+
+  const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+    ? 'audio/webm;codecs=opus' : 'audio/webm';
+  mediaRecorder = new MediaRecorder(audioStream,{mimeType:mime});
+  mediaRecorder.ondataavailable = e=>{ if(e.data.size>0) audioChunks.push(e.data); };
+  mediaRecorder.onstop = onRecordingStop;
+  mediaRecorder.start();
+
+  setHUD('rec','🔴 Grabando…');
+  document.getElementById('mic-btn')?.classList.add('recording');
+  startSilenceDetection();
+  setTimeout(()=>{ if(isRecording) stopRecording(); }, 25000);
 }
 
-// ─── MOOD BAR ────────────────────────────────────────────
-function updateVRMood(val) {
-  vrMood = Math.max(0, Math.min(100, val));
-  const color = vrMood<35 ? '#ff6b6b' : vrMood<60 ? '#f5a623' : '#1ec99a';
-  const width = 0.12 + (vrMood/100)*1.08;
-  const xPos  = -0.32 + ((vrMood/100)*0.54);
-  document.getElementById('mood-fill').setAttribute('color', color);
-  document.getElementById('mood-fill').setAttribute('width', width);
-  document.getElementById('mood-fill').setAttribute('position', `${xPos} 0 0.01`);
-  document.getElementById('mood-pct').setAttribute('text', 'value', vrMood+'%');
+function stopRecording() {
+  if(!isRecording||!mediaRecorder) return;
+  isRecording = false;
+  if(silenceTimer){ cancelAnimationFrame(silenceTimer); silenceTimer=null; }
+  mediaRecorder.stop();
+  document.getElementById('mic-btn')?.classList.remove('recording');
+  setHUD('thinking','Procesando…');
 }
 
-// ─── SALUDO ──────────────────────────────────────────────
-function greetUser() {
-  const gameId = localStorage.getItem('ldr_game_id') || '';
-  const name   = gameId.split('.')[1] || 'Manager';
-  setDialog('JUANJOLOTE', `¡Bienvenido ${name}! Soy Juanjolote. Cuando estés listo, presiona el botón del micrófono y habla con Carlos.`);
-  setJuanMood('happy');
-  speakVR(`Bienvenido ${name}. Soy Juanjolote. Presiona el micrófono cuando estés listo para hablar con Carlos.`);
+function startSilenceDetection() {
+  const data    = new Uint8Array(analyser.frequencyBinCount);
+  let silenceMs = 0, lastTime = performance.now();
+  function check() {
+    if(!isRecording) return;
+    analyser.getByteFrequencyData(data);
+    const avg = data.reduce((a,b)=>a+b,0)/data.length;
+    const now = performance.now();
+    const dt  = now - lastTime; lastTime = now;
+    if(avg < SILENCE_THRESHOLD){ silenceMs+=dt; if(silenceMs>=SILENCE_DURATION){ stopRecording(); return; } }
+    else silenceMs=0;
+    silenceTimer = requestAnimationFrame(check);
+  }
+  check();
 }
 
-// ─── CONTROLADORES QUEST ────────────────────────────────
+async function onRecordingStop() {
+  const blob = new Blob(audioChunks,{type:'audio/webm'});
+  if(blob.size < 800){ setHUD('ready','No te escuché · intenta de nuevo'); return; }
+  isProcessing = true;
+  try {
+    const text = await transcribeAudio(blob);
+    if(!text||text.trim().length<2){ setHUD('ready','No entendí · intenta de nuevo'); isProcessing=false; return; }
+    console.log('[Whisper]',text);
+    if(appState.screen==='practice') setDialog('TÚ',text);
+    setHUD('thinking','Pensando…');
+    await handleVRSpeech(text);
+  } catch(e) {
+    console.error('[Voice]',e);
+    setHUD('ready','Error · intenta de nuevo');
+  } finally { isProcessing=false; }
+}
+
+async function transcribeAudio(blob) {
+  const form = new FormData();
+  form.append('file', blob, 'rec.webm');
+  form.append('model','whisper-large-v3-turbo');
+  form.append('language','es');
+  form.append('response_format','json');
+  const res  = await fetch('/api/groq-whisper',{method:'POST',body:form});
+  const data = await res.json();
+  return data.text||'';
+}
+
+// ─── CONTROLADORES QUEST ─────────────────────────────────
 function setupControllers() {
   const scene = document.querySelector('a-scene');
+
   const rc = document.createElement('a-entity');
   rc.setAttribute('oculus-touch-controls','hand:right');
-  rc.setAttribute('raycaster','objects:.clickable;far:8;showLine:true;lineColor:#00c49a;lineOpacity:0.7');
+  rc.setAttribute('raycaster','objects:.clickable;far:6;showLine:true;lineColor:#00e5c0;lineOpacity:0.7');
   scene.appendChild(rc);
 
   const lc = document.createElement('a-entity');
   lc.setAttribute('oculus-touch-controls','hand:left');
-  lc.setAttribute('raycaster','objects:.clickable;far:8;showLine:true;lineColor:#7c3aff;lineOpacity:0.5');
+  lc.setAttribute('raycaster','objects:.clickable;far:6;showLine:true;lineColor:#9d5cff;lineOpacity:0.5');
   scene.appendChild(lc);
 
-  // Trigger derecho → grabar / parar
-  rc.addEventListener('triggerdown', () => {
-    if (!isRecording && !isProcessing) startRecording();
-    else if (isRecording) stopRecording();
+  // Trigger → click o grabar
+  [rc, lc].forEach(ctrl=>{
+    ctrl.addEventListener('triggerdown',()=>{
+      const hit = ctrl.components?.raycaster?.intersectedEls?.[0];
+      if(hit){ hit.click(); return; }
+      // Sin target → hablar
+      if(appState.screen==='practice'){
+        if(!isRecording&&!isProcessing) startRecording();
+        else if(isRecording) stopRecording();
+      }
+    });
   });
 
-  // Trigger izquierdo → también grabar
-  lc.addEventListener('triggerdown', () => {
-    if (!isRecording && !isProcessing) startRecording();
-    else if (isRecording) stopRecording();
-  });
-
-  // Botón A (Quest) → grabar
-  rc.addEventListener('abuttondown', () => {
-    if (!isRecording && !isProcessing) startRecording();
-    else if (isRecording) stopRecording();
+  // Botón A → grabar
+  rc.addEventListener('abuttondown',()=>{
+    if(appState.screen==='practice'){
+      if(!isRecording&&!isProcessing) startRecording();
+      else if(isRecording) stopRecording();
+    }
   });
 }
 
 // ─── INIT ────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', ()=>{
 
   // Botón mic desktop
-  const micBtn = document.getElementById('mic-btn');
-  micBtn?.addEventListener('click', () => {
-    if (!isRecording && !isProcessing) startRecording();
-    else if (isRecording) stopRecording();
+  document.getElementById('mic-btn')?.addEventListener('click',()=>{
+    if(appState.screen==='practice'){
+      if(!isRecording&&!isProcessing) startRecording();
+      else if(isRecording) stopRecording();
+    }
   });
 
-  // Logout
-  document.getElementById('btn-logout')?.addEventListener('click', () => {
+  // Clicks de navegación
+  document.getElementById('btn-interventions')?.addEventListener('click', e=>{ e.stopPropagation(); goMode('interventions'); });
+  document.getElementById('btn-techniques')?.addEventListener('click',    e=>{ e.stopPropagation(); goMode('techniques'); });
+  document.getElementById('btn-learn')?.addEventListener('click',         e=>{ e.stopPropagation(); goLearn(); });
+  document.getElementById('btn-work')?.addEventListener('click',          e=>{ e.stopPropagation(); goWork(); });
+  document.getElementById('btn-practice')?.addEventListener('click',      e=>{ e.stopPropagation(); goPractice(); });
+  document.getElementById('btn-mode-back')?.addEventListener('click',     e=>{ e.stopPropagation(); goWelcome(); });
+  document.getElementById('btn-end-practice')?.addEventListener('click',  e=>{ e.stopPropagation(); goEval(); });
+  document.getElementById('btn-new-session')?.addEventListener('click',   e=>{ e.stopPropagation(); goWelcome(); });
+  document.getElementById('btn-practice-again')?.addEventListener('click',e=>{ e.stopPropagation(); goPractice(); });
+  document.getElementById('btn-logout')?.addEventListener('click',()=>{
     localStorage.removeItem('ldr_session_token');
     localStorage.removeItem('ldr_refresh_token');
-    window.location.href = 'login-vr.html';
+    window.location.href='login-vr.html';
   });
 
   // A-Frame listo
-  document.querySelector('a-scene').addEventListener('loaded', () => {
+  document.querySelector('a-scene').addEventListener('loaded',()=>{
     setupControllers();
-    setupMic().then(() => {
-      setTimeout(greetUser, 1200);
+    setupMic().then(()=>{
+      // Saludo inicial de Juanjolote
+      const gameId = localStorage.getItem('ldr_game_id')||'';
+      const name   = gameId.split('.')[1]||'Manager';
+      const greet  = `¡Bienvenido${name ? ' '+name : ''}! Soy Juanjolote. Elige un camino — Intervenciones para practicar conversaciones de retención, o Técnicas para desarrollar habilidades específicas.`;
+      setTimeout(()=>{
+        setJuanMood('happy');
+        speakVR(greet,'juan');
+      }, 800);
     });
 
-    // Historial inicial de Carlos
-    agentHistory = [{ role:'assistant', content:'...Yeah? You wanted to see me?' }];
+    // Rotar estrellas lentamente
+    document.getElementById('stars-1')?.setAttribute('animation',
+      'property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
   });
 });
 
-window.speechSynthesis?.addEventListener('voiceschanged', ()=>{});
+window.speechSynthesis?.addEventListener('voiceschanged',()=>{});
 </script>
 </body>
 </html>
