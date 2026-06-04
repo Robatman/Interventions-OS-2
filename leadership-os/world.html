@@ -146,6 +146,13 @@
     <a-text id="mood-pct-txt" value="30%" position="0.8 0 0" align="right" color="white" width="1.5" opacity="0.7"></a-text>
   </a-entity>
 
+  <!-- ── BOTÓN CERRAR SESIÓN ───────────── -->
+<a-entity position="-2.2 2.0 -3" class="clickable" id="btn-logout">
+  <a-plane width="0.9" height="0.25" color="#ff5c5c" opacity="0.85"></a-plane>
+  <a-text value="Cerrar sesión" position="0 0 0.04"
+    align="center" color="#e8eeff" width="3.5"></a-text>
+</a-entity>
+  
   <!-- ── CÁMARA ─────────────────────────── -->
   <a-camera id="main-camera" position="0 1.6 0"
     look-controls wasd-controls="enabled: false">
@@ -166,6 +173,16 @@
 
 </a-scene>
 
+  <script>
+// ─── VERIFICAR SESIÓN VR ──────────────────
+(function() {
+  const token = sessionStorage.getItem('vr_token');
+  if (!token) {
+    window.location.href = 'login-vr.html';
+  }
+})();
+</script>
+  
 <script>
 // ─── STATE ────────────────────────────────
 let vrMood       = 30;
@@ -189,8 +206,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#btn-mic a-circle')?.addEventListener('click', startVRListening);
 
   // Saludo inicial cuando A-Frame está listo
-  document.querySelector('a-scene').addEventListener('loaded', () => {
+document.querySelector('a-scene').addEventListener('loaded', () => {
     setTimeout(greetUser, 1000);
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      sessionStorage.clear();
+      window.location.href = 'login-vr.html';
+    });
   });
 });
 
