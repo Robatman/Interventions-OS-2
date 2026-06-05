@@ -2101,7 +2101,7 @@ Sé directo y específico. No uses lenguaje genérico de coaching.`;
 // ─── TTS ─────────────────────────────────────────────────
 async function speakVR(text, who, onEnd) {
   try {
-    const res = await fetch("https://172.16.5.228:8000/api/tts", {
+    const res = await fetch("http://172.16.5.228:8000/api/tts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
