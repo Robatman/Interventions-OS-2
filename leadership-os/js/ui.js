@@ -630,3 +630,35 @@ function selectAndPreview(id) {
 function goHistory() {
   showHistory();
 }
+// ======================================
+// WELCOME BUTTONS
+// ======================================
+
+document.getElementById('btn-interventions')
+?.addEventListener('click', () => {
+
+  activeMenu = 'interventions';
+
+  // Primera intervención por default
+  currentIntervention = interventions?.[0] || null;
+
+  updateModeScreen();
+
+  show('s-mode');
+
+});
+
+
+document.getElementById('btn-techniques')
+?.addEventListener('click', () => {
+
+  activeMenu = 'techniques';
+
+  // Primera técnica por default
+  currentTechnique = techniques?.[0] || null;
+
+  updateModeScreen();
+
+  show('s-mode');
+
+});
