@@ -1585,10 +1585,35 @@ function goWelcome() {
 }
 
 function goMode(menuType) {
+
   appState.activeMenu = menuType;
-  const label = menuType === 'interventions' ? '🎯 Intervenciones' : '🛠 Técnicas';
-  document.getElementById('mode-title')?.setAttribute('text','value',label);
+
+  // =========================
+  // INTERVENTIONS
+  // =========================
+  if (menuType === 'interventions') {
+
+    appState.currentIntervention =
+      interventions?.[0] || null;
+
+  }
+
+  // =========================
+  // TECHNIQUES
+  // =========================
+  if (menuType === 'techniques') {
+
+    appState.currentTechnique =
+      techniques?.[0] || null;
+
+  }
+
+  // Actualiza pantalla VR
+  updateModeScreen();
+
+  // Mostrar pantalla
   showScreen('mode');
+
 }
 
 function goLearn() {
