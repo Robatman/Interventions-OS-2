@@ -2102,24 +2102,33 @@ Sé directo y específico. No uses lenguaje genérico de coaching.`;
 function speakVR(text, who, onEnd) {
 
   console.log("[TTS] Entró speakVR");
-  console.log("[TTS] speechSynthesis:", window.speechSynthesis);
+
+  if(!window.speechSynthesis){
+    console.log("[TTS] speechSynthesis NO soportado");
+
+    setHUD('ready','VR sin TTS');
+
+    if(onEnd) onEnd();
+
+    return;
+  }
 
   const voices = window.speechSynthesis.getVoices();
 
   console.log("[TTS] Voices:", voices);
 
-  if(!window.speechSynthesis){
-    console.log("[TTS] NO speechSynthesis");
-    if(onEnd) onEnd();
-    return;
-  }
-
   window.speechSynthesis.cancel();
 
   const utt = new SpeechSynthesisUtterance(text);
 
+  utt.lang = 'es-MX';
+
   utt.onstart = ()=> console.log("[TTS] START");
-  utt.onend   = ()=> console.log("[TTS] END");
+  utt.onend   = ()=> {
+      console.log("[TTS] END");
+      if(onEnd) onEnd();
+  };
+
   utt.onerror = (e)=> console.log("[TTS] ERROR", e);
 
   window.speechSynthesis.speak(utt);
