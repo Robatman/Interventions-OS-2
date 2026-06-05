@@ -2100,28 +2100,28 @@ Sé directo y específico. No uses lenguaje genérico de coaching.`;
 
 // ─── TTS ─────────────────────────────────────────────────
 function speakVR(text, who, onEnd) {
-  if(!window.speechSynthesis){ if(onEnd) onEnd(); return; }
+
+  console.log("[TTS] Entró speakVR");
+  console.log("[TTS] speechSynthesis:", window.speechSynthesis);
+
+  const voices = window.speechSynthesis.getVoices();
+
+  console.log("[TTS] Voices:", voices);
+
+  if(!window.speechSynthesis){
+    console.log("[TTS] NO speechSynthesis");
+    if(onEnd) onEnd();
+    return;
+  }
+
   window.speechSynthesis.cancel();
 
-  if(who==='agent') setAjolinMood('talking');
-  else              setJuanMood('talking');
+  const utt = new SpeechSynthesisUtterance(text);
 
-  const utt   = new SpeechSynthesisUtterance(text);
-  utt.lang    = 'es-MX';
-  utt.rate    = 0.87;
-  utt.pitch   = who==='agent' ? 0.85 : 1.1;
+  utt.onstart = ()=> console.log("[TTS] START");
+  utt.onend   = ()=> console.log("[TTS] END");
+  utt.onerror = (e)=> console.log("[TTS] ERROR", e);
 
-  const voices  = window.speechSynthesis.getVoices();
-  const esVoice = voices.find(v=>v.lang.startsWith('es'))||null;
-  if(esVoice) utt.voice = esVoice;
-
-  utt.onend = () => {
-    if(who==='agent') setAjolinMood('neutral');
-    else              setJuanMood('neutral');
-    if(onEnd) onEnd();
-  };
-  console.log(window.speechSynthesis);
-  console.log(window.speechSynthesis.getVoices());
   window.speechSynthesis.speak(utt);
 }
 
