@@ -2120,6 +2120,8 @@ function speakVR(text, who, onEnd) {
     else              setJuanMood('neutral');
     if(onEnd) onEnd();
   };
+  console.log(window.speechSynthesis);
+  console.log(window.speechSynthesis.getVoices());
   window.speechSynthesis.speak(utt);
 }
 
