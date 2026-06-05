@@ -563,86 +563,324 @@
   ══════════════════════════════════════ -->
   <a-entity id="screen-mode" visible="false">
 
-    <!-- Título del modo -->
-    <a-text id="mode-title" value="" position="0 2.3 -2.5"
-      align="center" color="#c8d8ff" font="exo2bold" width="6" opacity="0.95">
+  <!-- ══════════════════════════════════════
+       MAIN TITLE
+  ══════════════════════════════════════ -->
+
+  <a-entity
+    position="0 2.58 -3"
+    animation="property:position;to:0 2.66 -3;loop:true;dur:4200;dir:alternate;easing:easeInOutSine">
+
+    <a-text
+      id="mode-title"
+      value="🎯 Interventions"
+      align="center"
+      color="#e8eeff"
+      width="6.5"
+      font="exo2bold">
     </a-text>
 
-    <!-- 3 botones de modo -->
-    <!-- LEARN -->
-    <a-entity id="btn-learn" position="-1.6 1.3 -2.2" class="clickable"
-      animation__hover="property:position;to:-1.6 1.38 -2.2;startEvents:mouseenter;dur:200"
-      animation__unhover="property:position;to:-1.6 1.3 -2.2;startEvents:mouseleave;dur:200">
-      <a-plane width="1.0" height="0.70" color="#0a1840"
-        material="opacity:0.93;shader:flat;side:double">
-      </a-plane>
-      <a-plane width="1.04" height="0.74" color="#4466ff"
-        material="opacity:0.4;transparent:true;shader:flat;side:double" position="0 0 -0.005">
-      </a-plane>
-      <a-text value="📖" align="center" color="#4466ff"
-        width="2" position="0 0.18 0.01" font="mozillavr">
-      </a-text>
-      <a-text value="APRENDER" align="center" color="#4466ff"
-        width="3.2" position="0 0.00 0.01" font="mozillavr">
-      </a-text>
-      <a-text value="Juanjolote te enseña" align="center" color="#c8d8ff"
-        width="2.8" position="0 -0.18 0.01" opacity="0.65" font="mozillavr">
-      </a-text>
-    </a-entity>
+  </a-entity>
 
-    <!-- WORK TOGETHER -->
-    <a-entity id="btn-work" position="0 1.3 -2.2" class="clickable"
-      animation__hover="property:position;to:0 1.38 -2.2;startEvents:mouseenter;dur:200"
-      animation__unhover="property:position;to:0 1.3 -2.2;startEvents:mouseleave;dur:200">
-      <a-plane width="1.0" height="0.70" color="#100d40"
-        material="opacity:0.93;shader:flat;side:double">
-      </a-plane>
-      <a-plane width="1.04" height="0.74" color="#9d5cff"
-        material="opacity:0.4;transparent:true;shader:flat;side:double" position="0 0 -0.005">
-      </a-plane>
-      <a-text value="🤝" align="center" color="#9d5cff"
-        width="2" position="0 0.18 0.01" font="mozillavr">
-      </a-text>
-      <a-text value="REFLEXIONAR" align="center" color="#9d5cff"
-        width="3.2" position="0 0.00 0.01" font="mozillavr">
-      </a-text>
-      <a-text value="Conversa con tu coach" align="center" color="#c8d8ff"
-        width="2.8" position="0 -0.18 0.01" opacity="0.65" font="mozillavr">
-      </a-text>
-    </a-entity>
+  <!-- Subtitle -->
+  <a-text
+    id="mode-subtitle"
+    value="Choose your training mode"
+    position="0 2.22 -3"
+    align="center"
+    color="#c8d8ff"
+    width="4.8"
+    opacity="0.72"
+    font="mozillavr">
+  </a-text>
 
-    <!-- PRACTICE -->
-    <a-entity id="btn-practice" position="1.6 1.3 -2.2" class="clickable"
-      animation__hover="property:position;to:1.6 1.38 -2.2;startEvents:mouseenter;dur:200"
-      animation__unhover="property:position;to:1.6 1.38 -2.2;startEvents:mouseleave;dur:200">
-      <a-plane width="1.0" height="0.70" color="#0d2a20"
-        material="opacity:0.93;shader:flat;side:double">
-      </a-plane>
-      <a-plane width="1.04" height="0.74" color="#00e5c0"
-        material="opacity:0.4;transparent:true;shader:flat;side:double" position="0 0 -0.005">
-      </a-plane>
-      <a-text value="🎯" align="center" color="#00e5c0"
-        width="2" position="0 0.18 0.01" font="mozillavr">
-      </a-text>
-      <a-text value="PRACTICAR" align="center" color="#00e5c0"
-        width="3.2" position="0 0.00 0.01" font="mozillavr">
-      </a-text>
-      <a-text value="Agente random · Voz" align="center" color="#c8d8ff"
-        width="2.8" position="0 -0.18 0.01" opacity="0.65" font="mozillavr">
-      </a-text>
-    </a-entity>
+  <!-- Context pill -->
+  <a-entity position="0 1.92 -2.8">
 
-    <!-- BACK -->
-    <a-entity id="btn-mode-back" position="0 0.55 -2.2" class="clickable">
-      <a-plane width="0.6" height="0.22" color="#1a1030"
-        material="opacity:0.8;shader:flat;side:double">
-      </a-plane>
-      <a-text value="← Volver" color="#c8d8ff" align="center"
-        width="2.5" position="0 0 0.01" opacity="0.7" font="mozillavr">
-      </a-text>
-    </a-entity>
+    <a-plane
+      width="1.2"
+      height="0.24"
+      color="#111830"
+      material="opacity:0.86;shader:flat">
+    </a-plane>
+
+    <a-plane
+      width="1.24"
+      height="0.28"
+      color="#4466ff"
+      material="opacity:0.32;transparent:true;shader:flat"
+      position="0 0 -0.005">
+    </a-plane>
+
+    <a-text
+      id="mode-context-pill"
+      value="Training"
+      align="center"
+      color="#58a6ff"
+      width="3"
+      position="0 0 0.01"
+      font="mozillavr">
+    </a-text>
 
   </a-entity>
+
+  <!-- ══════════════════════════════════════
+       PRACTICE CARD
+  ══════════════════════════════════════ -->
+
+  <a-entity
+    id="btn-practice"
+    class="clickable"
+    position="-1.65 1.1 -2.7"
+    animation__hover="property:position;to:-1.65 1.2 -2.7;startEvents:mouseenter;dur:180"
+    animation__unhover="property:position;to:-1.65 1.1 -2.7;startEvents:mouseleave;dur:180">
+
+    <!-- Card -->
+    <a-plane
+      width="1.45"
+      height="0.92"
+      color="#102840"
+      material="opacity:0.94;shader:flat;side:double">
+    </a-plane>
+
+    <!-- Glow -->
+    <a-plane
+      width="1.49"
+      height="0.96"
+      color="#00e5c0"
+      material="opacity:0.36;transparent:true;shader:flat"
+      position="0 0 -0.005">
+    </a-plane>
+
+    <!-- Icon -->
+    <a-text
+      value="🎯"
+      align="center"
+      color="#00e5c0"
+      width="2"
+      position="0 0.26 0.01"
+      font="mozillavr">
+    </a-text>
+
+    <!-- Title -->
+    <a-text
+      value="PRACTICE"
+      align="center"
+      color="#00e5c0"
+      width="4"
+      position="0 0.05 0.01"
+      font="mozillavr">
+    </a-text>
+
+    <!-- Desc -->
+    <a-text
+      value="Simulate a real coaching conversation in VR"
+      align="center"
+      color="#c8d8ff"
+      width="3"
+      wrap-count="24"
+      position="0 -0.18 0.01"
+      opacity="0.75"
+      font="mozillavr">
+    </a-text>
+
+  </a-entity>
+
+  <!-- ══════════════════════════════════════
+       LEARN CARD
+  ══════════════════════════════════════ -->
+
+  <a-entity
+    id="btn-learn"
+    class="clickable"
+    position="0 1.1 -2.7"
+    animation__hover="property:position;to:0 1.2 -2.7;startEvents:mouseenter;dur:180"
+    animation__unhover="property:position;to:0 1.1 -2.7;startEvents:mouseleave;dur:180">
+
+    <!-- Card -->
+    <a-plane
+      width="1.45"
+      height="0.92"
+      color="#221240"
+      material="opacity:0.94;shader:flat;side:double">
+    </a-plane>
+
+    <!-- Glow -->
+    <a-plane
+      width="1.49"
+      height="0.96"
+      color="#9d5cff"
+      material="opacity:0.36;transparent:true;shader:flat"
+      position="0 0 -0.005">
+    </a-plane>
+
+    <!-- Icon -->
+    <a-text
+      value="🧠"
+      align="center"
+      color="#9d5cff"
+      width="2"
+      position="0 0.26 0.01"
+      font="mozillavr">
+    </a-text>
+
+    <!-- Title -->
+    <a-text
+      value="LEARN"
+      align="center"
+      color="#9d5cff"
+      width="4"
+      position="0 0.05 0.01"
+      font="mozillavr">
+    </a-text>
+
+    <!-- Desc -->
+    <a-text
+      value="Explore the technique with guided AI explanations"
+      align="center"
+      color="#c8d8ff"
+      width="3"
+      wrap-count="24"
+      position="0 -0.18 0.01"
+      opacity="0.75"
+      font="mozillavr">
+    </a-text>
+
+  </a-entity>
+
+  <!-- ══════════════════════════════════════
+       WORK TOGETHER CARD
+  ══════════════════════════════════════ -->
+
+  <a-entity
+    id="btn-work"
+    class="clickable"
+    position="1.65 1.1 -2.7"
+    animation__hover="property:position;to:1.65 1.2 -2.7;startEvents:mouseenter;dur:180"
+    animation__unhover="property:position;to:1.65 1.1 -2.7;startEvents:mouseleave;dur:180">
+
+    <!-- Card -->
+    <a-plane
+      width="1.45"
+      height="0.92"
+      color="#301820"
+      material="opacity:0.94;shader:flat;side:double">
+    </a-plane>
+
+    <!-- Glow -->
+    <a-plane
+      width="1.49"
+      height="0.96"
+      color="#ff5ca0"
+      material="opacity:0.36;transparent:true;shader:flat"
+      position="0 0 -0.005">
+    </a-plane>
+
+    <!-- Icon -->
+    <a-text
+      value="🤝"
+      align="center"
+      color="#ff5ca0"
+      width="2"
+      position="0 0.26 0.01"
+      font="mozillavr">
+    </a-text>
+
+    <!-- Title -->
+    <a-text
+      value="WORK TOGETHER"
+      align="center"
+      color="#ff5ca0"
+      width="4"
+      position="0 0.05 0.01"
+      font="mozillavr">
+    </a-text>
+
+    <!-- Desc -->
+    <a-text
+      value="Collaborate with the AI coach step-by-step"
+      align="center"
+      color="#c8d8ff"
+      width="3"
+      wrap-count="24"
+      position="0 -0.18 0.01"
+      opacity="0.75"
+      font="mozillavr">
+    </a-text>
+
+  </a-entity>
+
+  <!-- ══════════════════════════════════════
+       INFO PANEL
+  ══════════════════════════════════════ -->
+
+  <a-entity position="0 0.1 -2.5">
+
+    <a-plane
+      width="3.5"
+      height="0.34"
+      color="#101830"
+      material="opacity:0.86;shader:flat">
+    </a-plane>
+
+    <a-plane
+      width="3.54"
+      height="0.38"
+      color="#4466ff"
+      material="opacity:0.18;transparent:true;shader:flat"
+      position="0 0 -0.005">
+    </a-plane>
+
+    <a-text
+      value="Choose how you want to experience the VR training"
+      align="center"
+      color="#c8d8ff"
+      width="4.5"
+      position="0 0 0.01"
+      opacity="0.72"
+      font="mozillavr">
+    </a-text>
+
+  </a-entity>
+
+  <!-- ══════════════════════════════════════
+       BACK BUTTON
+  ══════════════════════════════════════ -->
+
+  <a-entity
+    id="mode-back-btn"
+    class="clickable"
+    position="0 -0.62 -2.4"
+    animation__hover="property:position;to:0 -0.56 -2.4;startEvents:mouseenter;dur:150"
+    animation__unhover="property:position;to:0 -0.62 -2.4;startEvents:mouseleave;dur:150">
+
+    <a-plane
+      width="0.9"
+      height="0.26"
+      color="#111830"
+      material="opacity:0.88;shader:flat">
+    </a-plane>
+
+    <a-plane
+      width="0.94"
+      height="0.30"
+      color="#58a6ff"
+      material="opacity:0.32;transparent:true;shader:flat"
+      position="0 0 -0.005">
+    </a-plane>
+
+    <a-text
+      value="← BACK"
+      align="center"
+      color="#58a6ff"
+      width="3"
+      position="0 0 0.01"
+      font="mozillavr">
+    </a-text>
+
+  </a-entity>
+
+</a-entity>
   <!-- /screen-mode -->
 <!-- ══════════════════════════════════════
      SCREEN: INTERVENTIONS
