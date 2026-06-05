@@ -2099,39 +2099,21 @@ Sé directo y específico. No uses lenguaje genérico de coaching.`;
 }
 
 // ─── TTS ─────────────────────────────────────────────────
-function speakVR(text, who, onEnd) {
+async function speakVR(text){
 
-  console.log("[TTS] Entró speakVR");
+   const res = await fetch('/api/tts',{
+      method:'POST',
+      headers:{
+         'Content-Type':'application/json'
+      },
+      body: JSON.stringify({ text })
+   });
 
-  if(!window.speechSynthesis){
-    console.log("[TTS] speechSynthesis NO soportado");
+   const data = await res.json();
 
-    setHUD('ready','VR sin TTS');
+   const audio = new Audio(data.url);
 
-    if(onEnd) onEnd();
-
-    return;
-  }
-
-  const voices = window.speechSynthesis.getVoices();
-
-  console.log("[TTS] Voices:", voices);
-
-  window.speechSynthesis.cancel();
-
-  const utt = new SpeechSynthesisUtterance(text);
-
-  utt.lang = 'es-MX';
-
-  utt.onstart = ()=> console.log("[TTS] START");
-  utt.onend   = ()=> {
-      console.log("[TTS] END");
-      if(onEnd) onEnd();
-  };
-
-  utt.onerror = (e)=> console.log("[TTS] ERROR", e);
-
-  window.speechSynthesis.speak(utt);
+   await audio.play();
 }
 
 // ─── MICRÓFONO ───────────────────────────────────────────
