@@ -37,8 +37,11 @@ export default async function handler(req, res) {
     }
 
     // Convertir audio
-    const buffer = await response.arrayBuffer();
+const audioBuffer = Buffer.from(await response.arrayBuffer());
 
+res.setHeader('Content-Type', 'audio/wav');
+
+return res.status(200).send(audioBuffer);
     console.log('Audio generado correctamente');
 
     // Headers para mp3
