@@ -534,8 +534,10 @@ async function goEval(){
 
 // TTS via OpenAI - works on Meta Quest Browser
 async function speakVR(text, who, onEnd) {
-  try {
+  let audio = null;
+  let url = null;
 
+  try {
     console.log('========== SPEAK VR ==========');
     console.log('Texto:', text);
     console.log('Who:', who);
@@ -557,22 +559,19 @@ async function speakVR(text, who, onEnd) {
       body: JSON.stringify(payload)
     });
 
-    console.log('STATUS:', res.status);
-    console.log('STATUS TEXT:', res.statusText);
+    console.log('STATUS:', res.status, res.statusText);
 
     if (!res.ok) {
-
       let errorText = '';
-
       try {
         errorText = await res.text();
       } catch (e) {
         errorText = 'No se pudo leer el error';
       }
 
-      console.log('========== ERROR RESPONSE ==========');
-      console.log(errorText);
-      console.log('====================================');
+      console.error('========== ERROR RESPONSE ==========');
+      console.error(errorText);
+      console.error('====================================');
 
       throw new Error(`TTS error ${res.status}`);
     }
@@ -581,37 +580,47 @@ async function speakVR(text, who, onEnd) {
 
     const blob = await res.blob();
 
-    console.log('Blob creado');
-    console.log('Blob size:', blob.size);
-    console.log('Blob type:', blob.type);
+    if (!blob || blob.size === 0) {
+      throw new Error('Blob vacío recibido del TTS');
+    }
 
-    const url = URL.createObjectURL(blob);
+    console.log('Blob size:', blob.size, 'type:', blob.type);
 
-    console.log('URL creada:', url);
+    url = URL.createObjectURL(blob);
+    audio = new Audio(url);
 
-    const audio = new Audio(url);
+    audio.preload = 'auto';
 
-    audio.onloadeddata = function () {
+    audio.onloadeddata = () => {
       console.log('Audio cargado correctamente');
     };
 
-    audio.onplay = function () {
+    audio.onplay = () => {
       console.log('Audio reproduciéndose');
     };
 
-    audio.onended = function () {
+    audio.onended = () => {
       console.log('Audio terminado');
 
-      URL.revokeObjectURL(url);
+      if (url) {
+        URL.revokeObjectURL(url);
+        url = null;
+      }
+
+      audio = null;
 
       if (onEnd) onEnd();
     };
 
-    audio.onerror = function (e) {
-
+    audio.onerror = (e) => {
       console.error('ERROR EN AUDIO:', e);
 
-      URL.revokeObjectURL(url);
+      if (url) {
+        URL.revokeObjectURL(url);
+        url = null;
+      }
+
+      audio = null;
 
       if (onEnd) onEnd();
     };
@@ -620,18 +629,18 @@ async function speakVR(text, who, onEnd) {
 
     await audio.play();
 
-    console.log('play() ejecutado');
+    console.log('play() ejecutado con éxito');
 
   } catch (err) {
+    console.error('========== CATCH TTS ==========');
+    console.error('[TTS ERROR]', err);
+    console.error('===============================');
 
-    console.log('========== CATCH ==========');
-    console.error('[TTS]', err);
-    console.log('===========================');
-
+    if (url) URL.revokeObjectURL(url);
     if (onEnd) onEnd();
   }
 }
-
+  
 async function setupMic(){
   try{
     audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
