@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
   const models = await modelsResponse.text();
   console.log('MODELS:', models);
-
+      console.log('Entro');
   // TTS request
   const response = await fetch(
     'https://api.groq.com/openai/v1/audio/speech',
@@ -30,6 +30,8 @@ export default async function handler(req, res) {
   if (!response.ok) {
     const err = await response.text();
     console.log('TTS ERROR:', err);
+          console.log('Entro al error jaja');
+
     return res.status(response.status).send(err);
   }
 
