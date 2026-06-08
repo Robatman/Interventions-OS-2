@@ -549,7 +549,7 @@ async function speakVR(text, who, onEnd) {
 
     console.log('Payload enviado:', payload);
 
-    var res = await fetch('/api/groq-tts', {
+    const res = await fetch('/api/groq-tts', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -561,45 +561,54 @@ async function speakVR(text, who, onEnd) {
     console.log('STATUS TEXT:', res.statusText);
 
     if (!res.ok) {
-      const txt = await res.text();
+
+      let errorText = '';
+
+      try {
+        errorText = await res.text();
+      } catch (e) {
+        errorText = 'No se pudo leer el error';
+      }
 
       console.log('========== ERROR RESPONSE ==========');
-      console.log(txt);
+      console.log(errorText);
       console.log('====================================');
 
-      throw new Error('TTS error ' + res.status);
+      throw new Error(`TTS error ${res.status}`);
     }
 
     console.log('Request exitosa');
 
-    var blob = await res.blob();
+    const blob = await res.blob();
 
     console.log('Blob creado');
     console.log('Blob size:', blob.size);
     console.log('Blob type:', blob.type);
 
-    var url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
 
     console.log('URL creada:', url);
 
-    var audio = new Audio(url);
+    const audio = new Audio(url);
 
-    audio.onloadeddata = function() {
+    audio.onloadeddata = function () {
       console.log('Audio cargado correctamente');
     };
 
-    audio.onplay = function() {
+    audio.onplay = function () {
       console.log('Audio reproduciéndose');
     };
 
-    audio.onended = function() {
+    audio.onended = function () {
       console.log('Audio terminado');
+
       URL.revokeObjectURL(url);
 
       if (onEnd) onEnd();
     };
 
-    audio.onerror = function(e) {
+    audio.onerror = function (e) {
+
       console.error('ERROR EN AUDIO:', e);
 
       URL.revokeObjectURL(url);
