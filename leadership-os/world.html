@@ -2099,9 +2099,44 @@ Sé directo y específico. No uses lenguaje genérico de coaching.`;
 }
 
 // ─── TTS ─────────────────────────────────────────────────
+// ─── TTS — reemplaza la función speakVR existente ────────
+// Voces OpenAI: nova (mujer cálida), onyx (hombre profundo),
+//               alloy, echo, fable, shimmer
+// Juanjolote → onyx | Agente → nova
+
 async function speakVR(text, who, onEnd) {
   try {
-    const res = await fetch("http://172.16.5.228:8000/api/tts", {
+    const voice = who === 'juan' ? 'onyx' : 'nova';
+
+    const res = await fetch('/api/openai-tts', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ text, voice })
+    });
+
+    if (!res.ok) throw new Error('TTS ' + res.status);
+
+    const blob      = await res.blob();
+    const url       = URL.createObjectURL(blob);
+    const audio     = new Audio(url);
+
+    audio.onended = () => {
+      URL.revokeObjectURL(url); // limpia memoria
+      if (onEnd) onEnd();
+    };
+
+    audio.onerror = (e) => {
+      console.error('[TTS audio error]', e);
+      if (onEnd) onEnd();
+    };
+
+    await audio.play();
+
+  } catch (err) {
+    console.error('[TTS]', err);
+    if (onEnd) onEnd(); // no bloquea el flujo si falla
+  }
+}
       method: "POST",
       headers: {
         "Content-Type": "application/json",
