@@ -534,7 +534,6 @@ async function goEval(){
 
 // TTS via OpenAI - works on Meta Quest Browser
 
-const API_KEY = "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";
 async function speakVR(text) {
   const response = await fetch("https://api.groq.com/openai/v1/audio/speech", {
     method: "POST",
@@ -551,17 +550,15 @@ async function speakVR(text) {
   });
 
   if (!response.ok) {
-    const err = await response.text();
-    console.error(err);
-    return;
+    throw new Error("Error al generar el audio");
   }
 
   const blob = await response.blob();
   const url = URL.createObjectURL(blob);
+
   const audio = new Audio(url);
   audio.play();
 }
-
   
 async function setupMic(){
   try{
