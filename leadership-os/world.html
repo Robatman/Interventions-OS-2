@@ -554,6 +554,8 @@ async function speakVR(text, who, onEnd) {
     audio.play();
   } catch (err) {
     console.error('[TTS]', err);
+              console.log('Entro al error jaja');
+
     if (onEnd) onEnd();
   }
 }
