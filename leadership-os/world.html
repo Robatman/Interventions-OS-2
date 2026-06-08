@@ -535,6 +535,11 @@ async function goEval(){
 // TTS via OpenAI - works on Meta Quest Browser
 async function speakVR(text, who, onEnd) {
   try {
+
+    console.log('Entró a speakVR');
+    console.log('Texto:', text);
+    console.log('Who:', who);
+
     var res = await fetch('/api/groq-tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -545,17 +550,43 @@ async function speakVR(text, who, onEnd) {
         response_format: 'mp3'
       })
     });
-    if (!res.ok) throw new Error('TTS error ' + res.status);
+
+    console.log('STATUS:', res.status);
+
+    if (!res.ok) {
+      const txt = await res.text();
+      console.log('ERROR RESPONSE:', txt);
+      throw new Error('TTS error ' + res.status);
+    }
+
+    console.log('La request sí funcionó');
+
     var blob = await res.blob();
+    console.log('Blob creado');
+
     var url = URL.createObjectURL(blob);
+    console.log('URL creada:', url);
+
     var audio = new Audio(url);
-    audio.onended = function() { URL.revokeObjectURL(url); if (onEnd) onEnd(); };
-    audio.onerror = function(e) { console.error('[TTS audio]', e); if (onEnd) onEnd(); };
+
+    audio.onended = function() {
+      console.log('Audio terminado');
+      URL.revokeObjectURL(url);
+      if (onEnd) onEnd();
+    };
+
+    audio.onerror = function(e) {
+      console.error('[TTS audio]', e);
+      if (onEnd) onEnd();
+    };
+
+    console.log('Intentando reproducir audio');
+
     audio.play();
+
   } catch (err) {
     console.error('[TTS]', err);
-              console.log('Entro al error jaja');
-
+    console.log('Entró al catch');
     if (onEnd) onEnd();
   }
 }
