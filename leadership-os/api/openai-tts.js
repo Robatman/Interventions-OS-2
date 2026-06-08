@@ -1,6 +1,9 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
+  console.log("KEY EXISTS:", !!process.env.OPENAIAPIKEY);
+  console.log("KEY START:", process.env.OPENAIAPIKEY?.slice(0, 10));
+
   const { text, voice = 'nova' } = req.body;
 
   const response = await fetch('https://api.openai.com/v1/audio/speech', {
