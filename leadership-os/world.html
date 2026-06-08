@@ -536,57 +536,37 @@ async function goEval(){
 async function speakVR(text, who, onEnd) {
   try {
 
-    console.log('Entró a speakVR');
-    console.log('Texto:', text);
-    console.log('Who:', who);
-
     var res = await fetch('/api/groq-tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'playai-tts',
+        model: 'canopylabs/orpheus-v1-english',
         input: text,
-        voice: who === 'juan' ? 'Fritz-PlayAI' : 'Celeste-PlayAI',
-        response_format: 'mp3'
+        voice: who === 'juan' ? 'tara' : 'leah',
+        response_format: 'wav'
       })
     });
 
-    console.log('STATUS:', res.status);
-
     if (!res.ok) {
       const txt = await res.text();
-      console.log('ERROR RESPONSE:', txt);
+      console.log(txt);
       throw new Error('TTS error ' + res.status);
     }
 
-    console.log('La request sí funcionó');
-
     var blob = await res.blob();
-    console.log('Blob creado');
-
     var url = URL.createObjectURL(blob);
-    console.log('URL creada:', url);
 
     var audio = new Audio(url);
 
     audio.onended = function() {
-      console.log('Audio terminado');
       URL.revokeObjectURL(url);
       if (onEnd) onEnd();
     };
-
-    audio.onerror = function(e) {
-      console.error('[TTS audio]', e);
-      if (onEnd) onEnd();
-    };
-
-    console.log('Intentando reproducir audio');
 
     audio.play();
 
   } catch (err) {
     console.error('[TTS]', err);
-    console.log('Entró al catch');
     if (onEnd) onEnd();
   }
 }
