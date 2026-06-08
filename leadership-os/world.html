@@ -551,8 +551,15 @@ async function speakVR(text) {
   });
 
   if (!response.ok) {
-    throw new Error("Error al generar el audio");
+    const err = await response.text();
+    console.error(err);
+    return;
   }
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const audio = new Audio(url);
+  audio.play();
 }
 
   
