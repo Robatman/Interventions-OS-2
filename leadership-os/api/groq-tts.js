@@ -9,15 +9,13 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
       },
-      const err = await response.text();
-console.log(err);
-return res.status(response.status).send(err);
       body: JSON.stringify(req.body)
     }
   );
 
   if (!response.ok) {
     const err = await response.text();
+    console.log(err);
     return res.status(response.status).send(err);
   }
 
