@@ -536,37 +536,89 @@ async function goEval(){
 async function speakVR(text, who, onEnd) {
   try {
 
+    console.log('========== SPEAK VR ==========');
+    console.log('Texto:', text);
+    console.log('Who:', who);
+
+    const payload = {
+      model: 'canopylabs/orpheus-v1-english',
+      input: text,
+      voice: who === 'juan' ? 'tara' : 'leah',
+      response_format: 'wav'
+    };
+
+    console.log('Payload enviado:', payload);
+
     var res = await fetch('/api/groq-tts', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'canopylabs/orpheus-v1-english',
-        input: text,
-        voice: who === 'juan' ? 'tara' : 'leah',
-        response_format: 'wav'
-      })
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
     });
+
+    console.log('STATUS:', res.status);
+    console.log('STATUS TEXT:', res.statusText);
 
     if (!res.ok) {
       const txt = await res.text();
+
+      console.log('========== ERROR RESPONSE ==========');
       console.log(txt);
+      console.log('====================================');
+
       throw new Error('TTS error ' + res.status);
     }
 
+    console.log('Request exitosa');
+
     var blob = await res.blob();
+
+    console.log('Blob creado');
+    console.log('Blob size:', blob.size);
+    console.log('Blob type:', blob.type);
+
     var url = URL.createObjectURL(blob);
+
+    console.log('URL creada:', url);
 
     var audio = new Audio(url);
 
+    audio.onloadeddata = function() {
+      console.log('Audio cargado correctamente');
+    };
+
+    audio.onplay = function() {
+      console.log('Audio reproduciéndose');
+    };
+
     audio.onended = function() {
+      console.log('Audio terminado');
       URL.revokeObjectURL(url);
+
       if (onEnd) onEnd();
     };
 
-    audio.play();
+    audio.onerror = function(e) {
+      console.error('ERROR EN AUDIO:', e);
+
+      URL.revokeObjectURL(url);
+
+      if (onEnd) onEnd();
+    };
+
+    console.log('Intentando reproducir audio...');
+
+    await audio.play();
+
+    console.log('play() ejecutado');
 
   } catch (err) {
+
+    console.log('========== CATCH ==========');
     console.error('[TTS]', err);
+    console.log('===========================');
+
     if (onEnd) onEnd();
   }
 }
