@@ -59,3 +59,6 @@ export default async function handler(req, res) {
     });
   }
 }
+
+
+console.log('Hola si estoy entrando pero no se jajajaj')
