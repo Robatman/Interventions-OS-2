@@ -1,6 +1,20 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
+  // Ver modelos disponibles
+  const modelsResponse = await fetch(
+    'https://api.groq.com/openai/v1/models',
+    {
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+      }
+    }
+  );
+
+  const models = await modelsResponse.text();
+  console.log('MODELS:', models);
+
+  // TTS request
   const response = await fetch(
     'https://api.groq.com/openai/v1/audio/speech',
     {
@@ -15,7 +29,7 @@ export default async function handler(req, res) {
 
   if (!response.ok) {
     const err = await response.text();
-    console.log(err);
+    console.log('TTS ERROR:', err);
     return res.status(response.status).send(err);
   }
 
