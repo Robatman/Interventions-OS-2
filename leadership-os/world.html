@@ -541,7 +541,11 @@ async function speakVR(text, who, onEnd) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: text, voice: voice })
     });
-    if (!res.ok) throw new Error('TTS error ' + res.status);
+    if (!res.ok) {
+  const txt = await res.text();
+  console.error(txt);
+  throw new Error('TTS error ' + res.status + ' - ' + txt);
+}
     var blob = await res.blob();
     var url = URL.createObjectURL(blob);
     var audio = new Audio(url);
