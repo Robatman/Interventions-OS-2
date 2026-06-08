@@ -535,17 +535,17 @@ async function goEval(){
 // TTS via OpenAI - works on Meta Quest Browser
 async function speakVR(text, who, onEnd) {
   try {
-    var voice = who === 'juan' ? 'onyx' : 'nova';
-    var res = await fetch('/api/openai-tts', {
+    var res = await fetch('/api/groq-tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text, voice: voice })
+      body: JSON.stringify({
+        model: 'playai-tts',
+        input: text,
+        voice: who === 'juan' ? 'Fritz-PlayAI' : 'Celeste-PlayAI',
+        response_format: 'mp3'
+      })
     });
-    if (!res.ok) {
-  const txt = await res.text();
-  console.error(txt);
-  throw new Error('TTS error ' + res.status + ' - ' + txt);
-}
+    if (!res.ok) throw new Error('TTS error ' + res.status);
     var blob = await res.blob();
     var url = URL.createObjectURL(blob);
     var audio = new Audio(url);
