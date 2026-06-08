@@ -545,7 +545,6 @@ async function speakVR(text, who, onEnd) {
     var blob = await res.blob();
     var url = URL.createObjectURL(blob);
     var audio = new Audio(url);
-    console.log(process.env.OPENAIAPIKEY)
     audio.onended = function() { URL.revokeObjectURL(url); if (onEnd) onEnd(); };
     audio.onerror = function(e) { console.error('[TTS audio]', e); if (onEnd) onEnd(); };
     audio.play();
