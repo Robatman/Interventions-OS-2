@@ -28,3 +28,6 @@ export default async function handler(req, res) {
   res.setHeader('Content-Type', 'audio/wav');
   res.status(200).send(Buffer.from(buffer));
 }
+
+
+console.log('Hola si estoy entrando pero no se jajajaj')
