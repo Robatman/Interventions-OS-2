@@ -6,8 +6,10 @@ export default async function handler(req, res) {
   const response = await fetch('https://api.openai.com/v1/audio/speech', {
     method: 'POST',
     headers: {
-      'Content-Type':  'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${
+        process.env.OPENAI_API_KEY || process.env.OPENAIAPIKEY
+      }`
     },
     body: JSON.stringify({
       model: 'tts-1',
