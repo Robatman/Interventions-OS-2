@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
-console.log("KEY:", process.env.GROQ_API_KEY?.slice(0, 15));
+
   const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
     method: 'POST',
     headers: {
