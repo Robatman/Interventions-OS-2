@@ -552,10 +552,18 @@ async function goEval(){
   return data.choices?.[0]?.message?.content || text;
 }
 
+  function getVoice(character) {
+  return {
+    juan: "daniel",
+    agent: "diana"
+  }[character] || "autumn";
+}
+  
 // TTS via OpenAI - works on Meta Quest Browser
 
-async function speakVR(text, voice = "autumn", callback) {
-  const API_KEY = "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";
+speakVR(text, getVoice('juan')){
+  
+const API_KEY = "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";
 
   // 1. Traducir a inglés
   const translateResponse = await fetch(
