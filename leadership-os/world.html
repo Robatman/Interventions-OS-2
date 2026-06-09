@@ -483,51 +483,47 @@ function parseAgentReply(raw){
   return {msg:msg,newMood:moodMatch?parseInt(moodMatch[1]):appState.vrMood,boxState:boxMatch?boxMatch[1]:appState.boxState};
 }
 
-async function handleVRSpeech(text){
-  if(!text.trim())return;
-  var mode=appState.currentArchetype?'practice':'learn';
-  appState.agentHistory.push({role:'user',content:text});
-  try{
-    var reply=await callGroqLLM(mode==='practice'?'practice':appState.activeMenu?'learn':'work');
-    var parsed=mode==='practice'?parseAgentReply(reply):{msg:reply,newMood:appState.vrMood,boxState:'out'};
-    appState.agentHistory.push({role:'assistant',content:reply});
-    if(mode==='practice'){
+async function handleVRSpeech(text) {
+  if (!text.trim()) return;
+  var mode = appState.currentArchetype ? 'practice' : 'learn';
+  appState.agentHistory.push({ role: 'user', content: text });
+  
+  try {
+    var reply = await callGroqLLM(mode === 'practice' ? 'practice' : appState.activeMenu ? 'learn' : 'work');
+    var parsed = mode === 'practice' ? parseAgentReply(reply) : { msg: reply, newMood: appState.vrMood, boxState: 'out' };
+    appState.agentHistory.push({ role: 'assistant', content: reply });
+    
+    if (mode === 'practice') {
       updateVRMood(parsed.newMood);
-      appState.boxState=parsed.boxState;
-      if(parsed.newMood>60)setAjolinMood('happy');
-      else if(parsed.newMood<30)setAjolinMood('sad');
+      appState.boxState = parsed.boxState;
+      if (parsed.newMood > 60) setAjolinMood('happy');
+      else if (parsed.newMood < 30) setAjolinMood('sad');
       else setAjolinMood('talking');
-      setDialog(appState.currentArchetype.name.toUpperCase(),parsed.msg);
+      setDialog(appState.currentArchetype.name.toUpperCase(), parsed.msg);
     } else {
       setJuanMood('talking');
-      setDialog('JUANJOLOTE',parsed.msg);
+      setDialog('JUANJOLOTE', parsed.msg);
     }
-    
+
     speakVR(
       parsed.msg,
       getVoice(mode === 'practice' ? 'agent' : 'juan'),
       function () {
-    
         setHUD('ready', 'Listo para hablar');
-    
         if (mode === 'practice') {
           setAjolinMood('neutral');
         } else {
           setJuanMood('neutral');
         }
-    
       }
     );
-    
-      setHUD('ready','Listo para hablar');
-      if(mode==='practice')setAjolinMood('neutral');
-      else setJuanMood('neutral');
-    });
-  } catch(e){
-    console.error('[LLM]',e);
-    setHUD('ready','Error, intenta de nuevo');
+
+  } catch (e) {
+    console.error('[LLM]', e);
+    setHUD('ready', 'Error, intenta de nuevo');
   }
 }
+
 
 async function goEval(){
   showScreen('eval');
