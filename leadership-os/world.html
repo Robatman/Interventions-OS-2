@@ -552,20 +552,18 @@ async function goEval(){
   return data.choices?.[0]?.message?.content || text;
 }
 
-  function getVoice(character) {
+function getVoice(character) {
   return {
     juan: "daniel",
     agent: "diana"
   }[character] || "autumn";
 }
-  
-// TTS via OpenAI - works on Meta Quest Browser
 
-speakVR(text, getVoice('juan')){
-  
-const API_KEY = "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";
+async function speakVR(text, voice = "autumn", callback = null) {
 
-  // 1. Traducir a inglés
+  const API_KEY = "TU_KEY";
+
+  // Traducir
   const translateResponse = await fetch(
     "https://api.groq.com/openai/v1/chat/completions",
     {
@@ -593,12 +591,13 @@ const API_KEY = "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";
   );
 
   const translateData = await translateResponse.json();
+
   const englishText =
     translateData.choices[0].message.content.trim();
 
   console.log("Translated:", englishText);
 
-  // 2. Generar audio
+  // Generar voz
   const speechResponse = await fetch(
     "https://api.groq.com/openai/v1/audio/speech",
     {
@@ -609,21 +608,31 @@ const API_KEY = "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";
       },
       body: JSON.stringify({
         model: "canopylabs/orpheus-v1-english",
-        voice,
+        voice: voice,
         response_format: "wav",
         input: englishText,
       }),
     }
   );
 
+  if (!speechResponse.ok) {
+    const err = await speechResponse.text();
+    console.error("TTS ERROR:", err);
+    return;
+  }
+
   const blob = await speechResponse.blob();
+
   const url = URL.createObjectURL(blob);
 
   const audio = new Audio(url);
 
   audio.onended = () => {
     URL.revokeObjectURL(url);
-    if (callback) callback();
+
+    if (callback) {
+      callback();
+    }
   };
 
   await audio.play();
