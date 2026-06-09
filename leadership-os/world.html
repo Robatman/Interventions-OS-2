@@ -786,7 +786,7 @@ document.addEventListener('DOMContentLoaded',function(){
       var gameId=localStorage.getItem('ldr_game_id')||'';
       var name=gameId.split('.')[1]||'Manager';
       var greet='Bienvenido'+(name?' '+name:'')+'. Soy Juanjolote. Elige un camino: Intervenciones para practicar conversaciones de retencion, o Tecnicas para desarrollar habilidades especificas.';
-      setTimeout(function(){setJuanMood('happy');speakVR(greet,'juan');},800);
+      setTimeout(function(){setJuanMood('happy');speakVR(greet,'daniel');},800);
     });
     var stars=document.getElementById('stars-1');
     if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
