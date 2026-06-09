@@ -552,18 +552,17 @@ async function goEval(){
   return data.choices?.[0]?.message?.content || text;
 }
 
-  function getVoice(character) {
+function getVoice(character) {
   return {
     juan: "daniel",
     agent: "diana"
   }[character] || "autumn";
 }
-  
-// TTS via OpenAI - works on Meta Quest Browser
 
-speakVR(text, getVoice('juan')){
-  
-const API_KEY = "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";
+// TTS via Groq
+async function speakVR(text, voice = "autumn") {
+
+  const API_KEY = "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";
 
   // 1. Traducir a inglés
   const translateResponse = await fetch(
@@ -593,6 +592,7 @@ const API_KEY = "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";
   );
 
   const translateData = await translateResponse.json();
+
   const englishText =
     translateData.choices[0].message.content.trim();
 
@@ -609,12 +609,25 @@ const API_KEY = "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";
       },
       body: JSON.stringify({
         model: "canopylabs/orpheus-v1-english",
-        voice,
+        voice: voice,
         response_format: "wav",
         input: englishText,
       }),
     }
   );
+
+  if (!speechResponse.ok) {
+    const err = await speechResponse.text();
+    console.error("TTS ERROR:", err);
+    return;
+  }
+
+  const audioBlob = await speechResponse.blob();
+  const audioUrl = URL.createObjectURL(audioBlob);
+
+  const audio = new Audio(audioUrl);
+  audio.play();
+}
 
   const blob = await speechResponse.blob();
   const url = URL.createObjectURL(blob);
