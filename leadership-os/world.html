@@ -560,9 +560,9 @@ function getVoice(character) {
 }
 
 // TTS via Groq
-async function speakVR(text, voice = "autumn") {
+async function speakVR(text, voice = "autumn", callback = null) {
 
-  const API_KEY = "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";
+  const API_KEY = "TU_API_KEY";
 
   // 1. Traducir a inglés
   const translateResponse = await fetch(
@@ -622,13 +622,7 @@ async function speakVR(text, voice = "autumn") {
     return;
   }
 
-  const audioBlob = await speechResponse.blob();
-  const audioUrl = URL.createObjectURL(audioBlob);
-
-  const audio = new Audio(audioUrl);
-  audio.play();
-}
-
+  // 3. Convertir a audio
   const blob = await speechResponse.blob();
   const url = URL.createObjectURL(blob);
 
@@ -636,11 +630,15 @@ async function speakVR(text, voice = "autumn") {
 
   audio.onended = () => {
     URL.revokeObjectURL(url);
-    if (callback) callback();
+
+    if (callback) {
+      callback();
+    }
   };
 
   await audio.play();
 }
+  
   
 async function setupMic(){
   try{
