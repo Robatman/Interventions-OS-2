@@ -388,7 +388,7 @@ function goLearn(){
   showScreen('practice');
   setJuanMood('happy');
   setDialog('JUANJOLOTE',intro);
-  speakVR(intro,'juan',function(){setHUD('ready','Listo para responder');});
+  speakVR(intro,'autumn',function(){setHUD('ready','Listo para responder');});
   appState.agentHistory.push({role:'assistant',content:intro});
 }
 
@@ -398,7 +398,7 @@ function goWork(){
   showScreen('practice');
   setJuanMood('talking');
   setDialog('JUANJOLOTE',intro);
-  speakVR(intro,'juan',function(){setHUD('ready','Listo para responder');});
+  speakVR(intro,'autumn',function(){setHUD('ready','Listo para responder');});
   appState.agentHistory.push({role:'assistant',content:intro});
 }
 
@@ -418,7 +418,7 @@ function goPractice(){
   appState.agentHistory.push({role:'assistant',content:opener});
   showScreen('practice');
   setDialog(arch.name.toUpperCase(),opener);
-  speakVR(opener,'agent',function(){setHUD('ready','Listo para hablar');});
+  speakVR(opener,'autumn',function(){setHUD('ready','Listo para hablar');});
 }
 
 function updateAgentAvatar(arch){
@@ -502,7 +502,7 @@ async function handleVRSpeech(text){
       setJuanMood('talking');
       setDialog('JUANJOLOTE',parsed.msg);
     }
-    speakVR(parsed.msg,mode==='practice'?'agent':'juan',function(){
+    speakVR(parsed.msg,mode==='autumn'?'autumn':'autumn',function(){
       setHUD('ready','Listo para hablar');
       if(mode==='practice')setAjolinMood('neutral');
       else setJuanMood('neutral');
@@ -525,7 +525,7 @@ async function goEval(){
     var feedback=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'Sesion completada.';
     var feedbackEl=document.getElementById('eval-feedback');
     if(feedbackEl)feedbackEl.setAttribute('text','value',feedback);
-    speakVR(feedback,'juan');
+    speakVR(feedback,'autumn');
   } catch(e){
     var feedbackEl2=document.getElementById('eval-feedback');
     if(feedbackEl2)feedbackEl2.setAttribute('text','value','Sesion completada. Buen trabajo.');
