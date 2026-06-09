@@ -502,14 +502,23 @@ async function handleVRSpeech(text){
       setJuanMood('talking');
       setDialog('JUANJOLOTE',parsed.msg);
     }
-    speakVR(parsed.msg,getVoice(mode === 'practice' ? 'agent' : 'juan'),
-  function(){
-    setHUD('ready','Listo para hablar');
-    if(mode==='practice')
-      setAjolinMood('neutral');
-    else
-      setJuanMood('neutral');
-});
+    
+    speakVR(
+      parsed.msg,
+      getVoice(mode === 'practice' ? 'agent' : 'juan'),
+      function () {
+    
+        setHUD('ready', 'Listo para hablar');
+    
+        if (mode === 'practice') {
+          setAjolinMood('neutral');
+        } else {
+          setJuanMood('neutral');
+        }
+    
+      }
+    );
+    
       setHUD('ready','Listo para hablar');
       if(mode==='practice')setAjolinMood('neutral');
       else setJuanMood('neutral');
