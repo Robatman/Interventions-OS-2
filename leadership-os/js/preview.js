@@ -536,12 +536,24 @@ let previewData  = null;
 
 function showTechniquePreview(techniqueId) {
   previewData = TECHNIQUE_PREVIEWS[techniqueId];
-  if (!previewData) { show('s-mode'); return; }
+
+  if (!previewData) {
+    show('s-mode');
+    return;
+  }
+
+  currentTechnique = TECHNIQUES?.[techniqueId] || {
+    icon: '✨',
+    label: previewData.title,
+    tagline: previewData.tagline
+  };
+
   previewStep  = 0;
   previewExIdx = 0;
+
   renderPreviewStep();
-  //show('s-preview');
-  show('s-techniques');
+
+  show('s-preview');
 }
 
 
@@ -641,23 +653,37 @@ function showExchange(exchanges) {
 function nextExchange() {
   if (!previewData) return;
 
+  // moves → join
   if (previewStep >= 2) {
-    previewStep++;
-    if (previewStep > 3) previewStep = 3;
+    previewStep = Math.min(previewStep + 1, 3);
     renderPreviewStep();
     return;
   }
 
-  const exchanges = previewStep === 0 ? previewData.bad.exchanges : previewData.good.exchanges;
+  const exchanges =
+    previewStep === 0
+      ? previewData.bad.exchanges
+      : previewData.good.exchanges;
 
+  // avanzar diálogo
+  previewExIdx++;
+
+  // todavía quedan líneas
   if (previewExIdx < exchanges.length) {
-    previewExIdx++;
     showExchange(exchanges);
     return;
   }
 
+  // mostrar insight al terminar
+  if (previewExIdx === exchanges.length) {
+    showExchange(exchanges);
+    return;
+  }
+
+  // avanzar al siguiente step
   previewStep++;
   previewExIdx = 0;
+
   renderPreviewStep();
 }
 
