@@ -214,6 +214,94 @@
   </a-entity>
 
   <!-- SCREEN: TECHNIQUES -->
+  <a-entity id="screen-technique-list" visible="false">
+
+  <a-text value="TECHNIQUES"
+          position="0 2.5 -2.8"
+          align="center"
+          color="#e8eeff"
+          width="6"
+          font="exo2bold">
+  </a-text>
+
+  <a-text value="Choose a technique to practice"
+          position="0 2.18 -2.8"
+          align="center"
+          color="#c8d8ff"
+          width="4.5"
+          opacity="0.7"
+          font="mozillavr">
+  </a-text>
+
+  <!-- ACTIVE LISTENING -->
+
+  <a-entity id="btn-active-listening"
+            position="0 1.4 -2.8"
+            class="clickable">
+
+    <a-plane width="1.6"
+             height="0.7"
+             color="#112540"
+             material="opacity:0.93;shader:flat">
+    </a-plane>
+
+    <a-plane width="1.64"
+             height="0.74"
+             color="#00e5c0"
+             material="opacity:0.32;transparent:true;shader:flat"
+             position="0 0 -0.005">
+    </a-plane>
+
+    <a-text value="ACTIVE LISTENING"
+            align="center"
+            color="#e8eeff"
+            width="3"
+            position="0 0.08 0.01"
+            font="mozillavr">
+    </a-text>
+
+    <a-text value="The technique behind all others"
+            align="center"
+            color="#c8d8ff"
+            width="2.6"
+            position="0 -0.14 0.01"
+            opacity="0.7"
+            wrap-count="24"
+            font="mozillavr">
+    </a-text>
+
+  </a-entity>
+
+  <!-- BACK -->
+
+  <a-entity id="btn-tech-list-back"
+            position="0 -0.7 -2.4"
+            class="clickable">
+
+    <a-plane width="0.82"
+             height="0.24"
+             color="#111830"
+             material="opacity:0.85;shader:flat">
+    </a-plane>
+
+    <a-plane width="0.86"
+             height="0.28"
+             color="#4466ff"
+             material="opacity:0.3;transparent:true;shader:flat"
+             position="0 0 -0.005">
+    </a-plane>
+
+    <a-text value="BACK"
+            align="center"
+            color="#4466ff"
+            width="3"
+            position="0 0 0.01"
+            font="mozillavr">
+    </a-text>
+
+  </a-entity>
+
+</a-entity>
   <a-entity id="screen-techniques" visible="false">
     <a-text value="TECHNIQUES" position="0 2.5 -2.8" align="center" color="#e8eeff" width="6" font="exo2bold"></a-text>
     <a-text value="Communication and leadership tools" position="0 2.18 -2.8" align="center" color="#c8d8ff" width="4.5" opacity="0.7" font="mozillavr"></a-text>
@@ -363,7 +451,7 @@ function pickRandomOpener(archetype,scenario){
 }
 
 function showScreen(name){
-  ['welcome','mode','practice','eval'].forEach(function(s){
+  ['welcome','mode','practice','eval','technique-list'].forEach(function(s){
     var el=document.getElementById('screen-'+s);
     if(el)el.setAttribute('visible',s===name);
   });
@@ -735,7 +823,38 @@ document.addEventListener('DOMContentLoaded',function(){
     }
   });
   var btnInt=document.getElementById('btn-interventions');if(btnInt)btnInt.addEventListener('click',function(e){e.stopPropagation();goMode('interventions');});
-  var btnTech=document.getElementById('btn-techniques');if(btnTech)btnTech.addEventListener('click',function(e){e.stopPropagation();goMode('techniques');});
+var btnTech=document.getElementById('btn-techniques');
+
+if(btnTech)
+  btnTech.addEventListener('click',function(e){
+
+    e.stopPropagation();
+
+    showScreen('technique-list');
+
+  });
+  var btnAL=document.getElementById('btn-active-listening');
+
+if(btnAL)
+  btnAL.addEventListener('click',function(e){
+
+    e.stopPropagation();
+
+    appState.selectedTechnique='active_listening';
+
+    goMode('techniques');
+
+  });
+  var btnTechBack=document.getElementById('btn-tech-list-back');
+
+if(btnTechBack)
+  btnTechBack.addEventListener('click',function(e){
+
+    e.stopPropagation();
+
+    goWelcome();
+
+  });
   var btnLearn=document.getElementById('btn-learn');if(btnLearn)btnLearn.addEventListener('click',function(e){e.stopPropagation();goLearn();});
   var btnWork=document.getElementById('btn-work');if(btnWork)btnWork.addEventListener('click',function(e){e.stopPropagation();goWork();});
   var btnPractice=document.getElementById('btn-practice');if(btnPractice)btnPractice.addEventListener('click',function(e){e.stopPropagation();goPractice();});
