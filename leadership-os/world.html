@@ -597,7 +597,7 @@ async function handleVRSpeech(text) {
       parsed.msg,
       getVoice(mode === 'practice' ? 'agent' : 'juan'),
       function () {
-        setHUD('ready', 'Listo para hablar');
+        setHUD('ready', 'Listo para hablarr');
         if (mode === 'practice') {
           setAjolinMood('neutral');
         } else {
@@ -714,7 +714,7 @@ async function setupMic(){
     analyser=audioContext.createAnalyser();
     analyser.fftSize=2048;
     audioContext.createMediaStreamSource(audioStream).connect(analyser);
-    setHUD('ready','Listo para hablar');
+    setHUD('ready','Listo para hablarrr');
   } catch(e){
     setHUD('idle','Sin microfono - modo texto');
     console.error('[Mic]',e);
