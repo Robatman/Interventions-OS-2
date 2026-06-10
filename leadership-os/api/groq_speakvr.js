@@ -68,8 +68,8 @@ export default async function handler(req, res) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "playai-tts",
-            voice: voice || "Fritz-PlayAI",
+          model: "canopylabs/orpheus-v1-english",
+          voice: voice || "autumn",
             response_format: "wav",
             input: text,
           }),
