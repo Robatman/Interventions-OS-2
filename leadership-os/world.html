@@ -546,22 +546,22 @@ speakVR(feedback,getVoice('juan'));
   
     //const API_KEY = "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";
 
-  async function translateToEnglish(text){
-  const res = await fetch('/api/groq', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
+async function translateToEnglish(text) {
+
+  const res = await fetch('/api/groq.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({
-      model:'llama-3.3-70b-versatile',
-      messages:[
-        {role:'system', content:'Translate the following text to natural English. Only return the translation.'},
-        {role:'user', content:text}
-      ],
-      temperature:0.2
+      type: 'translate',
+      text: text
     })
   });
 
   const data = await res.json();
-  return data.choices?.[0]?.message?.content || text;
+
+  return data.translation || text;
 }
 
 function getVoice(character) {
@@ -573,63 +573,26 @@ function getVoice(character) {
 
 async function speakVR(text, voice = "autumn", callback = null) {
 
-  const API_KEY = "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";
-
-  // Traducir
-  const translateResponse = await fetch(
-    "https://api.groq.com/openai/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a translator. Translate the user's text to English. Return only the translation.",
-          },
-          {
-            role: "user",
-            content: text,
-          },
-        ],
-        temperature: 0,
-      }),
-    }
-  );
-
-  const translateData = await translateResponse.json();
-
-  const englishText =
-    translateData.choices[0].message.content.trim();
+  // traducir usando PHP
+  const englishText = await translateToEnglish(text);
 
   console.log("Translated:", englishText);
 
-  // Generar voz
-  const speechResponse = await fetch(
-    "https://api.groq.com/openai/v1/audio/speech",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "canopylabs/orpheus-v1-english",
-        voice: voice,
-        response_format: "wav",
-        input: englishText,
-      }),
-    }
-  );
+  // pedir audio al backend
+  const speechResponse = await fetch('/api/groq.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      type: 'speech',
+      text: englishText,
+      voice: voice
+    })
+  });
 
   if (!speechResponse.ok) {
-    const err = await speechResponse.text();
-    console.error("TTS ERROR:", err);
+    console.error("TTS ERROR");
     return;
   }
 
@@ -640,6 +603,7 @@ async function speakVR(text, voice = "autumn", callback = null) {
   const audio = new Audio(url);
 
   audio.onended = () => {
+
     URL.revokeObjectURL(url);
 
     if (callback) {
