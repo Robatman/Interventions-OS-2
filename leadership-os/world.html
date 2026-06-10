@@ -823,16 +823,22 @@ document.addEventListener('DOMContentLoaded',function(){
     }
   });
   var btnInt=document.getElementById('btn-interventions');if(btnInt)btnInt.addEventListener('click',function(e){e.stopPropagation();goMode('interventions');});
-var btnTech=document.getElementById('btn-techniques');
-
-if(btnTech)
-  btnTech.addEventListener('click',function(e){
-
-    e.stopPropagation();
-
-    showScreen('technique-list');
-
-  });
+  
+  var btnTech=document.getElementById('btn-techniques');
+  
+  console.log("BTN TECH:", btnTech);
+  
+  if(btnTech)
+    btnTech.addEventListener('click',function(e){
+  
+      console.log("CLICK TECH");
+  
+      e.stopPropagation();
+  
+      showScreen('technique-list');
+  
+    });
+  
   var btnAL=document.getElementById('btn-active-listening');
 
 if(btnAL)
