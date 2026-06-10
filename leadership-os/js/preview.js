@@ -540,7 +540,13 @@ function showTechniquePreview(techniqueId) {
   previewStep  = 0;
   previewExIdx = 0;
   renderPreviewStep();
-  show('s-preview');
+  //show('s-preview');
+  show('s-techniques');
+}
+
+
+function selectAndPreview(techniqueId) {
+  showTechniquePreview(techniqueId);
 }
 
 // ─── STEP RENDERER ────────────────────────
