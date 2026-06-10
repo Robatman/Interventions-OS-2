@@ -548,7 +548,7 @@ speakVR(feedback,getVoice('juan'));
 
 async function translateToEnglish(text) {
 
-  const res = await fetch('/api/groq.php', {
+  const res = await fetch('/api/groq_speakvr', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -565,21 +565,22 @@ async function translateToEnglish(text) {
 }
 
 function getVoice(character) {
+
   return {
-    juan: "daniel",
-    agent: "diana"
-  }[character] || "autumn";
+    juan: "Fritz-PlayAI",
+    agent: "Celeste-PlayAI"
+  }[character] || "Fritz-PlayAI";
 }
 
-async function speakVR(text, voice = "autumn", callback = null) {
+async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
 
-  // traducir usando PHP
+  // traducir
   const englishText = await translateToEnglish(text);
 
   console.log("Translated:", englishText);
 
-  // pedir audio al backend
-  const speechResponse = await fetch('/api/groq.php', {
+  // pedir audio
+  const speechResponse = await fetch('/api/groq_speakvr', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -592,7 +593,11 @@ async function speakVR(text, voice = "autumn", callback = null) {
   });
 
   if (!speechResponse.ok) {
-    console.error("TTS ERROR");
+
+    const err = await speechResponse.text();
+
+    console.error("TTS ERROR:", err);
+
     return;
   }
 
