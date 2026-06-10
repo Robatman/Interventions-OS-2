@@ -5,7 +5,8 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 $type = $data["type"] ?? "";
 
-$apiKey = getenv("GROQ_API_KEY");
+$apiKey = "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";
+
 
 if (!$apiKey) {
     http_response_code(500);
