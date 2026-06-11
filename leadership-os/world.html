@@ -478,8 +478,6 @@ function goLearn(){
   setDialog('JUANJOLOTE',intro);
   speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
   appState.agentHistory.push({role:'assistant',content:intro});
-    console.log("dio click al goLearn")
-
 }
 
 function goWork(){
@@ -490,12 +488,10 @@ function goWork(){
   setDialog('JUANJOLOTE',intro);
   speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
   appState.agentHistory.push({role:'assistant',content:intro});
-    console.log("dio click al gowork")
-
 }
 
 function goPractice(){
-  /*var arch=pickRandomArchetype();
+  var arch=pickRandomArchetype();
   var scenario=pickRandomScenario(arch,appState.currentLevel);
   appState.currentArchetype=arch;
   appState.currentScenario=scenario;
@@ -507,11 +503,10 @@ function goPractice(){
   updateAgentAvatar(arch);
   updateVRMood(appState.vrMood);
   var opener=pickRandomOpener(arch,scenario);
-  appState.agentHistory.push({role:'assistant',content:opener});*/
-  showScreen('technique-list');
-  /*setDialog(arch.name.toUpperCase(),opener);
-  speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});*/
-  console.log("dio click al goPractice")
+  appState.agentHistory.push({role:'assistant',content:opener});
+  showScreen('practice');
+  setDialog(arch.name.toUpperCase(),opener);
+  speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});
 }
 
 function updateAgentAvatar(arch){
@@ -866,9 +861,7 @@ if(btnTechBack)
   var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
   var btnEnd=document.getElementById('btn-end-practice');if(btnEnd)btnEnd.addEventListener('click',function(e){e.stopPropagation();goEval();});
   var btnNew=document.getElementById('btn-new-session');if(btnNew)btnNew.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
-  
   var btnAgain=document.getElementById('btn-practice-again');if(btnAgain)btnAgain.addEventListener('click',function(e){e.stopPropagation();goPractice();});
-  
   var btnLogout=document.getElementById('btn-logout');
   if(btnLogout)btnLogout.addEventListener('click',function(){
     localStorage.removeItem('ldr_session_token');
@@ -887,17 +880,6 @@ if(btnTechBack)
     if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
   });
 });
- 
-    document.querySelector('a-scene').addEventListener('loaded', () => {
-      console.log("🚀 Sistema de rastreo de clics activado.");
-      const botones = document.querySelectorAll('.clickable');
-      botones.forEach(boton => {
-        boton.addEventListener('click', (evento) => {
-          console.log(`🎯 ¡Click detectado! Le diste a: #${evento.currentTarget.id}`);
-        });
-      });
-    });
-  
 </script>
 </body>
 </html>
