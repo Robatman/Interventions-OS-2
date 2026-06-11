@@ -214,73 +214,94 @@
   </a-entity>
 
   <!-- SCREEN: TECHNIQUES -->
- <!-- NUEVA SCREEN: LISTA DE 14 TÉCNICAS (Intermedia) -->
   <a-entity id="screen-technique-list" visible="false">
-    <a-text value="14 HERRRAMIENTAS DE COMUNICACION" position="0 2.7 -2.8" align="center" color="#e8eeff" width="5.5" font="exo2bold"></a-text>
-    <a-text value="Selecciona la habilidad que deseas desarrollar" position="0 2.45 -2.8" align="center" color="#c8d8ff" width="4" opacity="0.7" font="mozillavr"></a-text>
 
-    <!-- FILA 1 (Y = 1.8) -->
-    <!-- Botón 1: Active Listening -->
-    <a-entity id="btn-tech-active-listening" class="clickable tech-btn" position="-1.8 1.8 -2.8" data-tech="active_listening">
-      <a-plane width="1.1" height="0.4" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.13" height="0.43" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="ACTIVE LISTENING" align="center" color="#e8eeff" width="2.3" font="mozillavr"></a-text>
-    </a-entity>
+  <a-text value="TECHNIQUES"
+          position="0 2.5 -2.8"
+          align="center"
+          color="#e8eeff"
+          width="6"
+          font="exo2bold">
+  </a-text>
 
-    <!-- Botón 2: Empathy -->
-    <a-entity id="btn-tech-empathy" class="clickable tech-btn" position="-0.6 1.8 -2.8" data-tech="empathy">
-      <a-plane width="1.1" height="0.4" color="#2a1840" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.13" height="0.43" color="#9d5cff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="EMPATHY" align="center" color="#e8eeff" width="2.3" font="mozillavr"></a-text>
-    </a-entity>
+  <a-text value="Choose a technique to practice"
+          position="0 2.18 -2.8"
+          align="center"
+          color="#c8d8ff"
+          width="4.5"
+          opacity="0.7"
+          font="mozillavr">
+  </a-text>
 
-    <!-- Botón 3: Feedback -->
-    <a-entity id="btn-tech-feedback" class="clickable tech-btn" position="0.6 1.8 -2.8" data-tech="feedback">
-      <a-plane width="1.1" height="0.4" color="#3a2212" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.13" height="0.43" color="#ffb347" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="FEEDBACK" align="center" color="#e8eeff" width="2.3" font="mozillavr"></a-text>
-    </a-entity>
+  <!-- ACTIVE LISTENING -->
 
-    <!-- Botón 4: Coaching -->
-    <a-entity id="btn-tech-coaching" class="clickable tech-btn" position="1.8 1.8 -2.8" data-tech="coaching">
-      <a-plane width="1.1" height="0.4" color="#103020" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.13" height="0.43" color="#4dff88" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="COACHING" align="center" color="#e8eeff" width="2.3" font="mozillavr"></a-text>
-    </a-entity>
+  <a-entity id="btn-active-listening"
+            position="0 1.4 -2.8"
+            class="clickable">
 
-    <!-- FILA 2 (Y = 1.2) -->
-    <!-- Botón 5: Trust -->
-    <a-entity id="btn-tech-trust" class="clickable tech-btn" position="-1.8 1.2 -2.8" data-tech="trust">
-      <a-plane width="1.1" height="0.4" color="#132840" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.13" height="0.43" color="#58a6ff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="TRUST" align="center" color="#e8eeff" width="2.3" font="mozillavr"></a-text>
-    </a-entity>
+    <a-plane width="1.6"
+             height="0.7"
+             color="#112540"
+             material="opacity:0.93;shader:flat">
+    </a-plane>
 
-    <!-- Botón 6: Motivation -->
-    <a-entity id="btn-tech-motivation" class="clickable tech-btn" position="-0.6 1.2 -2.8" data-tech="motivation">
-      <a-plane width="1.1" height="0.4" color="#341020" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.13" height="0.43" color="#ff5ca0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="MOTIVATION" align="center" color="#e8eeff" width="2.3" font="mozillavr"></a-text>
-    </a-entity>
+    <a-plane width="1.64"
+             height="0.74"
+             color="#00e5c0"
+             material="opacity:0.32;transparent:true;shader:flat"
+             position="0 0 -0.005">
+    </a-plane>
 
-    <!-- [BOTONES 7 AL 14]: Puedes clonar la estructura de arriba cambiando la posición X, Y e ID -->
-    <!-- Ejemplo rápido de Fila 3 (Y = 0.6) y Fila 4 (Y = 0.0) para tus siguientes técnicas -->
-    <a-entity id="btn-tech-7" class="clickable tech-btn" position="0.6 1.2 -2.8" data-tech="tecnica_7">
-      <a-plane width="1.1" height="0.4" color="#1a1a1a" material="opacity:0.9"></a-plane>
-      <a-text value="TECNICA 7" align="center" color="#fff" width="2.3" font="mozillavr"></a-text>
-    </a-entity>
+    <a-text value="ACTIVE LISTENING"
+            align="center"
+            color="#e8eeff"
+            width="3"
+            position="0 0.08 0.01"
+            font="mozillavr">
+    </a-text>
 
-    <!-- BOTÓN REGRESAR AL MENÚ PRINCIPAL -->
-    <a-entity id="btn-tech-list-back" position="0 -0.6 -2.4" class="clickable">
-      <a-plane width="0.82" height="0.24" color="#111830" material="opacity:0.85;shader:flat"></a-plane>
-      <a-plane width="0.86" height="0.28" color="#4466ff" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="BACK" align="center" color="#4466ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
-    </a-entity>
+    <a-text value="The technique behind all others"
+            align="center"
+            color="#c8d8ff"
+            width="2.6"
+            position="0 -0.14 0.01"
+            opacity="0.7"
+            wrap-count="24"
+            font="mozillavr">
+    </a-text>
+
   </a-entity>
 
+  <!-- BACK -->
 
+  <a-entity id="btn-tech-list-back"
+            position="0 -0.7 -2.4"
+            class="clickable">
 
+    <a-plane width="0.82"
+             height="0.24"
+             color="#111830"
+             material="opacity:0.85;shader:flat">
+    </a-plane>
 
+    <a-plane width="0.86"
+             height="0.28"
+             color="#4466ff"
+             material="opacity:0.3;transparent:true;shader:flat"
+             position="0 0 -0.005">
+    </a-plane>
+
+    <a-text value="BACK"
+            align="center"
+            color="#4466ff"
+            width="3"
+            position="0 0 0.01"
+            font="mozillavr">
+    </a-text>
+
+  </a-entity>
+
+</a-entity>
   <a-entity id="screen-techniques" visible="false">
     <a-text value="TECHNIQUES" position="0 2.5 -2.8" align="center" color="#e8eeff" width="6" font="exo2bold"></a-text>
     <a-text value="Communication and leadership tools" position="0 2.18 -2.8" align="center" color="#c8d8ff" width="4.5" opacity="0.7" font="mozillavr"></a-text>
@@ -430,7 +451,6 @@ function pickRandomOpener(archetype,scenario){
 }
 
 function showScreen(name){
-  // Agregamos 'technique-list' a la lista para que se oculte o muestre correctamente
   ['welcome','mode','practice','eval','technique-list'].forEach(function(s){
     var el=document.getElementById('screen-'+s);
     if(el)el.setAttribute('visible',s===name);
@@ -442,11 +462,9 @@ function goWelcome(){showScreen('welcome');appState.agentHistory=[];appState.vrM
 
 function goMode(menuType){
   appState.activeMenu=menuType;
-  if(menuType==='interventions') {
-    appState.currentIntervention=(typeof interventions!=='undefined'&&interventions[0])||null;
-  }
-  // Si venimos de técnicas, appState.currentTechnique ya tendrá el valor del botón pulsado
-  if(typeof updateModeScreen==='function') updateModeScreen();
+  if(menuType==='interventions')appState.currentIntervention=(typeof interventions!=='undefined'&&interventions[0])||null;
+  if(menuType==='techniques')appState.currentTechnique=(typeof techniques!=='undefined'&&techniques[0])||null;
+  if(typeof updateModeScreen==='function')updateModeScreen();
   showScreen('mode');
 }
 
@@ -460,6 +478,8 @@ function goLearn(){
   setDialog('JUANJOLOTE',intro);
   speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
   appState.agentHistory.push({role:'assistant',content:intro});
+    console.log("dio click al goLearn")
+
 }
 
 function goWork(){
@@ -470,10 +490,12 @@ function goWork(){
   setDialog('JUANJOLOTE',intro);
   speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
   appState.agentHistory.push({role:'assistant',content:intro});
+    console.log("dio click al gowork")
+
 }
 
 function goPractice(){
-  var arch=pickRandomArchetype();
+  /*var arch=pickRandomArchetype();
   var scenario=pickRandomScenario(arch,appState.currentLevel);
   appState.currentArchetype=arch;
   appState.currentScenario=scenario;
@@ -485,10 +507,11 @@ function goPractice(){
   updateAgentAvatar(arch);
   updateVRMood(appState.vrMood);
   var opener=pickRandomOpener(arch,scenario);
-  appState.agentHistory.push({role:'assistant',content:opener});
-  showScreen('practice');
-  setDialog(arch.name.toUpperCase(),opener);
-  speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});
+  appState.agentHistory.push({role:'assistant',content:opener});*/
+  showScreen('technique-list');
+  /*setDialog(arch.name.toUpperCase(),opener);
+  speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});*/
+  console.log("dio click al goPractice")
 }
 
 function updateAgentAvatar(arch){
@@ -843,7 +866,9 @@ if(btnTechBack)
   var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
   var btnEnd=document.getElementById('btn-end-practice');if(btnEnd)btnEnd.addEventListener('click',function(e){e.stopPropagation();goEval();});
   var btnNew=document.getElementById('btn-new-session');if(btnNew)btnNew.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
+  
   var btnAgain=document.getElementById('btn-practice-again');if(btnAgain)btnAgain.addEventListener('click',function(e){e.stopPropagation();goPractice();});
+  
   var btnLogout=document.getElementById('btn-logout');
   if(btnLogout)btnLogout.addEventListener('click',function(){
     localStorage.removeItem('ldr_session_token');
@@ -862,40 +887,16 @@ if(btnTechBack)
     if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
   });
 });
-
-// 1. Al presionar "TÉCNICAS" en la pantalla de inicio, vamos a la lista de 14 botones
-  var btnTech = document.getElementById('btn-techniques');
-  if(btnTech) {
-    btnTech.addEventListener('click', function(e){
-      e.stopPropagation();
-      showScreen('technique-list'); // Abre la pantalla intermedia
+ 
+    document.querySelector('a-scene').addEventListener('loaded', () => {
+      console.log("🚀 Sistema de rastreo de clics activado.");
+      const botones = document.querySelectorAll('.clickable');
+      botones.forEach(boton => {
+        boton.addEventListener('click', (evento) => {
+          console.log(`🎯 ¡Click detectado! Le diste a: #${evento.currentTarget.id}`);
+        });
+      });
     });
-  }
-
-  // 2. Manejador dinámico para CUALQUIERA de los 14 botones de técnicas
-  var techButtons = document.querySelectorAll('.tech-btn');
-  techButtons.forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      // Obtenemos el identificador de la técnica desde el atributo data-tech
-      var selectedTech = btn.getAttribute('data-tech') || 'active_listening';
-      
-      // Guardamos la técnica en el estado de la app
-      appState.currentTechnique = selectedTech; 
-      
-      // Te manda a la pantalla de modos (Practice, Learn, Work Together)
-      goMode('techniques'); 
-    });
-  });
-
-  // 3. Botón de regreso de la lista de técnicas al menú principal
-  var btnTechListBack = document.getElementById('btn-tech-list-back');
-  if(btnTechListBack) {
-    btnTechListBack.addEventListener('click', function(e){
-      e.stopPropagation();
-      goWelcome(); // Regresa al inicio
-    });
-  }
   
 </script>
 </body>
