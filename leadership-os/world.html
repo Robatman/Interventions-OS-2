@@ -17,6 +17,15 @@
   #mic-btn{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:51;background:linear-gradient(135deg,#3d6bff,#9d5cff);color:#fff;border:none;border-radius:50%;width:54px;height:54px;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 24px rgba(100,100,255,0.5);display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
   #mic-btn:hover{transform:translateX(-50%) scale(1.1);}
   #mic-btn.recording{background:linear-gradient(135deg,#ff5ca0,#ff3c6b);box-shadow:0 0 24px #ff5ca0;}
+  
+  
+</style>
+</head>
+<body>
+<script>
+(function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
+</script>
+<script>  
   AFRAME.registerComponent('handler-botones-vr', {
   schema: {
     mensaje: {type: 'string', default: 'Botón presionado'},
@@ -79,11 +88,6 @@ function funcionMotivationalInterviewing() {
 function funcionNonviolentCommunication() {
   console.log("🕊️ Configurando Comunicación No Violenta...");
 }
-</style>
-</head>
-<body>
-<script>
-(function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
 </script>
 <script src="js/interventions.js"></script>
 <script src="js/archetypes.js"></script>
