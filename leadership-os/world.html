@@ -1,685 +1,998 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>LDR VR World - Técnicas Distribuidas</title>
-  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <style>
-    body { margin: 0; padding: 0; overflow: hidden; font-family: sans-serif; }
-    #voice-indicator {
-      position: absolute; top: 10px; left: 10px; z-index: 999;
-      background: rgba(0,0,0,0.7); color: #fff; padding: 6px 12px;
-      border-radius: 4px; font-size: 14px; display: none; pointer-events: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Centris · Neural Academy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<style>
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#060818;}
+  a-scene{width:100%;height:100%;}
+  #voice-hud{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:10px;background:rgba(15,20,50,0.85);border:1px solid #2a3a7a;border-radius:40px;padding:9px 22px;font-family:monospace;font-size:0.8rem;color:#c8d8ff;pointer-events:none;backdrop-filter:blur(8px);}
+  #voice-dot{width:11px;height:11px;border-radius:50%;background:#1a2a6a;transition:all 0.2s;}
+  #voice-dot.ready{background:#00e5c0;box-shadow:0 0 10px #00e5c0;}
+  #voice-dot.rec{background:#ff5ca0;box-shadow:0 0 14px #ff5ca0;animation:pulse 0.8s infinite alternate;}
+  #voice-dot.thinking{background:#9d5cff;box-shadow:0 0 12px #9d5cff;animation:pulse 1.2s infinite alternate;}
+  @keyframes pulse{from{opacity:1}to{opacity:0.3}}
+  #mic-btn{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:51;background:linear-gradient(135deg,#3d6bff,#9d5cff);color:#fff;border:none;border-radius:50%;width:54px;height:54px;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 24px rgba(100,100,255,0.5);display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+  #mic-btn:hover{transform:translateX(-50%) scale(1.1);}
+  #mic-btn.recording{background:linear-gradient(135deg,#ff5ca0,#ff3c6b);box-shadow:0 0 24px #ff5ca0;}
+</style>
 </head>
 <body>
+<script>
+(function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
+</script>
+<script src="js/interventions.js"></script>
+<script src="js/archetypes.js"></script>
+<script src="js/techniques.js"></script>
+<script src="js/prompts.js"></script>
+<div id="voice-hud"><div id="voice-dot" class="idle"></div><span id="voice-label">Iniciando Neural Academy...</span></div>
+<button id="mic-btn" title="Hablar">&#127908;</button>
+<a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018">
+  <a-assets>
+    <img id="juan-neutral"    src="assets/juanjolote_neutral.png">
+    <img id="juan-happy"      src="assets/juanjolote_happy.png">
+    <img id="juan-talking"    src="assets/juanjolote_talking.png">
+    <img id="juan-sad"        src="assets/juanjolote_sad.png">
+    <img id="ajolin-neutral"  src="assets/ajolin_neutral.png">
+    <img id="ajolin-happy"    src="assets/ajolin_happy.png">
+    <img id="ajolin-talking"  src="assets/ajolin_talking.png">
+    <img id="ajolin-sad"      src="assets/ajolin_sad.png">
+    <img id="ajolin-surprised" src="assets/ajolin_surprised.png">
+  </a-assets>
+  <a-light type="ambient" color="#1a1050" intensity="1.5"></a-light>
+  <a-light type="point" position="0 5 0" color="#4466ff" intensity="1.2" distance="20"></a-light>
+  <a-light type="point" position="-4 2 -4" color="#00e5c0" intensity="0.7" distance="12"></a-light>
+  <a-light type="point" position="4 2 -4" color="#9d5cff" intensity="0.6" distance="12"></a-light>
+  <a-light type="point" position="0 1 3" color="#ff5ca0" intensity="0.3" distance="8"></a-light>
+  <a-plane position="0 0 0" rotation="-90 0 0" width="40" height="40" color="#080c1f" material="shader:flat;opacity:1"></a-plane>
+  <a-entity position="0 0.01 0"><a-plane rotation="-90 0 0" width="40" height="40" material="color:#1a2a6a;opacity:0.25;transparent:true;shader:flat;wireframe:true"></a-plane></a-entity>
+  <a-sphere radius="30" color="#0a0a2a" material="opacity:1;shader:flat;side:back"></a-sphere>
+  <a-sphere position="-8 4 -18" radius="5" color="#1a0a4a" material="opacity:0.6;transparent:true;shader:flat"></a-sphere>
+  <a-sphere position="10 3 -20" radius="6" color="#0a1a3a" material="opacity:0.5;transparent:true;shader:flat"></a-sphere>
+  <a-sphere position="0 8 -22" radius="7" color="#0a2a2a" material="opacity:0.4;transparent:true;shader:flat"></a-sphere>
+  <a-entity id="stars-1">
+    <a-sphere position="-7 5 -14" radius="0.04" color="#00e5c0" material="shader:flat;opacity:0.9"></a-sphere>
+    <a-sphere position="5 7 -16" radius="0.03" color="#9d5cff" material="shader:flat;opacity:0.8"></a-sphere>
+    <a-sphere position="-12 4 -18" radius="0.05" color="#4466ff" material="shader:flat;opacity:0.7"></a-sphere>
+    <a-sphere position="9 6 -13" radius="0.03" color="#00e5c0" material="shader:flat;opacity:0.6"></a-sphere>
+    <a-sphere position="-5 9 -15" radius="0.04" color="#ff5ca0" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="13 5 -17" radius="0.03" color="#4466ff" material="shader:flat;opacity:0.7"></a-sphere>
+    <a-sphere position="-3 11 -20" radius="0.04" color="#9d5cff" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="7 8 -19" radius="0.05" color="#00e5c0" material="shader:flat;opacity:0.4"></a-sphere>
+    <a-sphere position="-14 6 -16" radius="0.03" color="#c8d8ff" material="shader:flat;opacity:0.6"></a-sphere>
+    <a-sphere position="3 13 -23" radius="0.04" color="#4466ff" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="-9 2 -11" radius="0.03" color="#9d5cff" material="shader:flat;opacity:0.8"></a-sphere>
+    <a-sphere position="11 10 -22" radius="0.04" color="#00e5c0" material="shader:flat;opacity:0.3"></a-sphere>
+    <a-sphere position="0 14 -26" radius="0.05" color="#4466ff" material="shader:flat;opacity:0.4"></a-sphere>
+    <a-sphere position="-17 5 -20" radius="0.03" color="#c8d8ff" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="15 3 -14" radius="0.04" color="#9d5cff" material="shader:flat;opacity:0.6"></a-sphere>
+    <a-sphere position="-6 6 -9" radius="0.03" color="#00e5c0" material="shader:flat;opacity:0.9"></a-sphere>
+    <a-sphere position="6 4 -10" radius="0.04" color="#4466ff" material="shader:flat;opacity:0.7"></a-sphere>
+    <a-sphere position="-10 12 -24" radius="0.03" color="#ff5ca0" material="shader:flat;opacity:0.4"></a-sphere>
+    <a-sphere position="17 2 -18" radius="0.05" color="#c8d8ff" material="shader:flat;opacity:0.3"></a-sphere>
+    <a-sphere position="-2 7 -12" radius="0.03" color="#9d5cff" material="shader:flat;opacity:0.7"></a-sphere>
+    <a-sphere position="8 11 -21" radius="0.04" color="#00e5c0" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="-13 8 -25" radius="0.03" color="#4466ff" material="shader:flat;opacity:0.4"></a-sphere>
+    <a-sphere position="4 15 -28" radius="0.05" color="#9d5cff" material="shader:flat;opacity:0.3"></a-sphere>
+  </a-entity>
+  <a-torus position="0 1 0" radius="6" radius-tubular="0.035" color="#2a3aaa" material="opacity:0.5;transparent:true;shader:flat" animation="property:rotation;to:0 360 0;loop:true;dur:25000;easing:linear"></a-torus>
+  <a-torus position="0 1 0" rotation="65 0 0" radius="5" radius-tubular="0.025" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" animation="property:rotation;to:65 360 0;loop:true;dur:18000;easing:linear"></a-torus>
+  <a-torus position="0 1 0" rotation="0 30 75" radius="7" radius-tubular="0.02" color="#9d5cff" material="opacity:0.2;transparent:true;shader:flat" animation="property:rotation;to:0 390 75;loop:true;dur:32000;easing:linear"></a-torus>
+  <a-torus position="0 1 0" rotation="45 15 0" radius="4" radius-tubular="0.018" color="#ff5ca0" material="opacity:0.2;transparent:true;shader:flat" animation="property:rotation;to:405 15 0;loop:true;dur:22000;easing:linear"></a-torus>
+  <a-sphere position="4.5 1.8 -3" radius="0.15" color="#4466ff" material="opacity:0.85;shader:flat" animation="property:position;to:4.5 2.4 -3;loop:true;dur:3200;dir:alternate;easing:easeInOutSine"></a-sphere>
+  <a-sphere position="-4.5 1.5 -2" radius="0.12" color="#00e5c0" material="opacity:0.85;shader:flat" animation="property:position;to:-4.5 2.1 -2;loop:true;dur:2700;dir:alternate;easing:easeInOutSine"></a-sphere>
+  <a-sphere position="3.5 2.2 3.5" radius="0.10" color="#9d5cff" material="opacity:0.85;shader:flat" animation="property:position;to:3.5 2.8 3.5;loop:true;dur:3800;dir:alternate;easing:easeInOutSine"></a-sphere>
+  <a-sphere position="-3 1.2 2.5" radius="0.09" color="#ff5ca0" material="opacity:0.8;shader:flat" animation="property:position;to:-3 1.8 2.5;loop:true;dur:2900;dir:alternate;easing:easeInOutSine"></a-sphere>
+  <a-sphere position="0 3.5 -5" radius="0.14" color="#00e5c0" material="opacity:0.7;shader:flat" animation="property:position;to:0 4.2 -5;loop:true;dur:4200;dir:alternate;easing:easeInOutSine"></a-sphere>
 
-  <div id="voice-indicator">Escuchando...</div>
+  <!-- SCREEN: WELCOME -->
+  <a-entity id="screen-welcome">
+    <a-entity id="juanjolote-entity" position="-1.9 0 -2.9">
+      <a-image id="juan-img" src="#juan-neutral" width="1.45" height="1.45" position="0 0.72 0" look-at="[camera]" animation="property:position;to:0 0.82 0;loop:true;dur:3000;dir:alternate;easing:easeInOutSine"></a-image>
+      <a-circle position="0 0.05 0" radius="0.85" rotation="-90 0 0" color="#00e5c0" material="opacity:0.08;transparent:true;shader:flat"></a-circle>
+      <a-torus position="0 0.05 0" radius="0.9" radius-tubular="0.014" rotation="-90 0 0" color="#00e5c0" material="opacity:0.35;transparent:true;shader:flat" animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:8000;easing:linear"></a-torus>
+      <a-text value="JUANJOLOTE" position="0 1.52 0" align="center" color="#00e5c0" width="3.5" font="mozillavr"></a-text>
+      <a-text value="Tu Coach VR" position="0 1.30 0" align="center" color="#c8d8ff" width="2.8" opacity="0.7" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="ajolin-entity" position="1.9 0 -2.9">
+      <a-image id="ajolin-img" src="#ajolin-neutral" width="1.45" height="1.45" position="0 0.72 0" look-at="[camera]" animation="property:position;to:0 0.82 0;loop:true;dur:2700;dir:alternate;easing:easeInOutSine"></a-image>
+      <a-circle position="0 0.05 0" radius="0.85" rotation="-90 0 0" color="#9d5cff" material="opacity:0.08;transparent:true;shader:flat"></a-circle>
+      <a-torus position="0 0.05 0" radius="0.9" radius-tubular="0.014" rotation="-90 0 0" color="#9d5cff" material="opacity:0.35;transparent:true;shader:flat" animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:6000;easing:linear"></a-torus>
+      <a-text value="AJOLIN" position="0 1.52 0" align="center" color="#9d5cff" width="3.5" font="mozillavr"></a-text>
+      <a-text value="Agente IA" position="0 1.30 0" align="center" color="#c8d8ff" width="2.8" opacity="0.7" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity position="0 2.65 -3.3" animation="property:position;to:0 2.73 -3.3;loop:true;dur:4000;dir:alternate;easing:easeInOutSine">
+      <a-text value="NEURAL ACADEMY" align="center" color="#e8eeff" font="exo2bold" width="7.5" opacity="0.98"></a-text>
+    </a-entity>
+    <a-text value="Centris Leadership OS" position="0 2.30 -3.3" align="center" color="#00e5c0" width="5" opacity="0.8" font="mozillavr"></a-text>
+    <a-text id="welcome-user-status" value="Retention Training Platform" position="0 2.02 -3.3" align="center" color="#c8d8ff" width="4" opacity="0.65" font="mozillavr"></a-text>
+    <a-entity position="0 1.72 -2.8">
+      <a-plane width="3" height="0.42" color="#0b1230" material="opacity:0.82;shader:flat;side:double"></a-plane>
+      <a-plane width="3.04" height="0.46" color="#2a3a7a" material="opacity:0.35;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
+      <a-text value="Choose your training path" align="center" color="#e8eeff" width="4.5" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-interventions" position="-1.2 1.02 -2.4" class="clickable" animation__hover="property:position;to:-1.2 1.12 -2.4;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:-1.2 1.02 -2.4;startEvents:mouseleave;dur:180">
+      <a-plane width="1.8" height="0.72" color="#0d2060" material="opacity:0.93;shader:flat;side:double"></a-plane>
+      <a-plane width="1.84" height="0.76" color="#00e5c0" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
+      <a-text value="INTERVENCIONES" align="center" color="#00e5c0" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
+      <a-text value="Pulse Check Stay Interview Anchoring" align="center" color="#c8d8ff" width="3.5" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-techniques" position="1.2 1.02 -2.4" class="clickable" animation__hover="property:position;to:1.2 1.12 -2.4;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:1.2 1.02 -2.4;startEvents:mouseleave;dur:180">
+      <a-plane width="1.8" height="0.72" color="#150d40" material="opacity:0.93;shader:flat;side:double"></a-plane>
+      <a-plane width="1.84" height="0.76" color="#9d5cff" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
+      <a-text value="TECNICAS" align="center" color="#9d5cff" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
+      <a-text value="14 herramientas de comunicacion" align="center" color="#c8d8ff" width="3.5" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-progress" position="0 0.45 -2.25" class="clickable">
+      <a-plane width="1.2" height="0.24" color="#101830" material="opacity:0.86;shader:flat;side:double"></a-plane>
+      <a-plane width="1.24" height="0.28" color="#4466ff" material="opacity:0.28;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="MY PROGRESS" align="center" color="#4466ff" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity position="-2.9 2.25 -2.5" rotation="0 30 0">
+      <a-plane id="btn-logout" width="0.82" height="0.24" color="#1a0a30" material="opacity:0.84;shader:flat;side:double" class="clickable">
+        <a-plane width="0.84" height="0.26" color="#ff5ca0" material="opacity:0.35;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="SALIR" color="#ff5ca0" align="center" width="2.8" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+  </a-entity>
 
-  <a-scene>
-    <a-assets>
-      </a-assets>
+  <!-- SCREEN: MODE -->
+  <a-entity id="screen-mode" visible="false">
+    <a-entity position="0 2.58 -3" animation="property:position;to:0 2.66 -3;loop:true;dur:4200;dir:alternate;easing:easeInOutSine">
+      <a-text id="mode-title" value="Interventions" align="center" color="#e8eeff" width="6.5" font="exo2bold"></a-text>
+    </a-entity>
+    <a-text id="mode-subtitle" value="Choose your training mode" position="0 2.22 -3" align="center" color="#c8d8ff" width="4.8" opacity="0.72" font="mozillavr"></a-text>
+    <a-entity position="0 1.92 -2.8">
+      <a-plane width="1.2" height="0.24" color="#111830" material="opacity:0.86;shader:flat"></a-plane>
+      <a-plane width="1.24" height="0.28" color="#4466ff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text id="mode-context-pill" value="Training" align="center" color="#58a6ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-practice" class="clickable" position="-1.65 1.1 -2.7" animation__hover="property:position;to:-1.65 1.2 -2.7;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:-1.65 1.1 -2.7;startEvents:mouseleave;dur:180">
+      <a-plane width="1.45" height="0.92" color="#102840" material="opacity:0.94;shader:flat;side:double"></a-plane>
+      <a-plane width="1.49" height="0.96" color="#00e5c0" material="opacity:0.36;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="PRACTICE" align="center" color="#00e5c0" width="4" position="0 0.15 0.01" font="mozillavr"></a-text>
+      <a-text value="Simulate a real coaching conversation in VR" align="center" color="#c8d8ff" width="3" wrap-count="24" position="0 -0.10 0.01" opacity="0.75" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-learn" class="clickable" position="0 1.1 -2.7" animation__hover="property:position;to:0 1.2 -2.7;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:0 1.1 -2.7;startEvents:mouseleave;dur:180">
+      <a-plane width="1.45" height="0.92" color="#221240" material="opacity:0.94;shader:flat;side:double"></a-plane>
+      <a-plane width="1.49" height="0.96" color="#9d5cff" material="opacity:0.36;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="LEARN" align="center" color="#9d5cff" width="4" position="0 0.15 0.01" font="mozillavr"></a-text>
+      <a-text value="Explore the technique with guided AI explanations" align="center" color="#c8d8ff" width="3" wrap-count="24" position="0 -0.10 0.01" opacity="0.75" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-work" class="clickable" position="1.65 1.1 -2.7" animation__hover="property:position;to:1.65 1.2 -2.7;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:1.65 1.1 -2.7;startEvents:mouseleave;dur:180">
+      <a-plane width="1.45" height="0.92" color="#301820" material="opacity:0.94;shader:flat;side:double"></a-plane>
+      <a-plane width="1.49" height="0.96" color="#ff5ca0" material="opacity:0.36;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="WORK TOGETHER" align="center" color="#ff5ca0" width="4" position="0 0.15 0.01" font="mozillavr"></a-text>
+      <a-text value="Collaborate with the AI coach step-by-step" align="center" color="#c8d8ff" width="3" wrap-count="24" position="0 -0.10 0.01" opacity="0.75" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="mode-back-btn" class="clickable" position="0 -0.62 -2.4">
+      <a-plane width="0.9" height="0.26" color="#111830" material="opacity:0.88;shader:flat"></a-plane>
+      <a-plane width="0.94" height="0.30" color="#58a6ff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="BACK" align="center" color="#58a6ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+  </a-entity>
 
-    <a-sky color="#030712"></a-sky>
-    <a-entity id="stars-1" particle-system="preset: stars; particleCount: 500" position="0 0 0"></a-entity>
+  <!-- SCREEN: INTERVENTIONS -->
+  <a-entity id="screen-interventions" visible="false">
+    <a-text value="INTERVENTIONS" position="0 2.45 -2.8" align="center" color="#e8eeff" width="6" font="exo2bold"></a-text>
+    <a-text value="Choose the retention conversation you want to practice" position="0 2.15 -2.8" align="center" color="#c8d8ff" width="4.5" opacity="0.7" font="mozillavr"></a-text>
+    <a-entity id="btn-pulse-check" position="-1.5 1.45 -2.6" class="clickable" animation__hover="property:position;to:-1.5 1.55 -2.6;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:-1.5 1.45 -2.6;startEvents:mouseleave;dur:180">
+      <a-plane width="1.45" height="0.82" color="#102840" material="opacity:0.94;shader:flat;side:double"></a-plane>
+      <a-plane width="1.49" height="0.86" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="PULSE CHECK" align="center" color="#00e5c0" width="4" position="0 0.12 0.01" font="mozillavr"></a-text>
+      <a-text value="First emotional check-in" align="center" color="#c8d8ff" width="3" position="0 -0.08 0.01" opacity="0.7" font="mozillavr"></a-text>
+      <a-text value="Day 30" align="center" color="#ffffff" width="2" position="0 -0.28 0.01" opacity="0.5" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-anchoring" position="1.5 1.45 -2.6" class="clickable" animation__hover="property:position;to:1.5 1.55 -2.6;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:1.5 1.45 -2.6;startEvents:mouseleave;dur:180">
+      <a-plane width="1.45" height="0.82" color="#1b1235" material="opacity:0.94;shader:flat;side:double"></a-plane>
+      <a-plane width="1.49" height="0.86" color="#9d5cff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="ANCHORING" align="center" color="#9d5cff" width="4" position="0 0.12 0.01" font="mozillavr"></a-text>
+      <a-text value="Build belonging and commitment" align="center" color="#c8d8ff" width="3" position="0 -0.08 0.01" opacity="0.7" font="mozillavr"></a-text>
+      <a-text value="Day 100" align="center" color="#ffffff" width="2" position="0 -0.28 0.01" opacity="0.5" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-stay" position="-1.5 0.38 -2.6" class="clickable" animation__hover="property:position;to:-1.5 0.48 -2.6;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:-1.5 0.38 -2.6;startEvents:mouseleave;dur:180">
+      <a-plane width="1.45" height="0.82" color="#2a1b10" material="opacity:0.94;shader:flat;side:double"></a-plane>
+      <a-plane width="1.49" height="0.86" color="#ffb347" material="opacity:0.35;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="STAY INTERVIEW" align="center" color="#ffb347" width="4" position="0 0.12 0.01" font="mozillavr"></a-text>
+      <a-text value="Why do they stay?" align="center" color="#c8d8ff" width="3" position="0 -0.08 0.01" opacity="0.7" font="mozillavr"></a-text>
+      <a-text value="Day 121" align="center" color="#ffffff" width="2" position="0 -0.28 0.01" opacity="0.5" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-tenure" position="1.5 0.38 -2.6" class="clickable" animation__hover="property:position;to:1.5 0.48 -2.6;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:1.5 0.38 -2.6;startEvents:mouseleave;dur:180">
+      <a-plane width="1.45" height="0.82" color="#301018" material="opacity:0.94;shader:flat;side:double"></a-plane>
+      <a-plane width="1.49" height="0.86" color="#ff5ca0" material="opacity:0.35;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="TENURE RENEWAL" align="center" color="#ff5ca0" width="4" position="0 0.12 0.01" font="mozillavr"></a-text>
+      <a-text value="Celebrate long-term growth" align="center" color="#c8d8ff" width="3" position="0 -0.08 0.01" opacity="0.7" font="mozillavr"></a-text>
+      <a-text value="Day 365" align="center" color="#ffffff" width="2" position="0 -0.28 0.01" opacity="0.5" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-interventions-back" position="0 -0.45 -2.4" class="clickable">
+      <a-plane width="0.8" height="0.24" color="#111830" material="opacity:0.85;shader:flat;side:double"></a-plane>
+      <a-plane width="0.84" height="0.28" color="#4466ff" material="opacity:0.28;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="BACK" align="center" color="#4466ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+  </a-entity>
+
+  <!-- SCREEN: TECHNIQUES -->
+  <a-entity id="screen-technique-list" visible="false">
+
+  <a-text value="TECHNIQUES"
+          position="0 2.5 -2.8"
+          align="center"
+          color="#e8eeff"
+          width="6"
+          font="exo2bold">
+  </a-text>
+
+  <a-text value="Choose a technique to practice"
+          position="0 2.18 -2.8"
+          align="center"
+          color="#c8d8ff"
+          width="4.5"
+          opacity="0.7"
+          font="mozillavr">
+  </a-text>
+
+  <!-- ACTIVE LISTENING -->
+
+  <!-- ACTIVE LISTENING -->
+<!-- ================= FILA 1 ================= -->
+
+<!-- ACTIVE LISTENING -->
+  <!-- ACTIVE LISTENING (Modificado con el componente) -->
+<a-entity id="btn-practice" position="-2.7 2.3 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="ACTIVE LISTENING" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="La tecnica que hace funcionar a todas las demas" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- POWERFUL QUESTIONS -->
+<a-entity id="btn-powerful-questions" position="-0.9 2.3 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="POWERFUL QUESTIONS" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Preguntas que abren posibilidades" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- MOTIVATIONAL INTERVIEWING -->
+<a-entity id="btn-motivational-interviewing" position="0.9 2.3 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="MOTIVATIONAL INTERVIEWING" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Elicita motivacion interna" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- NONVIOLENT COMMUNICATION -->
+<a-entity id="btn-nonviolent-communication" position="2.7 2.3 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="NONVIOLENT COMMUNICATION" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Observacion Sentimiento Necesidad Peticion" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+
+<!-- ================= FILA 2 ================= -->
+
+<!-- RADICAL CANDOR -->
+<a-entity id="btn-radical-candor" position="-2.7 1.5 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="RADICAL CANDOR" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Care personally Challenge directly" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- CRUCIAL CONVERSATIONS -->
+<a-entity id="btn-crucial-conversations" position="-0.9 1.5 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="CRUCIAL CONVERSATIONS" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Alto riesgo emociones fuertes" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- TACTICAL EMPATHY -->
+<a-entity id="btn-tactical-empathy" position="0.9 1.5 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="TACTICAL EMPATHY" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Etiqueta emociones espeja pregunta" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- SCARF MODEL -->
+<a-entity id="btn-scarf-model" position="2.7 1.5 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="SCARF MODEL" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Status Certainty Autonomy Relatedness" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+
+<!-- ================= FILA 3 ================= -->
+
+<!-- IMMUNITY TO CHANGE -->
+<a-entity id="btn-immunity-to-change" position="-2.7 0.7 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="IMMUNITY TO CHANGE" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Compromisos ocultos que bloquean" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- DRAMA TRIANGLE -->
+<a-entity id="btn-drama-triangle" position="-0.9 0.7 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="DRAMA TRIANGLE" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Victima Rescatador Perseguidor" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- GROW MODEL -->
+<a-entity id="btn-grow-model" position="0.9 0.7 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="GROW MODEL" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Goal Reality Options Will" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- STRENGTHS-BASED COACHING -->
+<a-entity id="btn-strengths-based-coaching" position="2.7 0.7 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="STRENGTHS-BASED" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Construye desde lo que funciona" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+
+<!-- ================= FILA 4 (Centrada) ================= -->
+
+<!-- GROWTH MINDSET -->
+<a-entity id="btn-growth-mindset" position="-0.9 -0.1 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="GROWTH MINDSET" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="De fijo a fluido la habilidad" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- SOLUTION-FOCUSED COACHING -->
+<a-entity id="btn-solution-focused-coaching" position="0.9 -0.1 -2.8" class="clickable">
+  <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="SOLUTION-FOCUSED" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Que ya esta funcionando Haz mas" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+  <!-- BACK -->
+
+  <a-entity id="btn-tech-list-back"
+            position="0 -0.7 -2.4"
+            class="clickable">
+
+    <a-plane width="0.82"
+             height="0.24"
+             color="#111830"
+             material="opacity:0.85;shader:flat">
+    </a-plane>
+
+    <a-plane width="0.86"
+             height="0.28"
+             color="#4466ff"
+             material="opacity:0.3;transparent:true;shader:flat"
+             position="0 0 -0.005">
+    </a-plane>
+
+    <a-text value="BACK"
+            align="center"
+            color="#4466ff"
+            width="3"
+            position="0 0 0.01"
+            font="mozillavr">
+    </a-text>
+
+  </a-entity>
+
+</a-entity>
+  <a-entity id="screen-techniques" visible="false">
+    <a-text value="TECHNIQUES" position="0 2.5 -2.8" align="center" color="#e8eeff" width="6" font="exo2bold"></a-text>
+    <a-text value="Communication and leadership tools" position="0 2.18 -2.8" align="center" color="#c8d8ff" width="4.5" opacity="0.7" font="mozillavr"></a-text>
+    <a-entity id="btn-tech-active-listening" position="-2.2 1.45 -2.8" class="clickable" animation__hover="property:position;to:-2.2 1.53 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:-2.2 1.45 -2.8;startEvents:mouseleave;dur:180">
+      <a-plane width="1.15" height="0.58" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+      <a-plane width="1.18" height="0.61" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="ACTIVE LISTENING" align="center" color="#e8eeff" width="2.5" wrap-count="18" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-tech-empathy" position="0 1.45 -2.8" class="clickable" animation__hover="property:position;to:0 1.53 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:0 1.45 -2.8;startEvents:mouseleave;dur:180">
+      <a-plane width="1.15" height="0.58" color="#2a1840" material="opacity:0.93;shader:flat"></a-plane>
+      <a-plane width="1.18" height="0.61" color="#9d5cff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="EMPATHY" align="center" color="#e8eeff" width="2.5" wrap-count="18" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-tech-feedback" position="2.2 1.45 -2.8" class="clickable" animation__hover="property:position;to:2.2 1.53 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:2.2 1.45 -2.8;startEvents:mouseleave;dur:180">
+      <a-plane width="1.15" height="0.58" color="#3a2212" material="opacity:0.93;shader:flat"></a-plane>
+      <a-plane width="1.18" height="0.61" color="#ffb347" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="FEEDBACK" align="center" color="#e8eeff" width="2.5" wrap-count="18" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-tech-coaching" position="-2.2 0.55 -2.8" class="clickable" animation__hover="property:position;to:-2.2 0.63 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:-2.2 0.55 -2.8;startEvents:mouseleave;dur:180">
+      <a-plane width="1.15" height="0.58" color="#103020" material="opacity:0.93;shader:flat"></a-plane>
+      <a-plane width="1.18" height="0.61" color="#4dff88" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="COACHING" align="center" color="#e8eeff" width="2.5" wrap-count="18" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-tech-trust" position="0 0.55 -2.8" class="clickable" animation__hover="property:position;to:0 0.63 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:0 0.55 -2.8;startEvents:mouseleave;dur:180">
+      <a-plane width="1.15" height="0.58" color="#132840" material="opacity:0.93;shader:flat"></a-plane>
+      <a-plane width="1.18" height="0.61" color="#58a6ff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="TRUST" align="center" color="#e8eeff" width="2.5" wrap-count="18" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-tech-motivation" position="2.2 0.55 -2.8" class="clickable" animation__hover="property:position;to:2.2 0.63 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:2.2 0.55 -2.8;startEvents:mouseleave;dur:180">
+      <a-plane width="1.15" height="0.58" color="#341020" material="opacity:0.93;shader:flat"></a-plane>
+      <a-plane width="1.18" height="0.61" color="#ff5ca0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="MOTIVATION" align="center" color="#e8eeff" width="2.5" wrap-count="18" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity position="0 -0.2 -2.5">
+      <a-plane width="3" height="0.32" color="#101830" material="opacity:0.84;shader:flat"></a-plane>
+      <a-text value="Select a communication technique to train in VR" align="center" color="#c8d8ff" width="4" position="0 0 0.01" opacity="0.7" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="btn-techniques-back" position="0 -0.72 -2.4" class="clickable">
+      <a-plane width="0.82" height="0.24" color="#111830" material="opacity:0.85;shader:flat"></a-plane>
+      <a-plane width="0.86" height="0.28" color="#4466ff" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="BACK" align="center" color="#4466ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+  </a-entity>
+
+  <!-- SCREEN: PRACTICE -->
+  <a-entity id="screen-practice" visible="false">
+    <a-entity id="agent-entity" position="0 0 -2.5">
+      <a-image id="agent-img" src="#ajolin-neutral" width="1.5" height="1.5" position="0 0.75 0" look-at="[camera]" animation="property:position;to:0 0.85 0;loop:true;dur:3000;dir:alternate;easing:easeInOutSine"></a-image>
+      <a-circle position="0 0.06 0" radius="1.0" rotation="-90 0 0" id="agent-halo" color="#9d5cff" material="opacity:0.06;transparent:true;shader:flat"></a-circle>
+      <a-torus position="0 0.06 0" id="agent-ring" radius="1.05" radius-tubular="0.015" rotation="-90 0 0" color="#9d5cff" material="opacity:0.3;transparent:true;shader:flat" animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:7000;easing:linear"></a-torus>
+      <a-text id="agent-name" value="Carlos Mendoza" position="0 1.65 0" align="center" color="#c8d8ff" width="3.5" font="mozillavr"></a-text>
+      <a-text id="agent-role" value="Agente 2 anos" position="0 1.45 0" align="center" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="dialog-panel" position="0 2.35 -2.5" visible="false">
+      <a-plane width="3.2" height="0.85" color="#080e2a" material="opacity:0.95;shader:flat;side:double"></a-plane>
+      <a-plane width="3.24" height="0.89" id="dialog-border" color="#9d5cff" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
+      <a-text id="dialog-speaker" value="CARLOS" position="-1.45 0.28 0.01" align="left" color="#9d5cff" width="2.5" font="mozillavr"></a-text>
+      <a-text id="dialog-text" value="..." position="0 0 0.01" align="center" color="#e8eeff" width="5.5" wrap-count="55" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity position="2.4 1.6 -2.2" rotation="0 -25 0">
+      <a-plane width="0.9" height="0.65" color="#080e2a" material="opacity:0.88;shader:flat;side:double"></a-plane>
+      <a-plane width="0.92" height="0.67" color="#2a3a7a" material="opacity:0.5;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="OPENNESS" position="0 0.22 0.01" align="center" color="#c8d8ff" width="2.2" opacity="0.6" font="mozillavr"></a-text>
+      <a-plane width="0.7" height="0.07" color="#0d1530" material="shader:flat" position="0 0.02 0.01"></a-plane>
+      <a-plane id="mood-fill" width="0.21" height="0.07" color="#ff5ca0" material="shader:flat" position="-0.245 0.02 0.015"></a-plane>
+      <a-text id="mood-pct" value="30%" position="0 -0.16 0.01" align="center" color="#c8d8ff" width="1.8" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="vr-voice-bar" position="0 0.45 -2.2" visible="false">
+      <a-plane width="2.2" height="0.22" color="#080e2a" material="opacity:0.9;shader:flat;side:double"></a-plane>
+      <a-circle id="vr-voice-dot" radius="0.07" color="#1a2a6a" material="shader:flat" position="-0.9 0 0.01"></a-circle>
+      <a-text id="vr-voice-label" value="Listo Trigger para hablar" color="#c8d8ff" align="left" width="3.5" position="-0.75 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity position="-2.5 2.0 -2.0" rotation="0 30 0">
+      <a-plane id="btn-end-practice" width="0.8" height="0.24" color="#1a0a20" material="opacity:0.85;shader:flat;side:double" class="clickable">
+        <a-plane width="0.82" height="0.26" color="#ff5ca0" material="opacity:0.35;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="Terminar" color="#ff5ca0" align="center" width="3" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+  </a-entity>
+
+  <!-- SCREEN: EVAL -->
+  <a-entity id="screen-eval" visible="false">
+    <a-entity position="-1.4 0 -2.5">
+      <a-image id="juan-eval-img" src="#juan-talking" width="1.2" height="1.2" position="0 0.6 0" look-at="[camera]" animation="property:position;to:0 0.7 0;loop:true;dur:3000;dir:alternate;easing:easeInOutSine"></a-image>
+      <a-torus position="0 0.06 0" radius="0.75" radius-tubular="0.012" rotation="-90 0 0" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:8000;easing:linear"></a-torus>
+    </a-entity>
+    <a-entity position="0.8 1.5 -2.5">
+      <a-plane width="2.8" height="2.2" color="#080e2a" material="opacity:0.96;shader:flat;side:double"></a-plane>
+      <a-plane width="2.84" height="2.24" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="SESION COMPLETADA" position="0 0.95 0.01" align="center" color="#00e5c0" width="4.5" font="mozillavr"></a-text>
+      <a-text value="Openness final:" position="-1.25 0.65 0.01" align="left" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr"></a-text>
+      <a-text id="eval-mood" value="--%"  position="1.1 0.65 0.01" align="right" color="#00e5c0" width="2" font="mozillavr"></a-text>
+      <a-plane width="2.4" height="0.004" color="#2a3a7a" material="shader:flat" position="0 0.48 0.01"></a-plane>
+      <a-text id="eval-feedback" value="Analizando conversacion..." position="0 0.1 0.01" align="center" color="#e8eeff" width="4.8" wrap-count="50" font="mozillavr"></a-text>
+      <a-plane id="btn-new-session" width="1.1" height="0.22" color="#0d2060" material="opacity:0.9;shader:flat;side:double" position="-0.65 -0.88 0.01" class="clickable">
+        <a-plane width="1.12" height="0.24" color="#4466ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="Nueva sesion" color="#4466ff" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+      <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
+        <a-plane width="1.12" height="0.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="Practicar de nuevo" color="#00e5c0" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+  </a-entity>
+
+  <a-camera id="main-camera" position="0 1.6 0" look-controls wasd-controls="enabled:false">
+    <a-entity geometry="primitive:ring;radiusInner:0.007;radiusOuter:0.012" material="color:#00e5c0;shader:flat;opacity:0.85" position="0 0 -1.0"></a-entity>
+    <a-cursor id="vr-cursor" raycaster="objects:.clickable;far:6" fuse="false" color="#00e5c0" opacity="0" position="0 0 -1.0" geometry="primitive:ring;radiusInner:0.009;radiusOuter:0.014" material="color:#00e5c0;shader:flat;opacity:0"></a-cursor>
+  </a-camera>
+</a-scene>
+
+<script>
+const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
+const SUPA_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
+
+let appState = {screen:'welcome',activeMenu:null,currentArchetype:null,currentScenario:null,currentLevel:'novice',agentHistory:[],vrMood:30,boxState:'out',conversationClosed:false,hingesOpened:[]};
+let isRecording=false,isProcessing=false,mediaRecorder=null,audioChunks=[],audioStream=null,audioContext=null,analyser=null,silenceTimer=null;
+const SILENCE_THRESHOLD=38,SILENCE_DURATION=1900;
+
+function setHUD(state,label){
+  var dot=document.getElementById('voice-dot'),lbl=document.getElementById('voice-label');
+  if(dot){dot.className='';dot.classList.add(state);}
+  if(lbl)lbl.textContent=label;
+  var vDot=document.getElementById('vr-voice-dot'),vLbl=document.getElementById('vr-voice-label'),vBar=document.getElementById('vr-voice-bar');
+  var colors={idle:'#1a2a6a',ready:'#00e5c0',rec:'#ff5ca0',thinking:'#9d5cff'};
+  if(vDot)vDot.setAttribute('color',colors[state]||'#1a2a6a');
+  if(vLbl)vLbl.setAttribute('text','value',label);
+  if(vBar)vBar.setAttribute('visible',state!=='idle');
+}
+
+function pickRandomArchetype(){
+  var ids=Object.keys(ARCHETYPES).filter(function(id){return ARCHETYPES[id].available;});
+  return ARCHETYPES[ids[Math.floor(Math.random()*ids.length)]];
+}
+
+function pickRandomScenario(archetype,level){
+  var pool=archetype.briefings[level]||archetype.briefings['novice']||[];
+  if(!pool.length)return null;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function pickRandomOpener(archetype,scenario){
+  var state=(scenario&&(scenario.carlosState||scenario.agentState))||'guarded-tired';
+  if(archetype.openers&&archetype.openers[state])return archetype.openers[state];
+  var vals=Object.values(archetype.openers||{});
+  return vals[Math.floor(Math.random()*vals.length)]||'...';
+}
+
+function showScreen(name){
+  ['welcome','mode','practice','eval','technique-list'].forEach(function(s){
+    var el=document.getElementById('screen-'+s);
+    if(el)el.setAttribute('visible',s===name);
+  });
+  appState.screen=name;
+}
+
+function goWelcome(){showScreen('welcome');appState.agentHistory=[];appState.vrMood=30;}
+
+function goMode(menuType){
+  appState.activeMenu=menuType;
+  if(menuType==='interventions')appState.currentIntervention=(typeof interventions!=='undefined'&&interventions[0])||null;
+  if(menuType==='techniques')appState.currentTechnique=(typeof techniques!=='undefined'&&techniques[0])||null;
+  if(typeof updateModeScreen==='function')updateModeScreen();
+  showScreen('mode');
+}
+
+function goLearn(){
+  appState.agentHistory=[];
+  var intro=appState.activeMenu==='interventions'
+    ?'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?'
+    :'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
+  showScreen('practice');
+  setJuanMood('happy');
+  setDialog('JUANJOLOTE',intro);
+  speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
+  appState.agentHistory.push({role:'assistant',content:intro});
+    console.log("dio click al goLearn")
+
+}
+
+function goWork(){
+  appState.agentHistory=[];
+  var intro='Cuentame, que situacion tienes con un agente ahora mismo?';
+  showScreen('practice');
+  setJuanMood('talking');
+  setDialog('JUANJOLOTE',intro);
+  speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
+  appState.agentHistory.push({role:'assistant',content:intro});
+    console.log("dio click al gowork")
+
+}
+
+function goPractice(){
+  var arch=pickRandomArchetype();
+  var scenario=pickRandomScenario(arch,appState.currentLevel);
+  appState.currentArchetype=arch;
+  appState.currentScenario=scenario;
+  appState.agentHistory=[];
+  appState.vrMood=(scenario&&scenario.startMood)||30;
+  appState.hingesOpened=[];
+  appState.conversationClosed=false;
+  if(typeof currentArchetype!=='undefined')currentArchetype=arch;
+  updateAgentAvatar(arch);
+  updateVRMood(appState.vrMood);
+  var opener=pickRandomOpener(arch,scenario);
+  appState.agentHistory.push({role:'assistant',content:opener});
+  showScreen('practice');
+  setDialog(arch.name.toUpperCase(),opener);
+  speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});
+  console.log("dio click al goPractice")
+}
+
+  function go14button(){
+  console.log("Entro a go14Butones");
+    showScreen('technique-list');
+  }
+
+function updateAgentAvatar(arch){
+  var nameEl=document.getElementById('agent-name'),roleEl=document.getElementById('agent-role');
+  var imgEl=document.getElementById('agent-img'),halo=document.getElementById('agent-halo'),ring=document.getElementById('agent-ring');
+  if(nameEl)nameEl.setAttribute('text','value',arch.name);
+  if(roleEl)roleEl.setAttribute('text','value',arch.role);
+  var colors={carlos:'#ff5ca0',valeria:'#9d5cff',miguel:'#00e5c0',sandra:'#f5a623'};
+  var col=colors[arch.id]||'#9d5cff';
+  if(halo)halo.setAttribute('color',col);
+  if(ring)ring.setAttribute('color',col);
+  if(imgEl)imgEl.setAttribute('src','#ajolin-neutral');
+}
+
+function setDialog(speaker,text){
+  var panel=document.getElementById('dialog-panel');
+  if(panel)panel.setAttribute('visible',true);
+  var sp=document.getElementById('dialog-speaker'),tx=document.getElementById('dialog-text');
+  if(sp)sp.setAttribute('text','value',speaker);
+  if(tx)tx.setAttribute('text','value',text);
+}
+
+function setJuanMood(mood){
+  var map={neutral:'#juan-neutral',happy:'#juan-happy',talking:'#juan-talking',sad:'#juan-sad'};
+  var el=document.getElementById('juan-img')||document.getElementById('juan-eval-img');
+  if(el)el.setAttribute('src',map[mood]||'#juan-neutral');
+}
+
+function setAjolinMood(mood){
+  var map={neutral:'#ajolin-neutral',happy:'#ajolin-happy',talking:'#ajolin-talking',sad:'#ajolin-sad',surprised:'#ajolin-surprised'};
+  var el=document.getElementById('agent-img');
+  if(el)el.setAttribute('src',map[mood]||'#ajolin-neutral');
+}
+
+function updateVRMood(val){
+  appState.vrMood=Math.max(0,Math.min(100,val));
+  var pct=appState.vrMood/100;
+  var color=appState.vrMood<35?'#ff5ca0':appState.vrMood<60?'#f5a623':'#00e5c0';
+  var w=0.07+pct*0.63,x=-0.315+pct*0.315;
+  var fill=document.getElementById('mood-fill'),pctEl=document.getElementById('mood-pct');
+  if(fill){fill.setAttribute('color',color);fill.setAttribute('width',w);fill.setAttribute('position',x+' 0.02 0.015');}
+  if(pctEl)pctEl.setAttribute('text','value',appState.vrMood+'%');
+}
+
+async function callGroqLLM(mode){
+  var systemPrompt='';
+  if(mode==='practice'){
+    systemPrompt=PROMPTS.avatar(appState.currentLevel);
+  } else if(mode==='learn'){
+    systemPrompt='Eres Juanjolote, coach de liderazgo calido y directo en Centris Neural Academy. Estas ensenando sobre '+(appState.activeMenu==='interventions'?'intervenciones de retencion':'tecnicas de comunicacion')+'. Habla en espanol. Conversacional, maximo 3 oraciones. Haz preguntas. Nunca des conferencias. Conecta todo a situaciones reales de call center.';
+  } else if(mode==='work'){
+    systemPrompt='Eres Juanjolote, coach socratico en Centris Neural Academy. Tu rol es hacer preguntas que ayuden al manager a descubrir sus propios insights. NUNCA des consejos directos. Haz UNA pregunta a la vez. Maximo 2 oraciones. Habla en espanol. Se calido pero directo.';
+  }
+  var res=await fetch('/api/groq',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemPrompt},...appState.agentHistory.slice(-12)],max_tokens:150,temperature:0.88})});
+  var data=await res.json();
+  return (data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'...';
+}
+
+function parseAgentReply(raw){
+  var moodMatch=raw.match(/\[MOOD:(\d+)\]/),boxMatch=raw.match(/\[BOX:(in|out)\]/);
+  var msg=raw.replace(/\[MOOD:\d+\]/g,'').replace(/\[BOX:(in|out)\]/g,'').replace(/\[TRIGGER:\w+\]/g,'').replace(/\[CLOSED:(true|false)\]/g,'').trim();
+  return {msg:msg,newMood:moodMatch?parseInt(moodMatch[1]):appState.vrMood,boxState:boxMatch?boxMatch[1]:appState.boxState};
+}
+
+async function handleVRSpeech(text) {
+  if (!text.trim()) return;
+  var mode = appState.currentArchetype ? 'practice' : 'learn';
+  appState.agentHistory.push({ role: 'user', content: text });
+  
+  try {
+    var reply = await callGroqLLM(mode === 'practice' ? 'practice' : appState.activeMenu ? 'learn' : 'work');
+    var parsed = mode === 'practice' ? parseAgentReply(reply) : { msg: reply, newMood: appState.vrMood, boxState: 'out' };
+    appState.agentHistory.push({ role: 'assistant', content: reply });
     
-    <a-light type="ambient" color="#334155" intensity="0.6"></a-light>
-    <a-light type="directional" color="#ffffff" intensity="0.8" position="5 10 3"></a-light>
-    <a-light type="point" color="#00e5c0" intensity="0.4" position="0 2 -2"></a-light>
-
-    <a-grid static-body geometry="primitive: plane; width: 100; height: 100" 
-            material="color: #0f172a; opacity: 0.8; src: url(https://cdn.aframe.io/a-grid/grid_dark.png); repeat: 50 50" 
-            rotation="-90 0 0" position="0 0 0"></a-grid>
-
-    <a-entity id="cameraRig" position="0 0 0">
-      <a-entity id="head" camera look-controls position="0 1.6 0">
-        <a-cursor id="main-cursor"
-                  raycaster="objects: .clickable"
-                  material="color: #00e5c0; shader: flat; opacity: 0.8"
-                  geometry="primitive: ring; radiusInner: 0.015; radiusOuter: 0.025"
-                  position="0 0 -1"
-                  animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 150; from: 0.1 0.1 0.1; to: 1 1 1"
-                  animation__fusing="property: scale; startEvents: fusing; easing: easeInCubic; dur: 1500; from: 1 1 1; to: 0.1 0.1 0.1"
-                  animation__mouseleave="property: scale; startEvents: mouseleave; easing: easeInCubic; dur: 500; to: 1 1 1">
-        </a-cursor>
-      </a-entity>
-      <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 10"></a-entity>
-      <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 10"></a-entity>
-    </a-entity>
-
-    <a-entity id="juanjolote" position="0 1.2 -4.5" rotation="0 0 0">
-      <a-cone radius-bottom="0.25" radius-top="0.05" height="1.2" color="#1e293b" material="wireframe: false; opacity:0.9"></a-cone>
-      <a-box id="juan-head" width="0.5" height="0.4" depth="0.4" position="0 0.7 0" color="#f472b6">
-        <a-sphere radius="0.04" color="#000" position="-0.15 0.05 0.21"></a-sphere>
-        <a-sphere radius="0.04" color="#000" position="0.15 0.05 0.21"></a-sphere>
-        <a-sphere radius="0.015" color="#fff" position="-0.16 0.07 0.23"></a-sphere>
-        <a-sphere radius="0.015" color="#fff" position="0.14 0.07 0.23"></a-sphere>
-        <a-box width="0.15" height="0.05" depth="0.05" position="-0.3 0.1 0" color="#ec4899" rotation="0 0 20"></a-box>
-        <a-box width="0.18" height="0.05" depth="0.05" position="-0.32 0 0" color="#ec4899" rotation="0 0 0"></a-box>
-        <a-box width="0.15" height="0.05" depth="0.05" position="-0.3 -0.1 0" color="#ec4899" rotation="0 0 -20"></a-box>
-        <a-box width="0.15" height="0.05" depth="0.05" position="0.3 0.1 0" color="#ec4899" rotation="0 0 -20"></a-box>
-        <a-box width="0.18" height="0.05" depth="0.05" position="0.32 0 0" color="#ec4899" rotation="0 0 0"></a-box>
-        <a-box width="0.15" height="0.05" depth="0.05" position="0.3 -0.1 0" color="#ec4899" rotation="0 0 20"></a-box>
-        <a-entity id="juan-mouth" geometry="primitive: torus; radius: 0.04; radiusTubular: 0.01; arc: 180" material="color: #451a03" position="0 -0.1 0.21" rotation="0 0 180"></a-entity>
-      </a-box>
-      <a-ring radius-inner="0.4" radius-outer="0.45" color="#00e5c0" rotation="-90 0 0" position="0 -0.58 0" material="shader:flat; opacity:0.6"></a-ring>
-    </a-entity>
-
-
-    <a-entity id="screen-welcome" visible="true" position="0 0 0">
-      <a-text value="LEADERSHIP SIMULATOR VR" align="center" color="#ffffff" width="5" position="0 2.5 -3" font="mozillavr"></a-text>
-      <a-text value="Desarrolla tus habilidades de liderazgo en entornos seguros" align="center" color="#94a3b8" width="3" position="0 2.2 -3" font="mozillavr"></a-text>
-
-      <a-entity id="btn-interventions" position="-1 1.4 -3" class="clickable">
-        <a-plane width="1.6" height="0.8" color="#1e1b4b" material="opacity:0.9; shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.84" color="#6366f1" material="opacity:0.4; transparent:true; shader:flat" position="0 0 -0.01"></a-plane>
-        <a-text value="INTERVENCIONES" align="center" color="#ffffff" width="3.5" position="0 0.15 0.02" font="mozillavr"></a-text>
-        <a-text value="Casos operacionales y conversaciones de retencion" align="center" color="#c7d2fe" width="2.4" position="0 -0.15 0.02" wrap-count="25" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-techniques" position="1 1.4 -3" class="clickable">
-        <a-plane width="1.6" height="0.8" color="#064e3b" material="opacity:0.9; shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.84" color="#10b981" material="opacity:0.4; transparent:true; shader:flat" position="0 0 -0.01"></a-plane>
-        <a-text value="TECNICAS" align="center" color="#ffffff" width="3.5" position="0 0.15 0.02" font="mozillavr"></a-text>
-        <a-text value="Practica herramientas de comunicacion aisladas" align="center" color="#a7f3d0" width="2.4" position="0 -0.15 0.02" wrap-count="25" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-logout" position="0 0.6 -3" class="clickable">
-        <a-plane width="1" height="0.3" color="#451a03" material="opacity:0.8; shader:flat"></a-plane>
-        <a-text value="Cerrar Sesion" align="center" color="#fca5a5" width="2.5" position="0 0 0.01" font="mozillavr"></a-text>
-      </a-entity>
-    </a-entity>
-
-
-    <a-entity id="screen-technique-list" visible="false" position="0 0 0">
-      
-      <a-text value="WHICH TECHNIQUE DO YOU WANT TO DEVELOP?" align="center" color="#ffffff" width="4.5" position="0 2.9 -2.8" font="mozillavr"></a-text>
-      <a-text value="Practice the technique in any operational scenario" align="center" color="#94a3b8" width="3" position="0 2.6 -2.8" font="mozillavr"></a-text>
-
-      <a-entity id="btn-tech-list-back" position="-2.7 2.9 -2.8" class="clickable">
-        <a-plane width="0.6" height="0.25" color="#334155" material="opacity:0.9; shader:flat"></a-plane>
-        <a-text value="<- Back" align="center" color="#e2e8f0" width="2.2" position="0 0 0.01" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-active-listening" position="-2.7 2.0 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="ACTIVE LISTENING" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="La tecnica que hace funcionar a todas las demas" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-powerful-questions" position="-0.9 2.0 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="POWERFUL QUESTIONS" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="Preguntas que abren posibilidades" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-motivational-interviewing" position="0.9 2.0 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="MOTIVATIONAL INTERVIEWING" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="Elicita motivacion interna" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-nonviolent-communication" position="2.7 2.0 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="NONVIOLENT COMMUNICATION" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="Observacion Sentimiento Necesidad Peticion" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-radical-candor" position="-2.7 1.3 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="RADICAL CANDOR" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="Care personally Challenge directly" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-crucial-conversations" position="-0.9 1.3 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="CRUCIAL CONVERSATIONS" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="Alto riesgo emociones fuertes" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-tactical-empathy" position="0.9 1.3 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="TACTICAL EMPATHY" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="Etiqueta emociones espeja pregunta" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-scarf-model" position="2.7 1.3 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="SCARF MODEL" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="Status Certainty Autonomy Relatedness" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-immunity-to-change" position="-2.7 0.6 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="IMMUNITY TO CHANGE" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="Compromisos ocultos que bloquean" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-drama-triangle" position="-0.9 0.6 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="DRAMA TRIANGLE" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="Victima Rescatador Perseguidor" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-grow-model" position="0.9 0.6 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="GROW MODEL" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="Goal Reality Options Will" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-strengths-based-coaching" position="2.7 0.6 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="STRENGTHS-BASED" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="Construye desde lo que funciona" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-growth-mindset" position="-0.9 -0.1 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="GROWTH MINDSET" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="De fijo a fluido la habilidad" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-solution-focused-coaching" position="0.9 -0.1 -2.8" class="clickable">
-        <a-plane width="1.6" height="0.55" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-        <a-plane width="1.64" height="0.59" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="SOLUTION-FOCUSED" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-        <a-text value="Que ya esta funcionando Haz mas" align="center" color="#c8d8ff" width="2.4" position="0 -0.12 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-      </a-entity>
-    </a-entity>
-
-
-    <a-entity id="screen-mode" visible="false" position="0 0 0">
-      <a-text value="SELECT TRAINING MODE" align="center" color="#ffffff" width="5" position="0 2.5 -3" font="mozillavr"></a-text>
-      <a-text id="mode-subtitle" value="Ruta seleccionada" align="center" color="#38bdf8" width="3.5" position="0 2.2 -3" font="mozillavr"></a-text>
-
-      <a-entity id="mode-back-btn" position="-2 2.5 -3" class="clickable">
-        <a-plane width="0.6" height="0.25" color="#334155" material="opacity:0.9; shader:flat"></a-plane>
-        <a-text value="<- Back" align="center" color="#e2e8f0" width="2.2" position="0 0 0.01" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-practice" position="-1.2 1.3 -3" class="clickable">
-        <a-plane width="1.1" height="0.9" color="#1e293b" material="opacity:0.95; shader:flat"></a-plane>
-        <a-text value="PRACTICE" align="center" color="#38bdf8" width="3.5" position="0 0.25 0.01" font="mozillavr"></a-text>
-        <a-text value="Roleplay interactivo por voz con IA y feedback en tiempo real" align="center" color="#94a3b8" width="2.0" position="0 -0.15 0.01" wrap-count="22" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-learn" position="0 1.3 -3" class="clickable">
-        <a-plane width="1.1" height="0.9" color="#1e293b" material="opacity:0.95; shader:flat"></a-plane>
-        <a-text value="LEARN" align="center" color="#a7f3d0" width="3.5" position="0 0.25 0.01" font="mozillavr"></a-text>
-        <a-text value="Micro-learning. Fundamentos conceptuales clave" align="center" color="#94a3b8" width="2.0" position="0 -0.15 0.01" wrap-count="22" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-work" position="1.2 1.3 -3" class="clickable">
-        <a-plane width="1.1" height="0.9" color="#1e293b" material="opacity:0.95; shader:flat"></a-plane>
-        <a-text value="WORK" align="center" color="#fef08a" width="3.5" position="0 0.25 0.01" font="mozillavr"></a-text>
-        <a-text value="Crea prompts y herramientas para usar hoy con tu equipo" align="center" color="#94a3b8" width="2.0" position="0 -0.15 0.01" wrap-count="22" font="mozillavr"></a-text>
-      </a-entity>
-    </a-entity>
-
-
-    <a-entity id="screen-practice" visible="false" position="0 0 0">
-      <a-text id="practice-role" value="Cargando escenario..." align="center" color="#f472b6" width="3" position="0 2.5 -3" font="mozillavr"></a-text>
-      
-      <a-entity id="dialogue-panel" position="0 1.6 -3">
-        <a-plane width="2.8" height="1.1" color="#0f172a" material="opacity:0.9; rx:0.1; shader:flat"></a-plane>
-        <a-plane width="2.84" height="1.14" color="#f472b6" material="opacity:0.3; shader:flat" position="0 0 -0.01"></a-plane>
-        <a-text id="juan-text" value="Iniciando conversacion..." align="center" color="#f8fafc" width="2.5" position="0 0 0.02" wrap-count="28" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="mic-btn" position="0 0.7 -2.8" class="clickable">
-        <a-circle radius="0.22" color="#e11d48" material="shader:flat"></a-circle>
-        <a-circle id="mic-ring" radius="0.25" color="#fda4af" material="opacity:0.4; shader:flat" position="0 0 -0.01"></a-circle>
-        <a-text value="TALK" align="center" color="#ffffff" width="3" position="0 0 0.02" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-end-practice" position="1.6 0.7 -3" class="clickable">
-        <a-plane width="0.8" height="0.3" color="#334155" material="opacity:0.8; shader:flat"></a-plane>
-        <a-text value="Terminar" align="center" color="#f1f5f9" width="2.2" position="0 0 0.01" font="mozillavr"></a-text>
-      </a-entity>
-    </a-entity>
-
-
-    <a-entity id="screen-eval" visible="false" position="0 0 0">
-      <a-text value="EVALUACION DE DESEMPENO" align="center" color="#ffffff" width="5" position="0 2.6 -3" font="mozillavr"></a-text>
-      
-      <a-entity id="eval-panel" position="0 1.6 -3">
-        <a-plane width="3" height="1.4" color="#0f172a" material="opacity:0.95; shader:flat"></a-plane>
-        <a-plane width="3.04" height="1.44" color="#00e5c0" material="opacity:0.4; shader:flat" position="0 0 -0.01"></a-plane>
-        
-        <a-text id="eval-score" value="Score: --%" align="left" color="#38bdf8" width="3" position="-1.3 0.4 0.02" font="mozillavr"></a-text>
-        <a-text id="eval-level" value="Nivel: --" align="left" color="#a7f3d0" width="3" position="0.1 0.4 0.02" font="mozillavr"></a-text>
-        
-        <a-text id="eval-feedback" value="Analizando tu conversacion..." align="center" color="#e2e8f0" width="2.7" position="0 -0.2 0.02" wrap-count="32" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-new-session" position="-0.8 0.6 -3" class="clickable">
-        <a-plane width="1.2" height="0.3" color="#064e3b" material="opacity:0.9; shader:flat"></a-plane>
-        <a-text value="Menu Principal" align="center" color="#ffffff" width="2.5" position="0 0 0.01" font="mozillavr"></a-text>
-      </a-entity>
-
-      <a-entity id="btn-practice-again" position="0.8 0.6 -3" class="clickable">
-        <a-plane width="1.2" height="0.3" color="#1e1b4b" material="opacity:0.9; shader:flat"></a-plane>
-        <a-text value="Reintentar" align="center" color="#ffffff" width="2.5" position="0 0 0.01" font="mozillavr"></a-text>
-      </a-entity>
-    </a-entity>
-
-  </a-scene>
-
-  <script>
-    // --- ESTADO GLOBAL DE LA APLICACIÓN ---
-    var appState = {
-      screen: 'welcome',       // Pantalla activa: 'welcome','technique-list','mode','practice','eval'
-      activeMenu: 'interventions', // Opciones primarias: 'interventions' o 'techniques'
-      selectedTechnique: null, // ID de la técnica seleccionada
-      currentTechnique: null,  // Datos del set de simulación activo
-      turns: 0,
-      maxTurns: 4,
-      history: []
-    };
-
-    // Variables globales para captura de Voz
-    var recognition = null;
-    var isRecording = false;
-    var isProcessing = false;
-    var synth = window.speechSynthesis;
-
-    // --- MANEJO DE PANTALLAS ---
-    function showScreen(name) {
-      var screens = ['welcome', 'technique-list', 'mode', 'practice', 'eval'];
-      screens.forEach(function(s) {
-        var el = document.getElementById('screen-' + s);
-        if (el) {
-          el.setAttribute('visible', s === name);
-          // Mover lejos del alcance si no está visible para evitar clics fantasma
-          if (s === name) {
-            el.setAttribute('position', '0 0 0');
-          } else {
-            el.setAttribute('position', '0 -100 0');
-          }
-        }
-      });
-      appState.screen = name;
+    if (mode === 'practice') {
+      updateVRMood(parsed.newMood);
+      appState.boxState = parsed.boxState;
+      if (parsed.newMood > 60) setAjolinMood('happy');
+      else if (parsed.newMood < 30) setAjolinMood('sad');
+      else setAjolinMood('talking');
+      setDialog(appState.currentArchetype.name.toUpperCase(), parsed.msg);
+    } else {
+      setJuanMood('talking');
+      setDialog('JUANJOLOTE', parsed.msg);
     }
 
-    function goWelcome() {
-      showScreen('welcome');
-      setJuanMood('happy');
-      speakVR("Menu de inicio. Elige una opcion para comenzar.", "daniel");
-    }
-
-    function goMode(menuType) {
-      appState.activeMenu = menuType;
-      
-      // Actualizar visualmente la ruta en la pantalla de modos
-      var modeSubtitle = document.getElementById('mode-subtitle');
-      if (modeSubtitle) {
-        if (menuType === 'techniques' && appState.selectedTechnique) {
-          var cleanName = appState.selectedTechnique.toUpperCase().replace(/_/g, ' ');
-          modeSubtitle.setAttribute('text', 'value', 'Ruta: TECNICAS -> ' + cleanName);
+    speakVR(
+      parsed.msg,
+      getVoice(mode === 'practice' ? 'agent' : 'juan'),
+      function () {
+        setHUD('ready', 'Listo para hablar');
+        if (mode === 'practice') {
+          setAjolinMood('neutral');
         } else {
-          modeSubtitle.setAttribute('text', 'value', 'Ruta: INTERVENCIONES OPERATIVAS');
+          setJuanMood('neutral');
         }
       }
-      
-      showScreen('mode');
-      speakVR("Elige la modalidad: Practice para simular por voz, Learn para teoria o Work para herramientas.", "daniel");
+    );
+
+  } catch (e) {
+    console.error('[LLM]', e);
+    setHUD('ready', 'Error, intenta de nuevo');
+  }
+}
+
+
+async function goEval(){
+  showScreen('eval');
+  var evalMoodEl=document.getElementById('eval-mood');
+  if(evalMoodEl)evalMoodEl.setAttribute('text','value',appState.vrMood+'%');
+  setJuanMood('talking');
+  var evalText='Analiza esta conversacion de practica. Agente: '+((appState.currentArchetype&&appState.currentArchetype.name)||'Agente')+' ('+((appState.currentArchetype&&appState.currentArchetype.trait)||'')+'). Mood final: '+appState.vrMood+'/100. Historial: '+appState.agentHistory.length+' turnos. Da feedback en 3 puntos concretos en espanol, maximo 4 oraciones total. Se directo y especifico. No uses lenguaje generico de coaching.';
+  try{
+    var res=await fetch('/api/groq',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Eres Juanjolote, coach directo y honesto. Evalua conversaciones de practica de liderazgo. Espanol. Concreto. Sin formalidades.'},{role:'user',content:evalText},...appState.agentHistory.slice(-8)],max_tokens:200,temperature:0.7})});
+    var data=await res.json();
+    var feedback=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'Sesion completada.';
+    var feedbackEl=document.getElementById('eval-feedback');
+    if(feedbackEl)feedbackEl.setAttribute('text','value',feedback);
+speakVR(feedback,getVoice('juan'));
+  } catch(e){
+    var feedbackEl2=document.getElementById('eval-feedback');
+    if(feedbackEl2)feedbackEl2.setAttribute('text','value','Sesion completada. Buen trabajo.');
+  }
+}
+  
+    //const API_KEY = "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";
+
+async function translateToEnglish(text) {
+
+  const res = await fetch('/api/groq_speakvr', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      type: 'translate',
+      text: text
+    })
+  });
+
+  const data = await res.json();
+
+  return data.translation || text;
+}
+
+function getVoice(character) {
+
+  return {
+     juan: "daniel",
+     agent: "diana"
+  }[character] || "Fritz-PlayAI";
+}
+
+async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
+
+  // traducir
+  const englishText = await translateToEnglish(text);
+
+  console.log("Translated:", englishText);
+
+  // pedir audio
+  const speechResponse = await fetch('/api/groq_speakvr', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      type: 'speech',
+      text: englishText,
+      voice: voice
+    })
+  });
+
+  if (!speechResponse.ok) {
+
+    const err = await speechResponse.text();
+
+    console.error("TTS ERROR:", err);
+
+    return;
+  }
+
+  const blob = await speechResponse.blob();
+
+  const url = URL.createObjectURL(blob);
+
+  const audio = new Audio(url);
+
+  audio.onended = () => {
+
+    URL.revokeObjectURL(url);
+
+    if (callback) {
+      callback();
     }
+  };
 
-    // --- ACCIONES DE MODALIDAD (DESTINOS PRINCIPALES) ---
-    function goPractice() {
-      // 1. Configurar datos semilla según la selección previa
-      if (appState.activeMenu === 'techniques') {
-        var cleanTechName = (appState.selectedTechnique || "active_listening").replace(/_/g, ' ');
-        appState.currentTechnique = {
-          title: cleanTechName.toUpperCase(),
-          initial_greet: "Hola, soy tu colaborador. Hagamos una simulacion enfocada en la tecnica de " + cleanTechName + ". ¿Como quieres empezar?",
-          character: "Colaborador Practicante"
-        };
-      } else {
-        appState.currentTechnique = {
-          title: "INTERVENCION OPERATIVA",
-          initial_greet: "Buenas tardes jefe. Tenemos un problema en la linea de operaciones y ocupo su guia. ¿Que hacemos?",
-          character: "Supervisor de Linea"
-        };
+  await audio.play();
+}
+  
+async function setupMic(){
+  try{
+    audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+    audioContext=new (window.AudioContext||window.webkitAudioContext)();
+    analyser=audioContext.createAnalyser();
+    analyser.fftSize=2048;
+    audioContext.createMediaStreamSource(audioStream).connect(analyser);
+    setHUD('ready','Listo para hablar');
+  } catch(e){
+    setHUD('idle','Sin microfono - modo texto');
+    console.error('[Mic]',e);
+  }
+}
+
+function startRecording(){
+  if(isRecording||isProcessing||!audioStream)return;
+  audioChunks=[];isRecording=true;
+  var mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
+  mediaRecorder=new MediaRecorder(audioStream,{mimeType:mime});
+  mediaRecorder.ondataavailable=function(e){if(e.data.size>0)audioChunks.push(e.data);};
+  mediaRecorder.onstop=onRecordingStop;
+  mediaRecorder.start();
+  setHUD('rec','Grabando...');
+  var btn=document.getElementById('mic-btn');if(btn)btn.classList.add('recording');
+  startSilenceDetection();
+  setTimeout(function(){if(isRecording)stopRecording();},25000);
+}
+
+function stopRecording(){
+  if(!isRecording||!mediaRecorder)return;
+  isRecording=false;
+  if(silenceTimer){cancelAnimationFrame(silenceTimer);silenceTimer=null;}
+  mediaRecorder.stop();
+  var btn=document.getElementById('mic-btn');if(btn)btn.classList.remove('recording');
+  setHUD('thinking','Procesando...');
+}
+
+function startSilenceDetection(){
+  var data=new Uint8Array(analyser.frequencyBinCount),silenceMs=0,lastTime=performance.now();
+  function check(){
+    if(!isRecording)return;
+    analyser.getByteFrequencyData(data);
+    var avg=data.reduce(function(a,b){return a+b;},0)/data.length;
+    var now=performance.now(),dt=now-lastTime;lastTime=now;
+    if(avg<SILENCE_THRESHOLD){silenceMs+=dt;if(silenceMs>=SILENCE_DURATION){stopRecording();return;}}
+    else silenceMs=0;
+    silenceTimer=requestAnimationFrame(check);
+  }
+  check();
+}
+
+async function onRecordingStop(){
+  var blob=new Blob(audioChunks,{type:'audio/webm'});
+  if(blob.size<800){setHUD('ready','No te escuche, intenta de nuevo');return;}
+  isProcessing=true;
+  try{
+    var text=await transcribeAudio(blob);
+    if(!text||text.trim().length<2){setHUD('ready','No entendi, intenta de nuevo');isProcessing=false;return;}
+    console.log('[Whisper]',text);
+    if(appState.screen==='practice')setDialog('TU',text);
+    setHUD('thinking','Pensando...');
+    await handleVRSpeech(text);
+  } catch(e){
+    console.error('[Voice]',e);
+    setHUD('ready','Error, intenta de nuevo');
+  } finally {isProcessing=false;}
+}
+
+async function transcribeAudio(blob){
+  var form=new FormData();
+  form.append('file',blob,'rec.webm');
+  form.append('model','whisper-large-v3-turbo');
+  form.append('language','es');
+  form.append('response_format','json');
+  var res=await fetch('/api/groq-whisper',{method:'POST',body:form});
+  var data=await res.json();
+  return data.text||'';
+}
+
+function setupControllers(){
+  var scene=document.querySelector('a-scene');
+  var rc=document.createElement('a-entity');
+  rc.setAttribute('oculus-touch-controls','hand:right');
+  rc.setAttribute('raycaster','objects:.clickable;far:6;showLine:true;lineColor:#00e5c0;lineOpacity:0.7');
+  scene.appendChild(rc);
+  var lc=document.createElement('a-entity');
+  lc.setAttribute('oculus-touch-controls','hand:left');
+  lc.setAttribute('raycaster','objects:.clickable;far:6;showLine:true;lineColor:#9d5cff;lineOpacity:0.5');
+  scene.appendChild(lc);
+  [rc,lc].forEach(function(ctrl){
+    ctrl.addEventListener('triggerdown',function(){
+      var hit=ctrl.components&&ctrl.components.raycaster&&ctrl.components.raycaster.intersectedEls&&ctrl.components.raycaster.intersectedEls[0];
+      if(hit){hit.click();return;}
+      if(appState.screen==='practice'){
+        if(!isRecording&&!isProcessing)startRecording();
+        else if(isRecording)stopRecording();
       }
-
-      // 2. Resetear contadores de simulación
-      appState.turns = 0;
-      appState.history = [];
-      
-      // 3. Renderizar textos en pantalla
-      var roleText = document.getElementById('practice-role');
-      if (roleText) roleText.setAttribute('text', 'value', appState.currentTechnique.title);
-      
-      var juanText = document.getElementById('juan-text');
-      if (juanText) juanText.setAttribute('text', 'value', appState.currentTechnique.initial_greet);
-
-      showScreen('practice');
-      setJuanMood('happy');
-      
-      // 4. Hablar el saludo inicial
-      setTimeout(function() {
-        speakVR(appState.currentTechnique.initial_greet, 'daniel');
-      }, 600);
-    }
-
-    function goLearn() {
-      var techLabel = appState.activeMenu === 'techniques' ? appState.selectedTechnique : 'Intervenciones';
-      alert("Abriendo modulo teorico para: " + techLabel);
-    }
-
-    function goWork() {
-      var techLabel = appState.activeMenu === 'techniques' ? appState.selectedTechnique : 'Intervenciones';
-      alert("Cargando plantillas de trabajo para: " + techLabel);
-    }
-
-    function goEval() {
-      // Generar score artificial para la muestra
-      var score = Math.floor(Math.random() * 30) + 70; // 70-99%
-      var level = score >= 90 ? "Experto" : "Competente";
-      
-      var scoreEl = document.getElementById('eval-score');
-      if (scoreEl) scoreEl.setAttribute('text', 'value', 'Score: ' + score + '%');
-      
-      var levelEl = document.getElementById('eval-level');
-      if (levelEl) levelEl.setAttribute('text', 'value', 'Nivel: ' + level);
-      
-      var feedEl = document.getElementById('eval-feedback');
-      if (feedEl) {
-        var msg = "Buen manejo de la estructura general. Demostraste un uso adecuado de los tiempos de escucha. Puedes mejorar afinando las propuestas concretas al cierre.";
-        feedEl.setAttribute('text', 'value', msg);
-      }
-
-      showScreen('eval');
-      setJuanMood('happy');
-      speakVR("Simulacion concluida. Revisa tu evaluacion en el tablero frontal.", "daniel");
-    }
-
-
-    // --- CONTROL DE RECONOCIMIENTO DE VOZ (WEB SPEECH API) ---
-    function setupMic() {
-      return new Promise(function(resolve) {
-        var Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!Speech) {
-          console.warn("Speech recognition no soportado en este navegador.");
-          return resolve();
-        }
-        recognition = new Speech();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'es-MX';
-
-        recognition.onstart = function() {
-          isRecording = true;
-          document.getElementById('voice-indicator').style.display = 'block';
-          var ring = document.getElementById('mic-ring');
-          if (ring) ring.setAttribute('material', 'color', '#22c55e'); // Verde al escuchar
-        };
-
-        recognition.onend = function() {
-          isRecording = false;
-          document.getElementById('voice-indicator').style.display = 'none';
-          var ring = document.getElementById('mic-ring');
-          if (ring) ring.setAttribute('material', 'color', '#fda4af');
-        };
-
-        recognition.onresult = function(event) {
-          if (event.results && event.results[0]) {
-            var text = event.results[0][0].transcript;
-            processUserVoice(text);
-          }
-        };
-        resolve();
-      });
-    }
-
-    function startRecording() {
-      if (recognition && !isRecording && !isProcessing) {
-        synth.cancel(); // Corta el habla de la IA si el usuario interrumpe
-        recognition.start();
-      }
-    }
-
-    function stopRecording() {
-      if (recognition && isRecording) {
-        recognition.stop();
-      }
-    }
-
-    function processUserVoice(text) {
-      if (!text || text.trim() === "") return;
-      
-      isProcessing = true;
-      appState.turns++;
-
-      // Mostrar texto del usuario temporalmente en la pantalla
-      var juanText = document.getElementById('juan-text');
-      if (juanText) juanText.setAttribute('text', 'value', 'Tu: "' + text + '"');
-
-      // Simular respuesta corta de Juanjolote (En producción aquí conectas tu API/Fetch)
-      setTimeout(function() {
-        var aiReply = "Entiendo lo que comentas. Sigamos profundizando en la situacion para resolverlo mejor.";
-        
-        if (appState.turns >= appState.maxTurns) {
-          if (juanText) juanText.setAttribute('text', 'value', 'Juanjolote: Entendido jefe. Creo que tenemos suficiente informacion. Evaluemos la sesion.');
-          speakVR("Entendido jefe. Creo que tenemos suficiente informacion. Evaluemos la sesion.", "daniel");
-          setTimeout(goEval, 4000);
-        } else {
-          if (juanText) juanText.setAttribute('text', 'value', 'Juanjolote: ' + aiReply);
-          setJuanMood('talk');
-          speakVR(aiReply, 'daniel');
-        }
-        isProcessing = false;
-      }, 1500);
-    }
-
-
-    // --- TEXT TO SPEECH (SALIDA DE AUDIO DE LA IA) ---
-    function speakVR(text, voiceType) {
-      if (!synth) return;
-      synth.cancel();
-      var utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'es-MX';
-      
-      utterance.onend = function() {
-        setJuanMood('happy');
-      };
-      synth.speak(utterance);
-    }
-
-    // --- CAMBIO DE ANIMACIÓN / EXPRESIÓN DE JUANJOLOTE ---
-    function setJuanMood(mood) {
-      var head = document.getElementById('juan-head');
-      var mouth = document.getElementById('juan-mouth');
-      if (!head || !mouth) return;
-
-      if (mood === 'talk') {
-        head.setAttribute('color', '#f472b6');
-        mouth.setAttribute('geometry', {primitive: 'torus', radius: 0.02, radiusTubular: 0.01, arc: 360});
-      } else if (mood === 'thinking') {
-        head.setAttribute('color', '#c084fc');
-        mouth.setAttribute('geometry', {primitive: 'torus', radius: 0.04, radiusTubular: 0.005, arc: 180});
-      } else { // happy / normal
-        head.setAttribute('color', '#f472b6');
-        mouth.setAttribute('geometry', {primitive: 'torus', radius: 0.04, radiusTubular: 0.01, arc: 180});
-        mouth.setAttribute('rotation', '0 0 180');
-      }
-    }
-
-
-    // ========================================================
-    // --- MAPEO DE INTERACCIONES AL CARGAR LA ESCENA ---
-    // ========================================================
-    document.addEventListener('DOMContentLoaded', function() {
-      
-      // --- NAVEGACIÓN MENÚ INICIAL ---
-      var btnInt = document.getElementById('btn-interventions');
-      if (btnInt) {
-        btnInt.addEventListener('click', function(e) {
-          e.stopPropagation();
-          goMode('interventions');
-        });
-      }
-
-      var btnTech = document.getElementById('btn-techniques');
-      if (btnTech) {
-        btnTech.addEventListener('click', function(e) {
-          e.stopPropagation();
-          showScreen('technique-list'); // Muestra la rejilla de los 14 botones
-        });
-      }
-
-      var btnTechBack = document.getElementById('btn-tech-list-back');
-      if (btnTechBack) {
-        btnTechBack.addEventListener('click', function(e) {
-          e.stopPropagation();
-          goWelcome();
-        });
-      }
-
-      // --- CAPTURA DINÁMICA AUTOMÁTICA DE LAS 14 TÉCNICAS ---
-      var techListScreen = document.getElementById('screen-technique-list');
-      if (techListScreen) {
-        techListScreen.addEventListener('click', function(e) {
-          var targetEntity = e.target;
-          
-          // Escala hacia arriba en la jerarquía 3D para encontrar el ID del botón que fue clickeado
-          while (targetEntity && targetEntity !== techListScreen) {
-            if (targetEntity.id && targetEntity.id.startsWith('btn-') && targetEntity.id !== 'btn-tech-list-back') {
-              e.stopPropagation();
-              
-              // Formatea el ID (ejemplo: 'btn-active-listening' -> 'active_listening')
-              var techniqueId = targetEntity.id.replace('btn-', '').replace(/-/g, '_');
-              appState.selectedTechnique = techniqueId;
-              
-              goMode('techniques'); // Te transfiere directo a la pantalla de modos
-              return;
-            }
-            targetEntity = targetEntity.parentNode;
-          }
-        });
-      }
-
-      // --- NAVEGACIÓN MODALIDADES (PRACTICE, LEARN, WORK) ---
-      var btnPractice = document.getElementById('btn-practice');
-      if (btnPractice) {
-        btnPractice.addEventListener('click', function(e) {
-          e.stopPropagation();
-          goPractice();
-        });
-      }
-
-      var btnLearn = document.getElementById('btn-learn');
-      if (btnLearn) {
-        btnLearn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          goLearn();
-        });
-      }
-
-      var btnWork = document.getElementById('btn-work');
-      if (btnWork) {
-        btnWork.addEventListener('click', function(e) {
-          e.stopPropagation();
-          goWork();
-        });
-      }
-
-      var btnModeBack = document.getElementById('mode-back-btn');
-      if (btnModeBack) {
-        btnModeBack.addEventListener('click', function(e) {
-          e.stopPropagation();
-          if (appState.activeMenu === 'techniques') {
-            showScreen('technique-list');
-          } else {
-            goWelcome();
-          }
-        });
-      }
-
-      // --- PANTALLAS COMPLEMENTARIAS (MIC, EVAL, LOGOUT) ---
-      var micBtn = document.getElementById('mic-btn');
-      if (micBtn) {
-        micBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          if (appState.screen === 'practice') {
-            if (!isRecording && !isProcessing) startRecording();
-            else if (isRecording) stopRecording();
-          }
-        });
-      }
-
-      var btnEnd = document.getElementById('btn-end-practice');
-      if (btnEnd) {
-        btnEnd.addEventListener('click', function(e) {
-          e.stopPropagation();
-          goEval();
-        });
-      }
-
-      var btnNew = document.getElementById('btn-new-session');
-      if (btnNew) {
-        btnNew.addEventListener('click', function(e) {
-          e.stopPropagation();
-          goWelcome();
-        });
-      }
-
-      var btnAgain = document.getElementById('btn-practice-again');
-      if (btnAgain) {
-        btnAgain.addEventListener('click', function(e) {
-          e.stopPropagation();
-          goPractice();
-        });
-      }
-
-      var btnLogout = document.getElementById('btn-logout');
-      if (btnLogout) {
-        btnLogout.addEventListener('click', function(e) {
-          e.stopPropagation();
-          localStorage.removeItem('ldr_session_token');
-          localStorage.removeItem('ldr_refresh_token');
-          window.location.href = 'login-vr.html';
-        });
-      }
-
-      // --- CARGA INICIAL DE LA ESCENA VR ---
-      var sceneEl = document.querySelector('a-scene');
-      if (sceneEl) {
-        sceneEl.addEventListener('loaded', function() {
-          setupMic().then(function() {
-            var gameId = localStorage.getItem('ldr_game_id') || '';
-            var name = gameId.split('.')[1] || 'Manager';
-            var greet = "Bienvenido " + name + ". Soy Juanjolote. Selecciona Intervenciones para resolver casos operativos, o Tecnicas para entrenar habilidades especificas.";
-            setTimeout(function() { 
-              setJuanMood('happy'); 
-              speakVR(greet, 'daniel'); 
-            }, 800);
-          });
-
-          // Animación de rotación continua del cielo estrellado
-          var stars = document.getElementById('stars-1');
-          if (stars) {
-            stars.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 180000; easing: linear');
-          }
-        });
-      }
-
     });
-  </script>
+  });
+  rc.addEventListener('abuttondown',function(){
+    if(appState.screen==='practice'){
+      if(!isRecording&&!isProcessing)startRecording();
+      else if(isRecording)stopRecording();
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  var micBtn=document.getElementById('mic-btn');
+  if(micBtn)micBtn.addEventListener('click',function(){
+    if(appState.screen==='practice'){
+      if(!isRecording&&!isProcessing)startRecording();
+      else if(isRecording)stopRecording();
+    }
+  });
+  var btnInt=document.getElementById('btn-interventions');if(btnInt)btnInt.addEventListener('click',function(e){e.stopPropagation();goMode('interventions');});
+var btnTech=document.getElementById('btn-techniques');
+
+if(btnTech)
+  btnTech.addEventListener('click',function(e){
+
+    e.stopPropagation();
+
+    showScreen('technique-list');
+
+  });
+  var btnAL=document.getElementById('btn-active-listening');
+
+if(btnAL)
+  btnAL.addEventListener('click',function(e){
+
+    e.stopPropagation();
+
+    appState.selectedTechnique='active_listening';
+
+    goMode('techniques');
+
+  });
+  var btnTechBack=document.getElementById('btn-tech-list-back');
+
+if(btnTechBack)
+  btnTechBack.addEventListener('click',function(e){
+
+    e.stopPropagation();
+
+    goWelcome();
+
+  });
+  var btnLearn=document.getElementById('btn-learn');if(btnLearn)btnLearn.addEventListener('click',function(e){e.stopPropagation();goLearn();});
+  var btnWork=document.getElementById('btn-work');if(btnWork)btnWork.addEventListener('click',function(e){e.stopPropagation();goWork();});
+  
+  var btnPractice=document.getElementById('btn-practice');if(btnPractice)btnPractice.addEventListener('click',function(e){e.stopPropagation();goPractice();});
+  
+  var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
+  var btnEnd=document.getElementById('btn-end-practice');if(btnEnd)btnEnd.addEventListener('click',function(e){e.stopPropagation();goEval();});
+  var btnNew=document.getElementById('btn-new-session');if(btnNew)btnNew.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
+  
+  var btnAgain=document.getElementById('btn-practice-again');if(btnAgain)btnAgain.addEventListener('click',function(e){e.stopPropagation();go14button();});
+  
+  var btnLogout=document.getElementById('btn-logout');
+  if(btnLogout)btnLogout.addEventListener('click',function(){
+    localStorage.removeItem('ldr_session_token');
+    localStorage.removeItem('ldr_refresh_token');
+    window.location.href='login-vr.html';
+  });
+  document.querySelector('a-scene').addEventListener('loaded',function(){
+    setupControllers();
+    setupMic().then(function(){
+      var gameId=localStorage.getItem('ldr_game_id')||'';
+      var name=gameId.split('.')[1]||'Manager';
+      var greet='Bienvenido'+(name?' '+name:'')+'. Soy Juanjolote. Elige un camino: Intervenciones para practicar conversaciones de retencion, o Tecnicas para desarrollar habilidades especificas.';
+      setTimeout(function(){setJuanMood('happy');speakVR(greet,'daniel');},800);
+    });
+    var stars=document.getElementById('stars-1');
+    if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
+  });
+});
+ 
+    document.querySelector('a-scene').addEventListener('loaded', () => {
+      console.log("🚀 Sistema de rastreo de clics activado.");
+      const botones = document.querySelectorAll('.clickable');
+      botones.forEach(boton => {
+        boton.addEventListener('click', (evento) => {
+          console.log(`🎯 ¡Click detectado! Le diste a: #${evento.currentTarget.id}`);
+        });
+      });
+    });
+  
+</script>
 </body>
 </html>
