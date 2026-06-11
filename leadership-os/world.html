@@ -32,14 +32,17 @@
     tecnica: {type: 'string', default: 'generica'}
   },
   
-  init: function () {
+init: function () {
     var el = this.el;
     var data = this.data;
 
-    // Escuchamos el evento 'click' que A-Frame genera mediante el cursor/raycaster en VR
     el.addEventListener('click', function (evt) {
-      // Evitar que el clic se propague si es necesario
-      evt.stopPropagation();
+      // Detiene por completo la propagación tanto en A-Frame como en el DOM nativo
+      if (evt.detail && evt.detail.sourceEvent) {
+        evt.detail.sourceEvent.stopPropagation();
+        evt.detail.sourceEvent.preventDefault();
+      }
+      evt.stopPropagation(); 
       
       // 1. Mensaje personalizado en consola
       console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id})`);
@@ -48,7 +51,6 @@
       ejecutarFuncionPorTecnica(data.tecnica);
     });
   }
-});
 
 // Aquí defines las distintas funciones para cada uno de tus 14 botones
 function ejecutarFuncionPorTecnica(tecnica) {
@@ -1052,7 +1054,8 @@ if(btnTechBack)
       const botones = document.querySelectorAll('.clickable');
       botones.forEach(boton => {
         boton.addEventListener('click', (evento) => {
-          console.log(`🎯 ¡Click detectado! Le diste a: #${evento.currentTarget.id}`);
+          console.log(`🎯 ¡Click detectado! Le...`);
+          // ...
         });
       });
     });
