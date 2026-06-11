@@ -507,7 +507,7 @@ function goPractice(){
   updateAgentAvatar(arch);
   updateVRMood(appState.vrMood);
   var opener=pickRandomOpener(arch,scenario);
-  appState.agentHistory.push({role:'assistant',content:opener});*/
+  appState.agentHistory.push({role:'assistant',content:opener});
   showScreen('practice');
   setDialog(arch.name.toUpperCase(),opener);
   speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});
