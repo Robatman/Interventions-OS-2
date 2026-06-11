@@ -473,7 +473,7 @@ function goLearn(){
   var intro=appState.activeMenu==='interventions'
     ?'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?'
     :'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
-  showScreen('technique-list');
+  showScreen('practice');
   setJuanMood('happy');
   setDialog('JUANJOLOTE',intro);
   speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
@@ -483,7 +483,7 @@ function goLearn(){
 function goWork(){
   appState.agentHistory=[];
   var intro='Cuentame, que situacion tienes con un agente ahora mismo?';
-  showScreen('technique-list');
+  showScreen('practice');
   setJuanMood('talking');
   setDialog('JUANJOLOTE',intro);
   speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
