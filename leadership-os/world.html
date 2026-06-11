@@ -880,7 +880,17 @@ if(btnTechBack)
     if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
   });
 });
-  console.log("Mensaje");
+ 
+    document.querySelector('a-scene').addEventListener('loaded', () => {
+      console.log("🚀 Sistema de rastreo de clics activado.");
+      const botones = document.querySelectorAll('.clickable');
+      botones.forEach(boton => {
+        boton.addEventListener('click', (evento) => {
+          console.log(`🎯 ¡Click detectado! Le diste a: #${evento.currentTarget.id}`);
+        });
+      });
+    });
+  
 </script>
 </body>
 </html>
