@@ -247,6 +247,14 @@
   <a-text value="La tecnica que hace funcionar a todas las demas" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
 </a-entity>
 
+    <a-entity id="btn-prueba" position="0 1 -2.5" class="clickable">
+  
+  <a-plane width="1.2" height="0.5" color="#112540" material="opacity:0.9;shader:flat"></a-plane>
+  
+  <a-text value="PROBAR BOTON" align="center" color="#e8eeff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
+
+</a-entity>
+
 <!-- POWERFUL QUESTIONS -->
 <a-entity id="btn-powerful-questions" position="-0.9 2.3 -2.8" class="clickable">
   <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
@@ -545,6 +553,25 @@ function showScreen(name){
   });
   appState.screen=name;
 }
+
+  function miNuevaFuncion() {
+  console.log("¡Genial, diste click en el botón de prueba!");
+  // Aquí pones todo lo que quieras que pase (cambiar pantallas, reproducir un sonido, hablar, etc.)
+  showScreen('welcome'); // Por ejemplo, que te regrese a la bienvenida
+}
+
+  var btnPrueba = document.getElementById('btn-prueba');
+
+// Si el botón existe en la pantalla...
+if (btnPrueba) {
+  // Nos quedamos esperando a que reciba un 'click'
+  btnPrueba.addEventListener('click', function(e) {
+    e.stopPropagation(); // Evitamos que el click se confunda con otros elementos detrás
+    
+    miNuevaFuncion(); // 🚀 ¡Llamamos a la función que creamos arriba!
+  });
+}
+  //Aquí tengo que borrar
 
 function goWelcome(){showScreen('welcome');appState.agentHistory=[];appState.vrMood=30;}
 
