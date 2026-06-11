@@ -473,7 +473,7 @@ function goLearn(){
   var intro=appState.activeMenu==='interventions'
     ?'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?'
     :'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
-  showScreen('practice');
+  showScreen('technique-list');
   setJuanMood('happy');
   setDialog('JUANJOLOTE',intro);
   speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
@@ -483,7 +483,7 @@ function goLearn(){
 function goWork(){
   appState.agentHistory=[];
   var intro='Cuentame, que situacion tienes con un agente ahora mismo?';
-  showScreen('practice');
+  showScreen('technique-list');
   setJuanMood('talking');
   setDialog('JUANJOLOTE',intro);
   speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
@@ -504,7 +504,7 @@ function goPractice(){
   updateVRMood(appState.vrMood);
   var opener=pickRandomOpener(arch,scenario);
   appState.agentHistory.push({role:'assistant',content:opener});
-  showScreen('practice');
+  showScreen('technique-list');
   setDialog(arch.name.toUpperCase(),opener);
   speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});
 }
