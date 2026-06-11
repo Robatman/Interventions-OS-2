@@ -29,23 +29,6 @@
 <script src="js/prompts.js"></script>
 <div id="voice-hud"><div id="voice-dot" class="idle"></div><span id="voice-label">Iniciando Neural Academy...</span></div>
 <button id="mic-btn" title="Hablar">&#127908;</button>
-  <script>
-// Registramos el componente en A-Frame
-AFRAME.registerComponent('practice-trigger', {
-  init: function () {
-    // Escuchamos el evento 'click' generado por el cursor de A-Frame
-    this.el.addEventListener('click', function () {
-      // Validamos que la función exista antes de llamarla
-      if (typeof goPractice === 'function') {
-        goPractice();
-      } else {
-        console.warn("La función goPractice() no está definida.");
-      }
-    });
-  }
-});
-    
-  </script>
 <a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018">
   <a-assets>
     <img id="juan-neutral"    src="assets/juanjolote_neutral.png">
@@ -257,7 +240,7 @@ AFRAME.registerComponent('practice-trigger', {
 
 <!-- ACTIVE LISTENING -->
   <!-- ACTIVE LISTENING (Modificado con el componente) -->
-<a-entity id="btn-active-listening" position="-2.7 2.3 -2.8" class="clickable" practice-trigger>
+<a-entity id="btn-active-listening" position="-2.7 2.3 -2.8" class="clickable">
   <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
   <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
   <a-text value="ACTIVE LISTENING" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
