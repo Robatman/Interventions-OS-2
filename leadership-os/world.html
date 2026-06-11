@@ -868,7 +868,7 @@ if(btnTechBack)
   if(btnTech) {
     btnTech.addEventListener('click', function(e){
       e.stopPropagation();
-      showScreen('technique-list'); // Abre la pantalla intermedia
+      showScreen('technique-list'); // Abre la pantalla intermedia de las 14 técnicas
     });
   }
 
@@ -883,17 +883,39 @@ if(btnTechBack)
       // Guardamos la técnica en el estado de la app
       appState.currentTechnique = selectedTech; 
       
-      // Te manda a la pantalla de modos (Practice, Learn, Work Together)
-      goMode('techniques'); 
+      // CORRECCIÓN AQUÍ: En lugar de iniciar la actividad directo,
+      // mostramos la pantalla de selección de modos (Practice / Learn / Work Together)
+      showScreen('modes'); 
     });
   });
 
-  // 3. Botón de regreso de la lista de técnicas al menú principal
-  var btnTechListBack = document.getElementById('btn-tech-list-back');
-  if(btnTechListBack) {
-    btnTechListBack.addEventListener('click', function(e){
+  // 3. Manejadores para los botones de la pantalla de modos (Practice, Learn, Work Together)
+  // Asegúrate de tener guardados estos elementos y que apunten a iniciar la actividad:
+  var btnPractice = document.getElementById('btn-mode-practice');
+  if(btnPractice) {
+    btnPractice.addEventListener('click', function(e) {
       e.stopPropagation();
-      goWelcome(); // Regresa al inicio
+      appState.currentMode = 'practice';
+      // Ahora sí, una vez elegido el modo, llamamos al flujo de la actividad
+      goMode('techniques'); 
+    });
+  }
+
+  var btnLearn = document.getElementById('btn-mode-learn');
+  if(btnLearn) {
+    btnLearn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      appState.currentMode = 'learn';
+      goMode('techniques');
+    });
+  }
+
+  var btnWork = document.getElementById('btn-mode-work');
+  if(btnWork) {
+    btnWork.addEventListener('click', function(e) {
+      e.stopPropagation();
+      appState.currentMode = 'work';
+      goMode('techniques');
     });
   }
   
