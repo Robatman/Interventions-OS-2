@@ -1,7 +1,7 @@
 
 export default async function handler(req, res) {
 
-  const API_KEY = "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";
+  const API_KEY = "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";
 
   if (req.method !== "POST") {
     return res.status(405).json({
