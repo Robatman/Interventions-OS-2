@@ -214,7 +214,7 @@
   </a-entity>
 
   <!-- SCREEN: TECHNIQUES -->
-  <!--<a-entity id="screen-technique-list" visible="false">-->
+  <a-entity id="screen-technique-list" visible="false">
 
   <a-text value="TECHNIQUES"
           position="0 2.5 -2.8"
@@ -239,8 +239,6 @@
             position="0 1.4 -2.8"
             class="clickable">
 
-    <a-entity id="btn-powerful-questions" class="clickable">
-  
     <a-plane width="1.6"
              height="0.7"
              color="#112540"
@@ -304,7 +302,7 @@
   </a-entity>
 
 </a-entity>
-  <!--<a-entity id="screen-techniques" visible="false">
+  <a-entity id="screen-techniques" visible="false">
     <a-text value="TECHNIQUES" position="0 2.5 -2.8" align="center" color="#e8eeff" width="6" font="exo2bold"></a-text>
     <a-text value="Communication and leadership tools" position="0 2.18 -2.8" align="center" color="#c8d8ff" width="4.5" opacity="0.7" font="mozillavr"></a-text>
     <a-entity id="btn-tech-active-listening" position="-2.2 1.45 -2.8" class="clickable" animation__hover="property:position;to:-2.2 1.53 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:-2.2 1.45 -2.8;startEvents:mouseleave;dur:180">
@@ -346,7 +344,7 @@
       <a-plane width="0.86" height="0.28" color="#4466ff" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
       <a-text value="BACK" align="center" color="#4466ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
     </a-entity>
-  </a-entity>-->
+  </a-entity>
 
   <!-- SCREEN: PRACTICE -->
   <a-entity id="screen-practice" visible="false">
@@ -453,7 +451,7 @@ function pickRandomOpener(archetype,scenario){
 }
 
 function showScreen(name){
-  ['welcome','mode','practice','eval','technique-list', 'interventions'].forEach(function(s){
+  ['welcome','mode','practice','eval','technique-list'].forEach(function(s){
     var el=document.getElementById('screen-'+s);
     if(el)el.setAttribute('visible',s===name);
   });
@@ -599,7 +597,7 @@ async function handleVRSpeech(text) {
       parsed.msg,
       getVoice(mode === 'practice' ? 'agent' : 'juan'),
       function () {
-        setHUD('ready', 'Listo para hablarr');
+        setHUD('ready', 'Listo para hablar');
         if (mode === 'practice') {
           setAjolinMood('neutral');
         } else {
@@ -716,7 +714,7 @@ async function setupMic(){
     analyser=audioContext.createAnalyser();
     analyser.fftSize=2048;
     audioContext.createMediaStreamSource(audioStream).connect(analyser);
-    setHUD('ready','Listo para hablarrr');
+    setHUD('ready','Listo para hablar');
   } catch(e){
     setHUD('idle','Sin microfono - modo texto');
     console.error('[Mic]',e);
@@ -815,16 +813,6 @@ function setupControllers(){
     }
   });
 }
-  
-  function selectTechnique(id){
-
-  appState.selectedTechnique=id;
-
-  console.log("Tecnica seleccionada:",id);
-
-  goMode('techniques');
-
-}
 
 document.addEventListener('DOMContentLoaded',function(){
   var micBtn=document.getElementById('mic-btn');
@@ -835,56 +823,28 @@ document.addEventListener('DOMContentLoaded',function(){
     }
   });
   var btnInt=document.getElementById('btn-interventions');if(btnInt)btnInt.addEventListener('click',function(e){e.stopPropagation();goMode('interventions');});
-  
-  var btnTech=document.getElementById('btn-techniques');
-  
-  console.log("BTN TECH:", btnTech);
-  
-  if(btnTech)
-    btnTech.addEventListener('click',function(e){
-  
-      console.log("CLICK TECH");
-  
-      e.stopPropagation();
-  
-      showScreen('technique-list');
-  
-    });
-  
-var btnAL=document.getElementById('btn-active-listening');
+var btnTech=document.getElementById('btn-techniques');
+
+if(btnTech)
+  btnTech.addEventListener('click',function(e){
+
+    e.stopPropagation();
+
+    showScreen('technique-list');
+
+  });
+  var btnAL=document.getElementById('btn-active-listening');
 
 if(btnAL)
   btnAL.addEventListener('click',function(e){
 
     e.stopPropagation();
 
-    selectTechnique('active_listening');
+    appState.selectedTechnique='active_listening';
+
+    goMode('techniques');
 
   });
-
-  var btnPQ=document.getElementById('btn-powerful-questions');
-
-if(btnPQ)
-  btnPQ.addEventListener('click',function(e){
-
-    e.stopPropagation();
-
-    selectTechnique('powerful_questions');
-
-  });
-
-  var btnMI=document.getElementById('btn-motivational-interviewing');
-
-if(btnMI)
-  btnMI.addEventListener('click',function(e){
-
-    e.stopPropagation();
-
-    selectTechnique('motivational_interviewing');
-
-  });
-
-  
   var btnTechBack=document.getElementById('btn-tech-list-back');
 
 if(btnTechBack)
@@ -898,13 +858,7 @@ if(btnTechBack)
   var btnLearn=document.getElementById('btn-learn');if(btnLearn)btnLearn.addEventListener('click',function(e){e.stopPropagation();goLearn();});
   var btnWork=document.getElementById('btn-work');if(btnWork)btnWork.addEventListener('click',function(e){e.stopPropagation();goWork();});
   var btnPractice=document.getElementById('btn-practice');if(btnPractice)btnPractice.addEventListener('click',function(e){e.stopPropagation();goPractice();});
-  var btnModeBack=document.getElementById('mode-back-btn');
-
-if(btnModeBack)
-  btnModeBack.addEventListener('click',function(e){
-    e.stopPropagation();
-    goWelcome();
-  });if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
+  var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
   var btnEnd=document.getElementById('btn-end-practice');if(btnEnd)btnEnd.addEventListener('click',function(e){e.stopPropagation();goEval();});
   var btnNew=document.getElementById('btn-new-session');if(btnNew)btnNew.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
   var btnAgain=document.getElementById('btn-practice-again');if(btnAgain)btnAgain.addEventListener('click',function(e){e.stopPropagation();goPractice();});
