@@ -17,6 +17,68 @@
   #mic-btn{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:51;background:linear-gradient(135deg,#3d6bff,#9d5cff);color:#fff;border:none;border-radius:50%;width:54px;height:54px;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 24px rgba(100,100,255,0.5);display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
   #mic-btn:hover{transform:translateX(-50%) scale(1.1);}
   #mic-btn.recording{background:linear-gradient(135deg,#ff5ca0,#ff3c6b);box-shadow:0 0 24px #ff5ca0;}
+  AFRAME.registerComponent('handler-botones-vr', {
+  schema: {
+    mensaje: {type: 'string', default: 'Botón presionado'},
+    tecnica: {type: 'string', default: 'generica'}
+  },
+  
+  init: function () {
+    var el = this.el;
+    var data = this.data;
+
+    // Escuchamos el evento 'click' que A-Frame genera mediante el cursor/raycaster en VR
+    el.addEventListener('click', function (evt) {
+      // Evitar que el clic se propague si es necesario
+      evt.stopPropagation();
+      
+      // 1. Mensaje personalizado en consola
+      console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id})`);
+      
+      // 2. Ejecutar la función correspondiente según la técnica elegida
+      ejecutarFuncionPorTecnica(data.tecnica);
+    });
+  }
+});
+
+// Aquí defines las distintas funciones para cada uno de tus 14 botones
+function ejecutarFuncionPorTecnica(tecnica) {
+  switch(tecnica) {
+    case 'active-listening':
+      funcionActiveListening();
+      break;
+    case 'powerful-questions':
+      funcionPowerfulQuestions();
+      break;
+    case 'motivational-interviewing':
+      funcionMotivationalInterviewing();
+      break;
+    case 'nonviolent-communication':
+      funcionNonviolentCommunication();
+      break;
+    // Agrega los casos restantes para completar los 14 botones...
+    default:
+      console.log("⚡ Ejecutando función genérica de la academia.");
+  }
+}
+
+// Ejemplos de tus funciones independientes
+function funcionActiveListening() {
+  console.log("🗣️ Activando entorno de Escucha Activa...");
+  // Tu lógica aquí (ej. cambiar estados de Juanjolote, actualizar HUD, etc.)
+}
+
+function funcionPowerfulQuestions() {
+  console.log("❓ Cargando batería de Preguntas Poderosas...");
+}
+
+function funcionMotivationalInterviewing() {
+  console.log("🎯 Iniciando Entrevista Motivacional...");
+}
+
+function funcionNonviolentCommunication() {
+  console.log("🕊️ Configurando Comunicación No Violenta...");
+}
 </style>
 </head>
 <body>
@@ -240,35 +302,33 @@
 
 <!-- ACTIVE LISTENING -->
   <!-- ACTIVE LISTENING (Modificado con el componente) -->
-<a-entity id="btn-practice" position="-2.7 2.3 -2.8" class="clickable">
+<a-entity id="btn-active-listening" position="-2.7 2.3 -2.8" class="clickable"
+          handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening">
   <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
   <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
   <a-text value="ACTIVE LISTENING" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-  <a-text value="La tecnica que hace funcionar a todas las demas" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
 </a-entity>
 
 <!-- POWERFUL QUESTIONS -->
-<a-entity id="btn-powerful-questions" position="-0.9 2.3 -2.8" class="clickable">
+<a-entity id="btn-powerful-questions" position="-0.9 2.3 -2.8" class="clickable"
+          handler-botones-vr="mensaje: Abriendo panel de Preguntas Poderosas; tecnica: powerful-questions">
   <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
   <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
   <a-text value="POWERFUL QUESTIONS" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-  <a-text value="Preguntas que abren posibilidades" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
 </a-entity>
 
-<!-- MOTIVATIONAL INTERVIEWING -->
-<a-entity id="btn-motivational-interviewing" position="0.9 2.3 -2.8" class="clickable">
+<a-entity id="btn-motivational-interviewing" position="0.9 2.3 -2.8" class="clickable"
+          handler-botones-vr="mensaje: Desplegando Entrevista Motivacional; tecnica: motivational-interviewing">
   <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
   <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
   <a-text value="MOTIVATIONAL INTERVIEWING" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-  <a-text value="Elicita motivacion interna" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
 </a-entity>
 
-<!-- NONVIOLENT COMMUNICATION -->
-<a-entity id="btn-nonviolent-communication" position="2.7 2.3 -2.8" class="clickable">
+<a-entity id="btn-nonviolent-communication" position="2.7 2.3 -2.8" class="clickable"
+          handler-botones-vr="mensaje: Iniciando Comunicación No Violenta; tecnica: nonviolent-communication">
   <a-plane width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
   <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
   <a-text value="NONVIOLENT COMMUNICATION" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-  <a-text value="Observacion Sentimiento Necesidad Peticion" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
 </a-entity>
 
 
