@@ -8,7 +8,8 @@
 
 // ─── GLOBAL STATE ─────────────────────────
 
-let GROQ_KEY = localStorage.getItem('groq_key') || '';
+//let GROQ_KEY = localStorage.getItem('groq_key') || '';
+let GROQ_KEY = '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';
 let learnHistory    = [];
 let workHistory     = [];
 let practiceHistory = [];
