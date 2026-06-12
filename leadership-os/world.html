@@ -27,69 +27,70 @@
 </script>
 <script>  
   AFRAME.registerComponent('handler-botones-vr', {
-  schema: {
-    mensaje: {type: 'string', default: 'Botón presionado'},
-    tecnica: {type: 'string', default: 'generica'}
-  },
-  
-init: function () {
-    var el = this.el;
-    var data = this.data;
+    schema: {
+      mensaje: {type: 'string', default: 'Botón presionado'},
+      tecnica: {type: 'string', default: 'generica'}
+    },
+    
+    init: function () {
+      var el = this.el;
+      var data = this.data; // Guarda los datos del schema ('mensaje' y 'tecnica')
 
-    el.addEventListener('click', function (evt) {
-      // Detiene por completo la propagación tanto en A-Frame como en el DOM nativo
-      if (evt.detail && evt.detail.sourceEvent) {
-        evt.detail.sourceEvent.stopPropagation();
-        evt.detail.sourceEvent.preventDefault();
-      }
-      evt.stopPropagation(); 
-      
-      // 1. Mensaje personalizado en consola
-      console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id})`);
-      
-      // 2. Ejecutar la función correspondiente según la técnica elegida
-      ejecutarFuncionPorTecnica(data.tecnica);
-    });
+      el.addEventListener('click', function (evt) {
+        // Detiene por completo la propagación tanto en A-Frame como en el DOM nativo
+        if (evt.detail && evt.detail.sourceEvent) {
+          evt.detail.sourceEvent.stopPropagation();
+          evt.detail.sourceEvent.preventDefault();
+        }
+        evt.stopPropagation(); 
+        
+        // 1. Mensaje personalizado en consola usando los datos del componente
+        console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id || el.parentElement.id})`);
+        
+        // 2. Ejecutar la función correspondiente según la técnica elegida
+        ejecutarFuncionPorTecnica(data.tecnica);
+      });
+    }
+  }); // <-- Aquí se cierra PERFECTAMENTE el componente de A-Frame.
+
+  // 🌟 LAS FUNCIONES AHORA VIVEN AFUERA Y SON GLOBALES 🌟
+
+  function ejecutarFuncionPorTecnica(tecnica) {
+    console.log("⚡ Buscando técnica:", tecnica); // Esto te ayudará a debuggear en consola
+    switch(tecnica) {
+      case 'active-listening':
+        funcionActiveListening();
+        break;
+      case 'powerful-questions':
+        funcionPowerfulQuestions();
+        break;
+      case 'motivational-interviewing':
+        funcionMotivationalInterviewing();
+        break;
+      case 'nonviolent-communication':
+        funcionNonviolentCommunication();
+        break;
+      default:
+        console.log("⚡ Ejecutando función genérica de la academia.");
+    }
   }
 
-// Aquí defines las distintas funciones para cada uno de tus 14 botones
-function ejecutarFuncionPorTecnica(tecnica) {
-  switch(tecnica) {
-    case 'active-listening':
-      funcionActiveListening();
-      break;
-    case 'powerful-questions':
-      funcionPowerfulQuestions();
-      break;
-    case 'motivational-interviewing':
-      funcionMotivationalInterviewing();
-      break;
-    case 'nonviolent-communication':
-      funcionNonviolentCommunication();
-      break;
-    // Agrega los casos restantes para completar los 14 botones...
-    default:
-      console.log("⚡ Ejecutando función genérica de la academia.");
+  // Tus funciones independientes listas para ser llamadas:
+  function funcionActiveListening() {
+    console.log("🗣️ Activando entorno de Escucha Activa...");
   }
-}
 
-// Ejemplos de tus funciones independientes
-function funcionActiveListening() {
-  console.log("🗣️ Activando entorno de Escucha Activa...");
-  // Tu lógica aquí (ej. cambiar estados de Juanjolote, actualizar HUD, etc.)
-}
+  function funcionPowerfulQuestions() {
+    console.log("❓ Cargando batería de Preguntas Poderosas...");
+  }
 
-function funcionPowerfulQuestions() {
-  console.log("❓ Cargando batería de Preguntas Poderosas...");
-}
+  function funcionMotivationalInterviewing() {
+    console.log("🎯 Iniciando Entrevista Motivacional...");
+  }
 
-function funcionMotivationalInterviewing() {
-  console.log("🎯 Iniciando Entrevista Motivacional...");
-}
-
-function funcionNonviolentCommunication() {
-  console.log("🕊️ Configurando Comunicación No Violenta...");
-}
+  function funcionNonviolentCommunication() {
+    console.log("🕊️ Configurando Comunicación No Violenta...");
+  }
 </script>
 <script src="js/interventions.js"></script>
 <script src="js/archetypes.js"></script>
