@@ -55,70 +55,25 @@
 
   // 🌟 LAS FUNCIONES AHORA VIVEN AFUERA Y SON GLOBALES 🌟
 
-function ejecutarFuncionPorTecnica(tecnica) {
-  console.log("⚡ Buscando técnica:", tecnica);
-
-  switch(tecnica) {
-    case 'active-listening':
-      funcionActiveListening();
-      break;
-
-    case 'powerful-questions':
-      funcionPowerfulQuestions();
-      break;
-
-    case 'motivational-interviewing':
-      funcionMotivationalInterviewing();
-      break;
-
-    case 'nonviolent-communication':
-      funcionNonviolentCommunication();
-      break;
-
-    case 'radical-candor':
-      funcionRadicalCandor();
-      break;
-
-     case 'crucial-conversations':
-       funcionCrucialConversations();
-       break;
-
-     case 'tactical-empathy':
-       funcionTacticalEmpathy();
-       break;
-
-     case 'scarf-model':
-       funcionScarfModel();
-       break;
-
-     case 'immunity-to-change':
-       funcionImmunityToChange();
-       break;
-
-     case 'drama-triangle':
-       funcionDramaTriangle();
-       break;
-
-     case 'grow-model':
-       funcionGrowModel();
-       break;
-
-    // case 'strengths-based-coaching':
-    //   funcionStrengthsBasedCoaching();
-    //   break;
-
-     case 'growth-mindset':
-       funcionGrowthMindset();
-       break;
-
-     case 'solution-focused-coaching':
-       funcionSolutionFocusedCoaching();
-       break;
-
-    default:
-      console.log("⚡ Ejecutando función genérica de la academia.");
+  function ejecutarFuncionPorTecnica(tecnica) {
+    console.log("⚡ Buscando técnica:", tecnica); // Esto te ayudará a debuggear en consola
+    switch(tecnica) {
+      case 'active-listening':
+        funcionActiveListening();
+        break;
+      case 'powerful-questions':
+        funcionPowerfulQuestions();
+        break;
+      case 'motivational-interviewing':
+        funcionMotivationalInterviewing();
+        break;
+      case 'nonviolent-communication':
+        funcionNonviolentCommunication();
+        break;
+      default:
+        console.log("⚡ Ejecutando función genérica de la academia.");
+    }
   }
-}
 
   // Tus funciones independientes listas para ser llamadas:
   function funcionActiveListening() {
@@ -140,56 +95,6 @@ function ejecutarFuncionPorTecnica(tecnica) {
     console.log("🕊️ Configurando Comunicación No Violenta...");
     goPractice();
   }
-  function funcionRadicalCandor() {
-  console.log("Ejecutando Radical Candor");
-  goPractice();
-}
-
-function funcionCrucialConversations() {
-  console.log("Ejecutando Crucial Conversations");
-  goPractice();
-}
-
-function funcionTacticalEmpathy() {
-  console.log("Ejecutando Tactical Empathy");
-  goPractice();
-}
-
-function funcionScarfModel() {
-  console.log("Ejecutando SCARF Model");
-  goPractice();
-}
-
-function funcionImmunityToChange() {
-  console.log("Ejecutando Immunity to Change");
-  goPractice();
-}
-
-function funcionDramaTriangle() {
-  console.log("Ejecutando Drama Triangle");
-  goPractice();
-}
-
-function funcionGrowModel() {
-  console.log("Ejecutando GROW Model");
-  goPractice();
-}
-
-function funcionStrengthsBasedCoaching() {
-  console.log("Ejecutando Strengths-Based Coaching");
-  goPractice();
-}
-
-function funcionGrowthMindset() {
-  console.log("Ejecutando Growth Mindset");
-  goPractice();
-}
-
-function funcionSolutionFocusedCoaching() {
-  console.log("Ejecutando Solution-Focused Coaching");
-  goPractice();
-}
-
 </script>
 <script src="js/interventions.js"></script>
 <script src="js/archetypes.js"></script>
@@ -846,7 +751,6 @@ function goPractice(){
   setDialog(arch.name.toUpperCase(),opener);
   speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});
   console.log("dio click al goPractice")
-  
 }
 
   function go14button(){
