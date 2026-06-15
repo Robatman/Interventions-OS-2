@@ -846,23 +846,7 @@ function goPractice(){
   setDialog(arch.name.toUpperCase(),opener);
   speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});
   console.log("dio click al goPractice")
-  console.log("📋 Volviendo al menú de las 14 técnicas...");
-
-  // 1. Seleccionamos los planos de tus botones (puedes usar un contenedor específico si no quieres activar todo)
-  // Por ejemplo, si tus 14 botones están dentro de un contenedor con id="menu-tecnicas":
-  const botonesTecnicas = document.querySelectorAll('#menu-tecnicas a-plane, #menu-tecnicas .clickable-fallback'); 
   
-  // O de forma general a los que quieras reactivar:
-  const botonesAReactivar = document.querySelectorAll('a-plane'); // O el selector que mejor se adapte a tu UI
-
-  botonesAReactivar.forEach(boton => {
-    // Asegúrate de filtrar cuáles quieres que vuelvan a ser clickeables
-    if (boton.id && boton.id.startsWith('btn-')) { 
-      boton.classList.add('clickable');
-    }
-  });
-
-  showScreen('technique-list');
 }
 
   function go14button(){
