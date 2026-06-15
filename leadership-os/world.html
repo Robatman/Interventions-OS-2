@@ -34,67 +34,92 @@
     
     init: function () {
       var el = this.el;
-      var data = this.data; // Guarda los datos del schema ('mensaje' y 'tecnica')
+      var data = this.data;
 
       el.addEventListener('click', function (evt) {
-        // Detiene por completo la propagación tanto en A-Frame como en el DOM nativo
         if (evt.detail && evt.detail.sourceEvent) {
           evt.detail.sourceEvent.stopPropagation();
           evt.detail.sourceEvent.preventDefault();
         }
         evt.stopPropagation(); 
         
-        // 1. Mensaje personalizado en consola usando los datos del componente
         console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id || el.parentElement.id})`);
-        
-        // 2. Ejecutar la función correspondiente según la técnica elegida
         ejecutarFuncionPorTecnica(data.tecnica);
       });
     }
-  }); // <-- Aquí se cierra PERFECTAMENTE el componente de A-Frame.
-
-  // 🌟 LAS FUNCIONES AHORA VIVEN AFUERA Y SON GLOBALES 🌟
+  });
 
   function ejecutarFuncionPorTecnica(tecnica) {
-    console.log("⚡ Buscando técnica:", tecnica); // Esto te ayudará a debuggear en consola
+    console.log("⚡ Buscando técnica:", tecnica);
+    
+    // Todas las técnicas llaman a goPractice(), por lo que podemos meter el comportamiento común aquí
     switch(tecnica) {
       case 'active-listening':
-        funcionActiveListening();
+        console.log("🗣️ Activando entorno de Escucha Activa...");
+        goPractice();
         break;
       case 'powerful-questions':
-        funcionPowerfulQuestions();
+        console.log("❓ Cargando batería de Preguntas Poderosas...");
+        goPractice();
         break;
       case 'motivational-interviewing':
-        funcionMotivationalInterviewing();
+        console.log("🎯 Iniciando Entrevista Motivacional...");
+        goPractice();
         break;
       case 'nonviolent-communication':
-        funcionNonviolentCommunication();
+        console.log("🕊️ Configurando Comunicación No Violenta...");
+        goPractice();
         break;
+
+      // === AGREGA LAS TÉCNICAS RESTANTES DE ESTA MANERA ===
+      case 'tecnica-5':
+        console.log("🚀 Iniciando Técnica 5...");
+        goPractice();
+        break;
+      case 'tecnica-6':
+        console.log("🚀 Iniciando Técnica 6...");
+        goPractice();
+        break;
+      case 'tecnica-7':
+        console.log("🚀 Iniciando Técnica 7...");
+        goPractice();
+        break;
+      case 'tecnica-8':
+        console.log("🚀 Iniciando Técnica 8...");
+        goPractice();
+        break;
+      case 'tecnica-9':
+        console.log("🚀 Iniciando Técnica 9...");
+        goPractice();
+        break;
+      case 'tecnica-10':
+        console.log("🚀 Iniciando Técnica 10...");
+        goPractice();
+        break;
+      case 'tecnica-11':
+        console.log("🚀 Iniciando Técnica 11...");
+        goPractice();
+        break;
+      case 'tecnica-12':
+        console.log("🚀 Iniciando Técnica 12...");
+        goPractice();
+        break;
+      case 'tecnica-13':
+        console.log("🚀 Iniciando Técnica 13...");
+        goPractice();
+        break;
+      case 'tecnica-14':
+        console.log("🚀 Iniciando Técnica 14...");
+        goPractice();
+        break;
+
       default:
-        console.log("⚡ Ejecutando función genérica de la academia.");
+        console.log("⚡ Ejecutando función genérica de la academia. (Por defecto también va a práctica)");
+        goPractice(); // Si quieres que por defecto ejecute goPractice() pase lo que pase, déjalo aquí.
     }
   }
 
-  // Tus funciones independientes listas para ser llamadas:
-  function funcionActiveListening() {
-    console.log("🗣️ Activando entorno de Escucha Activa...");
-    goPractice();
-  }
-
-  function funcionPowerfulQuestions() {
-    console.log("❓ Cargando batería de Preguntas Poderosas...");
-    goPractice();
-  }
-
-  function funcionMotivationalInterviewing() {
-    console.log("🎯 Iniciando Entrevista Motivacional...");
-    goPractice();
-  }
-
-  function funcionNonviolentCommunication() {
-    console.log("🕊️ Configurando Comunicación No Violenta...");
-    goPractice();
-  }
+  
 </script>
 <script src="js/interventions.js"></script>
 <script src="js/archetypes.js"></script>
