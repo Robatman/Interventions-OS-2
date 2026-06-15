@@ -34,90 +34,161 @@
     
     init: function () {
       var el = this.el;
-      var data = this.data;
+      var data = this.data; // Guarda los datos del schema ('mensaje' y 'tecnica')
 
       el.addEventListener('click', function (evt) {
+        // Detiene por completo la propagación tanto en A-Frame como en el DOM nativo
         if (evt.detail && evt.detail.sourceEvent) {
           evt.detail.sourceEvent.stopPropagation();
           evt.detail.sourceEvent.preventDefault();
         }
         evt.stopPropagation(); 
         
+        // 1. Mensaje personalizado en consola usando los datos del componente
         console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id || el.parentElement.id})`);
+        
+        // 2. Ejecutar la función correspondiente según la técnica elegida
         ejecutarFuncionPorTecnica(data.tecnica);
       });
     }
-  });
+  }); // <-- Aquí se cierra PERFECTAMENTE el componente de A-Frame.
 
-  function ejecutarFuncionPorTecnica(tecnica) {
-    console.log("⚡ Buscando técnica:", tecnica);
-    
-    // Todas las técnicas llaman a goPractice(), por lo que podemos meter el comportamiento común aquí
-    switch(tecnica) {
-      case 'active-listening':
-        console.log("🗣️ Activando entorno de Escucha Activa...");
-        goPractice();
-        break;
-      case 'powerful-questions':
-        console.log("❓ Cargando batería de Preguntas Poderosas...");
-        goPractice();
-        break;
-      case 'motivational-interviewing':
-        console.log("🎯 Iniciando Entrevista Motivacional...");
-        goPractice();
-        break;
-      case 'nonviolent-communication':
-        console.log("🕊️ Configurando Comunicación No Violenta...");
-        goPractice();
-        break;a
+  // 🌟 LAS FUNCIONES AHORA VIVEN AFUERA Y SON GLOBALES 🌟
 
-      case 'radical-candor':
-        console.log("🚀 Iniciando radical-candor...");
-        goPractice();
-        break;
-      case 'crucial-conversations':
-        console.log("🚀 Iniciando crucial-conversations...");
-        goPractice();
-        break;
-      case 'tactical-empathy':
-        console.log("🚀 Iniciando tactical-empathy...");
-        goPractice();
-        break;
-      case 'scarf-model':
-        console.log("🚀 Iniciando scarf-model...");
-        goPractice();
-        break;
-      case 'immunity-to-change':
-        console.log("🚀 Iniciando immunity-to-change...");
-        goPractice();
-        break;
-      case 'drama-triangle':
-        console.log("🚀 Iniciando drama-triangle...");
-        goPractice();
-        break;
-      case 'grow-model':
-        console.log("🚀 Iniciando grow-model...");
-        goPractice();
-        break;
-      case 'strengths-based-coaching':
-        console.log("🚀 Iniciando strengths-based-coaching...");
-        goPractice();
-        break;
-      case 'growth-mindset':
-        console.log("🚀 Iniciando growth-mindset...");
-        goPractice();
-        break;
-      case 'solution-focused-coaching':
-        console.log("🚀 Iniciando solution-focused-coaching...");
-        goPractice();
-        break;
+function ejecutarFuncionPorTecnica(tecnica) {
+  console.log("⚡ Buscando técnica:", tecnica);
 
-      default:
-        console.log("⚡ Ejecutando función genérica de la academia. (Por defecto también va a práctica)");
-        // goPractice(); // Si quieres que por defecto ejecute goPractice() pase lo que pase, déjalo aquí.
-    }
+  switch(tecnica) {
+    case 'active-listening':
+      funcionActiveListening();
+      break;
+
+    case 'powerful-questions':
+      funcionPowerfulQuestions();
+      break;
+
+    case 'motivational-interviewing':
+      funcionMotivationalInterviewing();
+      break;
+
+    case 'nonviolent-communication':
+      funcionNonviolentCommunication();
+      break;
+
+    case 'radical-candor':
+      funcionRadicalCandor();
+      break;
+
+    case 'crucial-conversations':
+      funcionCrucialConversations();
+      break;
+
+    case 'tactical-empathy':
+      funcionTacticalEmpathy();
+      break;
+
+    case 'scarf-model':
+      funcionScarfModel();
+      break;
+
+    case 'immunity-to-change':
+      funcionImmunityToChange();
+      break;
+
+    case 'drama-triangle':
+      funcionDramaTriangle();
+      break;
+
+    case 'grow-model':
+      funcionGrowModel();
+      break;
+
+    case 'strengths-based-coaching':
+      funcionStrengthsBasedCoaching();
+      break;
+
+    case 'growth-mindset':
+      funcionGrowthMindset();
+      break;
+
+    case 'solution-focused-coaching':
+      funcionSolutionFocusedCoaching();
+      break;
+
+    default:
+      console.log("⚡ Ejecutando función genérica de la academia.");
+  }
+}
+
+  // Tus funciones independientes listas para ser llamadas:
+  function funcionActiveListening() {
+    console.log("🗣️ Activando entorno de Escucha Activa...");
+    goPractice();
   }
 
+  function funcionPowerfulQuestions() {
+    console.log("❓ Cargando batería de Preguntas Poderosas...");
+    goPractice();
+  }
+
+  function funcionMotivationalInterviewing() {
+    console.log("🎯 Iniciando Entrevista Motivacional...");
+    goPractice();
+  }
+
+  function funcionNonviolentCommunication() {
+    console.log("🕊️ Configurando Comunicación No Violenta...");
+    goPractice();
+  }
+  function funcionRadicalCandor() {
+  console.log("Ejecutando Radical Candor");
+  goPractice();
+}
+
+function funcionCrucialConversations() {
+  console.log("Ejecutando Crucial Conversations");
+  goPractice();
+}
+
+function funcionTacticalEmpathy() {
+  console.log("Ejecutando Tactical Empathy");
+  goPractice();
+}
+
+function funcionScarfModel() {
+  console.log("Ejecutando SCARF Model");
+  goPractice();
+}
+
+function funcionImmunityToChange() {
+  console.log("Ejecutando Immunity to Change");
+  goPractice();
+}
+
+function funcionDramaTriangle() {
+  console.log("Ejecutando Drama Triangle");
+  goPractice();
+}
+
+function funcionGrowModel() {
+  console.log("Ejecutando GROW Model");
+  goPractice();
+}
+
+function funcionStrengthsBasedCoaching() {
+  console.log("Ejecutando Strengths-Based Coaching");
+  goPractice();
+}
+
+function funcionGrowthMindset() {
+  console.log("Ejecutando Growth Mindset");
+  goPractice();
+}
+
+function funcionSolutionFocusedCoaching() {
+  console.log("Ejecutando Solution-Focused Coaching");
+  goPractice();
+}
 
 </script>
 <script src="js/interventions.js"></script>
@@ -418,41 +489,51 @@
 
 
 <!-- ================= FILA 2 ================= -->
+
+<!-- RADICAL CANDOR -->
 <a-entity id="btn-radical-candor" position="-2.7 1.5 -2.8">
   <a-plane class="clickable" 
-           handler-botones-vr="mensaje: Iniciando RADICAL CANDOR; tecnica: radical-candor"
+           handler-botones-vr="mensaje: Abriendo Radical Candor; tecnica: radical-candor"
            width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
   </a-plane>
   <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
   <a-text value="RADICAL CANDOR" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Care personally Challenge directly" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
 </a-entity>
 
+<!-- CRUCIAL CONVERSATIONS -->
 <a-entity id="btn-crucial-conversations" position="-0.9 1.5 -2.8">
   <a-plane class="clickable" 
-           handler-botones-vr="mensaje: Iniciando CRUCIAL CONVERSATIONS; tecnica: crucial-conversations"
+           handler-botones-vr="mensaje: Abriendo Crucial Conversations; tecnica: crucial-conversations"
            width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
   </a-plane>
   <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
   <a-text value="CRUCIAL CONVERSATIONS" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Alto riesgo emociones fuertes" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
 </a-entity>
 
+<!-- TACTICAL EMPATHY -->
 <a-entity id="btn-tactical-empathy" position="0.9 1.5 -2.8">
   <a-plane class="clickable" 
-           handler-botones-vr="mensaje: Iniciando TACTICAL EMPATHY; tecnica: tactical-empathy"
+           handler-botones-vr="mensaje: Abriendo Tactical Empathy; tecnica: tactical-empathy"
            width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
   </a-plane>
-  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
   <a-text value="TACTICAL EMPATHY" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Etiqueta emociones espeja pregunta" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
 </a-entity>
 
+<!-- SCARF MODEL -->
 <a-entity id="btn-scarf-model" position="2.7 1.5 -2.8">
   <a-plane class="clickable" 
-           handler-botones-vr="mensaje: Iniciando SCARF MODEL; tecnica: scarf-model"
+           handler-botones-vr="mensaje: Abriendo SCARF Model; tecnica: scarf-model"
            width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
   </a-plane>
-  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
   <a-text value="SCARF MODEL" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Status Certainty Autonomy Relatedness" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
 </a-entity>
+
 
 <!-- ================= FILA 3 ================= -->
 
@@ -1148,16 +1229,16 @@ if(btnTechBack)
   });
 });
  
-    // document.querySelector('a-scene').addEventListener('loaded', () => {
-    //   console.log("🚀 Sistema de rastreo de clics activado.");
-    //   const botones = document.querySelectorAll('.clickable');
-    //   botones.forEach(boton => {
-    //     boton.addEventListener('click', (evento) => {
-    //       console.log(`🎯 ¡Click detectado! Le...`);
-    //       // ...
-    //     });
-    //   });
-    // });
+    document.querySelector('a-scene').addEventListener('loaded', () => {
+      console.log("🚀 Sistema de rastreo de clics activado.");
+      const botones = document.querySelectorAll('.clickable');
+      botones.forEach(boton => {
+        boton.addEventListener('click', (evento) => {
+          console.log(`🎯 ¡Click detectado! Le...`);
+          // ...
+        });
+      });
+    });
   
 </script>
 </body>
