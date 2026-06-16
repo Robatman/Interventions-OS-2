@@ -55,19 +55,6 @@
 
   // 🌟 LAS FUNCIONES AHORA VIVEN AFUERA Y SON GLOBALES 🌟
 
-
-function desactivarTodosLosBotones() {
-  // Oculta el contenedor y rompe la interacción de golpe
-  document.querySelector("#contenedor-botones").setAttribute("visible", "false");
-}
-
-function activarTodosLosBotones() {
-  // Los muestra y vuelven a ser interactivos
-  document.querySelector("#contenedor-botones").setAttribute("visible", "true");
-}
-
-
-
   function ejecutarFuncionPorTecnica(tecnica) {
     console.log("⚡ Buscando técnica:", tecnica); // Esto te ayudará a debuggear en consola
     switch(tecnica) {
@@ -92,25 +79,21 @@ function activarTodosLosBotones() {
   function funcionActiveListening() {
     console.log("🗣️ Activando entorno de Escucha Activa...");
     goPractice();
-    desactivarTodosLosBotones();
   }
 
   function funcionPowerfulQuestions() {
     console.log("❓ Cargando batería de Preguntas Poderosas...");
     goPractice();
-    desactivarTodosLosBotones();
   }
 
   function funcionMotivationalInterviewing() {
     console.log("🎯 Iniciando Entrevista Motivacional...");
     goPractice();
-    desactivarTodosLosBotones();
   }
 
   function funcionNonviolentCommunication() {
     console.log("🕊️ Configurando Comunicación No Violenta...");
     goPractice();
-    desactivarTodosLosBotones();
   }
 </script>
 <script src="js/interventions.js"></script>
@@ -304,154 +287,260 @@ function activarTodosLosBotones() {
   </a-entity>
 
   <!-- SCREEN: TECHNIQUES -->
-<a-entity id="contenedor-botones" visible="false">
-    <a-entity id="screen-technique-list">
+  <a-entity id="screen-technique-list" visible="false">
 
-      <a-text value="TECHNIQUES" position="0 2.5 -2.8" align="center" color="#e8eeff" width="6" font="exo2bold"></a-text>
-      <a-text value="Choose a technique to practice" position="0 2.18 -2.8" align="center" color="#c8d8ff" width="4.5" opacity="0.7" font="mozillavr"></a-text>
+  <a-text value="TECHNIQUES"
+          position="0 2.5 -2.8"
+          align="center"
+          color="#e8eeff"
+          width="6"
+          font="exo2bold">
+  </a-text>
 
-      <a-entity id="btn-active-listening" position="-2.7 2.3 -2.8">
-        <a-plane class="clickable" 
-                 handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening" 
-                 width="1.6" height="0.7" color="#0a1424" material="opacity:0.85; shader:flat; transparent:true"
-                 animation__mouseenter="property: material.color; to: #162c50; dur: 200; startEvents: mouseenter"
-                 animation__mouseleave="property: material.color; to: #0a1424; dur: 200; startEvents: mouseleave"
-                 animation__click="property: scale; to: 0.95 0.95 1; dur: 100; dir: alternate; loop: 1; startEvents: click">
-        </a-plane>
-        <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.25; shader:flat; transparent:true" position="0 0 -0.005"
-                 animation__neonIn="property: material.opacity; to: 0.9; dur: 150; startEvents: mouseenter"
-                 animation__neonOut="property: material.opacity; to: 0.25; dur: 150; startEvents: mouseleave">
-        </a-plane>
-        <a-text value="ACTIVE LISTENING" align="center" color="#ffffff" width="3" position="0 0 0.04" font="mozillavr"></a-text>
-      </a-entity>
+  <a-text value="Choose a technique to practice"
+          position="0 2.18 -2.8"
+          align="center"
+          color="#c8d8ff"
+          width="4.5"
+          opacity="0.7"
+          font="mozillavr">
+  </a-text>
 
-      <a-entity id="btn-powerful-questions" position="-0.9 2.3 -2.8" rotation="5 0 0">
-        <a-plane class="clickable" 
-                 handler-botones-vr="mensaje: Abriendo panel de Preguntas Poderosas; tecnica: powerful-questions"
-                 width="1.6" height="0.7" color="#0a1424" material="opacity:0.85; shader:flat; transparent:true"
-                 animation__mouseenter="property: material.color; to: #162c50; dur: 200; startEvents: mouseenter"
-                 animation__mouseleave="property: material.color; to: #0a1424; dur: 200; startEvents: mouseleave"
-                 animation__click="property: scale; to: 0.95 0.95 1; dur: 100; dir: alternate; loop: 1; startEvents: click">
-        </a-plane>
-        <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.25; shader:flat; transparent:true" position="0 0 -0.005"
-                 animation__neonIn="property: material.opacity; to: 0.9; dur: 150; startEvents: mouseenter"
-                 animation__neonOut="property: material.opacity; to: 0.25; dur: 150; startEvents: mouseleave">
-        </a-plane>
-        <a-text value="POWERFUL QUESTIONS" align="center" color="#ffffff" width="3.2" position="0 0 0.04" font="mozillavr"></a-text>
-      </a-entity>
+  <!-- ACTIVE LISTENING -->
 
-      <a-entity id="btn-motivational-interviewing" position="0.9 2.3 -2.8">
-        <a-plane class="clickable" 
-                 handler-botones-vr="mensaje: Desplegando Entrevista Motivacional; tecnica: motivational-interviewing" 
-                 width="1.6" height="0.7" color="#0a1424" material="opacity:0.85; shader:flat; transparent:true"
-                 animation__mouseenter="property: material.color; to: #162c50; dur: 200; startEvents: mouseenter"
-                 animation__mouseleave="property: material.color; to: #0a1424; dur: 200; startEvents: mouseleave"
-                 animation__click="property: scale; to: 0.95 0.95 1; dur: 100; dir: alternate; loop: 1; startEvents: click">
-        </a-plane>
-        <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.25; shader:flat; transparent:true" position="0 0 -0.005"
-                 animation__neonIn="property: material.opacity; to: 0.9; dur: 150; startEvents: mouseenter"
-                 animation__neonOut="property: material.opacity; to: 0.25; dur: 150; startEvents: mouseleave">
-        </a-plane>
-        <a-text value="MOTIVATIONAL INTERVIEWING" align="center" color="#e8eeff" width="3" position="0 0 0.04" font="mozillavr"></a-text>
-      </a-entity>
+  <!-- ACTIVE LISTENING -->
+<!-- ================= FILA 1 ================= -->
 
-      <a-entity id="btn-nonviolent-communication" position="2.7 2.3 -2.8">
-        <a-plane class="clickable" 
-                 handler-botones-vr="mensaje: Iniciando Comunicación No Violenta; tecnica: nonviolent-communication" 
-                 width="1.6" height="0.7" color="#0a1424" material="opacity:0.85; shader:flat; transparent:true"
-                 animation__mouseenter="property: material.color; to: #162c50; dur: 200; startEvents: mouseenter"
-                 animation__mouseleave="property: material.color; to: #0a1424; dur: 200; startEvents: mouseleave"
-                 animation__click="property: scale; to: 0.95 0.95 1; dur: 100; dir: alternate; loop: 1; startEvents: click">
-        </a-plane>
-        <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.25; shader:flat; transparent:true" position="0 0 -0.005"
-                 animation__neonIn="property: material.opacity; to: 0.9; dur: 150; startEvents: mouseenter"
-                 animation__neonOut="property: material.opacity; to: 0.25; dur: 150; startEvents: mouseleave">
-        </a-plane>
-        <a-text value="NONVIOLENT COMMUNICATION" align="center" color="#e8eeff" width="3" position="0 0 0.04" font="mozillavr"></a-text>
-      </a-entity>
+<!-- ACTIVE LISTENING -->
+<a-entity id="btn-active-listening" position="-2.7 2.3 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="ACTIVE LISTENING" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+</a-entity>
 
-    </a-entity>
+<!-- POWERFUL QUESTIONS -->
+<a-entity id="btn-powerful-questions" position="-0.9 2.3 -2.8">
+  
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo panel de Preguntas Poderosas; tecnica: powerful-questions"
+           width="1.6" 
+           height="0.7" 
+           color="#112540" 
+           material="opacity:0.93;shader:flat">
+  </a-plane>
+  
+  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  
+  <a-text value="POWERFUL QUESTIONS" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
 
-    <a-entity id="btn-radical-candor" position="-2.7 1.5 -2.8">
-      <a-plane class="clickable" handler-botones-vr="mensaje: Abriendo Radical Candor; tecnica: radical-candor" width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="RADICAL CANDOR" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-      <a-text value="Care personally Challenge directly" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-    </a-entity>
+</a-entity>
 
-    <a-entity id="btn-crucial-conversations" position="-0.9 1.5 -2.8">
-      <a-plane class="clickable" handler-botones-vr="mensaje: Abriendo Crucial Conversations; tecnica: crucial-conversations" width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="CRUCIAL CONVERSATIONS" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-      <a-text value="Alto riesgo emociones fuertes" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-    </a-entity>
+<!-- ================= FILA 1 ================= -->
 
-    <a-entity id="btn-tactical-empathy" position="0.9 1.5 -2.8">
-      <a-plane class="clickable" handler-botones-vr="mensaje: Abriendo Tactical Empathy; tecnica: tactical-empathy" width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="TACTICAL EMPATHY" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-      <a-text value="Etiqueta emociones espeja pregunta" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-    </a-entity>
+<!-- POWERFUL QUESTIONS -->
+<a-entity id="btn-powerful-questions" position="-0.9 2.3 -2.8" rotation="5 0 0">
+  
+  <!-- 🌟 PLANO INTERACTIVO (FONDO): Cambia de color suavemente al pasar el rayo (Hover) -->
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo panel de Preguntas Poderosas; tecnica: powerful-questions"
+           width="1.6" height="0.7" 
+           color="#0a1424" 
+           material="opacity:0.85; shader:flat; transparent:true"
+           animation__mouseenter="property: material.color; to: #162c50; dur: 200; startEvents: mouseenter"
+           animation__mouseleave="property: material.color; to: #0a1424; dur: 200; startEvents: mouseleave"
+           animation__click="property: scale; to: 0.95 0.95 1; dur: 100; dir: alternate; loop: 1; startEvents: click">
+  </a-plane>
+  
+  <!-- ⚡ BORDE DE NEÓN RESPLANDECIENTE: Se "enciende" e intensifica su brillo cuando lo apuntas con el control -->
+  <a-plane width="1.64" height="0.74" 
+           color="#00e5c0" 
+           material="opacity:0.25; shader:flat; transparent:true" 
+           position="0 0 -0.005"
+           animation__neonIn="property: material.opacity; to: 0.9; dur: 150; startEvents: mouseenter"
+           animation__neonOut="property: material.opacity; to: 0.25; dur: 150; startEvents: mouseleave">
+  </a-plane>
+  
+  <!-- 🧊 TEXTO CON PROFUNDIDAD (Efecto Parallax): Separado flotando hacia adelante en el eje Z (0.04) -->
+  <a-text value="POWERFUL QUESTIONS" 
+           align="center" color="#ffffff" width="3.2" 
+           position="0 0 0.04" font="mozillavr"
+           shader="msdf" negacontour="true">
+  </a-text>
 
-    <a-entity id="btn-scarf-model" position="2.7 1.5 -2.8">
-      <a-plane class="clickable" handler-botones-vr="mensaje: Abriendo SCARF Model; tecnica: scarf-model" width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="SCARF MODEL" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-      <a-text value="Status Certainty Autonomy Relatedness" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-    </a-entity>
+</a-entity>
 
-    <a-entity id="btn-immunity-to-change" position="-2.7 0.7 -2.8">
-      <a-plane class="clickable" handler-botones-vr="mensaje: Abriendo Immunity to Change; tecnica: immunity-to-change" width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="IMMUNITY TO CHANGE" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-      <a-text value="Compromisos ocultos que bloquean" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-    </a-entity>
+<!-- MOTIVATIONAL INTERVIEWING -->
+<a-entity id="btn-motivational-interviewing" position="0.9 2.3 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Desplegando Entrevista Motivacional; tecnica: motivational-interviewing"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="MOTIVATIONAL INTERVIEWING" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+</a-entity>
 
-    <a-entity id="btn-drama-triangle" position="-0.9 0.7 -2.8">
-      <a-plane class="clickable" handler-botones-vr="mensaje: Abriendo Drama Triangle; tecnica: drama-triangle" width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="DRAMA TRIANGLE" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-      <a-text value="Victima Rescatador Perseguidor" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-    </a-entity>
-
-    <a-entity id="btn-grow-model" position="0.9 0.7 -2.8">
-      <a-plane class="clickable" handler-botones-vr="mensaje: Abriendo GROW Model; tecnica: grow-model" width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.64" height="0.74" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="GROW MODEL" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-      <a-text value="Goal Reality Options Will" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-    </a-entity>
-
-    <a-entity id="btn-strengths-based-coaching" position="2.7 0.7 -2.8">
-      <a-plane class="clickable" handler-botones-vr="mensaje: Abriendo Strengths-Based Coaching; tecnica: strengths-based-coaching" width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.64" height="0.74" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="STRENGTHS-BASED" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-      <a-text value="Construye desde lo que funciona" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-    </a-entity>
-
-    <a-entity id="btn-growth-mindset" position="-0.9 -0.1 -2.8">
-      <a-plane class="clickable" handler-botones-vr="mensaje: Abriendo Growth Mindset; tecnica: growth-mindset" width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.64" height="0.74" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="GROWTH MINDSET" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-      <a-text value="De fijo a fluido la habilidad" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-    </a-entity>
-
-    <a-entity id="btn-solution-focused-coaching" position="0.9 -0.1 -2.8">
-      <a-plane class="clickable" handler-botones-vr="mensaje: Abriendo Solution-Focused Coaching; tecnica: solution-focused-coaching" width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.64" height="0.74" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="SOLUTION-FOCUSED" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
-      <a-text value="Que ya esta funcionando Haz mas" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
-    </a-entity>
-
-    <a-entity id="btn-tech-list-back" position="0 -0.7 -2.4">
-      <a-plane class="clickable" width="0.82" height="0.24" color="#111830" material="opacity:0.85;shader:flat"></a-plane>
-      <a-plane width="0.86" height="0.28" color="#4466ff" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="BACK" align="center" color="#4466ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
-    </a-entity>
-
-  </a-entity> </a-entity>
+<!-- NONVIOLENT COMMUNICATION -->
+<a-entity id="btn-nonviolent-communication" position="2.7 2.3 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Iniciando Comunicación No Violenta; tecnica: nonviolent-communication"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="NONVIOLENT COMMUNICATION" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+</a-entity>
 
 
+<!-- ================= FILA 2 ================= -->
 
+<!-- RADICAL CANDOR -->
+<a-entity id="btn-radical-candor" position="-2.7 1.5 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo Radical Candor; tecnica: radical-candor"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="RADICAL CANDOR" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Care personally Challenge directly" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- CRUCIAL CONVERSATIONS -->
+<a-entity id="btn-crucial-conversations" position="-0.9 1.5 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo Crucial Conversations; tecnica: crucial-conversations"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="CRUCIAL CONVERSATIONS" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Alto riesgo emociones fuertes" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- TACTICAL EMPATHY -->
+<a-entity id="btn-tactical-empathy" position="0.9 1.5 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo Tactical Empathy; tecnica: tactical-empathy"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="TACTICAL EMPATHY" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Etiqueta emociones espeja pregunta" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- SCARF MODEL -->
+<a-entity id="btn-scarf-model" position="2.7 1.5 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo SCARF Model; tecnica: scarf-model"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="SCARF MODEL" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Status Certainty Autonomy Relatedness" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+
+<!-- ================= FILA 3 ================= -->
+
+<!-- IMMUNITY TO CHANGE -->
+<a-entity id="btn-immunity-to-change" position="-2.7 0.7 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo Immunity to Change; tecnica: immunity-to-change"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="IMMUNITY TO CHANGE" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Compromisos ocultos que bloquean" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- DRAMA TRIANGLE -->
+<a-entity id="btn-drama-triangle" position="-0.9 0.7 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo Drama Triangle; tecnica: drama-triangle"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#a855f7" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="DRAMA TRIANGLE" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Victima Rescatador Perseguidor" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- GROW MODEL -->
+<a-entity id="btn-grow-model" position="0.9 0.7 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo GROW Model; tecnica: grow-model"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="GROW MODEL" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Goal Reality Options Will" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- STRENGTHS-BASED COACHING -->
+<a-entity id="btn-strengths-based-coaching" position="2.7 0.7 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo Strengths-Based Coaching; tecnica: strengths-based-coaching"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="STRENGTHS-BASED" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Construye desde lo que funciona" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+
+<!-- ================= FILA 4 (Centrada) ================= -->
+
+<!-- GROWTH MINDSET -->
+<a-entity id="btn-growth-mindset" position="-0.9 -0.1 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo Growth Mindset; tecnica: growth-mindset"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="GROWTH MINDSET" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="De fijo a fluido la habilidad" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+<!-- SOLUTION-FOCUSED COACHING -->
+<a-entity id="btn-solution-focused-coaching" position="0.9 -0.1 -2.8">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo Solution-Focused Coaching; tecnica: solution-focused-coaching"
+           width="1.6" height="0.7" color="#112540" material="opacity:0.93;shader:flat">
+  </a-plane>
+  <a-plane width="1.64" height="0.74" color="#f59e0b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="SOLUTION-FOCUSED" align="center" color="#e8eeff" width="3" position="0 0.08 0.01" font="mozillavr"></a-text>
+  <a-text value="Que ya esta funcionando Haz mas" align="center" color="#c8d8ff" width="2.6" position="0 -0.14 0.01" opacity="0.7" wrap-count="24" font="mozillavr"></a-text>
+</a-entity>
+
+  <!-- BACK -->
+
+  <a-entity id="btn-tech-list-back"
+            position="0 -0.7 -2.4"
+            class="clickable">
+
+    <a-plane width="0.82"
+             height="0.24"
+             color="#111830"
+             material="opacity:0.85;shader:flat">
+    </a-plane>
+
+    <a-plane width="0.86"
+             height="0.28"
+             color="#4466ff"
+             material="opacity:0.3;transparent:true;shader:flat"
+             position="0 0 -0.005">
+    </a-plane>
+
+    <a-text value="BACK"
+            align="center"
+            color="#4466ff"
+            width="3"
+            position="0 0 0.01"
+            font="mozillavr">
+    </a-text>
+
+  </a-entity>
+
+</a-entity>
   <a-entity id="screen-techniques" visible="false">
     <a-text value="TECHNIQUES" position="0 2.5 -2.8" align="center" color="#e8eeff" width="6" font="exo2bold"></a-text>
     <a-text value="Communication and leadership tools" position="0 2.18 -2.8" align="center" color="#c8d8ff" width="4.5" opacity="0.7" font="mozillavr"></a-text>
@@ -667,7 +756,6 @@ function goPractice(){
   function go14button(){
   console.log("Entro a go14Butones");
     showScreen('technique-list');
-    activarTodosLosBotones();
   }
 
 function updateAgentAvatar(arch){
