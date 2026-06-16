@@ -26,33 +26,33 @@
 (function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
 </script>
 <script>  
-  AFRAME.registerComponent('handler-botones-vr', {
-    schema: {
-      mensaje: {type: 'string', default: 'Botón presionado'},
-      tecnica: {type: 'string', default: 'generica'}
-    },
-    
-    init: function () {
-      var el = this.el;
-      var data = this.data; // Guarda los datos del schema ('mensaje' y 'tecnica')
+AFRAME.registerComponent('handler-botones-vr', {
+  schema: {
+    mensaje: {type: 'string', default: 'Botón presionado'},
+    tecnica: {type: 'string', default: 'generica'}
+  },
+  
+  init: function () {
+    var el = this.el;
+    var data = this.data;
 
-      el.addEventListener('click', function (evt) {
-        // Detiene por completo la propagación tanto en A-Frame como en el DOM nativo
-        if (evt.detail && evt.detail.sourceEvent) {
-          evt.detail.sourceEvent.stopPropagation();
-          evt.detail.sourceEvent.preventDefault();
-        }
-        evt.stopPropagation(); 
-        
-        // 1. Mensaje personalizado en consola usando los datos del componente
-        console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id || el.parentElement.id})`);
-        
-        // 2. Ejecutar la función correspondiente según la técnica elegida
-        ejecutarFuncionPorTecnica(data.tecnica);
-      });
-    }
-  }); // <-- Aquí se cierra PERFECTAMENTE el componente de A-Frame.
+    el.addEventListener('click', function (evt) {
+      // 🔒 SI EL BOTÓN ESTÁ OCULTO (O SU PANTALLA PADRE), IGNORAMOS EL EVENTO completamente
+      if (el.object3D && el.object3D.visible === false) {
+        return;
+      }
 
+      if (evt.detail && evt.detail.sourceEvent) {
+        evt.detail.sourceEvent.stopPropagation();
+        evt.detail.sourceEvent.preventDefault();
+      }
+      evt.stopPropagation(); 
+      
+      console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id || el.parentElement.id})`);
+      ejecutarFuncionPorTecnica(data.tecnica);
+    });
+  }
+});
   // 🌟 LAS FUNCIONES AHORA VIVEN AFUERA Y SON GLOBALES 🌟
 
   function ejecutarFuncionPorTecnica(tecnica) {
@@ -731,10 +731,9 @@
     </a-entity>
   </a-entity>
 
- <a-camera id="main-camera" position="0 1.6 0" look-controls wasd-controls="enabled:false">
+  <a-camera id="main-camera" position="0 1.6 0" look-controls wasd-controls="enabled:false">
     <a-entity geometry="primitive:ring;radiusInner:0.007;radiusOuter:0.012" material="color:#00e5c0;shader:flat;opacity:0.85" position="0 0 -1.0"></a-entity>
-    <!-- MODIFICADO: Ahora el cursor nativo solo clickea lo que tenga la clase Y sea visible en pantalla -->
-    <a-cursor id="vr-cursor" raycaster="objects: [visible='true'] .clickable; far:6" fuse="false" color="#00e5c0" opacity="0" position="0 0 -1.0" geometry="primitive:ring;radiusInner:0.009;radiusOuter:0.014" material="color:#00e5c0;shader:flat;opacity:0"></a-cursor>
+    <a-cursor id="vr-cursor" raycaster="objects: .clickable; far:6" fuse="false" color="#00e5c0" opacity="0" position="0 0 -1.0" geometry="primitive:ring;radiusInner:0.009;radiusOuter:0.014" material="color:#00e5c0;shader:flat;opacity:0"></a-cursor>
   </a-camera>
 </a-scene>
 
@@ -1142,28 +1141,41 @@ async function transcribeAudio(blob){
 function setupControllers(){
   var scene=document.querySelector('a-scene');
   
-  // Mano Derecha - Ahora solo intersecta elementos visibles con la clase .clickable
+  // Mano Derecha
   var rc=document.createElement('a-entity');
   rc.setAttribute('oculus-touch-controls','hand:right');
-  rc.setAttribute('raycaster','objects: [visible="true"] .clickable; far:6; showLine:true; lineColor:#00e5c0; lineOpacity:0.7');
+  rc.setAttribute('raycaster','objects: .clickable; far:6; showLine:true; lineColor:#00e5c0; lineOpacity:0.7');
   scene.appendChild(rc);
   
-  // Mano Izquierda - Ahora solo intersecta elementos visibles con la clase .clickable
+  // Mano Izquierda
   var lc=document.createElement('a-entity');
   lc.setAttribute('oculus-touch-controls','hand:left');
-  lc.setAttribute('raycaster','objects: [visible="true"] .clickable; far:6; showLine:true; lineColor:#9d5cff; lineOpacity:0.5');
+  lc.setAttribute('raycaster','objects: .clickable; far:6; showLine:true; lineColor:#9d5cff; lineOpacity:0.5');
   scene.appendChild(lc);
   
   [rc,lc].forEach(function(ctrl){
     ctrl.addEventListener('triggerdown',function(){
       var hit=ctrl.components&&ctrl.components.raycaster&&ctrl.components.raycaster.intersectedEls&&ctrl.components.raycaster.intersectedEls[0];
-      if(hit){hit.click();return;}
+      
+      if(hit){
+        // 🛑 FILTRO DE VISIBILIDAD DE SEGURIDAD
+        // object3D.visible evalúa si el elemento o sus padres ocultaron la entidad en la escena 3D
+        if (hit.object3D && hit.object3D.visible === false) {
+          console.log("🔒 Clic fantasma bloqueado en elemento oculto:", hit.id);
+          return; 
+        }
+        
+        hit.click();
+        return;
+      }
+      
       if(appState.screen==='practice'){
         if(!isRecording&&!isProcessing)startRecording();
         else if(isRecording)stopRecording();
       }
     });
   });
+  
   rc.addEventListener('abuttondown',function(){
     if(appState.screen==='practice'){
       if(!isRecording&&!isProcessing)startRecording();
@@ -1171,6 +1183,7 @@ function setupControllers(){
     }
   });
 }
+
 
 document.addEventListener('DOMContentLoaded',function(){
   var micBtn=document.getElementById('mic-btn');
