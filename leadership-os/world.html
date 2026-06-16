@@ -1145,41 +1145,115 @@ async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
   await audio.play();
 }
   
-async function setupMic(){
-  try{
-    audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
-    audioContext=new (window.AudioContext||window.webkitAudioContext)();
-    analyser=audioContext.createAnalyser();
-    analyser.fftSize=2048;
-    audioContext.createMediaStreamSource(audioStream).connect(analyser);
-    setHUD('ready','Listo para hablar');
-  } catch(e){
-    setHUD('idle','Sin microfono - modo texto');
-    console.error('[Mic]',e);
+// =========================================================================
+// 1. SETUP MIC: Inicialización básica limpia al cargar la página
+// =========================================================================
+async function setupMic() {
+  try {
+    // Solo pedimos permisos iniciales para asegurar que el usuario los otorgue en 2D
+    // Guardamos una referencia global del stream
+    window.localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    setHUD('ready', 'Micrófono inicializado');
+    console.log("🎙️ [Mic] Permisos iniciales concedidos de forma correcta.");
+  } catch (e) {
+    console.error("❌ [Mic] Error al pedir permisos iniciales:", e);
+    setHUD('idle', 'Error de micrófono');
   }
 }
 
-function startRecording(){
-  if(isRecording||isProcessing||!audioStream)return;
-  audioChunks=[];isRecording=true;
-  var mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
-  mediaRecorder=new MediaRecorder(audioStream,{mimeType:mime});
-  mediaRecorder.ondataavailable=function(e){if(e.data.size>0)audioChunks.push(e.data);};
-  mediaRecorder.onstop=onRecordingStop;
-  mediaRecorder.start();
-  setHUD('rec','Grabando...');
-  var btn=document.getElementById('mic-btn');if(btn)btn.classList.add('recording');
-  startSilenceDetection();
-  setTimeout(function(){if(isRecording)stopRecording();},25000);
+// =========================================================================
+// 2. START RECORDING: Se ejecuta al presionar el gatillo estando listos
+// =========================================================================
+async function startRecording() {
+  if (isRecording || isProcessing) return;
+
+  try {
+    console.log("🎙️ Reanudando hardware de micrófono para Meta Quest...");
+    
+    // 🛡️ PASO CLAVE PARA META QUEST BROWSER:
+    // Si perdimos el flujo o los tracks se cerraron, volvemos a solicitar el stream 
+    // Justo en el momento del "click/triggerdown" del usuario (evento físico directo requerido).
+    if (!window.localStream || window.localStream.getTracks().every(track => track.readyState === 'ended')) {
+      window.localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    }
+
+    // Si tu código usa un AudioContext global, forzamos su reanudación aquí
+    if (window.audioContext && window.audioContext.state === 'suspended') {
+      await window.audioContext.resume();
+    }
+
+    // Creamos y configuramos el MediaRecorder de forma fresca con el stream activo
+    mediaRecorder = new MediaRecorder(window.localStream);
+    chunks = [];
+
+    mediaRecorder.ondataavailable = function(e) {
+      if (e.data && e.data.size > 0) {
+        chunks.push(e.data);
+      }
+    };
+
+    mediaRecorder.onstop = async function() {
+      console.log("📦 Grabación finalizada. Procesando chunks de audio...");
+      isProcessing = true;
+      setHUD('thinking', 'Procesando audio...');
+      
+      var blob = new Blob(chunks, { type: 'audio/webm' });
+      
+      // Enviamos al backend/API (Tu lógica original para transcribir y responder con Groq/Whisper)
+      await sendAudioToPipeline(blob); 
+    };
+
+    // ¡Arrancamos la grabación física!
+    mediaRecorder.start();
+    isRecording = true;
+    
+    // Actualizamos la interfaz del HUD y botón visual
+    setHUD('rec', 'Escuchando...');
+    var micBtn = document.getElementById('mic-btn');
+    if (micBtn) micBtn.classList.add('recording');
+    
+    console.log("🟢 Grabación iniciada con éxito en VR.");
+  } catch (err) {
+    console.error("❌ Error crítico al intentar iniciar la grabación en VR:", err);
+    setHUD('ready', 'Error al grabar, intenta de nuevo');
+    isRecording = false;
+    isProcessing = false;
+  }
 }
 
-function stopRecording(){
-  if(!isRecording||!mediaRecorder)return;
-  isRecording=false;
-  if(silenceTimer){cancelAnimationFrame(silenceTimer);silenceTimer=null;}
-  mediaRecorder.stop();
-  var btn=document.getElementById('mic-btn');if(btn)btn.classList.remove('recording');
-  setHUD('thinking','Procesando...');
+// =========================================================================
+// 3. STOP RECORDING: Se ejecuta al soltar o volver a presionar el gatillo
+// =========================================================================
+function stopRecording() {
+  if (!isRecording) return;
+
+  try {
+    // Detenemos el MediaRecorder de forma normal para que dispare su evento `.onstop`
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
+    
+    isRecording = false;
+    
+    // Quitamos los estilos visuales de grabación
+    var micBtn = document.getElementById('mic-btn');
+    if (micBtn) micBtn.classList.remove('recording');
+
+    // 🛡️ SEGUNDO PASO CLAVE PARA META QUEST BROWSER:
+    // Apagamos los tracks del micrófono temporalmente. 
+    // Esto fuerza al visor a liberar el canal de audio tridimensional para que no se quede sordo ni buclado.
+    if (window.localStream) {
+      window.localStream.getTracks().forEach(function(track) {
+        track.stop();
+      });
+      console.log("🔒 Canal del micrófono liberado para evitar congelamiento de hardware.");
+    }
+  } catch (err) {
+    console.error("❌ Error al detener la grabación:", err);
+    setHUD('ready', 'Listo para hablar');
+    isRecording = false;
+    isProcessing = false;
+  }
 }
 
 function startSilenceDetection(){
