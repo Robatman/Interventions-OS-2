@@ -99,7 +99,7 @@
     console.log("🕊️ Configurando Comunicación No Violenta...");
     goPractice();
   }
-  
+
   function funcionRadicalCandor() {
     console.log("🕊️ Iniciando El Radical Candor...");
     goPractice();
@@ -775,11 +775,28 @@ function pickRandomOpener(archetype,scenario){
 }
 
 function showScreen(name){
+  // 1. Tu lógica original para ocultar/mostrar pantallas
   ['welcome','mode','practice','eval','technique-list'].forEach(function(s){
     var el=document.getElementById('screen-'+s);
     if(el)el.setAttribute('visible',s===name);
   });
   appState.screen=name;
+
+  // 2. ⚡ NUEVO: Actualizar el Raycaster según la pantalla activa
+  var raycasterEl = document.querySelector('[raycaster]');
+  
+  if (raycasterEl) {
+    if (name === 'practice') {
+      // Si entramos a la práctica, el láser SOLO detectará el botón "Terminar"
+      raycasterEl.setAttribute('raycaster', 'objects: .clickable-practice');
+    } else if (name === 'technique-list') {
+      // Si volvemos a la lista de técnicas, el láser SOLO detectará tus 14 botones
+      raycasterEl.setAttribute('raycaster', 'objects: .clickable-menu');
+    } else {
+      // Para cualquier otra pantalla, puedes dejar que detecte ambas o lo que necesites
+      raycasterEl.setAttribute('raycaster', 'objects: .clickable-menu, .clickable-practice');
+    }
+  }
 }
 
 function goWelcome(){showScreen('welcome');appState.agentHistory=[];appState.vrMood=30;}
