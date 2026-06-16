@@ -773,30 +773,30 @@ function pickRandomOpener(archetype,scenario){
   var vals=Object.values(archetype.openers||{});
   return vals[Math.floor(Math.random()*vals.length)]||'...';
 }
-
 function showScreen(name){
-  // Ocultar y mostrar pantallas usando el atributo visible
+  // 1. Tu lógica normal para ocultar/mostrar pantallas
   ['welcome','mode','practice','eval','interventions','techniques','technique-list'].forEach(function(s){
     var el=document.getElementById('screen-'+s);
     if(el)el.setAttribute('visible',s===name);
   });
   appState.screen=name;
 
-
-  // 2. ⚡ NUEVO: Actualizar el Raycaster según la pantalla activa
-  var raycasterEl = document.querySelector('[raycaster]');
+  // 2. ⚡ CONTROL DINÁMICO DE LOS 14 BOTONES
+  // Buscamos todos los planos que tengan asignado tu componente de técnicas
+  var planosTecnicas = document.querySelectorAll('[handler-botones-vr]');
   
-  if (raycasterEl) {
-    if (name === 'practice') {
-      // Si entramos a la práctica, el láser SOLO detectará el botón "Terminar"
-      raycasterEl.setAttribute('raycaster', 'objects: .clickable-practice');
-    } else if (name === 'technique-list') {
-      // Si volvemos a la lista de técnicas, el láser SOLO detectará tus 14 botones
-      raycasterEl.setAttribute('raycaster', 'objects: .clickable-menu');
-    } else {
-      // Para cualquier otra pantalla, puedes dejar que detecte ambas o lo que necesites
-      raycasterEl.setAttribute('raycaster', 'objects: .clickable-menu, .clickable-practice');
-    }
+  if (name === 'technique-list') {
+    // 🟢 Si entramos a la lista de técnicas, ACTIVAMOS los 14 botones agregándoles la clase
+    planosTecnicas.forEach(function(el) {
+      el.classList.add('clickable');
+    });
+    console.log("🟢 14 botones de técnicas ACTIVADOS");
+  } else {
+    // 🔴 Si nos vamos a cualquier otro lado (goPractice, welcome, etc), los DESACTIVAMOS removiendo la clase
+    planosTecnicas.forEach(function(el) {
+      el.classList.remove('clickable');
+    });
+    console.log("🔴 14 botones de técnicas DESACTIVADOS");
   }
 }
 
