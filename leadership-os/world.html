@@ -55,29 +55,70 @@ AFRAME.registerComponent('handler-botones-vr', {
 });
   // 🌟 LAS FUNCIONES AHORA VIVEN AFUERA Y SON GLOBALES 🌟
 
-  function ejecutarFuncionPorTecnica(tecnica) {
-    console.log("⚡ Buscando técnica:", tecnica); // Esto te ayudará a debuggear en consola
-    switch(tecnica) {
-      case 'active-listening':
-        funcionActiveListening();
-        break;
-      case 'powerful-questions':
-        funcionPowerfulQuestions();
-        break;
-      case 'motivational-interviewing':
-        funcionMotivationalInterviewing();
-        break;
-      case 'nonviolent-communication':
-        funcionNonviolentCommunication();
-        break;
-      case 'radical-candor':
-        funcionRadicalCandor();
-        break;
-      default:
-        
-        console.log("⚡ Ejecutando función genérica de la academia.");
-    }
+function ejecutarFuncionPorTecnica(tecnica) {
+  console.log("⚡ Buscando técnica:", tecnica);
+
+  switch(tecnica) {
+    case 'active-listening':
+      funcionActiveListening();
+      break;
+
+    case 'powerful-questions':
+      funcionPowerfulQuestions();
+      break;
+
+    case 'motivational-interviewing':
+      funcionMotivationalInterviewing();
+      break;
+
+    case 'nonviolent-communication':
+      funcionNonviolentCommunication();
+      break;
+
+    case 'radical-candor':
+      funcionRadicalCandor();
+      break;
+
+    case 'crucial-conversations':
+      funcionCrucialConversations();
+      break;
+
+    case 'tactical-empathy':
+      funcionTacticalEmpathy();
+      break;
+
+    case 'scarf-model':
+      funcionScarfModel();
+      break;
+
+    case 'immunity-to-change':
+      funcionImmunityToChange();
+      break;
+
+    case 'drama-triangle':
+      funcionDramaTriangle();
+      break;
+
+    case 'grow-model':
+      funcionGrowModel();
+      break;
+
+    case 'strengths-based-coaching':
+      funcionStrengthsBasedCoaching();
+      break;
+
+    case 'growth-mindset':
+      funcionGrowthMindset();
+      break;
+
+    case 'solution-focused-coaching':
+      funcionSolutionFocusedCoaching();
+      break;
+
+    default:
+      console.log("⚡ Ejecutando función genérica de la academia.");
   }
+}
 
   // Tus funciones independientes listas para ser llamadas:
   function funcionActiveListening() {
@@ -104,6 +145,51 @@ AFRAME.registerComponent('handler-botones-vr', {
     console.log("🕊️ Iniciando El Radical Candor...");
     goPractice();
   }
+
+  function funcionCrucialConversations() {
+  console.log("🕊️ Iniciando Crucial Conversations...");
+  goPractice();
+}
+
+function funcionTacticalEmpathy() {
+  console.log("🕊️ Iniciando Tactical Empathy...");
+  goPractice();
+}
+
+function funcionScarfModel() {
+  console.log("🕊️ Iniciando SCARF Model...");
+  goPractice();
+}
+
+function funcionImmunityToChange() {
+  console.log("🕊️ Iniciando Immunity to Change...");
+  goPractice();
+}
+
+function funcionDramaTriangle() {
+  console.log("🕊️ Iniciando Drama Triangle...");
+  goPractice();
+}
+
+function funcionGrowModel() {
+  console.log("🕊️ Iniciando GROW Model...");
+  goPractice();
+}
+
+function funcionStrengthsBasedCoaching() {
+  console.log("🕊️ Iniciando Strengths-Based Coaching...");
+  goPractice();
+}
+
+function funcionGrowthMindset() {
+  console.log("🕊️ Iniciando Growth Mindset...");
+  goPractice();
+}
+
+function funcionSolutionFocusedCoaching() {
+  console.log("🕊️ Iniciando Solution-Focused Coaching...");
+  goPractice();
+}
 
   
 </script>
@@ -1073,42 +1159,18 @@ async function setupMic(){
   }
 }
 
-// function startRecording(){
-//   if(isRecording||isProcessing||!audioStream)return;
-//   audioChunks=[];isRecording=true;
-//   var mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
-//   mediaRecorder=new MediaRecorder(audioStream,{mimeType:mime});
-//   mediaRecorder.ondataavailable=function(e){if(e.data.size>0)audioChunks.push(e.data);};
-//   mediaRecorder.onstop=onRecordingStop;
-//   mediaRecorder.start();
-//   setHUD('rec','Grabando...');
-//   var btn=document.getElementById('mic-btn');if(btn)btn.classList.add('recording');
-//   startSilenceDetection();
-//   setTimeout(function(){if(isRecording)stopRecording();},25000);
-// }
-
-async function startRecording() {
-  // 1. SI USAS AUDIOCONTEXT, FUERZA SU REANUDACIÓN TRAS EL CLICK DEL TRIGGER
-  if (window.audioContext && window.audioContext.state === 'suspended') {
-    await window.audioContext.resume();
-  }
-  
-  // 2. Vuelve a validar o solicitar el stream si es necesario
-  // Esto obliga al navegador de Meta a reactivar el hardware del micrófono
-  try {
-    if (!window.localStream) {
-      window.localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    }
-    
-    // Aquí continúa tu lógica original para encender el MediaRecorder...
-    // p.ej: mediaRecorder = new MediaRecorder(window.localStream);
-    // mediaRecorder.start();
-    
-    setHUD('rec', 'Grabando...');
-    console.log("🎙️ Grabación iniciada correctamente en VR");
-  } catch (err) {
-    console.error("Error al reactivar el micrófono:", err);
-  }
+function startRecording(){
+  if(isRecording||isProcessing||!audioStream)return;
+  audioChunks=[];isRecording=true;
+  var mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
+  mediaRecorder=new MediaRecorder(audioStream,{mimeType:mime});
+  mediaRecorder.ondataavailable=function(e){if(e.data.size>0)audioChunks.push(e.data);};
+  mediaRecorder.onstop=onRecordingStop;
+  mediaRecorder.start();
+  setHUD('rec','Grabando...');
+  var btn=document.getElementById('mic-btn');if(btn)btn.classList.add('recording');
+  startSilenceDetection();
+  setTimeout(function(){if(isRecording)stopRecording();},25000);
 }
 
 function stopRecording(){
