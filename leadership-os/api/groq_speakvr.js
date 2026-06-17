@@ -829,7 +829,7 @@ const SUPA_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
 
 let appState = {screen:'welcome',activeMenu:null,currentArchetype:null,currentScenario:null,currentLevel:'novice',agentHistory:[],vrMood:30,boxState:'out',conversationClosed:false,hingesOpened:[]};
 let isRecording=false,isProcessing=false,mediaRecorder=null,audioChunks=[],audioStream=null,audioContext=null,analyser=null,silenceTimer=null;
-const SILENCE_THRESHOLD=12,SILENCE_DURATION=2500;
+const SILENCE_THRESHOLD=38,SILENCE_DURATION=1900;
 
 function setHUD(state,label){
   var dot=document.getElementById('voice-dot'),lbl=document.getElementById('voice-label');
