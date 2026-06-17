@@ -1148,127 +1148,44 @@ async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
 // =========================================================================
 // 1. SETUP MIC: Inicialización de permisos al cargar la app
 // =========================================================================
-async function setupMic() {
-  try {
-    // Solicitud inicial para asegurar los permisos en el navegador en plano 2D
-    window.localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    setHUD('ready', 'Listo para hablar');
-    console.log("🎙️ [Mic] Permisos iniciales concedidos correctamente.");
-  } catch (e) {
-    console.error("❌ [Mic] Error en permisos iniciales:", e);
-    setHUD('idle', 'Error de micrófono');
+async function setupMic(){
+  try{
+    audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+    audioContext=new (window.AudioContext||window.webkitAudioContext)();
+    analyser=audioContext.createAnalyser();
+    analyser.fftSize=2048;
+    audioContext.createMediaStreamSource(audioStream).connect(analyser);
+    setHUD('ready','Listo para hablar');
+  } catch(e){
+    setHUD('idle','Sin microfono - modo texto');
+    console.error('[Mic]',e);
   }
 }
 
-// =========================================================================
-// 2. START RECORDING: Se ejecuta al presionar el gatillo / botón
-// =========================================================================
-async function startRecording() {
-  if (isRecording || isProcessing) return;
-
-  try {
-    console.log("🎙️ Reactivando hardware de audio para VR...");
-    
-    // 🛡️ REAPERTURA LIMPIA PARA META QUEST BROWSER:
-    // Si no hay stream activo o fue cerrado previamente, lo pedimos de forma fresca
-    if (!window.localStream || window.localStream.getTracks().every(track => track.readyState === 'ended')) {
-      window.localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    }
-
-    // Forzar reanudación del contexto de audio web (requisito de seguridad del navegador)
-    if (window.audioContext && window.audioContext.state === 'suspended') {
-      await window.audioContext.resume();
-    }
-
-    // Instancia limpia del MediaRecorder
-    mediaRecorder = new MediaRecorder(window.localStream);
-    chunks = [];
-
-    mediaRecorder.ondataavailable = function(e) {
-      if (e.data && e.data.size > 0) {
-        chunks.push(e.data);
-      }
-    };
-
-    mediaRecorder.onstop = async function() {
-      console.log("📦 Grabación físicamente finalizada. Procesando chunks de audio...");
-      
-      // Creamos el archivo de audio
-      var blob = new Blob(chunks, { type: 'audio/webm' });
-      
-      try {
-        // Enviar el archivo a tu tubería/API (Groq / Whisper / etc)
-        // Usamos un bloque try/catch aquí para que si la API falla, no se quede congelado
-        if (typeof sendAudioToPipeline === 'function') {
-          await sendAudioToPipeline(blob);
-        } else if (typeof sendAudio === 'function') {
-          await sendAudio(blob);
-        } else {
-          console.warn("⚠️ No se encontró la función de envío. Verifica si se llama sendAudio o sendAudioToPipeline.");
-        }
-      } catch (apiError) {
-        console.error("❌ Error en la API de transatlántico/audio:", apiError);
-        setHUD('ready', 'Error de red, intenta de nuevo');
-      } finally {
-        // 🌟 LA CLAVE: Desbloquear las banderas pase lo que pase al terminar el proceso de la API
-        isProcessing = false;
-      }
-    };
-
-    // Comenzamos la captura de audio real
-    mediaRecorder.start();
-    isRecording = true;
-    
-    // Actualización visual inmediata en HUD y botón HTML
-    setHUD('rec', 'Escuchando...');
-    var micBtn = document.getElementById('mic-btn');
-    if (micBtn) micBtn.classList.add('recording');
-    
-    console.log("🟢 Grabación en proceso...");
-  } catch (err) {
-    console.error("❌ Error al iniciar la grabación:", err);
-    setHUD('ready', 'Error al abrir micrófono');
-    isRecording = false;
-    isProcessing = false;
-  }
+function startRecording(){
+  if(isRecording||isProcessing||!audioStream)return;
+  audioChunks=[];isRecording=true;
+  var mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
+  mediaRecorder=new MediaRecorder(audioStream,{mimeType:mime});
+  mediaRecorder.ondataavailable=function(e){if(e.data.size>0)audioChunks.push(e.data);};
+  mediaRecorder.onstop=onRecordingStop;
+  mediaRecorder.start();
+  setHUD('rec','Grabando...');
+  var btn=document.getElementById('mic-btn');if(btn)btn.classList.add('recording');
+  startSilenceDetection();
+  setTimeout(function(){if(isRecording)stopRecording();},25000);
 }
 
-// =========================================================================
-// 3. STOP RECORDING: Se ejecuta al soltar el gatillo / presionar de nuevo
-// =========================================================================
-function stopRecording() {
-  if (!isRecording) return;
-
-  try {
-    // Cambiamos el estado a procesando ANTES de detener el MediaRecorder para evitar colisiones visuales
-    isRecording = false;
-    isProcessing = true;
-    setHUD('thinking', 'Procesando audio...');
-
-    // Quitamos los estilos de grabación del botón plano
-    var micBtn = document.getElementById('mic-btn');
-    if (micBtn) micBtn.classList.remove('recording');
-
-    // Detenemos el MediaRecorder de forma segura, lo que disparará el evento `.onstop` de arriba
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop();
-    }
-    
-    // 🛡️ LIBERACIÓN DE HARDWARE PARA VISORES VR:
-    // Detenemos físicamente los tracks para que el foco de las Quest no mantenga ocupada la tarjeta de audio
-    if (window.localStream) {
-      window.localStream.getTracks().forEach(function(track) {
-        track.stop();
-      });
-      console.log("🔒 Hardware del micrófono liberado correctamente.");
-    }
-  } catch (err) {
-    console.error("❌ Error al detener la grabación:", err);
-    setHUD('ready', 'Listo para hablar');
-    isRecording = false;
-    isProcessing = false;
-  }
+function stopRecording(){
+  if(!isRecording||!mediaRecorder)return;
+  isRecording=false;
+  if(silenceTimer){cancelAnimationFrame(silenceTimer);silenceTimer=null;}
+  mediaRecorder.stop();
+  var btn=document.getElementById('mic-btn');if(btn)btn.classList.remove('recording');
+  setHUD('thinking','Procesando...');
 }
+
+  
 function startSilenceDetection(){
   var data=new Uint8Array(analyser.frequencyBinCount),silenceMs=0,lastTime=performance.now();
   function check(){
