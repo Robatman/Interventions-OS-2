@@ -1150,71 +1150,145 @@ async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
 // =========================================================================
 async function setupMic(){
   try{
+    console.log('[Mic] Solicitando permisos de micrófono...');
     audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+    console.log('[Mic] Permisos concedidos. Stream obtenido:', audioStream.id);
+    
     audioContext=new (window.AudioContext||window.webkitAudioContext)();
+    console.log('[Mic] AudioContext estado inicial:', audioContext.state);
+    
     analyser=audioContext.createAnalyser();
     analyser.fftSize=2048;
     audioContext.createMediaStreamSource(audioStream).connect(analyser);
     setHUD('ready','Listo para hablar');
+    console.log('[Mic] Configuración completa y Analyser conectado.');
   } catch(e){
     setHUD('idle','Sin microfono - modo texto');
-    console.error('[Mic]',e);
+    console.error('[Mic] Error en setupMic:',e);
   }
 }
 
 function startRecording(){
-  if(isRecording||isProcessing||!audioStream)return;
-  audioChunks=[];isRecording=true;
+  console.log('[Grabación] Intento de iniciar grabación. Estado actual -> isRecording:', isRecording, 'isProcessing:', isProcessing, 'hasAudioStream:', !!audioStream);
+  if(isRecording||isProcessing||!audioStream) return;
+  
+  // Reactivar AudioContext por si el navegador lo suspendió (muy común)
+  if (audioContext && audioContext.state === 'suspended') {
+    console.log('[Mic] AudioContext suspendido. Intentando reactivar...');
+    audioContext.resume();
+  }
+
+  audioChunks=[]; isRecording=true;
   var mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
+  console.log('[Grabación] Usando formato MIME:', mime);
+  
   mediaRecorder=new MediaRecorder(audioStream,{mimeType:mime});
-  mediaRecorder.ondataavailable=function(e){if(e.data.size>0)audioChunks.push(e.data);};
+  
+  mediaRecorder.ondataavailable=function(e){
+    if(e.data.size>0){
+      audioChunks.push(e.data);
+      console.log('[Grabación] Chunk recibido. Tamaño:', e.data.size, 'bytes. Total chunks:', audioChunks.length);
+    } else {
+      console.warn('[Grabación] Chunk recibido pero está VACÍO (0 bytes)');
+    }
+  };
+  
   mediaRecorder.onstop=onRecordingStop;
   mediaRecorder.start();
   setHUD('rec','Grabando...');
-  var btn=document.getElementById('mic-btn');if(btn)btn.classList.add('recording');
+  var btn=document.getElementById('mic-btn'); if(btn)btn.classList.add('recording');
+  
+  console.log('[Grabación] Empezando detección de silencio...');
   startSilenceDetection();
-  setTimeout(function(){if(isRecording)stopRecording();},25000);
+  
+  setTimeout(function(){
+    if(isRecording){
+      console.log('[Grabación] Límite de 25 segundos alcanzado. Forzando parada.');
+      stopRecording();
+    }
+  },25000);
 }
 
 function stopRecording(){
+  console.log('[Grabación] stopRecording invocado. ¿Registrando?:', isRecording);
   if(!isRecording||!mediaRecorder)return;
   isRecording=false;
-  if(silenceTimer){cancelAnimationFrame(silenceTimer);silenceTimer=null;}
+  if(silenceTimer){
+    console.log('[Grabación] Limpiando temporizador de silencio.');
+    cancelAnimationFrame(silenceTimer);
+    silenceTimer=null;
+  }
   mediaRecorder.stop();
   var btn=document.getElementById('mic-btn');if(btn)btn.classList.remove('recording');
   setHUD('thinking','Procesando...');
 }
 
-  
 function startSilenceDetection(){
   var data=new Uint8Array(analyser.frequencyBinCount),silenceMs=0,lastTime=performance.now();
+  console.log('[Silencio] Detección iniciada. Umbral (SILENCE_THRESHOLD):', typeof SILENCE_THRESHOLD !== 'undefined' ? SILENCE_THRESHOLD : 'No definido');
+  
   function check(){
-    if(!isRecording)return;
+    if(!isRecording) return;
     analyser.getByteFrequencyData(data);
     var avg=data.reduce(function(a,b){return a+b;},0)/data.length;
-    var now=performance.now(),dt=now-lastTime;lastTime=now;
-    if(avg<SILENCE_THRESHOLD){silenceMs+=dt;if(silenceMs>=SILENCE_DURATION){stopRecording();return;}}
-    else silenceMs=0;
+    var now=performance.now(),dt=now-lastTime; lastTime=now;
+    
+    // Descomenta la línea de abajo si quieres ver el volumen en tiempo real (puede saturar la consola)
+    // console.log('[Silencio] Volumen promedio actual:', avg);
+    
+    if(avg<SILENCE_THRESHOLD){
+      silenceMs+=dt;
+      if(silenceMs>=SILENCE_DURATION){
+        console.log(`[Silencio] Silencio detectado por ${silenceMs}ms (Límite: ${SILENCE_DURATION}ms). Deteniendo grabación automáticamente.`);
+        stopRecording();
+        return;
+      }
+    } else {
+      if(silenceMs > 0) console.log('[Silencio] Ruido detectado, reseteando contador de silencio. Volumen:', avg);
+      silenceMs=0;
+    }
     silenceTimer=requestAnimationFrame(check);
   }
   check();
 }
 
 async function onRecordingStop(){
+  console.log('[Grabación] MediaRecorder se ha detenido. Armando el Blob...');
   var blob=new Blob(audioChunks,{type:'audio/webm'});
-  if(blob.size<800){setHUD('ready','No te escuche, intenta de nuevo');return;}
+  console.log('[Grabación] Archivo de audio generado -> Tamaño total:', blob.size, 'bytes');
+  
+  if(blob.size<800){
+    console.error('[Grabación] El archivo de audio es DEMASIADO PEQUEÑO (menor a 800 bytes). Se cancela el envío.');
+    setHUD('ready','No te escuche, intenta de nuevo');
+    return;
+  }
+  
   isProcessing=true;
   try{
+    console.log('[Whisper] Enviando audio a transcribir...');
     var text=await transcribeAudio(blob);
-    if(!text||text.trim().length<2){setHUD('ready','No entendi, intenta de nuevo');isProcessing=false;return;}
-    console.log('[Whisper]',text);
-    if(appState.screen==='practice')setDialog('TU',text);
+    console.log('[Whisper] Respuesta cruda recibida de la función transcribir:', text);
+    
+    if(!text||text.trim().length<2){
+      console.warn('[Whisper] La transcripción regresó vacía o demasiado corta.');
+      setHUD('ready','No entendi, intenta de nuevo');
+      isProcessing=false;
+      return;
+    }
+    
+    console.log('[Whisper] Transcripción exitosa:', text);
+    if(appState.screen==='practice') setDialog('TU',text);
     setHUD('thinking','Pensando...');
+    
+    console.log('[VR] Ejecutando handleVRSpeech con el texto...');
     await handleVRSpeech(text);
   } catch(e){
-    console.error('[Voice]',e);
+    console.error('[Voice] Error crítico en el flujo de parada/transcripción:', e);
     setHUD('ready','Error, intenta de nuevo');
-  } finally {isProcessing=false;}
+  } finally {
+    isProcessing=false;
+    console.log('[Grabación] Ciclo finalizado. Listo para la siguiente instrucción.');
+  }
 }
 
 async function transcribeAudio(blob){
@@ -1223,13 +1297,30 @@ async function transcribeAudio(blob){
   form.append('model','whisper-large-v3-turbo');
   form.append('language','es');
   form.append('response_format','json');
-  var res=await fetch('/api/groq-whisper',{method:'POST',body:form});
-  var data=await res.json();
-  return data.text||'';
+  
+  console.log('[API Fetch] Enviando POST a /api/groq-whisper...');
+  try {
+    var res=await fetch('/api/groq-whisper',{method:'POST',body:form});
+    console.log('[API Fetch] Status Code del servidor:', res.status, res.statusText);
+    
+    if(!res.ok) {
+      var errorRaw = await res.text();
+      console.error('[API Fetch] Error devuelto por el servidor backend:', errorRaw);
+      throw new Error('Error en el servidor de transcripción');
+    }
+    
+    var data=await res.json();
+    console.log('[API Fetch] JSON decodificado del servidor:', data);
+    return data.text||'';
+  } catch (fetchError) {
+    console.error('[API Fetch] Falló la petición HTTP de fetch:', fetchError);
+    throw fetchError;
+  }
 }
 
 function setupControllers(){
   var scene=document.querySelector('a-scene');
+  console.log('[VR Controles] Inicializando controladores VR...');
   
   // Mano Derecha
   var rc=document.createElement('a-entity');
@@ -1245,35 +1336,41 @@ function setupControllers(){
   
   [rc,lc].forEach(function(ctrl){
     ctrl.addEventListener('triggerdown',function(){
+      console.log('[VR Controles] Trigger presionado en:', ctrl.getAttribute('oculus-touch-controls'));
       var hit=ctrl.components&&ctrl.components.raycaster&&ctrl.components.raycaster.intersectedEls&&ctrl.components.raycaster.intersectedEls[0];
       
       if(hit){
-        // 🛑 FILTRO DE VISIBILIDAD DE SEGURIDAD
-        // object3D.visible evalúa si el elemento o sus padres ocultaron la entidad en la escena 3D
         if (hit.object3D && hit.object3D.visible === false) {
           console.log("🔒 Clic fantasma bloqueado en elemento oculto:", hit.id);
           return; 
         }
-        
+        console.log('[VR Controles] Clic ejecutado en elemento objetivo:', hit.id || hit.tagName);
         hit.click();
         return;
       }
       
+      console.log('[VR Controles] Trigger al aire. ¿Pantalla actual es practice?:', appState.screen);
       if(appState.screen==='practice'){
-        if(!isRecording&&!isProcessing)startRecording();
-        else if(isRecording)stopRecording();
+        if(!isRecording&&!isProcessing) {
+          console.log('[VR Controles] Iniciando grabación vía Trigger.');
+          startRecording();
+        }
+        else if(isRecording) {
+          console.log('[VR Controles] Deteniendo grabación vía Trigger.');
+          stopRecording();
+        }
       }
     });
   });
   
   rc.addEventListener('abuttondown',function(){
+    console.log('[VR Controles] Botón A presionado en mano derecha.');
     if(appState.screen==='practice'){
-      if(!isRecording&&!isProcessing)startRecording();
-      else if(isRecording)stopRecording();
+      if(!isRecording&&!isProcessing) startRecording();
+      else if(isRecording) stopRecording();
     }
   });
 }
-
 
 document.addEventListener('DOMContentLoaded',function(){
   var micBtn=document.getElementById('mic-btn');
