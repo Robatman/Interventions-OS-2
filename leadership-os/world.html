@@ -1006,6 +1006,21 @@ async function callGroqLLM(model, messages, max_tokens, temperature) {
   var MI_GROQ_KEY = "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"; 
   console.log('[API Directa LLM] Enviando petición a Groq Cloud...');
 
+  // --- ARREGLO DE SEGURIDAD PARA EL ERROR 400 ---
+  var formattedMessages = [];
+
+  if (!messages) {
+    // Si llegó completamente vacío, le inventamos un mensaje para que no rompa
+    formattedMessages = [{ role: "user", content: "Hola" }];
+  } else if (typeof messages === 'string') {
+    // Si handleVRSpeech te mandó un texto plano en lugar de un Array, lo convertimos al formato correcto
+    formattedMessages = [{ role: "user", content: messages }];
+  } else if (Array.isArray(messages)) {
+    // Si ya es un array, lo dejamos tal cual
+    formattedMessages = messages;
+  }
+  // ----------------------------------------------
+
   try {
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -1015,7 +1030,7 @@ async function callGroqLLM(model, messages, max_tokens, temperature) {
       },
       body: JSON.stringify({
         model: model || 'llama-3.3-70b-versatile',
-        messages: messages,
+        messages: formattedMessages, // Usamos el array seguro y formateado
         max_tokens: max_tokens || 200,
         temperature: temperature || 0.7
       })
@@ -1030,7 +1045,6 @@ async function callGroqLLM(model, messages, max_tokens, temperature) {
     }
 
     var data = await res.json();
-    // Groq devuelve la estructura estándar de OpenAI: data.choices[0].message.content
     return data; 
   } catch (err) {
     console.error('[API Directa LLM] Falló:', err);
