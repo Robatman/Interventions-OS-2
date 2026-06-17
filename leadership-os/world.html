@@ -989,19 +989,55 @@ function updateVRMood(val){
   if(pctEl)pctEl.setAttribute('text','value',appState.vrMood+'%');
 }
 
-async function callGroqLLM(mode){
-  var systemPrompt='';
-  if(mode==='practice'){
-    systemPrompt=PROMPTS.avatar(appState.currentLevel);
-  } else if(mode==='learn'){
-    systemPrompt='Eres Juanjolote, coach de liderazgo calido y directo en Centris Neural Academy. Estas ensenando sobre '+(appState.activeMenu==='interventions'?'intervenciones de retencion':'tecnicas de comunicacion')+'. Habla en espanol. Conversacional, maximo 3 oraciones. Haz preguntas. Nunca des conferencias. Conecta todo a situaciones reales de call center.';
-  } else if(mode==='work'){
-    systemPrompt='Eres Juanjolote, coach socratico en Centris Neural Academy. Tu rol es hacer preguntas que ayuden al manager a descubrir sus propios insights. NUNCA des consejos directos. Haz UNA pregunta a la vez. Maximo 2 oraciones. Habla en espanol. Se calido pero directo.';
+// async function callGroqLLM(mode){
+//   var systemPrompt='';
+//   if(mode==='practice'){
+//     systemPrompt=PROMPTS.avatar(appState.currentLevel);
+//   } else if(mode==='learn'){
+//     systemPrompt='Eres Juanjolote, coach de liderazgo calido y directo en Centris Neural Academy. Estas ensenando sobre '+(appState.activeMenu==='interventions'?'intervenciones de retencion':'tecnicas de comunicacion')+'. Habla en espanol. Conversacional, maximo 3 oraciones. Haz preguntas. Nunca des conferencias. Conecta todo a situaciones reales de call center.';
+//   } else if(mode==='work'){
+//     systemPrompt='Eres Juanjolote, coach socratico en Centris Neural Academy. Tu rol es hacer preguntas que ayuden al manager a descubrir sus propios insights. NUNCA des consejos directos. Haz UNA pregunta a la vez. Maximo 2 oraciones. Habla en espanol. Se calido pero directo.';
+//   }
+//   var res=await fetch('/api/groq',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemPrompt},...appState.agentHistory.slice(-12)],max_tokens:150,temperature:0.88})});
+//   var data=await res.json();
+//   return (data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'...';
+// }
+async function callGroqLLM(model, messages, max_tokens, temperature) {
+  var MI_GROQ_KEY = "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"; 
+  console.log('[API Directa LLM] Enviando petición a Groq Cloud...');
+
+  try {
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + MI_GROQ_KEY
+      },
+      body: JSON.stringify({
+        model: model || 'llama-3.3-70b-versatile',
+        messages: messages,
+        max_tokens: max_tokens || 200,
+        temperature: temperature || 0.7
+      })
+    });
+
+    console.log('[API Directa LLM] Status Code:', res.status);
+    
+    if (!res.ok) {
+      var errorRaw = await res.text();
+      console.error('[API Directa LLM] Error de Groq:', errorRaw);
+      throw new Error('Error en Groq LLM Directo');
+    }
+
+    var data = await res.json();
+    // Groq devuelve la estructura estándar de OpenAI: data.choices[0].message.content
+    return data; 
+  } catch (err) {
+    console.error('[API Directa LLM] Falló:', err);
+    throw err;
   }
-  var res=await fetch('/api/groq',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemPrompt},...appState.agentHistory.slice(-12)],max_tokens:150,temperature:0.88})});
-  var data=await res.json();
-  return (data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'...';
 }
+
 
 function parseAgentReply(raw){
   var moodMatch=raw.match(/\[MOOD:(\d+)\]/),boxMatch=raw.match(/\[BOX:(in|out)\]/);
@@ -1072,23 +1108,54 @@ speakVR(feedback,getVoice('juan'));
   
     //const API_KEY = "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";
 
+// async function translateToEnglish(text) {
+
+//   const res = await fetch('/api/groq_speakvr', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify({
+//       type: 'translate',
+//       text: text
+//     })
+//   });
+
+//   const data = await res.json();
+
+//   return data.translation || text;
+// }
+
 async function translateToEnglish(text) {
+  var MI_GROQ_KEY = "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";
+  console.log('[API Directa Traducción] Traduciendo con Groq...');
 
-  const res = await fetch('/api/groq_speakvr', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      type: 'translate',
-      text: text
-    })
-  });
+  try {
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + MI_GROQ_KEY
+      },
+      body: JSON.stringify({
+        model: 'llama3-8b-8192', // Un modelo rápido y barato para traducir
+        messages: [
+          { role: 'system', content: 'Translate the following text to English. Respond ONLY with the translation, nothing else.' },
+          { role: 'user', content: text }
+        ],
+        temperature: 0.2
+      })
+    });
 
-  const data = await res.json();
-
-  return data.translation || text;
+    if (!res.ok) throw new Error('Error en traducción directa');
+    var data = await res.json();
+    return data.choices[0].message.content.trim();
+  } catch (err) {
+    console.error('[Traducción Directa] Falló, usando texto original:', err);
+    return text; // Fallback por si acaso
+  }
 }
+
 
 function getVoice(character) {
 
