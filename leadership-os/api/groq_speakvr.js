@@ -1199,7 +1199,7 @@ function startRecording(){
   var btn=document.getElementById('mic-btn'); if(btn)btn.classList.add('recording');
   
   console.log('[Grabación] Empezando detección de silencio...');
-  startSilenceDetection();
+  // startSilenceDetection();
   
   setTimeout(function(){
     if(isRecording){
