@@ -1006,20 +1006,25 @@ async function callGroqLLM(model, messages, max_tokens, temperature) {
   var MI_GROQ_KEY = "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"; 
   console.log('[API Directa LLM] Enviando petición a Groq Cloud...');
 
-  // --- ARREGLO DE SEGURIDAD PARA EL ERROR 400 ---
-  var formattedMessages = [];
-
-  if (!messages) {
-    // Si llegó completamente vacío, le inventamos un mensaje para que no rompa
-    formattedMessages = [{ role: "user", content: "Hola" }];
-  } else if (typeof messages === 'string') {
-    // Si handleVRSpeech te mandó un texto plano en lugar de un Array, lo convertimos al formato correcto
-    formattedMessages = [{ role: "user", content: messages }];
-  } else if (Array.isArray(messages)) {
-    // Si ya es un array, lo dejamos tal cual
-    formattedMessages = messages;
+  // --- 1. FILTRO DE SEGURIDAD PARA EL MODELO ---
+  // Si te pasan 'practice' o viene vacío/indefinido, forzamos un modelo real de Groq
+  var selectedModel = model;
+  if (!selectedModel || selectedModel === 'practice' || typeof selectedModel !== 'string') {
+    selectedModel = 'llama-3.3-70b-versatile'; 
   }
   // ----------------------------------------------
+
+  // --- 2. FILTRO DE SEGURIDAD PARA LOS MENSAJES ---
+  var formattedMessages = [];
+  if (!messages) {
+    formattedMessages = [{ role: "user", content: "Hola" }];
+  } else if (typeof messages === 'string') {
+    // Si handleVRSpeech mandó texto plano en lugar de un Array, lo arreglamos aquí
+    formattedMessages = [{ role: "user", content: messages }];
+  } else if (Array.isArray(messages)) {
+    formattedMessages = messages;
+  }
+  // ------------------------------------------------
 
   try {
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -1029,8 +1034,8 @@ async function callGroqLLM(model, messages, max_tokens, temperature) {
         'Authorization': 'Bearer ' + MI_GROQ_KEY
       },
       body: JSON.stringify({
-        model: model || 'llama-3.3-70b-versatile',
-        messages: formattedMessages, // Usamos el array seguro y formateado
+        model: selectedModel, // Usamos el modelo validado
+        messages: formattedMessages,
         max_tokens: max_tokens || 200,
         temperature: temperature || 0.7
       })
