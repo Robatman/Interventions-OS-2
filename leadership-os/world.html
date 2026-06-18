@@ -860,8 +860,8 @@ function pickRandomOpener(archetype,scenario){
   return vals[Math.floor(Math.random()*vals.length)]||'...';
 }
 function showScreen(name){
-  // 1. Tu lógica normal para ocultar/mostrar pantallas (incluyendo tus nuevas pantallas si aplica)
-  ['welcome','mode','practice','eval','interventions','techniques','technique-list','interventions'].forEach(function(s){
+  // 1. Tu lógica normal para ocultar/mostrar pantallas
+  ['welcome','mode','practice','eval','interventions','techniques','technique-list','screen-interventions'].forEach(function(s){
     var el=document.getElementById('screen-'+s);
     if(el)el.setAttribute('visible',s===name);
   });
@@ -884,7 +884,6 @@ function showScreen(name){
     });
     console.log("🔴 14 botones de técnicas DESACTIVADOS");
   }
-
 }
 
 function goWelcome(){showScreen('welcome');appState.agentHistory=[];appState.vrMood=30;}
@@ -1381,14 +1380,16 @@ document.addEventListener('DOMContentLoaded',function(){
       else if(isRecording)stopRecording();
     }
   });
- // Capturar el nuevo botón de intervenciones
-var btnInterventions = document.getElementById('btn-interventions');
-if(btnInterventions) {
-  btnInterventions.addEventListener('click', function(e){
+  var btnInt=document.getElementById('btn-interventions');
+
+  if(btnInt)btnInt.addEventListener('click',function(e){
+
     e.stopPropagation();
-    showScreen('interventions'); // <--- Te manda directo respetando toda tu arquitectura de seguridad
+console.log("dio click al btnInt");
+showScreen('technique-list');
+
   });
-}
+
   var btnTech=document.getElementById('btn-techniques');
 
 if(btnTech)
