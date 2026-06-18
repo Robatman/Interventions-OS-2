@@ -115,6 +115,12 @@ function ejecutarFuncionPorTecnica(tecnica) {
       funcionSolutionFocusedCoaching();
       break;
 
+
+
+    case 'btn-interventions':
+      funcionShowInterventions();
+      break;
+
     default:
       console.log("⚡ Ejecutando función genérica de la academia.");
   }
@@ -191,6 +197,9 @@ function funcionSolutionFocusedCoaching() {
   goPractice();
 }
 
+function funcionShowInterventions(){
+  console.log("🔄 Cambiando a la pantalla de Intervenciones...");
+}
   
 </script>
 <script src="js/interventions.js"></script>
