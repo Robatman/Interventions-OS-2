@@ -1321,20 +1321,28 @@ async function onRecordingStop(){
 // }
 
 async function transcribeAudio(blob) {
-  const form = new FormData();
+  console.log('[Frontend] Enviando audio directo...');
 
-  form.append('file', blob, 'rec.webm');
-  form.append('model', 'whisper-large-v3-turbo');
-  form.append('language', 'es');
-  form.append('response_format', 'json');
+  try {
+    const response = await fetch('/api/transcribe', { // Asegúrate de que sea tu ruta exacta en Vercel
+      method: 'POST',
+      headers: {
+        'Content-Type': blob.type || 'audio/webm'
+      },
+      body: blob // <--- Mandamos el archivo de audio crudo (binario puro)
+    });
 
-  const res = await fetch('/api/transcribe', {
-    method: 'POST',
-    body: form
-  });
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`Error en el servidor: ${errText}`);
+    }
 
-  const data = await res.json();
-  return data.text || '';
+    const data = await response.json();
+    console.log('[Frontend] Transcripción:', data);
+    return data.text;
+  } catch (error) {
+    console.error('[Frontend] Error:', error);
+  }
 }
 
 
