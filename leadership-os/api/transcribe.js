@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     // 3. Creamos el nuevo FormData nativo que enviaremos a Groq Cloud
     const groqForm = new FormData();
     groqForm.append("file", audioBlob, "rec.webm");
-    groqForm.append("model", "whisper-large-v3-turbo");
+    groqForm.append("model", "whisper-large-v3");
     groqForm.append("language", "es");
     groqForm.append("response_format", "json");
 
