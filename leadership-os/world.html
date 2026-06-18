@@ -1383,16 +1383,12 @@ document.addEventListener('DOMContentLoaded',function(){
   });
  // Capturar el nuevo botón de intervenciones
 var btnInterventions = document.getElementById('btn-interventions');
-
-if (btnInterventions) {
-  btnInterventions.addEventListener('click', function(e) {
-    e.stopPropagation(); // Evita que el clic afecte a otros elementos de la escena de A-Frame
-    
-    console.log("🔄 Cambiando a la pantalla de Intervenciones...");
-    showScreen('interventions'); // <--- Llama a tu función encargada de swapear pantallas
+if(btnInterventions) {
+  btnInterventions.addEventListener('click', function(e){
+    e.stopPropagation();
+    showScreen('interventions'); // <--- Te manda directo respetando toda tu arquitectura de seguridad
   });
 }
-
   var btnTech=document.getElementById('btn-techniques');
 
 if(btnTech)
