@@ -191,6 +191,12 @@ function funcionSolutionFocusedCoaching() {
   goPractice();
 }
 
+function goIntervencionesMenu() {
+    
+    //document.querySelector('#screen-intervenciones').setAttribute('visible', true);
+    console.log("🚀 Navegando al menú de intervenciones...");
+
+}
   
 </script>
 <script src="js/interventions.js"></script>
@@ -861,7 +867,7 @@ function pickRandomOpener(archetype,scenario){
 }
 function showScreen(name){
   // 1. Tu lógica normal para ocultar/mostrar pantallas
-  ['welcome','mode','practice','eval','interventions','techniques','technique-list'].forEach(function(s){
+  ['welcome','mode','practice','eval','interventions','techniques','technique-list','screen-interventions'].forEach(function(s){
     var el=document.getElementById('screen-'+s);
     if(el)el.setAttribute('visible',s===name);
   });
@@ -1441,6 +1447,11 @@ if(btnTechBack)
     var stars=document.getElementById('stars-1');
     if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
   });
+});
+
+document.querySelector('#juanjolote-intervenciones').addEventListener('click', () => {
+    // Aquí pones la lógica para mandarlo al otro lado jaja
+    goIntervencionesMenu(); 
 });
  
     document.querySelector('a-scene').addEventListener('loaded', () => {
