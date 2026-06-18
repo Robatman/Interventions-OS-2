@@ -1173,43 +1173,84 @@ async function setupMic(){
 function startRecording(){
   console.log('[Grabación] Intento de iniciar grabación. Estado actual -> isRecording:', isRecording, 'isProcessing:', isProcessing, 'hasAudioStream:', !!audioStream);
   if(isRecording||isProcessing||!audioStream) return;
-  
-  // Reactivar AudioContext por si el navegador lo suspendió (muy común)
+
   if (audioContext && audioContext.state === 'suspended') {
     console.log('[Mic] AudioContext suspendido. Intentando reactivar...');
     audioContext.resume();
   }
 
-  audioChunks=[]; isRecording=true;
-  var mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
+  audioChunks = []; // Limpiamos completamente el array
+  isRecording = true;
+  
+  // Forzamos un formato estándar y compatible
+  var mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm';
   console.log('[Grabación] Usando formato MIME:', mime);
   
-  mediaRecorder=new MediaRecorder(audioStream,{mimeType:mime});
-  
-  mediaRecorder.ondataavailable=function(e){
-    if(e.data.size>0){
+  mediaRecorder = new MediaRecorder(audioStream, { mimeType: mime });
+
+  mediaRecorder.ondataavailable = function(e){
+    if(e.data && e.data.size > 0){
       audioChunks.push(e.data);
       console.log('[Grabación] Chunk recibido. Tamaño:', e.data.size, 'bytes. Total chunks:', audioChunks.length);
-    } else {
-      console.warn('[Grabación] Chunk recibido pero está VACÍO (0 bytes)');
     }
   };
-  
-  mediaRecorder.onstop=onRecordingStop;
-  mediaRecorder.start();
+
+  // AQUÍ ESTÁ EL TRUCO: Aseguramos la captura al detenerse
+  mediaRecorder.onstop = function() {
+    console.log('[Grabación] mediaRecorder se detuvo. Armando el Blob final con', audioChunks.length, 'chunks...');
+    
+    // Unimos los chunks asegurando el tipo MIME correcto
+    var audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+    console.log('[Grabación] Blob final creado. Tamaño real:', audioBlob.size, 'bytes');
+
+    // Mandamos el blob procesado a la función que ya tenías
+    onRecordingStopWithBlob(audioBlob);
+  };
+
+  mediaRecorder.start(250); // <--- IMPORTANTE: Le pedimos que guarde chunks cada 250ms en lugar de esperar al final
   setHUD('rec','Grabando...');
-  var btn=document.getElementById('mic-btn'); if(btn)btn.classList.add('recording');
-  
-  console.log('[Grabación] Empezando detección de silencio...');
-  // startSilenceDetection();
-  
+  var btn = document.getElementById('mic-btn');
+  if(btn) btn.classList.add('recording');
+
   setTimeout(function(){
     if(isRecording){
       console.log('[Grabación] Límite de 25 segundos alcanzado. Forzando parada.');
       stopRecording();
     }
-  },25000);
+  }, 25000);
 }
+
+// Modificamos el cierre para recibir el blob bien armado
+async function onRecordingStopWithBlob(blob) {
+  if (blob.size < 1000) {
+    console.warn('[Grabación] El audio es demasiado pequeño o está vacío.');
+    setHUD('ready', 'Audio muy corto, intenta de nuevo');
+    isProcessing = false;
+    return;
+  }
+
+  isProcessing = true;
+  setHUD('thinking', 'Transcribiendo...');
+
+  try {
+    var text = await transcribeAudio(blob);
+    console.log('[Transcriptor] Groq entendió:', text);
+    
+    if (text && text.trim().length > 0) {
+      setHUD('ready', 'Procesando respuesta...');
+      // Aquí se lo mandas a tu lógica de Juanjolote / IA para que responda
+      handleUserSpeech(text); 
+    } else {
+      setHUD('ready', 'No se entendió nada, intenta de nuevo');
+    }
+  } catch (err) {
+    console.error('[Grabación] Error en transcripción:', err);
+    setHUD('ready', 'Error en el servidor');
+  } finally {
+    isProcessing = false;
+  }
+}
+
 
 function stopRecording(){
   console.log('[Grabación] stopRecording invocado. ¿Registrando?:', isRecording);
