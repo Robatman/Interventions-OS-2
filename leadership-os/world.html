@@ -191,12 +191,6 @@ function funcionSolutionFocusedCoaching() {
   goPractice();
 }
 
-function goIntervencionesMenu() {
-    
-    //document.querySelector('#screen-intervenciones').setAttribute('visible', true);
-    console.log("🚀 Navegando al menú de intervenciones...");
-
-}
   
 </script>
 <script src="js/interventions.js"></script>
@@ -1386,8 +1380,17 @@ document.addEventListener('DOMContentLoaded',function(){
       else if(isRecording)stopRecording();
     }
   });
-  var btnInt=document.getElementById('btn-interventions');if(btnInt)btnInt.addEventListener('click',function(e){e.stopPropagation();goMode('interventions');});
-var btnTech=document.getElementById('btn-techniques');
+  var btnInt=document.getElementById('btn-interventions');
+
+  if(btnInt)btnInt.addEventListener('click',function(e){
+
+    e.stopPropagation();
+
+showScreen('technique-list');
+  
+  });
+
+  var btnTech=document.getElementById('btn-techniques');
 
 if(btnTech)
   btnTech.addEventListener('click',function(e){
@@ -1447,11 +1450,6 @@ if(btnTechBack)
     var stars=document.getElementById('stars-1');
     if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
   });
-});
-
-document.querySelector('#juanjolote-intervenciones').addEventListener('click', () => {
-    // Aquí pones la lógica para mandarlo al otro lado jaja
-    goIntervencionesMenu(); 
 });
  
     document.querySelector('a-scene').addEventListener('loaded', () => {
