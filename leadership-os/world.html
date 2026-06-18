@@ -1321,35 +1321,31 @@ async function onRecordingStop(){
 //   }
 // }
 
+// Asegúrate de que tu función en world.html se vea así (fíjate en el body: form)
 async function transcribeAudio(blob) {
   var form = new FormData();
-  // Adjuntamos el archivo de audio tal como lo tenías
   form.append('file', blob, 'rec.webm');
 
   console.log('[Frontend] Enviando audio a nuestro backend seguro...');
   try {
-    // Cambiamos la URL de Groq por la ruta de tu propia API local
     var res = await fetch('/api/transcribe', {
       method: 'POST',
+      body: form // 👈 ¡ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ AQUÍ!
     });
 
     console.log('[Frontend] Status Code de la API:', res.status);
-    
-    var data = await res.json();
+    var data = await res.status === 200 ? await res.json() : await res.json().catch(() => ({}));
 
     if (!res.ok) {
       throw new Error(data.error || 'Error desconocido en el servidor');
     }
 
-    // Retornamos el texto transcrito que nos devolvió nuestro backend
     return data.text || '';
-
   } catch (fetchError) {
     console.error('[Frontend] Error de conexión o procesamiento:', fetchError);
     throw fetchError;
   }
 }
-
 
 function setupControllers(){
   var scene=document.querySelector('a-scene');
