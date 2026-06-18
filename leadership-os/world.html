@@ -1069,8 +1069,6 @@ speakVR(feedback,getVoice('juan'));
     if(feedbackEl2)feedbackEl2.setAttribute('text','value','Sesion completada. Buen trabajo.');
   }
 }
-  
-    // const API_KEY = "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";
 
 async function translateToEnglish(text) {
   console.log("Entro aquí y no se que pez jaja");
@@ -1294,34 +1292,6 @@ async function onRecordingStop(){
   }
 }
 
-// async function transcribeAudio(blob){
-//   var form=new FormData();
-//   form.append('file',blob,'rec.webm');
-//   form.append('model','whisper-large-v3-turbo');
-//   form.append('language','es');
-//   form.append('response_format','json');
-  
-//   console.log('[API Fetch] Enviando POST a /api/groq-whisper...');
-//   try {
-//     var res=await fetch('/api/groq-whisper',{method:'POST',body:form});
-//     console.log('[API Fetch] Status Code del servidor:', res.status, res.statusText);
-    
-//     if(!res.ok) {
-//       var errorRaw = await res.text();
-//       console.error('[API Fetch] Error devuelto por el servidor backend:', errorRaw);
-//       throw new Error('Error en el servidor de transcripción');
-//     }
-    
-//     var data=await res.json();
-//     console.log('[API Fetch] JSON decodificado del servidor:', data);
-//     return data.text||'';
-//   } catch (fetchError) {
-//     console.error('[API Fetch] Falló la petición HTTP de fetch:', fetchError);
-//     throw fetchError;
-//   }
-// }
-
-// Asegúrate de que tu función en world.html se vea así (fíjate en el body: form)
 async function transcribeAudio(blob) {
   var form = new FormData();
   form.append('file', blob, 'rec.webm');
