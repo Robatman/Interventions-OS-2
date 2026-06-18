@@ -1321,31 +1321,31 @@ async function onRecordingStop(){
 //   }
 // }
 
-async function transcribeAudio(blob){
+async function transcribeAudio(blob) {
   var form = new FormData();
+  // Adjuntamos el archivo de audio tal como lo tenías
   form.append('file', blob, 'rec.webm');
-  form.append('model', 'whisper-large-v3-turbo');
-  form.append('language', 'es');
-  form.append('response_format', 'json');
 
-  // 🔑 REEMPLAZA ESTO CON TU PROPIA LLAVE DE GROQ PARA PRUEBAS LOCALES:
-  var MI_GROQ_KEY = "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";
-  console.log('[API Directa] Enviando POST directo a Groq Cloud...');
+  console.log('[Frontend] Enviando audio a nuestro backend seguro...');
   try {
-    var res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+    // Cambiamos la URL de Groq por la ruta de tu propia API local
+    var res = await fetch('/api/transcribe', {
       method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + MI_GROQ_KEY
-        // Nota: Con FormData NO debes poner 'Content-Type', el navegador lo pone solo
-      },
-      body: form
     });
-    console.log('[API Directa] Status Code:', res.status);
+
+    console.log('[Frontend] Status Code de la API:', res.status);
+    
     var data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Error desconocido en el servidor');
+    }
+
+    // Retornamos el texto transcrito que nos devolvió nuestro backend
     return data.text || '';
 
   } catch (fetchError) {
-    console.error('[API Directa] Error de conexión:', fetchError);
+    console.error('[Frontend] Error de conexión o procesamiento:', fetchError);
     throw fetchError;
   }
 }
