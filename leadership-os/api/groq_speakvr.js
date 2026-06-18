@@ -1,7 +1,14 @@
-
 export default async function handler(req, res) {
+  // Jalamos la variable de entorno de Groq
+  const API_KEY = process.env.GROQ_API_KEY;
 
-  const API_KEY = "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";
+  // Validación por si olvidas configurar la variable en tu entorno
+  if (!API_KEY) {
+    console.error("Falta la configuración de GROQ_API_KEY en las variables de entorno.");
+    return res.status(500).json({
+      error: "Internal server error: Missing API configuration."
+    });
+  }
 
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -10,15 +17,12 @@ export default async function handler(req, res) {
   }
 
   try {
-
     const { type, text, voice } = req.body;
 
     // =========================
     // TRADUCCIÓN
     // =========================
-
     if (type === "translate") {
-
       const response = await fetch(
         "https://api.groq.com/openai/v1/chat/completions",
         {
@@ -32,8 +36,7 @@ export default async function handler(req, res) {
             messages: [
               {
                 role: "system",
-                content:
-                  "Translate the following text to natural English. Only return the translation.",
+                content: "Translate the following text to natural English. Only return the translation.",
               },
               {
                 role: "user",
@@ -48,17 +51,14 @@ export default async function handler(req, res) {
       const data = await response.json();
 
       return res.status(200).json({
-        translation:
-          data.choices?.[0]?.message?.content || text
+        translation: data.choices?.[0]?.message?.content || text
       });
     }
 
     // =========================
     // TTS
     // =========================
-
     if (type === "speech") {
-
       const response = await fetch(
         "https://api.groq.com/openai/v1/audio/speech",
         {
@@ -68,8 +68,8 @@ export default async function handler(req, res) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-          model: "canopylabs/orpheus-v1-english",
-          voice: voice || "autumn",
+            model: "canopylabs/orpheus-v1-english",
+            voice: voice || "autumn",
             response_format: "wav",
             input: text,
           }),
@@ -77,20 +77,15 @@ export default async function handler(req, res) {
       );
 
       if (!response.ok) {
-
         const err = await response.text();
-
         console.error("GROQ ERROR:", err);
-
         return res.status(500).json({
           error: err
         });
       }
 
       const buffer = await response.arrayBuffer();
-
       res.setHeader("Content-Type", "audio/wav");
-
       return res.status(200).send(Buffer.from(buffer));
     }
 
@@ -99,9 +94,7 @@ export default async function handler(req, res) {
     });
 
   } catch (err) {
-
     console.error(err);
-
     return res.status(500).json({
       error: err.message
     });
