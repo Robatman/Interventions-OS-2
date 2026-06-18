@@ -121,6 +121,8 @@ function ejecutarFuncionPorTecnica(tecnica) {
       funcionShowInterventions();
       break;
 
+
+      
     default:
       console.log("⚡ Ejecutando función genérica de la academia.");
   }
@@ -199,6 +201,7 @@ function funcionSolutionFocusedCoaching() {
 
 function funcionShowInterventions(){
   console.log("🔄 Cambiando a la pantalla de Intervenciones...");
+  
 }
   
 </script>
@@ -298,12 +301,12 @@ function funcionShowInterventions(){
       <a-text value="INTERVENCIONES" align="center" color="#00e5c0" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
       <a-text value="Pulse Check Stay Interview Anchoring" align="center" color="#c8d8ff" width="3.5" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
     </a-entity>
-    <!-- <a-entity id="btn-techniques" position="1.2 1.02 -2.4" class="clickable" animation__hover="property:position;to:1.2 1.12 -2.4;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:1.2 1.02 -2.4;startEvents:mouseleave;dur:180">
+    <a-entity id="btn-techniques" position="1.2 1.02 -2.4" class="clickable" animation__hover="property:position;to:1.2 1.12 -2.4;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:1.2 1.02 -2.4;startEvents:mouseleave;dur:180">
       <a-plane width="1.8" height="0.72" color="#150d40" material="opacity:0.93;shader:flat;side:double"></a-plane>
       <a-plane width="1.84" height="0.76" color="#9d5cff" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
       <a-text value="TECNICAS" align="center" color="#9d5cff" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
       <a-text value="14 herramientas de comunicacion" align="center" color="#c8d8ff" width="3.5" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
-    </a-entity> -->
+    </a-entity>
     <a-entity id="btn-progress" position="0 0.45 -2.25" class="clickable">
       <a-plane width="1.2" height="0.24" color="#101830" material="opacity:0.86;shader:flat;side:double"></a-plane>
       <a-plane width="1.24" height="0.28" color="#4466ff" material="opacity:0.28;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
