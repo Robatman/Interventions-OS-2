@@ -1073,6 +1073,7 @@ speakVR(feedback,getVoice('juan'));
     // const API_KEY = "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";
 
 async function translateToEnglish(text) {
+  console.log("Entro aquí y no se que pez jaja");
 
   const res = await fetch('/api/groq_speakvr', {
     method: 'POST',
