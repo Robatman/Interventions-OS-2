@@ -312,24 +312,6 @@ function funcionShowInterventions(){
   </a-plane>
 </a-entity>
 
-    <a-entity id="btn-intervencion-active" position="-2.7 2.3 -2.8">
-  <a-plane class="clickable" 
-           handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="Intervencion Active" align="center" color="#ffffff" width="3.2" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
-    <!-- Borde minimalista estilizado -->
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
-
 
 
     <a-entity id="btn-techniques" position="1.2 1.02 -2.4" class="clickable" animation__hover="property:position;to:1.2 1.12 -2.4;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:1.2 1.02 -2.4;startEvents:mouseleave;dur:180">
@@ -455,7 +437,7 @@ function funcionShowInterventions(){
 
 <!-- ACTIVE LISTENING -->
 <a-entity id="btn-active-listening" position="-2.7 2.3 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -474,7 +456,7 @@ function funcionShowInterventions(){
 
 <!-- POWERFUL QUESTIONS -->
 <a-entity id="btn-powerful-questions" position="-0.9 2.3 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Abriendo panel de Preguntas Poderosas; tecnica: powerful-questions"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -492,7 +474,7 @@ function funcionShowInterventions(){
 
 <!-- MOTIVATIONAL INTERVIEWING -->
 <a-entity id="btn-motivational-interviewing" position="0.9 2.3 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Desplegando Entrevista Motivacional; tecnica: motivational-interviewing"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -510,7 +492,7 @@ function funcionShowInterventions(){
 
 <!-- NONVIOLENT COMMUNICATION -->
 <a-entity id="btn-nonviolent-communication" position="2.7 2.3 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Iniciando Comunicación No Violenta; tecnica: nonviolent-communication"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -531,7 +513,7 @@ function funcionShowInterventions(){
 
 <!-- RADICAL CANDOR -->
 <a-entity id="btn-radical-candor" position="-2.7 1.5 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Abriendo Radical Candor; tecnica: radical-candor"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -550,7 +532,7 @@ function funcionShowInterventions(){
 
 <!-- CRUCIAL CONVERSATIONS -->
 <a-entity id="btn-crucial-conversations" position="-0.9 1.5 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Abriendo Crucial Conversations; tecnica: crucial-conversations"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -569,7 +551,7 @@ function funcionShowInterventions(){
 
 <!-- TACTICAL EMPATHY -->
 <a-entity id="btn-tactical-empathy" position="0.9 1.5 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Abriendo Tactical Empathy; tecnica: tactical-empathy"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -588,7 +570,7 @@ function funcionShowInterventions(){
 
 <!-- SCARF MODEL -->
 <a-entity id="btn-scarf-model" position="2.7 1.5 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Abriendo SCARF Model; tecnica: scarf-model"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -610,7 +592,7 @@ function funcionShowInterventions(){
 
 <!-- IMMUNITY TO CHANGE -->
 <a-entity id="btn-immunity-to-change" position="-2.7 0.7 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Abriendo Immunity to Change; tecnica: immunity-to-change"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -629,7 +611,7 @@ function funcionShowInterventions(){
 
 <!-- DRAMA TRIANGLE -->
 <a-entity id="btn-drama-triangle" position="-0.9 0.7 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Abriendo Drama Triangle; tecnica: drama-triangle"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -648,7 +630,7 @@ function funcionShowInterventions(){
 
 <!-- GROW MODEL -->
 <a-entity id="btn-grow-model" position="0.9 0.7 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Abriendo GROW Model; tecnica: grow-model"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -667,7 +649,7 @@ function funcionShowInterventions(){
 
 <!-- STRENGTHS-BASED COACHING -->
 <a-entity id="btn-strengths-based-coaching" position="2.7 0.7 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Abriendo Strengths-Based Coaching; tecnica: strengths-based-coaching"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -689,7 +671,7 @@ function funcionShowInterventions(){
 
 <!-- GROWTH MINDSET -->
 <a-entity id="btn-growth-mindset" position="-0.9 -0.1 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Abriendo Growth Mindset; tecnica: growth-mindset"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -708,7 +690,7 @@ function funcionShowInterventions(){
 
 <!-- SOLUTION-FOCUSED COACHING -->
 <a-entity id="btn-solution-focused-coaching" position="0.9 -0.1 -2.8">
-  <a-plane class="clickable sub-tecnica" 
+  <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Abriendo Solution-Focused Coaching; tecnica: solution-focused-coaching"
            width="1.6" height="0.75" 
            color="#ffffff" 
@@ -905,15 +887,13 @@ function pickRandomOpener(archetype,scenario){
 }
 
 function showScreen(name){
-  // 1. Tu lógica normal para ocultar/mostrar pantallas
   ['welcome','mode','practice','eval','interventions','techniques','technique-list','screen-interventions'].forEach(function(s){
     var el=document.getElementById('screen-'+s);
     if(el)el.setAttribute('visible',s===name);
   });
   appState.screen=name;
 
-  // 2. ⚡ CONTROL DINÁMICO DE LOS 14 BOTONES ESPECÍFICOS
-  // 🎯 Asegúrate de cambiar esto para usar SOLO la clase '.sub-tecnica'
+
   var planosTecnicas = document.querySelectorAll('.sub-tecnica');
   
   if (name === 'technique-list') {
