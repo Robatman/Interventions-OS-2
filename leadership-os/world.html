@@ -295,14 +295,23 @@ function funcionShowInterventions(){
       <a-plane width="3.04" height="0.46" color="#2a3a7a" material="opacity:0.35;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
       <a-text value="Choose your training path" align="center" color="#e8eeff" width="4.5" position="0 0 0.01" font="mozillavr"></a-text>
     </a-entity>
-    <a-entity id="btn-interventions" position="-1.2 1.02 -2.4" class="clickable" animation__hover="property:position;to:-1.2 1.12 -2.4;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:-1.2 1.02 -2.4;startEvents:mouseleave;dur:180">
-      <a-plane width="1.8" height="0.72" color="#0d2060" material="opacity:0.93;shader:flat;side:double"></a-plane>
-      <a-plane width="1.84" height="0.76" color="#00e5c0" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
-      <a-text value="INTERVENCIONES" align="center" color="#00e5c0" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
-      <a-text value="Pulse Check Stay Interview Anchoring" align="center" color="#c8d8ff" width="3.5" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
 
+   <a-entity id="btn-interventions" position="-1.2 1.02 -2.4">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Iniciando módulo de Intervenciones; tecnica: interventions"
+           width="1.8" height="0.72" 
+           color="#0d2060" 
+           material="opacity:0.93;shader:flat;side:double"
+           animation__hover="property:position;to:0 0.1 0;startEvents:mouseenter;dur:180" 
+           animation__unhover="property:position;to:0 0 0;startEvents:mouseleave;dur:180">
+    
+    <a-plane width="1.84" height="0.76" color="#00e5c0" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
+    
+    <a-text value="INTERVENCIONES" align="center" color="#00e5c0" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
+    <a-text value="Pulse Check Stay Interview Anchoring" align="center" color="#c8d8ff" width="3.5" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
+  </a-plane>
+</a-entity>
 
-    </a-entity>
     <a-entity id="btn-intervencion-active" position="-2.7 2.3 -2.8">
   <a-plane class="clickable" 
            handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
