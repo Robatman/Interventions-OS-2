@@ -120,6 +120,9 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interventions':
       funcionShowInterventions();
       break;
+    case 'techniques':
+      funcionShowtechniques();
+      break;
 
 
       
@@ -201,6 +204,11 @@ function funcionSolutionFocusedCoaching() {
 
 function funcionShowInterventions(){
   console.log("🔄 Cambiando a la pantalla de Intervenciones...");
+  
+}
+
+function funcionShowtechniques(){
+  console.log("🔄 Cambiando a la pantalla de Técnicas...");
   
 }
   
@@ -308,18 +316,29 @@ function funcionShowInterventions(){
     <a-plane width="1.84" height="0.76" color="#00e5c0" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
     
     <a-text value="INTERVENCIONES" align="center" color="#00e5c0" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
-    <a-text value="Pulse Check Stay Interview Anchoring" align="center" color="#c8d8ff" width="3.5" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
+    <a-text value="| Interview Anchoring" align="center" color="#c8d8ff" width="3.5" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
   </a-plane>
 </a-entity>
 
 
 
-    <a-entity id="btn-techniques" position="1.2 1.02 -2.4" class="clickable" animation__hover="property:position;to:1.2 1.12 -2.4;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:1.2 1.02 -2.4;startEvents:mouseleave;dur:180">
-      <a-plane width="1.8" height="0.72" color="#150d40" material="opacity:0.93;shader:flat;side:double"></a-plane>
-      <a-plane width="1.84" height="0.76" color="#9d5cff" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
-      <a-text value="TECNICAS" align="center" color="#9d5cff" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
-      <a-text value="14 herramientas de comunicacion" align="center" color="#c8d8ff" width="3.5" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
-    </a-entity>
+  <a-entity id="btn-techniques" position="1.2 1.02 -2.4">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo menú de Técnicas; tecnica: techniques"
+           width="1.8" height="0.72" 
+           color="#150d40" 
+           material="opacity:0.93;shader:flat;side:double"
+           animation__hover="property:position;to:0 0.1 0;startEvents:mouseenter;dur:180" 
+           animation__unhover="property:position;to:0 0 0;startEvents:mouseleave;dur:180">
+    
+    <a-plane width="1.84" height="0.76" color="#9d5cff" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
+    
+    <a-text value="TECNICAS" align="center" color="#9d5cff" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
+    <a-text value="14 herramientas de comunicacion" align="center" color="#c8d8ff" width="3.5" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
+  </a-plane>
+</a-entity>
+
+
     <a-entity id="btn-progress" position="0 0.45 -2.25" class="clickable">
       <a-plane width="1.2" height="0.24" color="#101830" material="opacity:0.86;shader:flat;side:double"></a-plane>
       <a-plane width="1.24" height="0.28" color="#4466ff" material="opacity:0.28;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
@@ -690,7 +709,7 @@ function funcionShowInterventions(){
 
 <!-- SOLUTION-FOCUSED COACHING -->
 <a-entity id="btn-solution-focused-coaching" position="0.9 -0.1 -2.8">
-  <a-plane class="sub-tecnica" 
+  <a-plane class="clickable sub-tecnica" 
            handler-botones-vr="mensaje: Abriendo Solution-Focused Coaching; tecnica: solution-focused-coaching"
            width="1.6" height="0.75" 
            color="#ffffff" 
