@@ -905,33 +905,32 @@ function pickRandomOpener(archetype,scenario){
 }
 
 function showScreen(name){
+  // 1. Tu lógica normal para ocultar/mostrar pantallas
   ['welcome','mode','practice','eval','interventions','techniques','technique-list','screen-interventions'].forEach(function(s){
     var el=document.getElementById('screen-'+s);
     if(el)el.setAttribute('visible',s===name);
   });
   appState.screen=name;
 
-  var planosTecnicas = document.querySelectorAll('[handler-botones-vr]');
+  // 2. ⚡ CONTROL DINÁMICO DE LOS 14 BOTONES ESPECÍFICOS
+  // 🎯 Asegúrate de cambiar esto para usar SOLO la clase '.sub-tecnica'
+  var planosTecnicas = document.querySelectorAll('.sub-tecnica');
   
-  var botonesAfectados = Array.from(planosTecnicas).filter(function(el) {
-    var datosComponente = el.getAttribute('handler-botones-vr');
-    
-
-    return !datosComponente.includes('tecnica: interventions'); 
-  });
-
   if (name === 'technique-list') {
-    botonesAfectados.forEach(function(el) {
+    planosTecnicas.forEach(function(el) {
       el.classList.add('clickable');
     });
-    console.log("🟢 Botones de técnicas filtrados ACTIVADOS");
+    console.log("🟢 14 botones de técnicas específicos ACTIVADOS");
   } else {
-    botonesAfectados.forEach(function(el) {
+    planosTecnicas.forEach(function(el) {
       el.classList.remove('clickable');
     });
-    console.log("🔴 Botones de técnicas filtrados DESACTIVADOS");
+    console.log("🔴 14 botones de técnicas específicos DESACTIVADOS");
   }
 }
+
+
+
 function goWelcome(){showScreen('welcome');appState.agentHistory=[];appState.vrMood=30;}
 
 function goMode(menuType){
