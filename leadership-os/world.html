@@ -204,6 +204,7 @@ function funcionSolutionFocusedCoaching() {
 
 function funcionShowInterventions(){
   console.log("🔄 Cambiando a la pantalla de Intervenciones...");
+  showScreen('screen-interventions');
   
 }
 
@@ -906,7 +907,17 @@ function pickRandomOpener(archetype,scenario){
 }
 
 function showScreen(name){
-  ['welcome','mode','practice','eval','interventions','techniques','technique-list','screen-interventions'].forEach(function(s){
+  [
+    'welcome',
+    'mode',
+    'practice',
+    'eval',
+    'interventions',
+    'techniques',
+    'technique-list',
+    'screen-interventions'
+  
+  ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
     if(el)el.setAttribute('visible',s===name);
   });
