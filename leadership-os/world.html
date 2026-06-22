@@ -59,6 +59,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
   console.log("⚡ Buscando técnica:", tecnica);
 
   switch(tecnica) {
+    
     case 'active-listening':
       funcionActiveListening();
       break;
@@ -205,7 +206,6 @@ function funcionSolutionFocusedCoaching() {
 
 function funcionShowInterventions(){
   console.log("🔄 Cambiando a la pantalla de Intervenciones...");
-
   goInterventions();
   
 }
@@ -392,7 +392,7 @@ function funcionShowtechniques(){
   </a-entity>
 
   <!-- SCREEN: INTERVENTIONS -->
-  <a-entity id="screen-interventions-buttons" visible="false">
+  <a-entity id="screen-interventions-list" visible="false">
    <a-entity id="btn-active-listening" position="-2.7 2.3 -2.8">
   <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
@@ -899,8 +899,7 @@ function showScreen(name){
     'eval',
     'interventions',
     'techniques',
-    'technique-list',
-    'screen-interventions-buttons'
+    'technique-list'
   
   ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
@@ -989,7 +988,7 @@ function goPractice(){
 
   function goInterventions(){
   console.log("Entro a goInterventions");
-    showScreen('screen-interventions-buttons');
+    showScreen('techniques');
   }
 
 function updateAgentAvatar(arch){
