@@ -742,49 +742,74 @@ function funcionShowtechniques(){
 
 </a-entity>
 
-  <a-entity id="screen-techniques" visible="false">
-    <a-text value="TECHNIQUES" position="0 2.5 -2.8" align="center" color="#e8eeff" width="6" font="exo2bold"></a-text>
-    <a-text value="Communication and leadership tools" position="0 2.18 -2.8" align="center" color="#c8d8ff" width="4.5" opacity="0.7" font="mozillavr"></a-text>
-    <a-entity id="btn-tech-active-listening" position="-2.2 1.45 -2.8" class="clickable" animation__hover="property:position;to:-2.2 1.53 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:-2.2 1.45 -2.8;startEvents:mouseleave;dur:180">
-      <a-plane width="1.15" height="0.58" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.18" height="0.61" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="ACTIVE LISTENING" align="center" color="#e8eeff" width="2.5" wrap-count="18" position="0 0 0.01" font="mozillavr"></a-text>
-    </a-entity>
-    <a-entity id="btn-tech-empathy" position="0 1.45 -2.8" class="clickable" animation__hover="property:position;to:0 1.53 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:0 1.45 -2.8;startEvents:mouseleave;dur:180">
-      <a-plane width="1.15" height="0.58" color="#2a1840" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.18" height="0.61" color="#9d5cff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="EMPATHY" align="center" color="#e8eeff" width="2.5" wrap-count="18" position="0 0 0.01" font="mozillavr"></a-text>
-    </a-entity>
-    <a-entity id="btn-tech-feedback" position="2.2 1.45 -2.8" class="clickable" animation__hover="property:position;to:2.2 1.53 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:2.2 1.45 -2.8;startEvents:mouseleave;dur:180">
-      <a-plane width="1.15" height="0.58" color="#3a2212" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.18" height="0.61" color="#ffb347" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="FEEDBACK" align="center" color="#e8eeff" width="2.5" wrap-count="18" position="0 0 0.01" font="mozillavr"></a-text>
-    </a-entity>
-    <a-entity id="btn-tech-coaching" position="-2.2 0.55 -2.8" class="clickable" animation__hover="property:position;to:-2.2 0.63 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:-2.2 0.55 -2.8;startEvents:mouseleave;dur:180">
-      <a-plane width="1.15" height="0.58" color="#103020" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.18" height="0.61" color="#4dff88" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="COACHING" align="center" color="#e8eeff" width="2.5" wrap-count="18" position="0 0 0.01" font="mozillavr"></a-text>
-    </a-entity>
-    <a-entity id="btn-tech-trust" position="0 0.55 -2.8" class="clickable" animation__hover="property:position;to:0 0.63 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:0 0.55 -2.8;startEvents:mouseleave;dur:180">
-      <a-plane width="1.15" height="0.58" color="#132840" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.18" height="0.61" color="#58a6ff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="TRUST" align="center" color="#e8eeff" width="2.5" wrap-count="18" position="0 0 0.01" font="mozillavr"></a-text>
-    </a-entity>
-    <a-entity id="btn-tech-motivation" position="2.2 0.55 -2.8" class="clickable" animation__hover="property:position;to:2.2 0.63 -2.8;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:2.2 0.55 -2.8;startEvents:mouseleave;dur:180">
-      <a-plane width="1.15" height="0.58" color="#341020" material="opacity:0.93;shader:flat"></a-plane>
-      <a-plane width="1.18" height="0.61" color="#ff5ca0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="MOTIVATION" align="center" color="#e8eeff" width="2.5" wrap-count="18" position="0 0 0.01" font="mozillavr"></a-text>
-    </a-entity>
-    <a-entity position="0 -0.2 -2.5">
-      <a-plane width="3" height="0.32" color="#101830" material="opacity:0.84;shader:flat"></a-plane>
-      <a-text value="Select a communication technique to train in VR" align="center" color="#c8d8ff" width="4" position="0 0 0.01" opacity="0.7" font="mozillavr"></a-text>
-    </a-entity>
-    <a-entity id="btn-techniques-back" position="0 -0.72 -2.4" class="clickable">
-      <a-plane width="0.82" height="0.24" color="#111830" material="opacity:0.85;shader:flat"></a-plane>
-      <a-plane width="0.86" height="0.28" color="#4466ff" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="BACK" align="center" color="#4466ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
-    </a-entity>
+ <a-entity id="screen-techniques" visible="false">
+  <!-- HEADER -->
+  <a-text value="INTERVENCIONES" position="0 2.5 -2.8" align="center" color="#e8eeff" width="6" font="exo2bold"></a-text>
+  <a-text value="Which intervention do you want to work on?\nEach has its own moment, owner, and objective." position="0 2.15 -2.8" align="center" color="#c8d8ff" width="4.2" opacity="0.7" font="mozillavr"></a-text>
+
+  <!-- GRID DE INTERVENCIONES (Fila Superior) -->
+  <!-- 1. Pulse Check (Izquierda) -->
+  <a-entity id="btn-interv-pulse-check" position="-1.5 1.35 -2.8" class="clickable" 
+            animation__hover="property:position;to:-1.5 1.41 -2.8;startEvents:mouseenter;dur:180" 
+            animation__unhover="property:position;to:-1.5 1.35 -2.8;startEvents:mouseleave;dur:180">
+    <a-plane width="2.6" height="0.9" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
+    <a-plane width="2.64" height="0.94" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+    <!-- Contenido -->
+    <a-text value="💓" align="center" position="-1.0 0.1 0.01" width="4"></a-text>
+    <a-text value="PULSE CHECK" align="left" color="#e8eeff" width="3" font="exo2bold" position="-0.7 0.25 0.01"></a-text>
+    <a-text value="Primera revision - Senales tempranas\n¿Como te sientes aqui?" align="left" color="#c8d8ff" width="2" font="mozillavr" position="-0.7 -0.02 0.01" opacity="0.8"></a-text>
+    <a-text value="Dia 30 - Recruiting - Training - Coach" align="left" color="#00e5c0" width="1.8" font="mozillavr" position="-0.7 -0.3 0.01"></a-text>
   </a-entity>
+
+  <!-- 2. Anchoring (Derecha) -->
+  <a-entity id="btn-interv-anchoring" position="1.5 1.35 -2.8" class="clickable" 
+            animation__hover="property:position;to:1.5 1.41 -2.8;startEvents:mouseenter;dur:180" 
+            animation__unhover="property:position;to:1.5 1.35 -2.8;startEvents:mouseleave;dur:180">
+    <a-plane width="2.6" height="0.9" color="#2a1840" material="opacity:0.93;shader:flat"></a-plane>
+    <a-plane width="2.64" height="0.94" color="#9d5cff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+    <!-- Contenido -->
+    <a-text value="⚓" align="center" position="-1.0 0.1 0.01" width="4"></a-text>
+    <a-text value="ANCHORING" align="left" color="#e8eeff" width="3" font="exo2bold" position="-0.7 0.25 0.01"></a-text>
+    <a-text value="Pertenencia - Metas\nAnclar el compromiso del agente" align="left" color="#c8d8ff" width="2" font="mozillavr" position="-0.7 -0.02 0.01" opacity="0.8"></a-text>
+    <a-text value="Dia 100 - Manager directo" align="left" color="#9d5cff" width="1.8" font="mozillavr" position="-0.7 -0.3 0.01"></a-text>
+  </a-entity>
+
+
+  <!-- GRID DE INTERVENCIONES (Fila Inferior) -->
+  <!-- 3. Stay Interview (Izquierda) -->
+  <a-entity id="btn-interv-stay-interview" position="-1.5 0.3 -2.8" class="clickable" 
+            animation__hover="property:position;to:-1.5 0.36 -2.8;startEvents:mouseenter;dur:180" 
+            animation__unhover="property:position;to:-1.5 0.3 -2.8;startEvents:mouseleave;dur:180">
+    <a-plane width="2.6" height="0.9" color="#3a2a12" material="opacity:0.93;shader:flat"></a-plane>
+    <a-plane width="2.64" height="0.94" color="#ffb347" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+    <!-- Contenido -->
+    <a-text value="🎯" align="center" position="-1.0 0.1 0.01" width="4"></a-text>
+    <a-text value="STAY INTERVIEW" align="left" color="#e8eeff" width="3" font="exo2bold" position="-0.7 0.25 0.01"></a-text>
+    <a-text value="¿Por que te quedas?\nAntes de que piense en irse" align="left" color="#c8d8ff" width="2" font="mozillavr" position="-0.7 -0.02 0.01" opacity="0.8"></a-text>
+    <a-text value="Dia 121 - HR" align="left" color="#ffb347" width="1.8" font="mozillavr" position="-0.7 -0.3 0.01"></a-text>
+  </a-entity>
+
+  <!-- 4. Tenure Renewal (Derecha) -->
+  <a-entity id="btn-interv-tenure-renewal" position="1.5 0.3 -2.8" class="clickable" 
+            animation__hover="property:position;to:1.5 0.36 -2.8;startEvents:mouseenter;dur:180" 
+            animation__unhover="property:position;to:1.5 0.3 -2.8;startEvents:mouseleave;dur:180">
+    <a-plane width="2.6" height="0.9" color="#401818" material="opacity:0.93;shader:flat"></a-plane>
+    <a-plane width="2.64" height="0.94" color="#ff6b6b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+    <!-- Contenido -->
+    <a-text value="🏆" align="center" position="-1.0 0.1 0.01" width="4"></a-text>
+    <a-text value="TENURE RENEWAL" align="left" color="#e8eeff" width="3" font="exo2bold" position="-0.7 0.25 0.01"></a-text>
+    <a-text value="Reconocimiento anual - Celebracion\nRenovacion del vinculo" align="left" color="#c8d8ff" width="2" font="mozillavr" position="-0.7 -0.02 0.01" opacity="0.8"></a-text>
+    <a-text value="Dia 365 - Comite" align="left" color="#ff6b6b" width="1.8" font="mozillavr" position="-0.7 -0.3 0.01"></a-text>
+  </a-entity>
+
+
+  <!-- BOTÓN BACK / REGRESAR -->
+  <a-entity id="btn-techniques-back" position="0 -0.45 -2.5" class="clickable">
+    <a-plane width="0.82" height="0.24" color="#111830" material="opacity:0.85;shader:flat"></a-plane>
+    <a-plane width="0.86" height="0.28" color="#4466ff" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+    <a-text value="BACK" align="center" color="#4466ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
+  </a-entity>
+</a-entity>
 
   <!-- SCREEN: PRACTICE -->
   <a-entity id="screen-practice" visible="false">
