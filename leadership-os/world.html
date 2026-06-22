@@ -390,7 +390,7 @@ function funcionShowtechniques(){
   </a-entity>
 
   <!-- SCREEN: INTERVENTIONS -->
-  <a-entity id="screen-interventions" visible="true">
+  <a-entity id="screen-interventions" visible="false">
    <a-entity id="btn-active-listening" position="-2.7 2.3 -2.8">
   <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
@@ -1407,85 +1407,85 @@ function setupControllers(){
   });
 }
 
-document.addEventListener('DOMContentLoaded',function(){
-  var micBtn=document.getElementById('mic-btn');
-  if(micBtn)micBtn.addEventListener('click',function(){
-    if(appState.screen==='practice'){
-      if(!isRecording&&!isProcessing)startRecording();
-      else if(isRecording)stopRecording();
-    }
-  });
-  var btnInt=document.getElementById('btn-interventions');
+// document.addEventListener('DOMContentLoaded',function(){
+//   var micBtn=document.getElementById('mic-btn');
+//   if(micBtn)micBtn.addEventListener('click',function(){
+//     if(appState.screen==='practice'){
+//       if(!isRecording&&!isProcessing)startRecording();
+//       else if(isRecording)stopRecording();
+//     }
+//   });
+//   var btnInt=document.getElementById('btn-interventions');
 
-  if(btnInt)btnInt.addEventListener('click',function(e){
+//   if(btnInt)btnInt.addEventListener('click',function(e){
 
-    e.stopPropagation();
-console.log("dio click al btnInt");
-showScreen('technique-list');
+//     e.stopPropagation();
+// console.log("dio click al btnInt");
+// showScreen('technique-list');
 
-  });
+//   });
 
-  var btnTech=document.getElementById('btn-techniques');
+//   var btnTech=document.getElementById('btn-techniques');
 
-if(btnTech)
-  btnTech.addEventListener('click',function(e){
+// if(btnTech)
+//   btnTech.addEventListener('click',function(e){
 
-    e.stopPropagation();
+//     e.stopPropagation();
 
-    showScreen('technique-list');
+//     showScreen('technique-list');
 
-  });
-  var btnAL=document.getElementById('btn-active-listening');
+//   });
+//   var btnAL=document.getElementById('btn-active-listening');
 
-if(btnAL)
-  btnAL.addEventListener('click',function(e){
+// if(btnAL)
+//   btnAL.addEventListener('click',function(e){
 
-    e.stopPropagation();
+//     e.stopPropagation();
 
-    appState.selectedTechnique='active_listening';
+//     appState.selectedTechnique='active_listening';
 
-    goMode('techniques');
+//     goMode('techniques');
 
-  });
-  var btnTechBack=document.getElementById('btn-tech-list-back');
+//   });
+//   var btnTechBack=document.getElementById('btn-tech-list-back');
 
-if(btnTechBack)
-  btnTechBack.addEventListener('click',function(e){
+// if(btnTechBack)
+//   btnTechBack.addEventListener('click',function(e){
 
-    e.stopPropagation();
+//     e.stopPropagation();
 
-    goWelcome();
+//     goWelcome();
 
-  });
-  var btnLearn=document.getElementById('btn-learn');if(btnLearn)btnLearn.addEventListener('click',function(e){e.stopPropagation();goLearn();});
-  var btnWork=document.getElementById('btn-work');if(btnWork)btnWork.addEventListener('click',function(e){e.stopPropagation();goWork();});
+//   });
+//   var btnLearn=document.getElementById('btn-learn');if(btnLearn)btnLearn.addEventListener('click',function(e){e.stopPropagation();goLearn();});
+//   var btnWork=document.getElementById('btn-work');if(btnWork)btnWork.addEventListener('click',function(e){e.stopPropagation();goWork();});
   
-  var btnPractice=document.getElementById('btn-practice');if(btnPractice)btnPractice.addEventListener('click',function(e){e.stopPropagation();goPractice();});
+//   var btnPractice=document.getElementById('btn-practice');if(btnPractice)btnPractice.addEventListener('click',function(e){e.stopPropagation();goPractice();});
   
-  var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
-  var btnEnd=document.getElementById('btn-end-practice');if(btnEnd)btnEnd.addEventListener('click',function(e){e.stopPropagation();goEval();});
-  var btnNew=document.getElementById('btn-new-session');if(btnNew)btnNew.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
+//   var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
+//   var btnEnd=document.getElementById('btn-end-practice');if(btnEnd)btnEnd.addEventListener('click',function(e){e.stopPropagation();goEval();});
+//   var btnNew=document.getElementById('btn-new-session');if(btnNew)btnNew.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
   
-  var btnAgain=document.getElementById('btn-practice-again');if(btnAgain)btnAgain.addEventListener('click',function(e){e.stopPropagation();go14button();});
+//   var btnAgain=document.getElementById('btn-practice-again');if(btnAgain)btnAgain.addEventListener('click',function(e){e.stopPropagation();go14button();});
   
-  var btnLogout=document.getElementById('btn-logout');
-  if(btnLogout)btnLogout.addEventListener('click',function(){
-    localStorage.removeItem('ldr_session_token');
-    localStorage.removeItem('ldr_refresh_token');
-    window.location.href='login-vr.html';
-  });
-  document.querySelector('a-scene').addEventListener('loaded',function(){
-    setupControllers();
-    setupMic().then(function(){
-      var gameId=localStorage.getItem('ldr_game_id')||'';
-      var name=gameId.split('.')[1]||'Manager';
-      var greet='Bienvenido'+(name?' '+name:'')+'. Soy Juanjolote. Elige un camino: Intervenciones para practicar conversaciones de retencion, o Tecnicas para desarrollar habilidades especificas.';
-      setTimeout(function(){setJuanMood('happy');speakVR(greet,'daniel');},800);
-    });
-    var stars=document.getElementById('stars-1');
-    if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
-  });
-});
+//   var btnLogout=document.getElementById('btn-logout');
+//   if(btnLogout)btnLogout.addEventListener('click',function(){
+//     localStorage.removeItem('ldr_session_token');
+//     localStorage.removeItem('ldr_refresh_token');
+//     window.location.href='login-vr.html';
+//   });
+//   document.querySelector('a-scene').addEventListener('loaded',function(){
+//     setupControllers();
+//     setupMic().then(function(){
+//       var gameId=localStorage.getItem('ldr_game_id')||'';
+//       var name=gameId.split('.')[1]||'Manager';
+//       var greet='Bienvenido'+(name?' '+name:'')+'. Soy Juanjolote. Elige un camino: Intervenciones para practicar conversaciones de retencion, o Tecnicas para desarrollar habilidades especificas.';
+//       setTimeout(function(){setJuanMood('happy');speakVR(greet,'daniel');},800);
+//     });
+//     var stars=document.getElementById('stars-1');
+//     if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
+//   });
+// });
  
     document.querySelector('a-scene').addEventListener('loaded', () => {
       console.log("🚀 Sistema de rastreo de clics activado.");
