@@ -120,6 +120,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interventions':
       funcionShowInterventions();
       break;
+      
     case 'techniques':
       funcionShowtechniques();
       break;
@@ -388,9 +389,7 @@ function funcionShowtechniques(){
       <a-plane width="0.94" height="0.30" color="#58a6ff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
       <a-text value="BACK" align="center" color="#58a6ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
     </a-entity>
-  </a-entity>
-
-  <!-- SCREEN: INTERVENTIONS -->
+      <!-- SCREEN: INTERVENTIONS -->
   <a-entity id="screen-interventions" visible="false">
    <a-entity id="btn-active-listening" position="-2.7 2.3 -2.8">
   <a-plane class="sub-tecnica" 
@@ -410,6 +409,9 @@ function funcionShowtechniques(){
   </a-plane>
 </a-entity>
   </a-entity>
+  </a-entity>
+
+
 
   <!-- SCREEN: TECHNIQUES -->
   <a-entity id="screen-technique-list" visible="false">
@@ -986,7 +988,9 @@ function goPractice(){
   }
 
   function goInterventions(){
+
   console.log("Entro a goInterventions");
+  
     showScreen('screen-techniques');
   }
 
