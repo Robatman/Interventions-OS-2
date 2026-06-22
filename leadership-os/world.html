@@ -1467,23 +1467,23 @@ function setupControllers(){
   });
 }
 
-document.addEventListener('DOMContentLoaded',function(){
-  var micBtn=document.getElementById('mic-btn');
-  if(micBtn)micBtn.addEventListener('click',function(){
-    if(appState.screen==='practice'){
-      if(!isRecording&&!isProcessing)startRecording();
-      else if(isRecording)stopRecording();
-    }
-  });
-  var btnInt=document.getElementById('btn-interventions');
+// document.addEventListener('DOMContentLoaded',function(){
+//   var micBtn=document.getElementById('mic-btn');
+//   if(micBtn)micBtn.addEventListener('click',function(){
+//     if(appState.screen==='practice'){
+//       if(!isRecording&&!isProcessing)startRecording();
+//       else if(isRecording)stopRecording();
+//     }
+//   });
+//   var btnInt=document.getElementById('btn-interventions');
 
-  if(btnInt)btnInt.addEventListener('click',function(e){
+//   if(btnInt)btnInt.addEventListener('click',function(e){
 
-    e.stopPropagation();
-console.log("dio click al btnInt");
-showScreen('technique-list');
+//     e.stopPropagation();
+// console.log("dio click al btnInt");
+// showScreen('technique-list');
 
-  });
+//   });
 
   var btnTech=document.getElementById('btn-techniques');
 
