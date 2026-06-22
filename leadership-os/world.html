@@ -1028,15 +1028,29 @@ function goPractice(){
   console.log("dio click al goPractice")
 }
 
-  function go14button(){
-  console.log("Entro a go14Butones");
-    showScreen('technique-list');
-  }
+function goInterventions() {
+  // Mostrar pantalla de intervenciones
+  const screenInterv = document.getElementById('screen-interventions-list');
+  screenInterv.setAttribute('visible', 'true');
+  screenInterv.setAttribute('scale', '1 1 1');
+  
+  // Ocultar por completo la de técnicas (vaciando su escala)
+  const screenTech = document.getElementById('screen-technique-list');
+  screenTech.setAttribute('visible', 'false');
+  screenTech.setAttribute('scale', '0 0 0'); // <-- Evita que el raycaster colisione
+}
 
-  function goInterventions(){
-  console.log("Entro a goInterventions");
-    showScreen('interventions');
-  }
+function go14button() {
+  // Mostrar pantalla de técnicas
+  const screenTech = document.getElementById('screen-technique-list');
+  screenTech.setAttribute('visible', 'true');
+  screenTech.setAttribute('scale', '1 1 1');
+  
+  // Ocultar pantalla de intervenciones
+  const screenInterv = document.getElementById('screen-interventions-list');
+  screenInterv.setAttribute('visible', 'false');
+  screenInterv.setAttribute('scale', '0 0 0'); // <-- Evita que el raycaster colisione
+}
 
 function updateAgentAvatar(arch){
   var nameEl=document.getElementById('agent-name'),roleEl=document.getElementById('agent-role');
