@@ -117,7 +117,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
 
 
 
-    case 'screen-interventions':
+    case 'interventions':
       funcionShowInterventions();
       break;
     case 'techniques':
@@ -914,8 +914,8 @@ function showScreen(name){
     'eval',
     'interventions',
     'techniques',
-    'technique-list',
-    'screen-interventions'
+    'technique-list'
+    // 'screen-interventions'
   
   ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
