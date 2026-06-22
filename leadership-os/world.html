@@ -899,7 +899,7 @@ function showScreen(name){
     'interventions',
     'techniques',
     'technique-list',
-    'screen-technique-list'
+    'screen-techniques'
   
   ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
@@ -987,10 +987,8 @@ function goPractice(){
   }
 
   function goInterventions(){
-
   console.log("Entro a goInterventions");
-  
-    showScreen('screen-technique-list');
+    showScreen('screen-techniques');
   }
 
 function updateAgentAvatar(arch){
