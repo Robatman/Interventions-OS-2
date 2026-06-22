@@ -1126,8 +1126,6 @@ speakVR(feedback,getVoice('juan'));
 }
 
 async function translateToEnglish(text) {
-  console.log("Entro aquí y no se que pez jaja");
-
   const res = await fetch('/api/groq_speakvr', {
     method: 'POST',
     headers: {
