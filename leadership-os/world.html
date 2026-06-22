@@ -392,7 +392,7 @@ function funcionShowtechniques(){
   </a-entity>
 
   <!-- SCREEN: INTERVENTIONS -->
-  <a-entity id="screen-interventions" visible="false">
+  <a-entity id="screen-interventions-buttons" visible="false">
    <a-entity id="btn-active-listening" position="-2.7 2.3 -2.8">
   <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
@@ -741,6 +741,7 @@ function funcionShowtechniques(){
   </a-entity>
 
 </a-entity>
+
   <a-entity id="screen-techniques" visible="false">
     <a-text value="TECHNIQUES" position="0 2.5 -2.8" align="center" color="#e8eeff" width="6" font="exo2bold"></a-text>
     <a-text value="Communication and leadership tools" position="0 2.18 -2.8" align="center" color="#c8d8ff" width="4.5" opacity="0.7" font="mozillavr"></a-text>
@@ -899,7 +900,7 @@ function showScreen(name){
     'interventions',
     'techniques',
     'technique-list',
-    'screen-techniques'
+    'screen-interventions-buttons'
   
   ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
@@ -988,7 +989,7 @@ function goPractice(){
 
   function goInterventions(){
   console.log("Entro a goInterventions");
-    showScreen('screen-techniques');
+    showScreen('screen-interventions-buttons');
   }
 
 function updateAgentAvatar(arch){
