@@ -37,9 +37,23 @@ AFRAME.registerComponent('handler-botones-vr', {
     var data = this.data;
 
     el.addEventListener('click', function (evt) {
-      // 🔒 SI EL BOTÓN ESTÁ OCULTO (O SU PANTALLA PADRE), IGNORAMOS EL EVENTO completamente
-      if (el.object3D && el.object3D.visible === false) {
-        return;
+      // 🔒 SI EL BOTÓN O ALGUNO DE SUS PADRES ESTÁ OCULTO, IGNORAMOS EL EVENTO completamente
+      if (el.object3D) {
+        let current = el.object3D;
+        let isHierarchyVisible = true;
+        
+        // Recorremos hacia arriba en el árbol 3D comprobando la visibilidad
+        while (current) {
+          if (current.visible === false) {
+            isHierarchyVisible = false;
+            break;
+          }
+          current = current.parent;
+        }
+
+        if (!isHierarchyVisible) {
+          return; // Detiene el clic si la pantalla o el contenedor está oculto
+        }
       }
 
       if (evt.detail && evt.detail.sourceEvent) {
@@ -53,8 +67,6 @@ AFRAME.registerComponent('handler-botones-vr', {
     });
   }
 });
-  // 🌟 LAS FUNCIONES AHORA VIVEN AFUERA Y SON GLOBALES 🌟
-
 function ejecutarFuncionPorTecnica(tecnica) {
   console.log("⚡ Buscando técnica:", tecnica);
 
