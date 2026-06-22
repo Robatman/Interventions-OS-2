@@ -204,7 +204,8 @@ function funcionSolutionFocusedCoaching() {
 
 function funcionShowInterventions(){
   console.log("🔄 Cambiando a la pantalla de Intervenciones...");
-  showScreen('screen-interventions');
+
+  goInterventions();
   
 }
 
@@ -981,6 +982,11 @@ function goPractice(){
 
   function go14button(){
   console.log("Entro a go14Butones");
+    showScreen('technique-list');
+  }
+
+  function goInterventions(){
+  console.log("Entro a goInterventions");
     showScreen('technique-list');
   }
 
