@@ -127,9 +127,14 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'solution-focused-coaching':
       funcionSolutionFocusedCoaching();
       break;
+      
+      
+      case 'interv-pulse-check':
+        funcionIntervPulseCheck();
+        break;
 
 
-
+      
     case 'interventions':
       funcionShowInterventions();
       break;
@@ -225,6 +230,11 @@ function funcionShowInterventions(){
 function funcionShowtechniques(){
   console.log("🔄 Cambiando a la pantalla de Técnicas...");
   go14button();
+}
+
+function funcionIntervPulseCheck(){
+  console.log("🔄 Cargando herramienta Pulse Check...");
+  goPractice();
 }
   
 </script>
