@@ -415,7 +415,7 @@ function funcionIntervPulseCheck(){
 
   <!-- SCREEN: INTERVENTIONS -->
   <a-entity id="screen-interventions-list" visible="false">
-   <a-entity id="btn-interv-active-listening" position="-2.7 2.3 -2.8">
+   <a-entity id="btn-active-listening" position="-2.7 2.3 -2.8">
   <a-plane class="sub-tecnica" 
            handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
            width="1.6" height="0.75" 
@@ -957,13 +957,12 @@ function showScreen(name){
 
   var planosTecnicas = document.querySelectorAll('.sub-tecnica');
   
-if (name === 'interventions') {
-  // Desactivamos los 14 botones para que NO interfieran de fondo de ninguna manera
-  planosTecnicas.forEach(function(el) {
-    el.classList.remove('clickable'); // <-- Esto evita que intercepten clics fantasmas
-  });
-  console.log("🔴 14 botones de técnicas desactivados para no interferir en Intervenciones");
-} else if (name === 'interventions') {
+if (name === 'technique-list') {
+    planosTecnicas.forEach(function(el) {
+      el.classList.add('clickable');
+    });
+    console.log("🟢 14 botones de técnicas específicos ACTIVADOS");
+  } else if (name === 'interventions') {
     planosTecnicas.forEach(function(el) {
       el.classList.remove('clickable');
     });
