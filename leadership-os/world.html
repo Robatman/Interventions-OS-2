@@ -963,11 +963,17 @@ if (name === 'technique-list') {
     });
     console.log("🟢 14 botones de técnicas específicos ACTIVADOS");
   } else if (name === 'interventions') {
-    // Si entra a interventions, removemos la clase 'clickable' para desactivarlos
     planosTecnicas.forEach(function(el) {
       el.classList.remove('clickable');
     });
     console.log("🔴 14 botones de técnicas específicos DESACTIVADOS por ingresar a Intervenciones");
+
+    const btnTecnicasGeneral = document.getElementById('btn-tecnicas'); // Cambia 'btn-tecnicas' por el ID real de tu botón
+    if (btnTecnicasGeneral) {
+      btnTecnicasGeneral.classList.remove('clickable');
+      console.log("🔴 Botón general de técnicas DESACTIVADO");
+    }
+
   } else {
     planosTecnicas.forEach(function(el) {
       el.classList.remove('clickable');
