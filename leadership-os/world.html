@@ -960,6 +960,7 @@ function showScreen(name){
 if (name === 'technique-list') {
     planosTecnicas.forEach(function(el) {
       el.classList.add('clickable');
+      console.log("🟢 Botón de técnica ACTIVADO: " + el.id);
     });
     console.log("🟢 14 botones de técnicas específicos ACTIVADOS");
   } else if (name === 'interventions') {
