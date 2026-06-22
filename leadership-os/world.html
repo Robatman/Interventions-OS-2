@@ -957,11 +957,17 @@ function showScreen(name){
 
   var planosTecnicas = document.querySelectorAll('.sub-tecnica');
   
-  if (name === 'technique-list') {
+if (name === 'technique-list') {
     planosTecnicas.forEach(function(el) {
       el.classList.add('clickable');
     });
     console.log("🟢 14 botones de técnicas específicos ACTIVADOS");
+  } else if (name === 'interventions') {
+    // Si entra a interventions, removemos la clase 'clickable' para desactivarlos
+    planosTecnicas.forEach(function(el) {
+      el.classList.remove('clickable');
+    });
+    console.log("🔴 14 botones de técnicas específicos DESACTIVADOS por ingresar a Intervenciones");
   } else {
     planosTecnicas.forEach(function(el) {
       el.classList.remove('clickable');
@@ -1028,29 +1034,15 @@ function goPractice(){
   console.log("dio click al goPractice")
 }
 
-function goInterventions() {
-  // Mostrar pantalla de intervenciones
-  const screenInterv = document.getElementById('screen-interventions-list');
-  screenInterv.setAttribute('visible', 'true');
-  screenInterv.setAttribute('scale', '1 1 1');
-  
-  // Ocultar por completo la de técnicas (vaciando su escala)
-  const screenTech = document.getElementById('screen-technique-list');
-  screenTech.setAttribute('visible', 'false');
-  screenTech.setAttribute('scale', '0 0 0'); // <-- Evita que el raycaster colisione
-}
+  function go14button(){
+  console.log("Entro a go14Butones");
+    showScreen('technique-list');
+  }
 
-function go14button() {
-  // Mostrar pantalla de técnicas
-  const screenTech = document.getElementById('screen-technique-list');
-  screenTech.setAttribute('visible', 'true');
-  screenTech.setAttribute('scale', '1 1 1');
-  
-  // Ocultar pantalla de intervenciones
-  const screenInterv = document.getElementById('screen-interventions-list');
-  screenInterv.setAttribute('visible', 'false');
-  screenInterv.setAttribute('scale', '0 0 0'); // <-- Evita que el raycaster colisione
-}
+  function goInterventions(){
+  console.log("Entro a goInterventions");
+    showScreen('interventions');
+  }
 
 function updateAgentAvatar(arch){
   var nameEl=document.getElementById('agent-name'),roleEl=document.getElementById('agent-role');
