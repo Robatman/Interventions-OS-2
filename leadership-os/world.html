@@ -119,20 +119,19 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interv-pulse-check': funcionIntervPulseCheck(); break;
     case 'interventions': funcionShowInterventions(); break;
     case 'techniques': funcionShowtechniques(); break;
+
     // ==========================================
     // 🎭 CASES DE INTERVENCIONES (Los 4 Botones)
     // ==========================================
     case 'interv-retencion': funcionIntervRetencion(); break;
-    case 'interv-fidelizacion': 
-    funcionIntervFidelizacion(); 
-    break;
-    case 'interv-soporte-critico': 
-    funcionIntervSoporteCritico(); 
-    break;
-    case 'interv-reclamaciones': 
-    funcionIntervReclamaciones(); 
-    break;
-    default: console.log("⚡ Ejecutando función genérica de la academia.");
+    case 'interv-fidelizacion': funcionIntervFidelizacion(); break;
+    case 'interv-soporte-critico': funcionIntervSoporteCritico(); break;
+    case 'interv-reclamaciones': funcionIntervReclamaciones(); break;
+
+    // 🚨 El default SIEMPRE debe ir al último
+    default: 
+      console.log("⚡ Ejecutando función genérica de la academia.");
+      break;
   }
 }
 
