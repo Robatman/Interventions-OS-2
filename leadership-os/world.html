@@ -99,6 +99,8 @@ function cambiarPantallaVR(pantallaMostrarId) {
 function ejecutarFuncionPorTecnica(tecnica) {
   console.log("⚡ Buscando técnica:", tecnica);
 
+  cambiarPantallaVR(''); 
+
   switch(tecnica) {
     case 'active-listening': funcionActiveListening(); break;
     case 'powerful-questions': funcionPowerfulQuestions(); break;
