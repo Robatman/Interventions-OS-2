@@ -885,10 +885,7 @@ function funcionIntervReclamaciones() {
 
 
 
-  <!-- ══════════════════════════════════════
-       PANEL A: SELECTOR DE TÉCNICAS (Menú 3D)
-  ══════════════════════════════════════ -->
-<a-entity id="panel-techniques" position="0 1.6 -2" visible="true">
+<a-entity id="panel-techniques" position="0 1.6 -2" visible="false">
   <a-plane width="3" height="2" color="#1a1a2e" material="opacity: 0.9"></a-plane>
   <a-text value="Choose a technique to preview" align="center" position="0 0.7 0.01" width="4"></a-text>
 
@@ -899,10 +896,6 @@ function funcionIntervReclamaciones() {
   </a-plane>
 </a-entity>
 
-  <!-- ══════════════════════════════════════
-       PANEL B: EL CHAT PREVIEW (Juanjolote y el agente)
-  ══════════════════════════════════════ -->
-  <!-- Inicia en visible="false" para que no estorbe al principio -->
 <a-entity id="panel-preview" position="0 1.6 -2" visible="false">
   <a-plane width="3" height="2" color="#222831" material="opacity: 0.95"></a-plane>
   <a-text value="Preview de la Conversación" align="center" position="0 0.8 0.01" width="4" color="#eeeeee"></a-text>
@@ -1503,17 +1496,8 @@ function setupControllers(){
 }
 
 
-// Simulación de los diálogos que tienes en tu base de datos o archivo de técnicas
-// const previewDialogs = {
-//   active_listening: [
-//     { speaker: "JUANJOLOTE", text: "¡Qué onda! Oye, la verdad ando bien estresado con las métricas de esta semana...", color: "#00adb5" },
-//     { speaker: "COACH", text: "Te escucho, Juanjo. Noto frustración en tu voz, ¿qué es lo que más te está pesando?", color: "#ffb347" },
-//     { speaker: "JUANJOLOTE", text: "Es que siento que por más que me esfuerzo, el sistema no me cuenta bien las llamadas.", color: "#00adb5" }
-//   ]
-// };
 
 function selectAndPreviewVR(techniqueId) {
-  // 1. Ocultar el menú de técnicas y mostrar el de Preview
   document.querySelector('#panel-techniques').setAttribute('visible', 'false');
   document.querySelector('#panel-preview').setAttribute('visible', 'true');
 
@@ -1545,10 +1529,8 @@ function selectAndPreviewVR(techniqueId) {
     const textValue = `${speakerName}: ${msg.text}`;
     
     // Asignamos colores fijos para diferenciar los diálogos en el espacio 3D
-    // #00adb5 para Juanjolote (A) y #ffb347 para Ajolín/Agente (B)
     const bubbleColor = msg.speaker === 'A' ? "#00adb5" : "#ffb347";
 
-    // Nota: Usamos 'text' corregido (sin el 'a-') para que A-Frame lo renderice
     messageEntity.setAttribute('text', {
       value: textValue,
       align: 'left',
