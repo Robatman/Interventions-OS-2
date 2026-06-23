@@ -342,37 +342,37 @@ function funcionIntervReclamaciones() {
 
 
   <a-entity id="screen-learn-work-practice" visible="false">
-    <a-entity id="agent-entity" position="0 0 -2.5">
-      <a-image id="agent-img" src="#ajolin-neutral" width="1.5" height="1.5" position="0 0.75 0" look-at="[camera]" animation="property:position;to:0 0.85 0;loop:true;dur:3000;dir:alternate;easing:easeInOutSine"></a-image>
-      <a-circle position="0 0.06 0" radius="1.0" rotation="-90 0 0" id="agent-halo" color="#9d5cff" material="opacity:0.06;transparent:true;shader:flat"></a-circle>
-      <a-torus position="0 0.06 0" id="agent-ring" radius="1.05" radius-tubular="0.015" rotation="-90 0 0" color="#9d5cff" material="opacity:0.3;transparent:true;shader:flat" animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:7000;easing:linear"></a-torus>
-      <a-text id="agent-name" value="Carlos Mendoza" position="0 1.65 0" align="center" color="#c8d8ff" width="3.5" font="mozillavr"></a-text>
-      <a-text id="agent-role" value="Agente 2 anos" position="0 1.45 0" align="center" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr"></a-text>
+  <a-entity position="0 2.58 -3" animation="property:position;to:0 2.66 -3;loop:true;dur:4200;dir:alternate;easing:easeInOutSine">
+      <a-text id="mode-title" value="Interventions" align="center" color="#e8eeff" width="6.5" font="exo2bold"></a-text>
     </a-entity>
-    <a-entity id="dialog-panel" position="0 2.35 -2.5" visible="false">
-      <a-plane width="3.2" height="0.85" color="#080e2a" material="opacity:0.95;shader:flat;side:double"></a-plane>
-      <a-plane width="3.24" height="0.89" id="dialog-border" color="#9d5cff" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
-      <a-text id="dialog-speaker" value="CARLOS" position="-1.45 0.28 0.01" align="left" color="#9d5cff" width="2.5" font="mozillavr"></a-text>
-      <a-text id="dialog-text" value="..." position="0 0 0.01" align="center" color="#e8eeff" width="5.5" wrap-count="55" font="mozillavr"></a-text>
+    <a-text id="mode-subtitle" value="Choose your training mode" position="0 2.22 -3" align="center" color="#c8d8ff" width="4.8" opacity="0.72" font="mozillavr"></a-text>
+    <a-entity position="0 1.92 -2.8">
+      <a-plane width="1.2" height="0.24" color="#111830" material="opacity:0.86;shader:flat"></a-plane>
+      <a-plane width="1.24" height="0.28" color="#4466ff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text id="mode-context-pill" value="Training" align="center" color="#58a6ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
     </a-entity>
-    <a-entity position="2.4 1.6 -2.2" rotation="0 -25 0">
-      <a-plane width="0.9" height="0.65" color="#080e2a" material="opacity:0.88;shader:flat;side:double"></a-plane>
-      <a-plane width="0.92" height="0.67" color="#2a3a7a" material="opacity:0.5;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="OPENNESS" position="0 0.22 0.01" align="center" color="#c8d8ff" width="2.2" opacity="0.6" font="mozillavr"></a-text>
-      <a-plane width="0.7" height="0.07" color="#0d1530" material="shader:flat" position="0 0.02 0.01"></a-plane>
-      <a-plane id="mood-fill" width="0.21" height="0.07" color="#ff5ca0" material="shader:flat" position="-0.245 0.02 0.015"></a-plane>
-      <a-text id="mood-pct" value="30%" position="0 -0.16 0.01" align="center" color="#c8d8ff" width="1.8" font="mozillavr"></a-text>
+    <a-entity id="btn-practice" class="clickable" position="-1.65 1.1 -2.7" animation__hover="property:position;to:-1.65 1.2 -2.7;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:-1.65 1.1 -2.7;startEvents:mouseleave;dur:180">
+      <a-plane width="1.45" height="0.92" color="#102840" material="opacity:0.94;shader:flat;side:double"></a-plane>
+      <a-plane width="1.49" height="0.96" color="#00e5c0" material="opacity:0.36;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="PRACTICE" align="center" color="#00e5c0" width="4" position="0 0.15 0.01" font="mozillavr"></a-text>
+      <a-text value="Simulate a real coaching conversation in VR" align="center" color="#c8d8ff" width="3" wrap-count="24" position="0 -0.10 0.01" opacity="0.75" font="mozillavr"></a-text>
     </a-entity>
-    <a-entity id="vr-voice-bar" position="0 0.45 -2.2" visible="false">
-      <a-plane width="2.2" height="0.22" color="#080e2a" material="opacity:0.9;shader:flat;side:double"></a-plane>
-      <a-circle id="vr-voice-dot" radius="0.07" color="#1a2a6a" material="shader:flat" position="-0.9 0 0.01"></a-circle>
-      <a-text id="vr-voice-label" value="Listo Trigger para hablar" color="#c8d8ff" align="left" width="3.5" position="-0.75 0 0.01" font="mozillavr"></a-text>
+    <a-entity id="btn-learn" class="clickable" position="0 1.1 -2.7" animation__hover="property:position;to:0 1.2 -2.7;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:0 1.1 -2.7;startEvents:mouseleave;dur:180">
+      <a-plane width="1.45" height="0.92" color="#221240" material="opacity:0.94;shader:flat;side:double"></a-plane>
+      <a-plane width="1.49" height="0.96" color="#9d5cff" material="opacity:0.36;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="LEARN" align="center" color="#9d5cff" width="4" position="0 0.15 0.01" font="mozillavr"></a-text>
+      <a-text value="Explore the technique with guided AI explanations" align="center" color="#c8d8ff" width="3" wrap-count="24" position="0 -0.10 0.01" opacity="0.75" font="mozillavr"></a-text>
     </a-entity>
-    <a-entity position="-2.5 2.0 -2.0" rotation="0 30 0">
-      <a-plane id="btn-end-practice" width="0.8" height="0.24" color="#1a0a20" material="opacity:0.85;shader:flat;side:double" class="clickable">
-        <a-plane width="0.82" height="0.26" color="#ff5ca0" material="opacity:0.35;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="Terminar" color="#ff5ca0" align="center" width="3" position="0 0 0.01" font="mozillavr"></a-text>
-      </a-plane>
+    <a-entity id="btn-work" class="clickable" position="1.65 1.1 -2.7" animation__hover="property:position;to:1.65 1.2 -2.7;startEvents:mouseenter;dur:180" animation__unhover="property:position;to:1.65 1.1 -2.7;startEvents:mouseleave;dur:180">
+      <a-plane width="1.45" height="0.92" color="#301820" material="opacity:0.94;shader:flat;side:double"></a-plane>
+      <a-plane width="1.49" height="0.96" color="#ff5ca0" material="opacity:0.36;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="WORK TOGETHER" align="center" color="#ff5ca0" width="4" position="0 0.15 0.01" font="mozillavr"></a-text>
+      <a-text value="Collaborate with the AI coach step-by-step" align="center" color="#c8d8ff" width="3" wrap-count="24" position="0 -0.10 0.01" opacity="0.75" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="mode-back-btn" class="clickable" position="0 -0.62 -2.4">
+      <a-plane width="0.9" height="0.26" color="#111830" material="opacity:0.88;shader:flat"></a-plane>
+      <a-plane width="0.94" height="0.30" color="#58a6ff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="BACK" align="center" color="#58a6ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
     </a-entity>
   </a-entity>
 
