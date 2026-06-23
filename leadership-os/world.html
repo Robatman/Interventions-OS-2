@@ -70,9 +70,16 @@ AFRAME.registerComponent('handler-botones-vr', {
   }
 });
 
-// 🚀 FUNCIÓN MAESTRA: Apaga colisiones (scale="0 0 0") y visibilidad al cambiar de pantalla
+// 🚀 FUNCIÓN MAESTRA CORREGIDA: Apaga colisiones y visibilidad de todas las pantallas
 function cambiarPantallaVR(pantallaMostrarId) {
-  const pantallas = ['screen-welcome', 'screen-mode', 'screen-interventions-list', 'screen-technique-list'];
+  // Asegúrate de agregar AQUÍ todos los IDs de tus pantallas <a-entity id="..."> exactamente como se llamen
+  const pantallas = [
+    'screen-welcome', 
+    'screen-mode', 
+    'screen-interventions-list', 
+    'screen-technique-list',
+    'interventions' // ¡Ojo! Si tu pantalla de intervenciones se llama "interventions" agrégala aquí
+  ];
   
   pantallas.forEach(id => {
     const elPantalla = document.getElementById(id);
@@ -83,7 +90,7 @@ function cambiarPantallaVR(pantallaMostrarId) {
       elPantalla.setAttribute('visible', 'true');
       elPantalla.setAttribute('scale', '1 1 1');
     } else {
-      // Desactivamos visibilidad y colapsamos su espacio físico 3D para liberar el puntero
+      // Desactivamos por completo la anterior
       elPantalla.setAttribute('visible', 'false');
       elPantalla.setAttribute('scale', '0 0 0');
     }
@@ -154,7 +161,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
 
   function funcionShowInterventions(){
     console.log("🔄 Cambiando a la pantalla de Intervenciones...");
-    showScreen('interventions');  
+    showScreen('interventions');  // <- Usa un método diferente llamado showScreen
   }
 
   function funcionShowtechniques(){
