@@ -700,8 +700,27 @@ function funcionIntervReclamaciones() {
   <a-text value="Which intervention do you want to work on?\nEach has its own moment, owner, and objective." position="0 2.15 -2.8" align="center" color="#c8d8ff" width="4.2" opacity="0.7" font="mozillavr"></a-text>
 
   <!-- GRID DE INTERVENCIONES (Fila Superior) -->
+   <a-entity id="btn-interv-retencion" position="-2.7 2.3 -2.8">
+  <a-plane class="sub-tecnica" 
+           handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
+           width="1.6" height="0.75" 
+           color="#ffffff" 
+           material="opacity: 0.18; shader: flat; transparent: true; side: double"
+           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+           animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+    
+    <a-text value="ACTIVE LISTENING" align="center" color="#ffffff" width="3.2" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
+    <!-- Borde minimalista estilizado -->
+    <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+  </a-plane>
+</a-entity>
+
+
   <!-- 1. Pulse Check (Izquierda) -->
-<a-entity id="btn-interv-retencion" class="clickable" 
+<!-- <a-entity id="btn-interv-retencion" class="clickable" 
             handler-botones-vr="mensaje: Iniciando Pulse Check; tecnica: interv-retencion"
             position="-1.5 1.35 -2.8" 
             animation__hover="property:position;to:-1.5 1.41 -2.8;startEvents:mouseenter;dur:180" 
@@ -712,7 +731,7 @@ function funcionIntervReclamaciones() {
     <a-text value="PULSE CHECK" align="left" color="#e8eeff" width="3" font="exo2bold" position="-0.7 0.25 0.01"></a-text>
     <a-text value="Primera revision - Senales tempranas\n¿Como te sientes aqui?" align="left" color="#c8d8ff" width="2" font="mozillavr" position="-0.7 -0.02 0.01" opacity="0.8"></a-text>
     <a-text value="Dia 30 - Recruiting - Training - Coach" align="left" color="#00e5c0" width="1.8" font="mozillavr" position="-0.7 -0.3 0.01"></a-text>
-  </a-entity>
+  </a-entity> -->
 
   <a-entity id="btn-interv-soporte-critico" class="clickable" 
             handler-botones-vr="mensaje: Iniciando Soporte Crítico; tecnica: interv-soporte-critico"
