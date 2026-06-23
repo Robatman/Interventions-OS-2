@@ -159,10 +159,10 @@ function ejecutarFuncionPorTecnica(tecnica) {
   function funcionSolutionFocusedCoaching() { console.log("🕊️ Iniciando Solution-Focused Coaching..."); goPractice(); }
   function funcionIntervPulseCheck() { console.log("🔄 Cargando herramienta Pulse Check..."); goPractice(); }
 
-function funcionShowInterventions(){
-  console.log("🔄 Cambiando a la pantalla de Intervenciones...");
-  cambiarPantallaVR('screen-interventions-list'); // O el ID exacto que use esa pantalla
-}
+  function funcionShowInterventions(){
+    console.log("🔄 Cambiando a la pantalla de Intervenciones...");
+    showScreen('interventions');  // <- Usa un método diferente llamado showScreen
+  }
 
   function funcionShowtechniques(){
     console.log("🔄 Cambiando a la pantalla de Técnicas...");
