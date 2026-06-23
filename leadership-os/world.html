@@ -70,15 +70,15 @@ AFRAME.registerComponent('handler-botones-vr', {
   }
 });
 
-// 🚀 FUNCIÓN MAESTRA CORREGIDA: Apaga colisiones y visibilidad de todas las pantallas
+// 🚀 FUNCIÓN MAESTRA: Apaga colisiones y visibilidad de todas las pantallas
 function cambiarPantallaVR(pantallaMostrarId) {
-  // Asegúrate de agregar AQUÍ todos los IDs de tus pantallas <a-entity id="..."> exactamente como se llamen
+  // 🌟 Asegúrate de incluir AQUÍ los IDs exactos de TODAS tus pantallas
   const pantallas = [
     'screen-welcome', 
     'screen-mode', 
-    'screen-interventions-list', 
+    'screen-interventions-list', // Agregado por si acaso
     'screen-technique-list',
-    'interventions' // ¡Ojo! Si tu pantalla de intervenciones se llama "interventions" agrégala aquí
+    'interventions'
   ];
   
   pantallas.forEach(id => {
@@ -86,11 +86,11 @@ function cambiarPantallaVR(pantallaMostrarId) {
     if (!elPantalla) return;
 
     if (id === pantallaMostrarId) {
-      // Activamos por completo la pantalla actual
+      // Activamos por completo la pantalla seleccionada
       elPantalla.setAttribute('visible', 'true');
       elPantalla.setAttribute('scale', '1 1 1');
     } else {
-      // Desactivamos por completo la anterior
+      // Desactivamos por completo todas las demás
       elPantalla.setAttribute('visible', 'false');
       elPantalla.setAttribute('scale', '0 0 0');
     }
@@ -102,7 +102,6 @@ function cambiarPantallaVR(pantallaMostrarId) {
     raycasterEl.components.raycaster.refreshObjects();
   }
 }
-
 function ejecutarFuncionPorTecnica(tecnica) {
   console.log("⚡ Buscando técnica:", tecnica);
 
