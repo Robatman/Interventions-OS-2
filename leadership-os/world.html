@@ -884,49 +884,31 @@ function funcionIntervReclamaciones() {
 
 
 
-
-
-
-  <!-- <a-entity  screen-active-listening-vr visible="false">
-    <a-cursor color="#teal" raycaster="objects: .clickable"></a-cursor>
-  </a-entity>
-
   <!-- ══════════════════════════════════════
        PANEL A: SELECTOR DE TÉCNICAS (Menú 3D)
   ══════════════════════════════════════ -->
-  <a-entity id="panel-techniques" position="0 1.6 -2" visible="true">
-    <!-- Fondo del Menú -->
-    <a-plane width="3" height="2" color="#1a1a2e" material="opacity: 0.9"></a-plane>
-    <a-text value="Choose a technique to preview" align="center" position="0 0.7 0.01" width="4"></a-text>
+<a-entity id="panel-techniques" position="0 1.6 -2" visible="true">
+  <a-plane width="3" height="2" color="#1a1a2e" material="opacity: 0.9"></a-plane>
+  <a-text value="Choose a technique to preview" align="center" position="0 0.7 0.01" width="4"></a-text>
 
-    <!-- Botón para ver el Preview (con clase .clickable para el cursor) -->
-    <a-plane id="btn-active-listening" class="clickable" 
-             width="2" height="0.4" color="#00adb5" position="0 0 0.02"
-             onclick="selectAndPreviewVR('active_listening')">
-      <a-text value="👂 Active Listening (Preview)" align="center" color="#fff" width="3.5"></a-text>
-    </a-plane>
-  </a-entity>
+  <a-plane id="btn-active-listening" class="clickable" 
+           width="2" height="0.4" color="#00adb5" position="0 0 0.02"
+           onclick="selectAndPreviewVR('active_listening')">
+    <a-text value="👂 Active Listening (Preview)" align="center" color="#fff" width="3.5"></a-text>
+  </a-plane>
+</a-entity>
 
   <!-- ══════════════════════════════════════
        PANEL B: EL CHAT PREVIEW (Juanjolote y el agente)
   ══════════════════════════════════════ -->
   <!-- Inicia en visible="false" para que no estorbe al principio -->
-  <a-entity id="panel-preview" position="0 1.6 -2" visible="false">
-    <!-- Fondo del Chat estilo VR -->
-    <a-plane width="3.5" height="2.5" color="#161625" material="opacity: 0.95"></a-plane>
-    <a-text value="Technique Preview" align="center" position="0 1.1 0.01" width="4" color="#00adb5"></a-text>
+<a-entity id="panel-preview" position="0 1.6 -2" visible="false">
+  <a-plane width="3" height="2" color="#222831" material="opacity: 0.95"></a-plane>
+  <a-text value="Preview de la Conversación" align="center" position="0 0.8 0.01" width="4" color="#eeeeee"></a-text>
 
-    <!-- Contenedor dinámico donde JavaScript va a ir "escribiendo" los mensajes -->
-    <a-entity id="vr-preview-stage" position="0 0.3 0.01"></a-entity>
+  <a-entity id="vr-preview-stage" position="-1.2 0.3 0.02"></a-entity>
+</a-entity>
 
-    <!-- Botón para regresar al menú -->
-    <a-plane id="btn-back-vr" class="clickable" 
-             width="0.8" height="0.3" color="#ff6b6b" position="0 -1 0.02"
-             onclick="exitPreviewVR()">
-      <a-text value="← Back" align="center" color="#fff" width="3"></a-text>
-    </a-plane>
-  </a-entity>
- -->
 
 
 
@@ -1554,12 +1536,13 @@ function selectAndPreviewVR(techniqueId) {
     const textValue = `${msg.speaker}: ${msg.text}`;
     
     // Le añadimos el componente de texto de A-Frame
-    messageEntity.setAttribute('a-text', {
+  // Cambiamos 'a-text' por 'text'
+    messageEntity.setAttribute('text', {
       value: textValue,
       align: 'left',
       width: 3,
       color: msg.color,
-      wrapCount: 40 // Ajusta qué tan rápido se corta el renglón
+      wrapCount: 40
     });
 
     // Añadir la burbuja al escenario
