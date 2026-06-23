@@ -704,25 +704,26 @@ function funcionIntervReclamaciones() {
 
   <!-- GRID DE INTERVENCIONES (Fila Superior) -->
   <!-- 1. Pulse Check (Izquierda) -->
-  <a-entity id="btn-interv-pulse-check" position="-1.5 1.35 -2.8" class="clickable" 
+<a-entity id="btn-interv-pulse-check" class="clickable" 
+            handler-botones-vr="mensaje: Iniciando Pulse Check; tecnica: interv-pulse-check"
+            position="-1.5 1.35 -2.8" 
             animation__hover="property:position;to:-1.5 1.41 -2.8;startEvents:mouseenter;dur:180" 
             animation__unhover="property:position;to:-1.5 1.35 -2.8;startEvents:mouseleave;dur:180">
     <a-plane width="2.6" height="0.9" color="#112540" material="opacity:0.93;shader:flat"></a-plane>
     <a-plane width="2.64" height="0.94" color="#00e5c0" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-    <!-- Contenido -->
     <a-text value="💓" align="center" position="-1.0 0.1 0.01" width="4"></a-text>
     <a-text value="PULSE CHECK" align="left" color="#e8eeff" width="3" font="exo2bold" position="-0.7 0.25 0.01"></a-text>
     <a-text value="Primera revision - Senales tempranas\n¿Como te sientes aqui?" align="left" color="#c8d8ff" width="2" font="mozillavr" position="-0.7 -0.02 0.01" opacity="0.8"></a-text>
     <a-text value="Dia 30 - Recruiting - Training - Coach" align="left" color="#00e5c0" width="1.8" font="mozillavr" position="-0.7 -0.3 0.01"></a-text>
   </a-entity>
 
-  <!-- 2. Anchoring (Derecha) -->
-  <a-entity id="btn-interv-anchoring" position="1.5 1.35 -2.8" class="clickable" 
+  <a-entity id="btn-interv-anchoring" class="clickable" 
+            handler-botones-vr="mensaje: Iniciando Anchoring; tecnica: interv-fidelizacion"
+            position="1.5 1.35 -2.8" 
             animation__hover="property:position;to:1.5 1.41 -2.8;startEvents:mouseenter;dur:180" 
             animation__unhover="property:position;to:1.5 1.35 -2.8;startEvents:mouseleave;dur:180">
     <a-plane width="2.6" height="0.9" color="#2a1840" material="opacity:0.93;shader:flat"></a-plane>
     <a-plane width="2.64" height="0.94" color="#9d5cff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-    <!-- Contenido -->
     <a-text value="⚓" align="center" position="-1.0 0.1 0.01" width="4"></a-text>
     <a-text value="ANCHORING" align="left" color="#e8eeff" width="3" font="exo2bold" position="-0.7 0.25 0.01"></a-text>
     <a-text value="Pertenencia - Metas\nAnclar el compromiso del agente" align="left" color="#c8d8ff" width="2" font="mozillavr" position="-0.7 -0.02 0.01" opacity="0.8"></a-text>
@@ -730,27 +731,26 @@ function funcionIntervReclamaciones() {
   </a-entity>
 
 
-  <!-- GRID DE INTERVENCIONES (Fila Inferior) -->
-  <!-- 3. Stay Interview (Izquierda) -->
-  <a-entity id="btn-interv-stay-interview" position="-1.5 0.3 -2.8" class="clickable" 
+  <a-entity id="btn-interv-stay-interview" class="clickable" 
+            handler-botones-vr="mensaje: Iniciando Stay Interview; tecnica: interv-soporte-critico"
+            position="-1.5 0.3 -2.8" 
             animation__hover="property:position;to:-1.5 0.36 -2.8;startEvents:mouseenter;dur:180" 
             animation__unhover="property:position;to:-1.5 0.3 -2.8;startEvents:mouseleave;dur:180">
     <a-plane width="2.6" height="0.9" color="#3a2a12" material="opacity:0.93;shader:flat"></a-plane>
     <a-plane width="2.64" height="0.94" color="#ffb347" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-    <!-- Contenido -->
     <a-text value="🎯" align="center" position="-1.0 0.1 0.01" width="4"></a-text>
     <a-text value="STAY INTERVIEW" align="left" color="#e8eeff" width="3" font="exo2bold" position="-0.7 0.25 0.01"></a-text>
     <a-text value="¿Por que te quedas?\nAntes de que piense en irse" align="left" color="#c8d8ff" width="2" font="mozillavr" position="-0.7 -0.02 0.01" opacity="0.8"></a-text>
     <a-text value="Dia 121 - HR" align="left" color="#ffb347" width="1.8" font="mozillavr" position="-0.7 -0.3 0.01"></a-text>
   </a-entity>
 
-  <!-- 4. Tenure Renewal (Derecha) -->
-  <a-entity id="btn-interv-tenure-renewal" position="1.5 0.3 -2.8" class="clickable" 
+  <a-entity id="btn-interv-tenure-renewal" class="clickable" 
+            handler-botones-vr="mensaje: Iniciando Tenure Renewal; tecnica: interv-reclamaciones"
+            position="1.5 0.3 -2.8" 
             animation__hover="property:position;to:1.5 0.36 -2.8;startEvents:mouseenter;dur:180" 
             animation__unhover="property:position;to:1.5 0.3 -2.8;startEvents:mouseleave;dur:180">
     <a-plane width="2.6" height="0.9" color="#401818" material="opacity:0.93;shader:flat"></a-plane>
     <a-plane width="2.64" height="0.94" color="#ff6b6b" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-    <!-- Contenido -->
     <a-text value="🏆" align="center" position="-1.0 0.1 0.01" width="4"></a-text>
     <a-text value="TENURE RENEWAL" align="left" color="#e8eeff" width="3" font="exo2bold" position="-0.7 0.25 0.01"></a-text>
     <a-text value="Reconocimiento anual - Celebracion\nRenovacion del vinculo" align="left" color="#c8d8ff" width="2" font="mozillavr" position="-0.7 -0.02 0.01" opacity="0.8"></a-text>
