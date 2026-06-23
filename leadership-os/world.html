@@ -206,6 +206,7 @@ function funcionIntervReclamaciones() {
 <script src="js/archetypes.js"></script>
 <script src="js/techniques.js"></script>
 <script src="js/prompts.js"></script>
+<script src="js/preview.js"></script>
 <div id="voice-hud"><div id="voice-dot" class="idle"></div><span id="voice-label">Iniciando Neural Academy...</span></div>
 <button id="mic-btn" title="Hablar">&#127908;</button>
 <a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018">
@@ -920,7 +921,6 @@ function funcionIntervReclamaciones() {
 
 
 
-
   <a-camera id="main-camera" position="0 1.6 0" look-controls wasd-controls="enabled:false">
     <a-entity geometry="primitive:ring;radiusInner:0.007;radiusOuter:0.012" material="color:#00e5c0;shader:flat;opacity:0.85" position="0 0 -1.0"></a-entity>
     <a-cursor id="vr-cursor" raycaster="objects: .clickable, .sub-tecnica; far:6" fuse="false" color="#00e5c0" opacity="0" position="0 0 -1.0" geometry="primitive:ring;radiusInner:0.009;radiusOuter:0.014" material="color:#00e5c0;shader:flat;opacity:0"></a-cursor>    
@@ -1504,55 +1504,63 @@ function setupControllers(){
 
 
 // Simulación de los diálogos que tienes en tu base de datos o archivo de técnicas
-const previewDialogs = {
-  active_listening: [
-    { speaker: "JUANJOLOTE", text: "¡Qué onda! Oye, la verdad ando bien estresado con las métricas de esta semana...", color: "#00adb5" },
-    { speaker: "COACH", text: "Te escucho, Juanjo. Noto frustración en tu voz, ¿qué es lo que más te está pesando?", color: "#ffb347" },
-    { speaker: "JUANJOLOTE", text: "Es que siento que por más que me esfuerzo, el sistema no me cuenta bien las llamadas.", color: "#00adb5" }
-  ]
-};
+// const previewDialogs = {
+//   active_listening: [
+//     { speaker: "JUANJOLOTE", text: "¡Qué onda! Oye, la verdad ando bien estresado con las métricas de esta semana...", color: "#00adb5" },
+//     { speaker: "COACH", text: "Te escucho, Juanjo. Noto frustración en tu voz, ¿qué es lo que más te está pesando?", color: "#ffb347" },
+//     { speaker: "JUANJOLOTE", text: "Es que siento que por más que me esfuerzo, el sistema no me cuenta bien las llamadas.", color: "#00adb5" }
+//   ]
+// };
 
 function selectAndPreviewVR(techniqueId) {
   // 1. Ocultar el menú de técnicas y mostrar el de Preview
   document.querySelector('#panel-techniques').setAttribute('visible', 'false');
   document.querySelector('#panel-preview').setAttribute('visible', 'true');
 
-  // 2. Obtener los mensajes de Juanjolote
-  const conversation = previewDialogs[techniqueId];
-  const stage = document.querySelector('#vr-preview-stage');
-  
-  // Limpiar el contenedor por si había un preview anterior
-  stage.innerHTML = '';
+  // 2. Acceder directamente al objeto global de tu preview.js
+  // Agregamos una validación por si acaso no se ha cargado el archivo
+  if (typeof TECHNIQUE_PREVIEWS === 'undefined') {
+    console.error("No se encontró el objeto TECHNIQUE_PREVIEWS. Revisa el orden en tu HTML.");
+    return;
+  }
 
-  // 3. Renderizar las burbujas de chat flotantes en el espacio 3D
-  let yOffset = 0.4; // Separación vertical entre mensajes
+  const techniqueData = TECHNIQUE_PREVIEWS[techniqueId];
+  if (!techniqueData) return;
+
+  // Como tu archivo tiene rama "bad" y "good", aquí elegimos mostrar el lado "good"
+  const conversation = techniqueData.good.exchanges; 
   
-  conversation.forEach((msg, index) => {
-    // Creamos una entidad para el texto del mensaje
+  const stage = document.querySelector('#vr-preview-stage');
+  stage.innerHTML = ''; // Limpiar mensajes anteriores
+
+  // 3. Renderizar en el espacio 3D de A-Frame
+  let yOffset = 0.4; 
+  
+  conversation.forEach((msg) => {
     const messageEntity = document.createElement('a-entity');
     messageEntity.setAttribute('position', `0 ${yOffset} 0`);
 
-    // Formato del texto (Remitente + Mensaje)
-    const textValue = `${msg.speaker}: ${msg.text}`;
+    // Mapeamos el speaker: si es 'A' toma el rol dinámico (ej. Coach), si es 'B' es 'Agent'
+    const speakerName = msg.speaker === 'A' ? techniqueData.roleA : 'Agent';
+    const textValue = `${speakerName}: ${msg.text}`;
     
-    // Le añadimos el componente de texto de A-Frame
-  // Cambiamos 'a-text' por 'text'
+    // Asignamos colores fijos para diferenciar los diálogos en el espacio 3D
+    // #00adb5 para Juanjolote (A) y #ffb347 para Ajolín/Agente (B)
+    const bubbleColor = msg.speaker === 'A' ? "#00adb5" : "#ffb347";
+
+    // Nota: Usamos 'text' corregido (sin el 'a-') para que A-Frame lo renderice
     messageEntity.setAttribute('text', {
       value: textValue,
       align: 'left',
       width: 3,
-      color: msg.color,
-      wrapCount: 40
+      color: bubbleColor,
+      wrapCount: 40 
     });
 
-    // Añadir la burbuja al escenario
     stage.appendChild(messageEntity);
-    
-    // Bajamos la posición para el siguiente mensaje (estilo feed de chat)
-    yOffset -= 0.5; 
+    yOffset -= 0.5; // Espaciado vertical descendente
   });
 }
-
 function exitPreviewVR() {
   // Regresar todo a como estaba al principio
   document.querySelector('#panel-preview').setAttribute('visible', 'false');
