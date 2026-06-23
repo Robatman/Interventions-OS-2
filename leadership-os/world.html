@@ -168,22 +168,22 @@ function ejecutarFuncionPorTecnica(tecnica) {
 // ==========================================
   function funcionIntervRetencion() {
   console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
-  showScreen('mode-list');
+  showScreen('mode');
 }
 
 function funcionIntervFidelizacion() {
   console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
-  showScreen('mode-list');
+  showScreen('mode');
 }
 
 function funcionIntervSoporteCritico() {
   console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
-  showScreen('mode-list');
+  showScreen('mode');
 }
 
 function funcionIntervReclamaciones() {
   console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
-  showScreen('mode-list');
+  showScreen('mode');
 }
 </script>
 
@@ -330,7 +330,7 @@ function funcionIntervReclamaciones() {
   </a-entity>
 
   <!-- SCREEN: MODE -->
-  <a-entity id="screen-mode-list" visible="false">
+  <a-entity id="screen-mode" visible="false">
     <a-entity position="0 2.58 -3" animation="property:position;to:0 2.66 -3;loop:true;dur:4200;dir:alternate;easing:easeInOutSine">
       <a-text id="mode-title" value="Interventions" align="center" color="#e8eeff" width="6.5" font="exo2bold"></a-text>
     </a-entity>
@@ -894,7 +894,7 @@ function showScreen(name){
     'eval',
     'interventions',
     'techniques',
-    'mode-list'
+    'mode'
   
   ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
