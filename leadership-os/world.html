@@ -72,33 +72,24 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 // 🚀 FUNCIÓN MAESTRA: Apaga colisiones (scale="0 0 0") y visibilidad al cambiar de pantalla
 function cambiarPantallaVR(pantallaMostrarId) {
-  // Asegúrate de que el ID tenga exactamente el mismo nombre que pusiste en el HTML ("screen-mode-list")
-  const pantallas = [
-    'screen-welcome', 
-    'screen-mode-list', // 👈 Corregido el nombre aquí para que coincida con el HTML
-    'screen-interventions-list', 
-    'screen-technique-list'
-  ];
+  const pantallas = ['screen-welcome', 'screen-mode', 'screen-interventions-list', 'screen-technique-list'];
   
-  // Añadimos una validación de seguridad por si mandas un texto vacío
-  if (!pantallas.includes(pantallaMostrarId) && pantallaMostrarId !== '') {
-    console.warn("⚠️ La pantalla solicitada no existe en la lista maestra:", pantallaMostrarId);
-  }
-
   pantallas.forEach(id => {
     const elPantalla = document.getElementById(id);
     if (!elPantalla) return;
 
     if (id === pantallaMostrarId) {
+      // Activamos por completo la pantalla actual
       elPantalla.setAttribute('visible', 'true');
       elPantalla.setAttribute('scale', '1 1 1');
     } else {
+      // Desactivamos visibilidad y colapsamos su espacio físico 3D para liberar el puntero
       elPantalla.setAttribute('visible', 'false');
-      elPantalla.setAttribute('scale', '0 0 0'); // Evita colisiones fantasma
+      elPantalla.setAttribute('scale', '0 0 0');
     }
   });
 
-  // Forzamos al raycaster a recalcular inmediatamente
+  // Forzamos al raycaster de la escena a recalcular los botones activos inmediatamente
   const raycasterEl = document.querySelector('[raycaster]');
   if (raycasterEl && raycasterEl.components.raycaster) {
     raycasterEl.components.raycaster.refreshObjects();
@@ -168,30 +159,30 @@ function ejecutarFuncionPorTecnica(tecnica) {
 
   function funcionShowtechniques(){
     console.log("🔄 Cambiando a la pantalla de Técnicas...");
-    showScreen('technique-list'); // 👈 Aquí usamos el método seguro
+    cambiarPantallaVR('screen-technique-list'); // 👈 Aquí usamos el método seguro
   }
 
 // ==========================================
 // 🚀 NUEVAS FUNCIONES DE INTERVENCIONES
 // ==========================================
- function funcionIntervRetencion() {
+  function funcionIntervRetencion() {
   console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
-  cambiarPantallaVR('screen-mode'); // 👈 Cambiado aquí
+  cambiarPantallaVR('screen-mode');
 }
 
 function funcionIntervFidelizacion() {
   console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
-  cambiarPantallaVR('screen-mode'); // 👈 Cambiado aquí
+  cambiarPantallaVR('screen-mode');
 }
 
 function funcionIntervSoporteCritico() {
   console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
-  cambiarPantallaVR('screen-mode'); // 👈 Cambiado aquí
+  cambiarPantallaVR('screen-mode');
 }
 
 function funcionIntervReclamaciones() {
   console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
-  cambiarPantallaVR('screen-mode'); // 👈 Cambiado aquí
+  cambiarPantallaVR('screen-mode');
 }
 </script>
 
@@ -338,11 +329,11 @@ function funcionIntervReclamaciones() {
   </a-entity>
 
   <!-- SCREEN: MODE -->
-  <a-entity id="screen-mode-list" visible="false">
+  <a-entity id="screen-mode" visible="false">
     <a-entity position="0 2.58 -3" animation="property:position;to:0 2.66 -3;loop:true;dur:4200;dir:alternate;easing:easeInOutSine">
       <a-text id="mode-title" value="Interventions" align="center" color="#e8eeff" width="6.5" font="exo2bold"></a-text>
     </a-entity>
-    <a-text id="mode-subtitle" value="Choose your training mode-list" position="0 2.22 -3" align="center" color="#c8d8ff" width="4.8" opacity="0.72" font="mozillavr"></a-text>
+    <a-text id="mode-subtitle" value="Choose your training mode" position="0 2.22 -3" align="center" color="#c8d8ff" width="4.8" opacity="0.72" font="mozillavr"></a-text>
     <a-entity position="0 1.92 -2.8">
       <a-plane width="1.2" height="0.24" color="#111830" material="opacity:0.86;shader:flat"></a-plane>
       <a-plane width="1.24" height="0.28" color="#4466ff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
@@ -902,7 +893,7 @@ function showScreen(name){
     'eval',
     'interventions',
     'techniques',
-    'mode'
+    'screen-mode'
   
   ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
