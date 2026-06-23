@@ -702,7 +702,7 @@ function funcionIntervReclamaciones() {
   <!-- GRID DE INTERVENCIONES (Fila Superior) -->
    <a-entity id="btn-interv-retencion" position="-2.7 2.3 -2.8">
   <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
+           handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: btn-interv-retencion"
            width="1.6" height="0.75" 
            color="#ffffff" 
            material="opacity: 0.18; shader: flat; transparent: true; side: double"
@@ -712,7 +712,7 @@ function funcionIntervReclamaciones() {
            animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
            animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
     
-    <a-text value="ACTIVE LISTENING" align="center" color="#ffffff" width="3.2" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
+    <a-text value="No ACTIVE LISTENING" align="center" color="#ffffff" width="3.2" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
     <!-- Borde minimalista estilizado -->
     <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
   </a-plane>
