@@ -72,7 +72,8 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 // 🚀 FUNCIÓN MAESTRA: Apaga colisiones (scale="0 0 0") y visibilidad al cambiar de pantalla
 function cambiarPantallaVR(pantallaMostrarId) {
-  const pantallas = ['screen-welcome', 'screen-mode', 'screen-interventions-list', 'screen-technique-list'];
+  const pantallas = +
+  ['screen-welcome', /*'screen-mode',*/ 'screen-interventions-list', 'screen-technique-list'];
   
   pantallas.forEach(id => {
     const elPantalla = document.getElementById(id);
@@ -159,7 +160,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
 
   function funcionShowtechniques(){
     console.log("🔄 Cambiando a la pantalla de Técnicas...");
-    cambiarPantallaVR('screen-technique-list'); // 👈 Aquí usamos el método seguro
+    showScreen('screen-technique-list'); // 👈 Aquí usamos el método seguro
   }
 
 // ==========================================
@@ -167,22 +168,22 @@ function ejecutarFuncionPorTecnica(tecnica) {
 // ==========================================
   function funcionIntervRetencion() {
   console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
-  cambiarPantallaVR('screen-mode');
+  showScreen('mode-list');
 }
 
 function funcionIntervFidelizacion() {
   console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
-  cambiarPantallaVR('screen-mode');
+  showScreen('mode-list');
 }
 
 function funcionIntervSoporteCritico() {
   console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
-  cambiarPantallaVR('screen-mode');
+  showScreen('mode-list');
 }
 
 function funcionIntervReclamaciones() {
   console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
-  cambiarPantallaVR('screen-mode');
+  showScreen('mode-list');
 }
 </script>
 
@@ -329,7 +330,7 @@ function funcionIntervReclamaciones() {
   </a-entity>
 
   <!-- SCREEN: MODE -->
-  <a-entity id="screen-mode" visible="false">
+  <a-entity id="screen-mode-list" visible="false">
     <a-entity position="0 2.58 -3" animation="property:position;to:0 2.66 -3;loop:true;dur:4200;dir:alternate;easing:easeInOutSine">
       <a-text id="mode-title" value="Interventions" align="center" color="#e8eeff" width="6.5" font="exo2bold"></a-text>
     </a-entity>
@@ -893,7 +894,7 @@ function showScreen(name){
     'eval',
     'interventions',
     'techniques',
-    'screen-mode'
+    'mode-list'
   
   ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
