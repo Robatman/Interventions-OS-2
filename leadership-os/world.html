@@ -72,7 +72,7 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 // 🚀 FUNCIÓN MAESTRA: Apaga colisiones (scale="0 0 0") y visibilidad al cambiar de pantalla
 function cambiarPantallaVR(pantallaMostrarId) {
-  const pantallas = ['screen-welcome', 'screen-mode', 'screen-interventions-list', 'screen-technique-list'];
+  const pantallas = ['screen-welcome', 'screen-mode', 'screen-interventions', 'screen-interventions-list', 'screen-technique-list'];
   
   pantallas.forEach(id => {
     const elPantalla = document.getElementById(id);
