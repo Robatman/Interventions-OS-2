@@ -849,7 +849,7 @@ function showScreen(name){
 
   var planosTecnicas = document.querySelectorAll('.sub-tecnica');
   
-if (name === 'technique-list') {
+if (name === 'technique-list' || name === 'screen-technique-list') {
     planosTecnicas.forEach(function(el) {
       el.classList.add('clickable');
       console.log("🟢 Botón de técnica ACTIVADO: " + el.id);
