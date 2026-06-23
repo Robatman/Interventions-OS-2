@@ -108,7 +108,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
   cambiarPantallaVR(''); 
 
   switch(tecnica) {
-    case 'active-listening': funcionActiveListening(); break;
+    case 'active-listening': /*funcionActiveListening();*/ showScreen('active-listening-vr'); break;
     case 'powerful-questions': funcionPowerfulQuestions(); break;
     case 'motivational-interviewing': funcionMotivationalInterviewing(); break;
     case 'nonviolent-communication': funcionNonviolentCommunication(); break;
@@ -879,6 +879,66 @@ function funcionIntervReclamaciones() {
     </a-entity>
   </a-entity>
 
+
+
+
+
+
+
+
+
+  <a-entity  screen-active-listening-vr visible="false">
+    <a-cursor color="#teal" raycaster="objects: .clickable"></a-cursor>
+  </a-entity>
+
+  <!-- ══════════════════════════════════════
+       PANEL A: SELECTOR DE TÉCNICAS (Menú 3D)
+  ══════════════════════════════════════ -->
+  <a-entity id="panel-techniques" position="0 1.6 -2" visible="true">
+    <!-- Fondo del Menú -->
+    <a-plane width="3" height="2" color="#1a1a2e" material="opacity: 0.9"></a-plane>
+    <a-text value="Choose a technique to preview" align="center" position="0 0.7 0.01" width="4"></a-text>
+
+    <!-- Botón para ver el Preview (con clase .clickable para el cursor) -->
+    <a-plane id="btn-active-listening" class="clickable" 
+             width="2" height="0.4" color="#00adb5" position="0 0 0.02"
+             onclick="selectAndPreviewVR('active_listening')">
+      <a-text value="👂 Active Listening (Preview)" align="center" color="#fff" width="3.5"></a-text>
+    </a-plane>
+  </a-entity>
+
+  <!-- ══════════════════════════════════════
+       PANEL B: EL CHAT PREVIEW (Juanjolote y el agente)
+  ══════════════════════════════════════ -->
+  <!-- Inicia en visible="false" para que no estorbe al principio -->
+  <a-entity id="panel-preview" position="0 1.6 -2" visible="false">
+    <!-- Fondo del Chat estilo VR -->
+    <a-plane width="3.5" height="2.5" color="#161625" material="opacity: 0.95"></a-plane>
+    <a-text value="Technique Preview" align="center" position="0 1.1 0.01" width="4" color="#00adb5"></a-text>
+
+    <!-- Contenedor dinámico donde JavaScript va a ir "escribiendo" los mensajes -->
+    <a-entity id="vr-preview-stage" position="0 0.3 0.01"></a-entity>
+
+    <!-- Botón para regresar al menú -->
+    <a-plane id="btn-back-vr" class="clickable" 
+             width="0.8" height="0.3" color="#ff6b6b" position="0 -1 0.02"
+             onclick="exitPreviewVR()">
+      <a-text value="← Back" align="center" color="#fff" width="3"></a-text>
+    </a-plane>
+  </a-entity>
+
+
+
+
+
+
+
+
+
+
+
+
+
   <a-camera id="main-camera" position="0 1.6 0" look-controls wasd-controls="enabled:false">
     <a-entity geometry="primitive:ring;radiusInner:0.007;radiusOuter:0.012" material="color:#00e5c0;shader:flat;opacity:0.85" position="0 0 -1.0"></a-entity>
     <a-cursor id="vr-cursor" raycaster="objects: .clickable, .sub-tecnica; far:6" fuse="false" color="#00e5c0" opacity="0" position="0 0 -1.0" geometry="primitive:ring;radiusInner:0.009;radiusOuter:0.014" material="color:#00e5c0;shader:flat;opacity:0"></a-cursor>    
@@ -931,7 +991,8 @@ function showScreen(name){
     'interventions',
     'techniques',
     'screen-mode',
-    'learn-work-practice'
+    'learn-work-practice',
+    'active-listening-vr'
   
   ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
@@ -1458,6 +1519,65 @@ function setupControllers(){
     }
   });
 }
+
+
+// Simulación de los diálogos que tienes en tu base de datos o archivo de técnicas
+const previewDialogs = {
+  active_listening: [
+    { speaker: "JUANJOLOTE", text: "¡Qué onda! Oye, la verdad ando bien estresado con las métricas de esta semana...", color: "#00adb5" },
+    { speaker: "COACH", text: "Te escucho, Juanjo. Noto frustración en tu voz, ¿qué es lo que más te está pesando?", color: "#ffb347" },
+    { speaker: "JUANJOLOTE", text: "Es que siento que por más que me esfuerzo, el sistema no me cuenta bien las llamadas.", color: "#00adb5" }
+  ]
+};
+
+function selectAndPreviewVR(techniqueId) {
+  // 1. Ocultar el menú de técnicas y mostrar el de Preview
+  document.querySelector('#panel-techniques').setAttribute('visible', 'false');
+  document.querySelector('#panel-preview').setAttribute('visible', 'true');
+
+  // 2. Obtener los mensajes de Juanjolote
+  const conversation = previewDialogs[techniqueId];
+  const stage = document.querySelector('#vr-preview-stage');
+  
+  // Limpiar el contenedor por si había un preview anterior
+  stage.innerHTML = '';
+
+  // 3. Renderizar las burbujas de chat flotantes en el espacio 3D
+  let yOffset = 0.4; // Separación vertical entre mensajes
+  
+  conversation.forEach((msg, index) => {
+    // Creamos una entidad para el texto del mensaje
+    const messageEntity = document.createElement('a-entity');
+    messageEntity.setAttribute('position', `0 ${yOffset} 0`);
+
+    // Formato del texto (Remitente + Mensaje)
+    const textValue = `${msg.speaker}: ${msg.text}`;
+    
+    // Le añadimos el componente de texto de A-Frame
+    messageEntity.setAttribute('a-text', {
+      value: textValue,
+      align: 'left',
+      width: 3,
+      color: msg.color,
+      wrapCount: 40 // Ajusta qué tan rápido se corta el renglón
+    });
+
+    // Añadir la burbuja al escenario
+    stage.appendChild(messageEntity);
+    
+    // Bajamos la posición para el siguiente mensaje (estilo feed de chat)
+    yOffset -= 0.5; 
+  });
+}
+
+function exitPreviewVR() {
+  // Regresar todo a como estaba al principio
+  document.querySelector('#panel-preview').setAttribute('visible', 'false');
+  document.querySelector('#panel-techniques').setAttribute('visible', 'true');
+}
+
+
+
 
 document.addEventListener('DOMContentLoaded',function(){
   var micBtn=document.getElementById('mic-btn');
