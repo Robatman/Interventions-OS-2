@@ -25,6 +25,9 @@
 <script>
 (function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
 </script>
+
+
+
 <script>  
 AFRAME.registerComponent('handler-botones-vr', {
   schema: {
@@ -37,22 +40,21 @@ AFRAME.registerComponent('handler-botones-vr', {
     var data = this.data;
 
     el.addEventListener('click', function (evt) {
-      // 🔒 SI EL BOTÓN O ALGUNO DE SUS PADRES ESTÁ OCULTO, IGNORAMOS EL EVENTO completamente
+      // 🔒 Validamos que el botón pertenezca a una jerarquía completamente visible y con escala real
       if (el.object3D) {
         let current = el.object3D;
-        let isHierarchyVisible = true;
+        let isHierarchyActive = true;
         
-        // Recorremos hacia arriba en el árbol 3D comprobando la visibilidad
         while (current) {
-          if (current.visible === false) {
-            isHierarchyVisible = false;
+          if (current.visible === false || current.scale.x === 0) {
+            isHierarchyActive = false;
             break;
           }
           current = current.parent;
         }
 
-        if (!isHierarchyVisible) {
-          return; // Detiene el clic si la pantalla o el contenedor está oculto
+        if (!isHierarchyActive) {
+          return; // Detiene por completo la ejecución si la pantalla está inactiva
         }
       }
 
@@ -67,177 +69,89 @@ AFRAME.registerComponent('handler-botones-vr', {
     });
   }
 });
+
+// 🚀 FUNCIÓN MAESTRA: Apaga colisiones (scale="0 0 0") y visibilidad al cambiar de pantalla
+function cambiarPantallaVR(pantallaMostrarId) {
+  const pantallas = ['screen-welcome', 'screen-mode', 'screen-interventions-list', 'screen-technique-list'];
+  
+  pantallas.forEach(id => {
+    const elPantalla = document.getElementById(id);
+    if (!elPantalla) return;
+
+    if (id === pantallaMostrarId) {
+      // Activamos por completo la pantalla actual
+      elPantalla.setAttribute('visible', 'true');
+      elPantalla.setAttribute('scale', '1 1 1');
+    } else {
+      // Desactivamos visibilidad y colapsamos su espacio físico 3D para liberar el puntero
+      elPantalla.setAttribute('visible', 'false');
+      elPantalla.setAttribute('scale', '0 0 0');
+    }
+  });
+
+  // Forzamos al raycaster de la escena a recalcular los botones activos inmediatamente
+  const raycasterEl = document.querySelector('[raycaster]');
+  if (raycasterEl && raycasterEl.components.raycaster) {
+    raycasterEl.components.raycaster.refreshObjects();
+  }
+}
+
 function ejecutarFuncionPorTecnica(tecnica) {
   console.log("⚡ Buscando técnica:", tecnica);
 
   switch(tecnica) {
-    
-    case 'active-listening':
-      funcionActiveListening();
-      break;
-
-    case 'powerful-questions':
-      funcionPowerfulQuestions();
-      break;
-
-    case 'motivational-interviewing':
-      funcionMotivationalInterviewing();
-      break;
-
-    case 'nonviolent-communication':
-      funcionNonviolentCommunication();
-      break;
-
-    case 'radical-candor':
-      funcionRadicalCandor();
-      break;
-
-    case 'crucial-conversations':
-      funcionCrucialConversations();
-      break;
-
-    case 'tactical-empathy':
-      funcionTacticalEmpathy();
-      break;
-
-    case 'scarf-model':
-      funcionScarfModel();
-      break;
-
-    case 'immunity-to-change':
-      funcionImmunityToChange();
-      break;
-
-    case 'drama-triangle':
-      funcionDramaTriangle();
-      break;
-
-    case 'grow-model':
-      funcionGrowModel();
-      break;
-
-    case 'strengths-based-coaching':
-      funcionStrengthsBasedCoaching();
-      break;
-
-    case 'growth-mindset':
-      funcionGrowthMindset();
-      break;
-
-    case 'solution-focused-coaching':
-      funcionSolutionFocusedCoaching();
-      break;
-      
-      
-      case 'interv-pulse-check':
-        funcionIntervPulseCheck();
-        break;
-
-
-      
-    case 'interventions':
-      funcionShowInterventions();
-      break;
-      
-    case 'techniques':
-      funcionShowtechniques();
-      break;
-
-
-      
-    default:
-      console.log("⚡ Ejecutando función genérica de la academia.");
+    case 'active-listening': funcionActiveListening(); break;
+    case 'powerful-questions': funcionPowerfulQuestions(); break;
+    case 'motivational-interviewing': funcionMotivationalInterviewing(); break;
+    case 'nonviolent-communication': funcionNonviolentCommunication(); break;
+    case 'radical-candor': funcionRadicalCandor(); break;
+    case 'crucial-conversations': funcionCrucialConversations(); break;
+    case 'tactical-empathy': funcionTacticalEmpathy(); break;
+    case 'scarf-model': funcionScarfModel(); break;
+    case 'immunity-to-change': funcionImmunityToChange(); break;
+    case 'drama-triangle': funcionDramaTriangle(); break;
+    case 'grow-model': funcionGrowModel(); break;
+    case 'strengths-based-coaching': funcionStrengthsBasedCoaching(); break;
+    case 'growth-mindset': funcionGrowthMindset(); break;
+    case 'solution-focused-coaching': funcionSolutionFocusedCoaching(); break;
+    case 'interv-pulse-check': funcionIntervPulseCheck(); break;
+    case 'interventions': funcionShowInterventions(); break;
+    case 'techniques': funcionShowtechniques(); break;
+    default: console.log("⚡ Ejecutando función genérica de la academia.");
   }
 }
 
-  // Tus funciones independientes listas para ser llamadas:
-  function funcionActiveListening() {
-    console.log("🗣️ Activando entorno de Escucha Activa...");
-    goPractice();
+  // Tus funciones de redirección adaptadas para usar el nuevo sistema seguro:
+  function funcionActiveListening() { console.log("🗣️ Activando entorno de Escucha Activa..."); goPractice(); }
+  function funcionPowerfulQuestions() { console.log("❓ Cargando batería de Preguntas Poderosas..."); goPractice(); }
+  function funcionMotivationalInterviewing() { console.log("🎯 Iniciando Entrevista Motivacional..."); goPractice(); }
+  function funcionNonviolentCommunication() { console.log("🕊️ Configurando Comunicación No Violenta..."); goPractice(); }
+  function funcionRadicalCandor() { console.log("🕊️ Iniciando El Radical Candor..."); goPractice(); }
+  function funcionCrucialConversations() { console.log("🕊️ Iniciando Crucial Conversations..."); goPractice(); }
+  function funcionTacticalEmpathy() { console.log("🕊️ Iniciando Tactical Empathy..."); goPractice(); }
+  function funcionScarfModel() { console.log("🕊️ Iniciando SCARF Model..."); goPractice(); }
+  function funcionImmunityToChange() { console.log("🕊️ Iniciando Immunity to Change..."); goPractice(); }
+  function funcionDramaTriangle() { console.log("🕊️ Iniciando Drama Triangle..."); goPractice(); }
+  function funcionGrowModel() { console.log("🕊️ Iniciando GROW Model..."); goPractice(); }
+  function funcionStrengthsBasedCoaching() { console.log("🕊️ Iniciando Strengths-Based Coaching..."); goPractice(); }
+  function funcionGrowthMindset() { console.log("🕊️ Iniciando Growth Mindset..."); goPractice(); }
+  function funcionSolutionFocusedCoaching() { console.log("🕊️ Iniciando Solution-Focused Coaching..."); goPractice(); }
+  function funcionIntervPulseCheck() { console.log("🔄 Cargando herramienta Pulse Check..."); goPractice(); }
+
+  function funcionShowInterventions(){
+    console.log("🔄 Cambiando a la pantalla de Intervenciones...");
+    cambiarPantallaVR('screen-interventions-list'); // 👈 Aquí usamos el método seguro
   }
 
-  function funcionPowerfulQuestions() {
-    console.log("❓ Cargando batería de Preguntas Poderosas...");
-    goPractice();
+  function funcionShowtechniques(){
+    console.log("🔄 Cambiando a la pantalla de Técnicas...");
+    cambiarPantallaVR('screen-technique-list'); // 👈 Aquí usamos el método seguro
   }
-
-  function funcionMotivationalInterviewing() {
-    console.log("🎯 Iniciando Entrevista Motivacional...");
-    goPractice();
-  }
-
-  function funcionNonviolentCommunication() {
-    console.log("🕊️ Configurando Comunicación No Violenta...");
-    goPractice();
-  }
-
-  function funcionRadicalCandor() {
-    console.log("🕊️ Iniciando El Radical Candor...");
-    goPractice();
-  }
-
-  function funcionCrucialConversations() {
-  console.log("🕊️ Iniciando Crucial Conversations...");
-  goPractice();
-}
-
-function funcionTacticalEmpathy() {
-  console.log("🕊️ Iniciando Tactical Empathy...");
-  goPractice();
-}
-
-function funcionScarfModel() {
-  console.log("🕊️ Iniciando SCARF Model...");
-  goPractice();
-}
-
-function funcionImmunityToChange() {
-  console.log("🕊️ Iniciando Immunity to Change...");
-  goPractice();
-}
-
-function funcionDramaTriangle() {
-  console.log("🕊️ Iniciando Drama Triangle...");
-  goPractice();
-}
-
-function funcionGrowModel() {
-  console.log("🕊️ Iniciando GROW Model...");
-  goPractice();
-}
-
-function funcionStrengthsBasedCoaching() {
-  console.log("🕊️ Iniciando Strengths-Based Coaching...");
-  goPractice();
-}
-
-function funcionGrowthMindset() {
-  console.log("🕊️ Iniciando Growth Mindset...");
-  goPractice();
-}
-
-function funcionSolutionFocusedCoaching() {
-  console.log("🕊️ Iniciando Solution-Focused Coaching...");
-  goPractice();
-}
-
-function funcionShowInterventions(){
-  console.log("🔄 Cambiando a la pantalla de Intervenciones...");
-  goInterventions();
-  
-}
-
-function funcionShowtechniques(){
-  console.log("🔄 Cambiando a la pantalla de Técnicas...");
-  go14button();
-}
-
-function funcionIntervPulseCheck(){
-  console.log("🔄 Cargando herramienta Pulse Check...");
-  goPractice();
-}
-  
 </script>
+
+
+
+
 <script src="js/interventions.js"></script>
 <script src="js/archetypes.js"></script>
 <script src="js/techniques.js"></script>
@@ -1554,16 +1468,16 @@ if(btnTechBack)
   });
 });
  
-    // document.querySelector('a-scene').addEventListener('loaded', () => {
-    //   console.log("🚀 Sistema de rastreo de clics activado.");
-    //   const botones = document.querySelectorAll('.clickable');
-    //   botones.forEach(boton => {
-    //     boton.addEventListener('click', (evento) => {
-    //       console.log(`🎯 ¡Click detectado! Le...`);
-    //       // ...
-    //     });
-    //   });
-    // });
+    document.querySelector('a-scene').addEventListener('loaded', () => {
+      console.log("🚀 Sistema de rastreo de clics activado.");
+      const botones = document.querySelectorAll('.clickable');
+      botones.forEach(boton => {
+        boton.addEventListener('click', (evento) => {
+          console.log(`🎯 ¡Click detectado! Le...`);
+          // ...
+        });
+      });
+    });
   
 </script>
 </body>
