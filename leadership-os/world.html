@@ -79,7 +79,6 @@ function cambiarPantallaVR(pantallaMostrarId) {
     'screen-interventions-list', // Agregado por si acaso
     'screen-technique-list',
     'interventions'
-    //'screen-learn-work-practice'
   ];
   
   pantallas.forEach(id => {
@@ -134,14 +133,6 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interv-fidelizacion': funcionIntervFidelizacion(); break;
     case 'interv-soporte-critico': funcionIntervSoporteCritico(); break;
     case 'interv-reclamaciones': funcionIntervReclamaciones(); break;
-    
-        // ==========================================
-    // 🎭 CASES DE practice,lear,work togheter (Los 3 Botones)
-    // ==========================================
-    case 'practice-intervention': goPractice(); break; // Antes llamaba a otra cosa o no hacía lo correcto
-    case 'learn-intervention': goLearn(); break;
-    case 'work-together-intervention': goWork(); break;
-    
 
     // 🚨 El default SIEMPRE debe ir al último
     default: 
@@ -198,27 +189,10 @@ function funcionIntervSoporteCritico() {
 function funcionIntervReclamaciones() {
   console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
-
-
 }
-
-function funcionPracticeIntervention() {
-  console.log("🔄 Módulo Practice");
-  goPractice(); // 👈 Destino correcto
-}
-
-function funcionLearnIntervention() {
-  console.log("🔄 Módulo Learn");
-  goLearn(); // 👈 Destino correcto
-}
-
-function funcionWorkTogetherIntervention() {
-  console.log("🔄 Módulo Work Together");
-  goWork(); // 👈 Destino correcto
-}
-
-
 </script>
+
+
 
 
 <script src="js/interventions.js"></script>
@@ -362,6 +336,7 @@ function funcionWorkTogetherIntervention() {
 
 
   <a-entity id="screen-learn-work-practice" visible="false">
+
 
     <a-entity id="btn-practice-intervention" position="-2.5 1.4 -2.6" rotation="0 15 0">
       <a-plane class="sub-tecnica clickable" 
