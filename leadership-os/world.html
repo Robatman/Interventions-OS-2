@@ -108,7 +108,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
   cambiarPantallaVR(''); 
 
   switch(tecnica) {
-    case 'active-listening': /*funcionActiveListening();*/ showScreen('active-listening-activity'); break;
+    case 'active-listening': /*funcionActiveListening();*/ showScreen('active-listening-vr'); break;
     case 'powerful-questions': funcionPowerfulQuestions(); break;
     case 'motivational-interviewing': funcionMotivationalInterviewing(); break;
     case 'nonviolent-communication': funcionNonviolentCommunication(); break;
@@ -137,7 +137,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'practice-intervention': goPractice(); break;
     case 'learn-intervention': goLearn(); break;
     case 'work-together-intervention': goWork(); break;
-  
+    
     
     
     
@@ -885,7 +885,7 @@ function funcionIntervReclamaciones() {
 
 
 
-<a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
+<a-entity id="panel-techniques" position="0 1.6 -2" visible="true">
   <a-plane width="3" height="2" color="#1a1a2e" material="opacity: 0.9"></a-plane>
   <a-text value="Choose a technique to preview" align="center" position="0 0.7 0.01" width="4"></a-text>
 
@@ -897,10 +897,9 @@ function funcionIntervReclamaciones() {
 </a-entity>
 
 <a-entity id="panel-preview" position="0 1.6 -2" visible="false">
-  <a-plane width="3" height="2" color="#222831" material="opacity: 0.95"></a-plane>
-  <a-text value="Preview de la Conversación" align="center" position="0 0.8 0.01" width="4" color="#eeeeee"></a-text>
-
-  <a-entity id="vr-preview-stage" position="-1.2 0.3 0.02"></a-entity>
+  <a-plane width="3" height="2.5" color="#222831" material="opacity: 0.95"></a-plane>
+  
+  <a-entity id="vr-preview-stage" position="-1.2 0.5 0.02"></a-entity>
 </a-entity>
 
 
@@ -967,7 +966,7 @@ function showScreen(name){
     'techniques',
     'screen-mode',
     'learn-work-practice',
-    'active-listening-activity'
+    'active-listening-vr'
   
   ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
@@ -1498,8 +1497,8 @@ function setupControllers(){
 
 
 function selectAndPreviewVR(techniqueId) {
-  document.querySelector('#panel-techniques').setAttribute('visible', 'false');
-  document.querySelector('#panel-preview').setAttribute('visible', 'true');
+document.querySelector('#panel-techniques').setAttribute('visible', 'false');
+document.querySelector('#panel-preview').setAttribute('visible', 'true');
 
   // 2. Acceder directamente al objeto global de tu preview.js
   // Agregamos una validación por si acaso no se ha cargado el archivo
@@ -1545,8 +1544,9 @@ function selectAndPreviewVR(techniqueId) {
 }
 function exitPreviewVR() {
   // Regresar todo a como estaba al principio
-  document.querySelector('#panel-preview').setAttribute('visible', 'false');
-  document.querySelector('#panel-techniques').setAttribute('visible', 'true');
+document.querySelector('#panel-techniques').setAttribute('visible', 'false');      
+document.querySelector('#panel-preview').setAttribute('visible', 'true');
+  
 }
 
 
