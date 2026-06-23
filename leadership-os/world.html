@@ -145,7 +145,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
 
   function funcionShowtechniques(){
     console.log("🔄 Cambiando a la pantalla de Técnicas...");
-    cambiarPantallaVR('screen-technique-list'); // 👈 Aquí usamos el método seguro
+    cambiarPantallaVR('technique'); // 👈 Aquí usamos el método seguro
   }
 </script>
 
@@ -325,27 +325,6 @@ function ejecutarFuncionPorTecnica(tecnica) {
       <a-plane width="0.94" height="0.30" color="#58a6ff" material="opacity:0.32;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
       <a-text value="BACK" align="center" color="#58a6ff" width="3" position="0 0 0.01" font="mozillavr"></a-text>
     </a-entity>
-  </a-entity>
-
-  <!-- SCREEN: INTERVENTIONS -->
-  <a-entity id="screen-interventions-list" visible="false">
-   <a-entity id="btn-active-listening" position="-2.7 2.3 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="ACTIVE LISTENING" align="center" color="#ffffff" width="3.2" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
-    <!-- Borde minimalista estilizado -->
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
   </a-entity>
 
   <!-- SCREEN: TECHNIQUES -->
@@ -859,8 +838,7 @@ function showScreen(name){
     'practice',
     'eval',
     'interventions',
-    'techniques',
-    'technique-list'
+    'techniques'
   
   ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
