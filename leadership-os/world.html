@@ -389,6 +389,64 @@ function funcionIntervReclamaciones() {
       </a-plane>
     </a-entity> -->
 
+
+    <!-- PRACTICE INTERVENTION -->
+<a-entity id="btn-practice-intervention" position="-2.7 0.7 -2.8">
+  <a-plane class="sub-tecnica" 
+           handler-botones-vr="mensaje: Abriendo Practice Intervention; tecnica: practice-intervention"
+           width="1.6" height="0.75" 
+           color="#ffffff" 
+           material="opacity: 0.18; shader: flat; transparent: true; side: double"
+           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+           animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
+           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+    
+    <a-text value="PRACTICE INTERVENTION" align="center" color="#ffffff" width="3" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+    <a-text value="Compromisos ocultos que bloquean" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+    <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+  </a-plane>
+</a-entity>
+
+<!-- Learn -->
+<a-entity id="btn-learn-intervention" position="-0.9 0.7 -2.8">
+  <a-plane class="sub-tecnica" 
+           handler-botones-vr="mensaje: Abriendo Learn Intervention; tecnica: learn-intervention"
+           width="1.6" height="0.75" 
+           color="#ffffff" 
+           material="opacity: 0.18; shader: flat; transparent: true; side: double"
+           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+           animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
+           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+    
+    <a-text value="Learn" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+    <a-text value="Victima Rescatador Perseguidor" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+    <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+  </a-plane>
+</a-entity>
+
+<!-- GROW MODEL -->
+<a-entity id="btn-work-together-intervention" position="0.9 0.7 -2.8">
+  <a-plane class="sub-tecnica" 
+           handler-botones-vr="mensaje: Abriendo Work Together Intervention; tecnica: work-together-intervention"
+           width="1.6" height="0.75" 
+           color="#ffffff" 
+           material="opacity: 0.18; shader: flat; transparent: true; side: double"
+           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+           animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
+           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+    
+    <a-text value="WORK TOGETHER INTERVENTION" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+    <a-text value="Collaboration Communication Problem-Solving" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+    <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+  </a-plane>
+</a-entity>
+
   </a-entity>
 
 
