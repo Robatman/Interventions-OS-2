@@ -133,7 +133,14 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interv-fidelizacion': funcionIntervFidelizacion(); break;
     case 'interv-soporte-critico': funcionIntervSoporteCritico(); break;
     case 'interv-reclamaciones': funcionIntervReclamaciones(); break;
-
+    
+    case 'practice-intervention': goPractice(); break;
+    case 'learn-intervention': goLearn(); break;
+    case 'work-together-intervention': goWork(); break;
+    
+    
+    
+    
     // 🚨 El default SIEMPRE debe ir al último
     default: 
       console.log("⚡ Ejecutando función genérica de la academia.");
