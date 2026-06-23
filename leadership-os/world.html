@@ -79,6 +79,7 @@ function cambiarPantallaVR(pantallaMostrarId) {
     'screen-interventions-list', // Agregado por si acaso
     'screen-technique-list',
     'interventions'
+    //'screen-learn-work-practice'
   ];
   
   pantallas.forEach(id => {
@@ -137,9 +138,9 @@ function ejecutarFuncionPorTecnica(tecnica) {
         // ==========================================
     // 🎭 CASES DE practice,lear,work togheter (Los 3 Botones)
     // ==========================================
-    case 'practice-intervention': funcionPracticeIntervention(); break;
-    case 'learn-intervention': funcionLearnIntervention(); break;
-    case 'work-together-intervention': funcionWorkTogetherIntervention(); break;
+    case 'practice-intervention': goPractice(); break; // Antes llamaba a otra cosa o no hacía lo correcto
+    case 'learn-intervention': goLearn(); break;
+    case 'work-together-intervention': goWork(); break;
     
 
     // 🚨 El default SIEMPRE debe ir al último
@@ -202,18 +203,18 @@ function funcionIntervReclamaciones() {
 }
 
 function funcionPracticeIntervention() {
-  console.log("🔄 [Intervención] Cargando simulación: Practice Intervention...");
-  showScreen('technique-list');
+  console.log("🔄 Módulo Practice");
+  goPractice(); // 👈 Destino correcto
 }
 
 function funcionLearnIntervention() {
-  console.log("🔄 [Intervención] Cargando simulación: Learn Intervention...");
-  showScreen('technique-list');
+  console.log("🔄 Módulo Learn");
+  goLearn(); // 👈 Destino correcto
 }
 
 function funcionWorkTogetherIntervention() {
-  console.log("🔄 [Intervención] Cargando simulación: Work Together Intervention...");
-  showScreen('technique-list');
+  console.log("🔄 Módulo Work Together");
+  goWork(); // 👈 Destino correcto
 }
 
 
@@ -363,8 +364,8 @@ function funcionWorkTogetherIntervention() {
   <a-entity id="screen-learn-work-practice" visible="false">
 
     <a-entity id="btn-practice-intervention" position="-2.5 1.4 -2.6" rotation="0 15 0">
-      <a-plane class="sub-tecnica" 
-               handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: interv-retencion"
+      <a-plane class="sub-tecnica clickable" 
+              handler-botones-vr="mensaje: Iniciando práctica; tecnica: practice-intervention"
                width="1.5" height="0.8" 
                color="#111830" 
                material="opacity: 0.7; shader: flat; transparent: true; side: double; strokeColor: #4466ff; strokeWidth: 2"
@@ -380,8 +381,8 @@ function funcionWorkTogetherIntervention() {
     </a-entity>
 
     <a-entity id="btn-learn-intervention" position="-0.85 1.4 -2.8" rotation="0 5 0">
-      <a-plane class="sub-tecnica" 
-               handler-botones-vr="mensaje: Abriendo panel de Preguntas Poderosas; tecnica: interv-soporte-critico"
+      <a-plane class="sub-tecnica clickable" 
+              handler-botones-vr="mensaje: Iniciando aprendizaje; tecnica: learn-intervention"
                width="1.5" height="0.8" 
                color="#111830" 
                material="opacity: 0.7; shader: flat; transparent: true; side: double"
@@ -396,9 +397,9 @@ function funcionWorkTogetherIntervention() {
       </a-plane>
     </a-entity>
 
-    <a-entity id="btn-work-together-intervention" position="0.85 1.4 -2.8" rotation="0 -5 0">
-      <a-plane class="sub-tecnica" 
-               handler-botones-vr="mensaje: Desplegando Entrevista Motivacional; tecnica: interv-reclamaciones"
+      <a-entity id="btn-work-together-intervention" position="0.85 1.4 -2.8" rotation="0 -5 0">
+        <a-plane class="sub-tecnica clickable" 
+                handler-botones-vr="mensaje: Iniciando co-working; tecnica: work-together-intervention"
                width="1.5" height="0.8" 
                color="#111830" 
                material="opacity: 0.7; shader: flat; transparent: true; side: double"
