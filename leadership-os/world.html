@@ -167,22 +167,22 @@ function ejecutarFuncionPorTecnica(tecnica) {
 // ==========================================
   function funcionIntervRetencion() {
   console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
-  // if (typeof goPractice === 'function') goPractice();
+  showscreen('screen-mode');
 }
 
 function funcionIntervFidelizacion() {
   console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
-  // if (typeof goPractice === 'function') goPractice();
+  showscreen('screen-mode');
 }
 
 function funcionIntervSoporteCritico() {
   console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
-  // if (typeof goPractice === 'function') goPractice();
+  showscreen('screen-mode');
 }
 
 function funcionIntervReclamaciones() {
   console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
-  // if (typeof goPractice === 'function') goPractice();
+  showscreen('screen-mode');
 }
 </script>
 
@@ -892,7 +892,8 @@ function showScreen(name){
     'practice',
     'eval',
     'interventions',
-    'techniques'
+    'techniques',
+    'screen-mode'
   
   ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
