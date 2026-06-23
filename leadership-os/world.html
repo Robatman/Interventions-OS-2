@@ -159,10 +159,10 @@ function ejecutarFuncionPorTecnica(tecnica) {
   function funcionSolutionFocusedCoaching() { console.log("🕊️ Iniciando Solution-Focused Coaching..."); goPractice(); }
   function funcionIntervPulseCheck() { console.log("🔄 Cargando herramienta Pulse Check..."); goPractice(); }
 
-  function funcionShowInterventions(){
-    console.log("🔄 Cambiando a la pantalla de Intervenciones...");
-    showScreen('interventions');  // <- Usa un método diferente llamado showScreen
-  }
+function funcionShowInterventions(){
+  console.log("🔄 Cambiando a la pantalla de Intervenciones...");
+  cambiarPantallaVR('screen-interventions-list'); // O el ID exacto que use esa pantalla
+}
 
   function funcionShowtechniques(){
     console.log("🔄 Cambiando a la pantalla de Técnicas...");
@@ -172,24 +172,24 @@ function ejecutarFuncionPorTecnica(tecnica) {
 // ==========================================
 // 🚀 NUEVAS FUNCIONES DE INTERVENCIONES
 // ==========================================
-  function funcionIntervRetencion() {
+function funcionIntervRetencion() {
   console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
-  showScreen('screen-mode');
+  cambiarPantallaVR('screen-mode'); // 👈 Cambiado aquí
 }
 
 function funcionIntervFidelizacion() {
   console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
-  showScreen('screen-mode');
+  cambiarPantallaVR('screen-mode'); // 👈 Cambiado aquí
 }
 
 function funcionIntervSoporteCritico() {
   console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
-  showScreen('screen-mode');
+  cambiarPantallaVR('screen-mode'); // 👈 Cambiado aquí
 }
 
 function funcionIntervReclamaciones() {
   console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
-  showScreen('screen-mode');
+  cambiarPantallaVR('screen-mode'); // 👈 Cambiado aquí
 }
 </script>
 
