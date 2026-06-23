@@ -167,22 +167,22 @@ function ejecutarFuncionPorTecnica(tecnica) {
 // ==========================================
   function funcionIntervRetencion() {
   console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
-  showScreen('screen-mode');
+  showScreen('mode');
 }
 
 function funcionIntervFidelizacion() {
   console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
-  showScreen('screen-mode');
+  showScreen('mode');
 }
 
 function funcionIntervSoporteCritico() {
   console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
-  showScreen('screen-mode');
+  showScreen('mode');
 }
 
 function funcionIntervReclamaciones() {
   console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
-  showScreen('screen-mode');
+  showScreen('mode');
 }
 </script>
 
@@ -893,7 +893,7 @@ function showScreen(name){
     'eval',
     'interventions',
     'techniques',
-    'screen-mode'
+    'mode'
   
   ].forEach(function(s){
     var el=document.getElementById('screen-'+s);
