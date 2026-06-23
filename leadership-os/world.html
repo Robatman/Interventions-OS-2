@@ -72,25 +72,33 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 // 🚀 FUNCIÓN MAESTRA: Apaga colisiones (scale="0 0 0") y visibilidad al cambiar de pantalla
 function cambiarPantallaVR(pantallaMostrarId) {
-  const pantallas = +
-  ['screen-welcome', 'screen-mode', 'screen-interventions-list', 'screen-technique-list'];
+  // Asegúrate de que el ID tenga exactamente el mismo nombre que pusiste en el HTML ("screen-mode-list")
+  const pantallas = [
+    'screen-welcome', 
+    'screen-mode-list', // 👈 Corregido el nombre aquí para que coincida con el HTML
+    'screen-interventions-list', 
+    'screen-technique-list'
+  ];
   
+  // Añadimos una validación de seguridad por si mandas un texto vacío
+  if (!pantallas.includes(pantallaMostrarId) && pantallaMostrarId !== '') {
+    console.warn("⚠️ La pantalla solicitada no existe en la lista maestra:", pantallaMostrarId);
+  }
+
   pantallas.forEach(id => {
     const elPantalla = document.getElementById(id);
     if (!elPantalla) return;
 
     if (id === pantallaMostrarId) {
-      // Activamos por completo la pantalla actual
       elPantalla.setAttribute('visible', 'true');
       elPantalla.setAttribute('scale', '1 1 1');
     } else {
-      // Desactivamos visibilidad y colapsamos su espacio físico 3D para liberar el puntero
       elPantalla.setAttribute('visible', 'false');
-      elPantalla.setAttribute('scale', '0 0 0');
+      elPantalla.setAttribute('scale', '0 0 0'); // Evita colisiones fantasma
     }
   });
 
-  // Forzamos al raycaster de la escena a recalcular los botones activos inmediatamente
+  // Forzamos al raycaster a recalcular inmediatamente
   const raycasterEl = document.querySelector('[raycaster]');
   if (raycasterEl && raycasterEl.components.raycaster) {
     raycasterEl.components.raycaster.refreshObjects();
@@ -166,24 +174,24 @@ function ejecutarFuncionPorTecnica(tecnica) {
 // ==========================================
 // 🚀 NUEVAS FUNCIONES DE INTERVENCIONES
 // ==========================================
-  function funcionIntervRetencion() {
+ function funcionIntervRetencion() {
   console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
-  showScreen('mode-list');
+  cambiarPantallaVR('screen-mode'); // 👈 Cambiado aquí
 }
 
 function funcionIntervFidelizacion() {
   console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
-  showScreen('mode-list');
+  cambiarPantallaVR('screen-mode'); // 👈 Cambiado aquí
 }
 
 function funcionIntervSoporteCritico() {
   console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
-  showScreen('mode-list');
+  cambiarPantallaVR('screen-mode'); // 👈 Cambiado aquí
 }
 
 function funcionIntervReclamaciones() {
   console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
-  showScreen('mode-list');
+  cambiarPantallaVR('screen-mode'); // 👈 Cambiado aquí
 }
 </script>
 
