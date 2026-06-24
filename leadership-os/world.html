@@ -885,18 +885,19 @@ function funcionIntervReclamaciones() {
 
 
 
+<!-- Opcional: Puedes borrar esta entidad completa si ya no quieres que exista el botón -->
 <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
-<a-entity id="panel-preview" position="0 1.6 -2">
+  <!-- Ya no se mostrará nada de esto -->
+</a-entity>
+
+<!-- Cambiamos visible="false" por visible="true" -->
+<a-entity id="panel-preview" position="0 1.6 -2" visible="true">
   <a-plane width="3" height="2" color="#222831" material="opacity: 0.95"></a-plane>
   <a-text value="Preview de la Conversación" align="center" position="0 0.8 0.01" width="4" color="#eeeeee"></a-text>
 
+  <!-- Aquí es donde se va a inyectar la conversación de forma automática -->
   <a-entity id="vr-preview-stage" position="-1.2 0.3 0.02"></a-entity>
 </a-entity>
-
-</a-entity>
-
-
-
 
 
 
