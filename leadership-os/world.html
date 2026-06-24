@@ -890,12 +890,18 @@ function funcionIntervReclamaciones() {
   
   <a-text value="Active Listening Session" align="center" position="0 0.9 0.01" width="4"></a-text>
 
-  <a-entity id="vr-preview-stage" position="-1.3 0.2 0.02"></a-entity>
+  <a-entity id="vr-preview-stage" position="0 0 0.02"></a-entity>
+
+  <a-plane id="btn-next-vr" class="clickable" 
+           width="1.4" height="0.3" color="#00adb5" position="0 -0.4 0.02"
+           onclick="renderNextVRMessage()">
+    <a-text value="SIGUIENTE ➔" align="center" color="#fff" width="3"></a-text>
+  </a-plane>
 
   <a-plane id="btn-back-techniques" class="clickable" 
-          width="1.2" height="0.3" color="#ff5ca0" position="0 -0.8 0.02"
-          onclick="cambiarPantallaVR('screen-welcome'); goWelcome();">
-    <a-text value="Volver" align="center" color="#fff" width="3"></a-text>
+           width="1.4" height="0.3" color="#ff5ca0" position="0 -0.8 0.02"
+           onclick="exitPreviewVR()">
+    <a-text value="VOLVER" align="center" color="#fff" width="3"></a-text>
   </a-plane>
 </a-entity>
 
@@ -1491,6 +1497,9 @@ function setupControllers(){
 }
 
 
+// Variables globales para controlar el flujo del paso a paso
+let currentConversationVR = [];
+let currentVRIndex = 0;
 
 function selectAndPreviewVR(techniqueId) {
   // 1. Ocultar la lista de técnicas y mostrar la de Active Listening
@@ -1505,39 +1514,71 @@ function selectAndPreviewVR(techniqueId) {
   const techniqueData = TECHNIQUE_PREVIEWS[techniqueId];
   if (!techniqueData) return;
 
-  const conversation = techniqueData.good.exchanges; 
+  // Guardamos la conversación entera y reiniciamos el índice a 0
+  currentConversationVR = techniqueData.good.exchanges; 
+  currentVRIndex = 0;
   
+  // Guardamos el rol del hablante A para usarlo en el paso a paso
+  window.currentRoleA = techniqueData.roleA;
+
+  // Renderizamos el primer mensaje
+  renderNextVRMessage();
+}
+
+function renderNextVRMessage() {
   const stage = document.querySelector('#vr-preview-stage');
-  if (!stage) {
-    console.error("No se encontró el contenedor #vr-preview-stage en el HTML.");
+  if (!stage) return;
+  
+  stage.innerHTML = ''; // Limpiamos el texto anterior para que solo salga uno a la vez
+
+  // Si ya llegamos al final de los mensajes de la conversación
+  if (currentVRIndex >= currentConversationVR.length) {
+    const endEntity = document.createElement('a-entity');
+    endEntity.setAttribute('position', '0 0.2 0');
+    endEntity.setAttribute('text', {
+      value: "¡Fin de la previsualización!\nPulsa VOLVER para regresar.",
+      align: 'center',
+      width: 2.6,
+      color: "#00adb5",
+      wrapCount: 30
+    });
+    stage.appendChild(endEntity);
+    
+    // Ocultamos el botón "Siguiente" ya que no hay más contenido
+    const btnNext = document.getElementById('btn-next-vr');
+    if (btnNext) btnNext.setAttribute('visible', 'false');
     return;
   }
-  stage.innerHTML = ''; // Limpiar mensajes anteriores
 
-  // 3. Renderizar en el espacio 3D de A-Frame
-  let yOffset = 0.4; 
+  // Asegurar que el botón de siguiente sea visible si volvemos a empezar
+  const btnNext = document.getElementById('btn-next-vr');
+  if (btnNext) btnNext.setAttribute('visible', 'true');
+
+  // Obtener el mensaje actual basado en el índice
+  const msg = currentConversationVR[currentVRIndex];
+
+  const messageEntity = document.createElement('a-entity');
+  messageEntity.setAttribute('position', '0 0.2 0'); // Posición centrada fija en el plano
+
+  const speakerName = msg.speaker === 'A' ? (window.currentRoleA || 'Coach') : 'Agent';
+  const textValue = `${speakerName}:\n${msg.text}`;
   
-  conversation.forEach((msg) => {
-    const messageEntity = document.createElement('a-entity');
-    messageEntity.setAttribute('position', `0 ${yOffset} 0`);
+  const bubbleColor = msg.speaker === 'A' ? "#00adb5" : "#ffb347";
 
-    const speakerName = msg.speaker === 'A' ? techniqueData.roleA : 'Agent';
-    const textValue = `${speakerName}: ${msg.text}`;
-    
-    const bubbleColor = msg.speaker === 'A' ? "#00adb5" : "#ffb347";
-
-    messageEntity.setAttribute('text', {
-      value: textValue,
-      align: 'left',
-      width: 2.6, // Ajustado ligeramente para que quepa bien en el plano
-      color: bubbleColor,
-      wrapCount: 35 
-    });
-
-    stage.appendChild(messageEntity);
-    yOffset -= 0.45; // Espaciado vertical descendente
+  messageEntity.setAttribute('text', {
+    value: textValue,
+    align: 'center', // Centrado para que luzca como un diálogo directo
+    width: 2.6,
+    color: bubbleColor,
+    wrapCount: 35 
   });
+
+  stage.appendChild(messageEntity);
+
+  // Incrementamos el índice para que el próximo clic muestre el siguiente diálogo
+  currentVRIndex++;
 }
+
 
 function exitPreviewVR() {
   // Regresar de la conversación al menú de técnicas
