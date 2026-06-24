@@ -108,7 +108,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
   cambiarPantallaVR(''); 
 
   switch(tecnica) {
-    case 'active-listening': /*funcionActiveListening();*/ showScreen('active-listening-activity'); break;
+    case 'active-listening': selectAndPreviewVR('active_listening'); break;
     case 'powerful-questions': funcionPowerfulQuestions(); break;
     case 'motivational-interviewing': funcionMotivationalInterviewing(); break;
     case 'nonviolent-communication': funcionNonviolentCommunication(); break;
@@ -885,25 +885,17 @@ function funcionIntervReclamaciones() {
 
 
 
-<!-- Reemplaza tu contenedor actual de 'screen-active-listening-activity' por este: -->
 <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
-  <!-- Fondo de la pantalla -->
-  <a-plane width="3" height="2" color="#1a1a2e" material="opacity: 0.9"></a-plane>
+  <a-plane width="3" height="2.2" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
   
-  <!-- Título de la actividad -->
-  <a-text value="Active Listening Session" align="center" position="0 0.7 0.01" width="4"></a-text>
+  <a-text value="Active Listening Session" align="center" position="0 0.9 0.01" width="4"></a-text>
 
-  <!-- Caja de texto donde se mostrará la conversación de la IA -->
-  <a-plane color="#222831" width="2.6" height="0.8" position="0 0.1 0.02">
-    <a-text id="preview-text-vr" value="Loading conversation..." 
-            align="center" color="#eee" width="2.4" wrap-count="30"></a-text>
-  </a-plane>
+  <a-entity id="vr-preview-stage" position="-1.3 0.2 0.02"></a-entity>
 
-  <!-- Botón para enviar/avanzar en la conversación (Equivalente al selectAndPreviewVR) -->
-  <a-plane id="btn-send-vr" class="clickable" 
-           width="1.8" height="0.3" color="#00adb5" position="0 -0.5 0.02"
-           onclick="selectAndPreviewVR('active_listening')">
-    <a-text value="Next / Respond" align="center" color="#fff" width="3"></a-text>
+  <a-plane id="btn-back-techniques" class="clickable" 
+           width="1.2" height="0.3" color="#ff5ca0" position="0 -0.8 0.02"
+           onclick="exitPreviewVR()">
+    <a-text value="VOLVER" align="center" color="#fff" width="3"></a-text>
   </a-plane>
 </a-entity>
 
@@ -1501,11 +1493,10 @@ function setupControllers(){
 
 
 function selectAndPreviewVR(techniqueId) {
-  document.querySelector('#panel-techniques').setAttribute('visible', 'false');
-  document.querySelector('#panel-preview').setAttribute('visible', 'true');
+  // 1. Ocultar la lista de técnicas y mostrar la de Active Listening
+  document.querySelector('#screen-technique-list').setAttribute('visible', 'false');
+  document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'true');
 
-  // 2. Acceder directamente al objeto global de tu preview.js
-  // Agregamos una validación por si acaso no se ha cargado el archivo
   if (typeof TECHNIQUE_PREVIEWS === 'undefined') {
     console.error("No se encontró el objeto TECHNIQUE_PREVIEWS. Revisa el orden en tu HTML.");
     return;
@@ -1514,10 +1505,13 @@ function selectAndPreviewVR(techniqueId) {
   const techniqueData = TECHNIQUE_PREVIEWS[techniqueId];
   if (!techniqueData) return;
 
-  // Como tu archivo tiene rama "bad" y "good", aquí elegimos mostrar el lado "good"
   const conversation = techniqueData.good.exchanges; 
   
   const stage = document.querySelector('#vr-preview-stage');
+  if (!stage) {
+    console.error("No se encontró el contenedor #vr-preview-stage en el HTML.");
+    return;
+  }
   stage.innerHTML = ''; // Limpiar mensajes anteriores
 
   // 3. Renderizar en el espacio 3D de A-Frame
@@ -1527,31 +1521,29 @@ function selectAndPreviewVR(techniqueId) {
     const messageEntity = document.createElement('a-entity');
     messageEntity.setAttribute('position', `0 ${yOffset} 0`);
 
-    // Mapeamos el speaker: si es 'A' toma el rol dinámico (ej. Coach), si es 'B' es 'Agent'
     const speakerName = msg.speaker === 'A' ? techniqueData.roleA : 'Agent';
     const textValue = `${speakerName}: ${msg.text}`;
     
-    // Asignamos colores fijos para diferenciar los diálogos en el espacio 3D
     const bubbleColor = msg.speaker === 'A' ? "#00adb5" : "#ffb347";
 
     messageEntity.setAttribute('text', {
       value: textValue,
       align: 'left',
-      width: 3,
+      width: 2.6, // Ajustado ligeramente para que quepa bien en el plano
       color: bubbleColor,
-      wrapCount: 40 
+      wrapCount: 35 
     });
 
     stage.appendChild(messageEntity);
-    yOffset -= 0.5; // Espaciado vertical descendente
+    yOffset -= 0.45; // Espaciado vertical descendente
   });
 }
-function exitPreviewVR() {
-  // Regresar todo a como estaba al principio
-  document.querySelector('#panel-preview').setAttribute('visible', 'false');
-  document.querySelector('#panel-techniques').setAttribute('visible', 'true');
-}
 
+function exitPreviewVR() {
+  // Regresar de la conversación al menú de técnicas
+  document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'false');
+  document.querySelector('#screen-technique-list').setAttribute('visible', 'true');
+}
 
 
 
