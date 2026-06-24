@@ -885,19 +885,24 @@ function funcionIntervReclamaciones() {
 
 
 
-<!-- Opcional: Puedes borrar esta entidad completa si ya no quieres que exista el botón -->
 <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
-  <!-- Ya no se mostrará nada de esto -->
+  <a-plane width="3" height="2" color="#1a1a2e" material="opacity: 0.9"></a-plane>
+  <a-text value="Choose a technique to preview" align="center" position="0 0.7 0.01" width="4"></a-text>
+
+  <a-plane id="btn-active-listening" class="clickable" 
+           width="2" height="0.4" color="#00adb5" position="0 0 0.02"
+           onclick="selectAndPreviewVR('active_listening')">
+    <a-text value="👂 Active Listening (Preview)" align="center" color="#fff" width="3.5"></a-text>
+  </a-plane>
 </a-entity>
 
-<!-- Cambiamos visible="false" por visible="true" -->
-<a-entity id="panel-preview" position="0 1.6 -2" visible="true">
+<a-entity id="panel-preview" position="0 1.6 -2" visible="false">
   <a-plane width="3" height="2" color="#222831" material="opacity: 0.95"></a-plane>
   <a-text value="Preview de la Conversación" align="center" position="0 0.8 0.01" width="4" color="#eeeeee"></a-text>
 
-  <!-- Aquí es donde se va a inyectar la conversación de forma automática -->
   <a-entity id="vr-preview-stage" position="-1.2 0.3 0.02"></a-entity>
 </a-entity>
+
 
 
 
@@ -1697,22 +1702,6 @@ if (btnNewSession) {
     var stars=document.getElementById('stars-1');
     if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
   });
-});
-
-// Este evento se dispara automáticamente cuando la página termina de cargar
-window.addEventListener('load', function() {
-    // Si usas A-Frame, es más seguro esperar a que la escena esté cargada
-    const scene = document.querySelector('a-scene');
-    
-    if (scene) {
-        scene.addEventListener('loaded', function () {
-            // Llamamos a la función directamente pasando 'active_listening'
-            selectAndPreviewVR('active_listening');
-        });
-    } else {
-        // Por si acaso no encuentra la escena inmediatamente
-        selectAndPreviewVR('active_listening');
-    }
 });
  
     document.querySelector('a-scene').addEventListener('loaded', () => {
