@@ -885,24 +885,27 @@ function funcionIntervReclamaciones() {
 
 
 
+<!-- Reemplaza tu contenedor actual de 'screen-active-listening-activity' por este: -->
 <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
+  <!-- Fondo de la pantalla -->
   <a-plane width="3" height="2" color="#1a1a2e" material="opacity: 0.9"></a-plane>
-  <a-text value="Choose a technique to preview" align="center" position="0 0.7 0.01" width="4"></a-text>
+  
+  <!-- Título de la actividad -->
+  <a-text value="Active Listening Session" align="center" position="0 0.7 0.01" width="4"></a-text>
 
-  <a-plane id="btn-active-listening" class="clickable" 
-           width="2" height="0.4" color="#00adb5" position="0 0 0.02"
+  <!-- Caja de texto donde se mostrará la conversación de la IA -->
+  <a-plane color="#222831" width="2.6" height="0.8" position="0 0.1 0.02">
+    <a-text id="preview-text-vr" value="Loading conversation..." 
+            align="center" color="#eee" width="2.4" wrap-count="30"></a-text>
+  </a-plane>
+
+  <!-- Botón para enviar/avanzar en la conversación (Equivalente al selectAndPreviewVR) -->
+  <a-plane id="btn-send-vr" class="clickable" 
+           width="1.8" height="0.3" color="#00adb5" position="0 -0.5 0.02"
            onclick="selectAndPreviewVR('active_listening')">
-    <a-text value="👂 Active Listening (Preview)" align="center" color="#fff" width="3.5"></a-text>
+    <a-text value="Next / Respond" align="center" color="#fff" width="3"></a-text>
   </a-plane>
 </a-entity>
-
-<a-entity id="panel-preview" position="0 1.6 -2" visible="false">
-  <a-plane width="3" height="2" color="#222831" material="opacity: 0.95"></a-plane>
-  <a-text value="Preview de la Conversación" align="center" position="0 0.8 0.01" width="4" color="#eeeeee"></a-text>
-
-  <a-entity id="vr-preview-stage" position="-1.2 0.3 0.02"></a-entity>
-</a-entity>
-
 
 
 
