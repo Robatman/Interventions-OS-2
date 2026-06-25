@@ -889,28 +889,33 @@ function funcionIntervReclamaciones() {
 
 <!-- SCREEN: ACTIVE LISTENING ACTIVITY -->
   <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
-    <!-- Fondo del contenedor principal un poco más amplio para que quepa todo perfectamente -->
+    <!-- Fondo del contenedor principal -->
     <a-plane width="3.4" height="2.4" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
     
     <a-text value="Active Listening Session" align="center" position="0 1.05 0.01" width="4.5" font="exo2bold"></a-text>
 
-    <!-- Escenario de Preview original (si se sigue usando) -->
-    <a-entity id="vr-preview-stage" position="-1.3 0.2 0.02"></a-entity>
+    <!-- ================================================================= -->
+    <!-- ESTADO 1: CONVERSACIÓN / PREVIEW (Visible por defecto) -->
+    <!-- ================================================================= -->
+    <a-entity id="listening-session-content" visible="true" position="0 0 0">
+      <!-- Tu escenario de Preview o simulación de conversación actual -->
+      <a-entity id="vr-preview-stage" position="0 0.1 0.02">
+        <!-- Aquí puedes meter texto de la conversación o lo que ya tenías montado -->
+        <a-text value="[ Simulación de Conversación / Contenido de la Sesión ]" align="center" width="3.5" color="#fff" font="mozillavr"></a-text>
+      </a-entity>
+    </a-entity>
 
     <!-- ================================================================= -->
-    <!-- 👁📋 SECCIÓN DE MOVES (4 CUADRITOS EN GRID DE 2x2) 🔄✅ -->
+    <!-- ESTADO 2: LOS 4 CUADRITOS (Ocultos por defecto) -->
     <!-- ================================================================= -->
-    <a-entity id="moves-container" position="0 0.15 0.01">
+    <a-entity id="moves-container" position="0 0.15 0.01" visible="false">
       
       <!-- Cuadro 1: Pay Attention (Arriba Izquierda) -->
       <a-entity id="move-pay-attention" position="-0.75 0.35 0.01">
         <a-plane width="1.3" height="0.55" color="#0b1230" material="opacity:0.9; shader:flat">
           <a-plane width="1.32" height="0.57" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
-          <!-- Icono (Arriba) -->
           <a-text value="👁" align="center" position="0 0.18 0.01" width="4" font="mozillavr"></a-text>
-          <!-- Label (Abajo del icono - Resaltado) -->
           <a-text value="Pay Attention" align="center" position="0 0.02 0.01" width="3.2" color="#00e5c0" font="exo2bold"></a-text>
-          <!-- Descripción (Hasta abajo) -->
           <a-text value="Be fully present \n no phone, no planning your next line" align="center" position="0 -0.15 0.01" width="2.1" color="#c8d8ff" font="mozillavr" wrap-count="28"></a-text>
         </a-plane>
       </a-entity>
@@ -919,11 +924,8 @@ function funcionIntervReclamaciones() {
       <a-entity id="move-reflect-back" position="0.75 0.35 0.01">
         <a-plane width="1.3" height="0.55" color="#0b1230" material="opacity:0.9; shader:flat">
           <a-plane width="1.32" height="0.57" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
-          <!-- Icono (Arriba) -->
           <a-text value="🔄" align="center" position="0 0.18 0.01" width="4" font="mozillavr"></a-text>
-          <!-- Label (Abajo del icono - Resaltado) -->
           <a-text value="Reflect Back" align="center" position="0 0.02 0.01" width="3.2" color="#00e5c0" font="exo2bold"></a-text>
-          <!-- Descripción (Hasta abajo) -->
           <a-text value="Repeat the core of what you heard \n in your own words" align="center" position="0 -0.15 0.01" width="2.1" color="#c8d8ff" font="mozillavr" wrap-count="28"></a-text>
         </a-plane>
       </a-entity>
@@ -932,11 +934,8 @@ function funcionIntervReclamaciones() {
       <a-entity id="move-validate" position="-0.75 -0.35 0.01">
         <a-plane width="1.3" height="0.55" color="#0b1230" material="opacity:0.9; shader:flat">
           <a-plane width="1.32" height="0.57" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
-          <!-- Icono (Arriba) -->
           <a-text value="✅" align="center" position="0 0.18 0.01" width="4" font="mozillavr"></a-text>
-          <!-- Label (Abajo del icono - Resaltado) -->
           <a-text value="Validate" align="center" position="0 0.02 0.01" width="3.2" color="#00e5c0" font="exo2bold"></a-text>
-          <!-- Descripción (Hasta abajo) -->
           <a-text value="Acknowledge their feeling makes sense \n even if you disagree" align="center" position="0 -0.15 0.01" width="2.1" color="#c8d8ff" font="mozillavr" wrap-count="28"></a-text>
         </a-plane>
       </a-entity>
@@ -945,11 +944,8 @@ function funcionIntervReclamaciones() {
       <a-entity id="move-summarize" position="0.75 -0.35 0.01">
         <a-plane width="1.3" height="0.55" color="#0b1230" material="opacity:0.9; shader:flat">
           <a-plane width="1.32" height="0.57" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
-          <!-- Icono (Arriba) -->
           <a-text value="📋" align="center" position="0 0.18 0.01" width="4" font="mozillavr"></a-text>
-          <!-- Label (Abajo del icono - Resaltado) -->
           <a-text value="Summarize" align="center" position="0 0.02 0.01" width="3.2" color="#00e5c0" font="exo2bold"></a-text>
-          <!-- Descripción (Hasta abajo) -->
           <a-text value="Recap before you respond \n prevents misunderstanding" align="center" position="0 -0.15 0.01" width="2.1" color="#c8d8ff" font="mozillavr" wrap-count="28"></a-text>
         </a-plane>
       </a-entity>
@@ -957,12 +953,12 @@ function funcionIntervReclamaciones() {
     </a-entity>
 
     <!-- ================================================================= -->
-    <!-- BOTÓN MODIFICADO: "See the moves" (Abajo centrado) -->
+    <!-- BOTÓN INTERACTIVO DINÁMICO (Llama a la función toggle Moves) -->
     <!-- ================================================================= -->
-    <a-plane id="btn-back-techniques" class="clickable" 
-             width="1.4" height="0.26" color="#ff5ca0" position="0 -0.95 0.02"
-             onclick="cambiarPantallaVR('screen-welcome'); goWelcome();">
-      <a-text value="See the moves" align="center" color="#fff" width="3.5" font="mozillavr"></a-text>
+    <a-plane id="btn-toggle-active-listening" class="clickable" 
+             width="1.5" height="0.26" color="#ff5ca0" position="0 -0.95 0.02"
+             onclick="toggleListeningMoves()">
+      <a-text id="text-btn-toggle-listening" value="See the moves" align="center" color="#fff" width="3.5" font="mozillavr"></a-text>
     </a-plane>
   </a-entity>
 
@@ -1005,6 +1001,46 @@ function pickRandomArchetype(){
   var ids=Object.keys(ARCHETYPES).filter(function(id){return ARCHETYPES[id].available;});
   return ARCHETYPES[ids[Math.floor(Math.random()*ids.length)]];
 }
+
+
+
+
+let mostrandoMoves = false;
+
+function toggleListeningMoves() {
+  const sessionContent = document.getElementById('listening-session-content');
+  const movesContainer = document.getElementById('moves-container');
+  const btnText = document.getElementById('text-btn-toggle-listening');
+  const btnPlane = document.getElementById('btn-toggle-active-listening');
+
+  if (!mostrandoMoves) {
+    // 1. Ocultar conversación y mostrar los 4 cuadritos
+    sessionContent.setAttribute('visible', 'false');
+    movesContainer.setAttribute('visible', 'true');
+    
+    // 2. Cambiar el texto e interfaz del botón
+    btnText.setAttribute('value', 'Back to session');
+    btnPlane.setAttribute('color', '#4e54c8'); // Cambia a un color azul/morado opcional para indicar "regresar"
+    
+    mostrandoMoves = true;
+  } else {
+    // 1. Mostrar conversación y ocultar los cuadritos
+    sessionContent.setAttribute('visible', 'true');
+    movesContainer.setAttribute('visible', 'false');
+    
+    // 2. Restaurar el botón original
+    btnText.setAttribute('value', 'See the moves');
+    btnPlane.setAttribute('color', '#ff5ca0'); // Regresa a tu rosa original
+    
+    mostrandoMoves = false;
+  }
+}
+
+// Opcional: Asegúrate de resetear el estado si el usuario cambia totalmente de pantalla 
+// mediante tus funciones globales (como goWelcome), agregando:
+// mostrandoMoves = false;
+
+
 
 function pickRandomScenario(archetype,level){
   var pool=archetype.briefings[level]||archetype.briefings['novice']||[];
@@ -1765,6 +1801,9 @@ if (btnNewSession) {
     if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
   });
 });
+
+
+
  
     document.querySelector('a-scene').addEventListener('loaded', () => {
       console.log("🚀 Sistema de rastreo de clics activado.");
