@@ -123,7 +123,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'growth-mindset': selectAndPreviewVR('growth_mindset'); break;
     case 'solution-focused-coaching': selectAndPreviewVR('solution_focused_coaching'); break;
     
-    
+
     case 'interv-pulse-check': funcionIntervPulseCheck(); break;
     case 'interventions': funcionShowInterventions(); break;
     case 'techniques': funcionShowtechniques(); break;
@@ -887,19 +887,84 @@ function funcionIntervReclamaciones() {
 
 
 
-<a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
-  <a-plane width="3" height="2.2" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
-  
-  <a-text value="Active Listening Session" align="center" position="0 0.9 0.01" width="4"></a-text>
+<!-- SCREEN: ACTIVE LISTENING ACTIVITY -->
+  <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
+    <!-- Fondo del contenedor principal un poco más amplio para que quepa todo perfectamente -->
+    <a-plane width="3.4" height="2.4" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
+    
+    <a-text value="Active Listening Session" align="center" position="0 1.05 0.01" width="4.5" font="exo2bold"></a-text>
 
-  <a-entity id="vr-preview-stage" position="-1.3 0.2 0.02"></a-entity>
+    <!-- Escenario de Preview original (si se sigue usando) -->
+    <a-entity id="vr-preview-stage" position="-1.3 0.2 0.02"></a-entity>
 
-  <a-plane id="btn-back-techniques" class="clickable" 
-          width="1.2" height="0.3" color="#ff5ca0" position="0 -0.8 0.02"
-          onclick="cambiarPantallaVR('screen-welcome'); goWelcome();">
-    <a-text value="Volver" align="center" color="#fff" width="3"></a-text>
-  </a-plane>
-</a-entity>
+    <!-- ================================================================= -->
+    <!-- 👁📋 SECCIÓN DE MOVES (4 CUADRITOS EN GRID DE 2x2) 🔄✅ -->
+    <!-- ================================================================= -->
+    <a-entity id="moves-container" position="0 0.15 0.01">
+      
+      <!-- Cuadro 1: Pay Attention (Arriba Izquierda) -->
+      <a-entity id="move-pay-attention" position="-0.75 0.35 0.01">
+        <a-plane width="1.3" height="0.55" color="#0b1230" material="opacity:0.9; shader:flat">
+          <a-plane width="1.32" height="0.57" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+          <!-- Icono (Arriba) -->
+          <a-text value="👁" align="center" position="0 0.18 0.01" width="4" font="mozillavr"></a-text>
+          <!-- Label (Abajo del icono - Resaltado) -->
+          <a-text value="Pay Attention" align="center" position="0 0.02 0.01" width="3.2" color="#00e5c0" font="exo2bold"></a-text>
+          <!-- Descripción (Hasta abajo) -->
+          <a-text value="Be fully present \n no phone, no planning your next line" align="center" position="0 -0.15 0.01" width="2.1" color="#c8d8ff" font="mozillavr" wrap-count="28"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- Cuadro 2: Reflect Back (Arriba Derecha) -->
+      <a-entity id="move-reflect-back" position="0.75 0.35 0.01">
+        <a-plane width="1.3" height="0.55" color="#0b1230" material="opacity:0.9; shader:flat">
+          <a-plane width="1.32" height="0.57" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+          <!-- Icono (Arriba) -->
+          <a-text value="🔄" align="center" position="0 0.18 0.01" width="4" font="mozillavr"></a-text>
+          <!-- Label (Abajo del icono - Resaltado) -->
+          <a-text value="Reflect Back" align="center" position="0 0.02 0.01" width="3.2" color="#00e5c0" font="exo2bold"></a-text>
+          <!-- Descripción (Hasta abajo) -->
+          <a-text value="Repeat the core of what you heard \n in your own words" align="center" position="0 -0.15 0.01" width="2.1" color="#c8d8ff" font="mozillavr" wrap-count="28"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- Cuadro 3: Validate (Abajo Izquierda) -->
+      <a-entity id="move-validate" position="-0.75 -0.35 0.01">
+        <a-plane width="1.3" height="0.55" color="#0b1230" material="opacity:0.9; shader:flat">
+          <a-plane width="1.32" height="0.57" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+          <!-- Icono (Arriba) -->
+          <a-text value="✅" align="center" position="0 0.18 0.01" width="4" font="mozillavr"></a-text>
+          <!-- Label (Abajo del icono - Resaltado) -->
+          <a-text value="Validate" align="center" position="0 0.02 0.01" width="3.2" color="#00e5c0" font="exo2bold"></a-text>
+          <!-- Descripción (Hasta abajo) -->
+          <a-text value="Acknowledge their feeling makes sense \n even if you disagree" align="center" position="0 -0.15 0.01" width="2.1" color="#c8d8ff" font="mozillavr" wrap-count="28"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- Cuadro 4: Summarize (Abajo Derecha) -->
+      <a-entity id="move-summarize" position="0.75 -0.35 0.01">
+        <a-plane width="1.3" height="0.55" color="#0b1230" material="opacity:0.9; shader:flat">
+          <a-plane width="1.32" height="0.57" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+          <!-- Icono (Arriba) -->
+          <a-text value="📋" align="center" position="0 0.18 0.01" width="4" font="mozillavr"></a-text>
+          <!-- Label (Abajo del icono - Resaltado) -->
+          <a-text value="Summarize" align="center" position="0 0.02 0.01" width="3.2" color="#00e5c0" font="exo2bold"></a-text>
+          <!-- Descripción (Hasta abajo) -->
+          <a-text value="Recap before you respond \n prevents misunderstanding" align="center" position="0 -0.15 0.01" width="2.1" color="#c8d8ff" font="mozillavr" wrap-count="28"></a-text>
+        </a-plane>
+      </a-entity>
+
+    </a-entity>
+
+    <!-- ================================================================= -->
+    <!-- BOTÓN MODIFICADO: "See the moves" (Abajo centrado) -->
+    <!-- ================================================================= -->
+    <a-plane id="btn-back-techniques" class="clickable" 
+             width="1.4" height="0.26" color="#ff5ca0" position="0 -0.95 0.02"
+             onclick="cambiarPantallaVR('screen-welcome'); goWelcome();">
+      <a-text value="See the moves" align="center" color="#fff" width="3.5" font="mozillavr"></a-text>
+    </a-plane>
+  </a-entity>
 
 
 
