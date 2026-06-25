@@ -956,7 +956,7 @@ function funcionIntervReclamaciones() {
     <!-- BOTÓN INTERACTIVO DINÁMICO (Llama a la función toggle Moves) -->
     <!-- ================================================================= -->
     <a-plane id="btn-toggle-active-listening" class="clickable" 
-             width="1.5" height="0.26" color="#ff5ca0" position="0 -0.95 0.02"
+             width="1.8" height="0.26" color="#ff5ca0" position="0 -0.95 0.02"
              onclick="toggleListeningMoves()">
       <a-text id="text-btn-toggle-listening" value="See the moves" align="center" color="#fff" width="3.5" font="mozillavr"></a-text>
     </a-plane>
@@ -1018,27 +1018,20 @@ function toggleListeningMoves() {
     sessionContent.setAttribute('visible', 'false');
     movesContainer.setAttribute('visible', 'true');
     
-    // 2. Cambiar el texto e interfaz del botón
-    btnText.setAttribute('value', 'Back to session');
-    btnPlane.setAttribute('color', '#4e54c8'); // Cambia a un color azul/morado opcional para indicar "regresar"
+    // 2. Cambiar el texto del botón al call-to-action de avanzar
+    btnText.setAttribute('value', "I'm ready \u2014 let's go \u2192"); // Códigos Unicode limpios para "—" y "→" en A-Frame
+    btnPlane.setAttribute('color', '#00e5c0'); // Cambia a verde/turquesa de "listo" (opcional, puedes dejar el #ff5ca0 si prefieres)
     
     mostrandoMoves = true;
   } else {
-    // 1. Mostrar conversación y ocultar los cuadritos
-    sessionContent.setAttribute('visible', 'true');
-    movesContainer.setAttribute('visible', 'false');
+    // 3. Si ya estaba viendo los "moves" y presiona el botón, avanza a la siguiente pantalla
+    // Reseteamos la variable de estado para la próxima vez que se entre a esta sección
+    mostrandoMoves = false; 
     
-    // 2. Restaurar el botón original
-    btnText.setAttribute('value', 'See the moves');
-    btnPlane.setAttribute('color', '#ff5ca0'); // Regresa a tu rosa original
-    
-    mostrandoMoves = false;
+    // Ejecuta tu función para avanzar de pantalla
+    showScreen('learn-work-practice');
   }
 }
-
-// Opcional: Asegúrate de resetear el estado si el usuario cambia totalmente de pantalla 
-// mediante tus funciones globales (como goWelcome), agregando:
-// mostrandoMoves = false;
 
 
 
