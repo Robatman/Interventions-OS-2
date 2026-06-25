@@ -108,20 +108,22 @@ function ejecutarFuncionPorTecnica(tecnica) {
   cambiarPantallaVR(''); 
 
   switch(tecnica) {
-    case 'active-listening': selectAndPreviewVR('active_listening'); break;
+   case 'active-listening': selectAndPreviewVR('active_listening'); break;
     case 'powerful-questions': selectAndPreviewVR('powerful_questions'); break;
-    case 'motivational-interviewing': funcionMotivationalInterviewing(); break;
-    case 'nonviolent-communication': funcionNonviolentCommunication(); break;
-    case 'radical-candor': funcionRadicalCandor(); break;
-    case 'crucial-conversations': funcionCrucialConversations(); break;
-    case 'tactical-empathy': funcionTacticalEmpathy(); break;
-    case 'scarf-model': funcionScarfModel(); break;
-    case 'immunity-to-change': funcionImmunityToChange(); break;
-    case 'drama-triangle': funcionDramaTriangle(); break;
-    case 'grow-model': funcionGrowModel(); break;
-    case 'strengths-based-coaching': funcionStrengthsBasedCoaching(); break;
-    case 'growth-mindset': funcionGrowthMindset(); break;
-    case 'solution-focused-coaching': funcionSolutionFocusedCoaching(); break;
+    case 'motivational-interviewing': selectAndPreviewVR('motivational_interviewing'); break;
+    case 'nonviolent-communication': selectAndPreviewVR('nonviolent_communication'); break;
+    case 'radical-candor': selectAndPreviewVR('radical_candor'); break;
+    case 'crucial-conversations': selectAndPreviewVR('crucial_conversations'); break;
+    case 'tactical-empathy': selectAndPreviewVR('tactical_empathy'); break;
+    case 'scarf-model': selectAndPreviewVR('scarf_model'); break;
+    case 'immunity-to-change': selectAndPreviewVR('immunity_to_change'); break;
+    case 'drama-triangle': selectAndPreviewVR('drama_triangle'); break;
+    case 'grow-model': selectAndPreviewVR('grow_model'); break;
+    case 'strengths-based-coaching': selectAndPreviewVR('strengths_based_coaching'); break;
+    case 'growth-mindset': selectAndPreviewVR('growth_mindset'); break;
+    case 'solution-focused-coaching': selectAndPreviewVR('solution_focused_coaching'); break;
+    
+    
     case 'interv-pulse-check': funcionIntervPulseCheck(); break;
     case 'interventions': funcionShowInterventions(); break;
     case 'techniques': funcionShowtechniques(); break;
