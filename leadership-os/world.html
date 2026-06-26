@@ -952,14 +952,12 @@ function funcionIntervReclamaciones() {
 
     </a-entity>
 
-    <!-- ================================================================= -->
-    <!-- BOTÓN INTERACTIVO DINÁMICO (Llama a la función toggle Moves) -->
-    <!-- ================================================================= -->
-    <a-plane id="btn-toggle-active-listening" class="clickable" 
-             width="1.8" height="0.26" color="#ff5ca0" position="0 -0.95 0.02"
-             onclick="toggleListeningMoves()">
-      <a-text id="text-btn-toggle-listening" value="See the moves" align="center" color="#fff" width="3.5" font="mozillavr"></a-text>
-    </a-plane>
+
+<a-plane id="btn-toggle-active-listening" class="clickable" 
+         width="1.8" height="0.26" color="#ff5ca0" position="0 -0.95 0.02"
+         onclick="toggleListeningMoves()">
+  <a-text id="text-btn-toggle-listening" value="See the moves" align="center" color="#fff" width="3.5" font="mozillavr"></a-text>
+</a-plane>
   </a-entity>
 
 
@@ -1014,31 +1012,27 @@ function toggleListeningMoves() {
   const btnPlane = document.getElementById('btn-toggle-active-listening');
 
   if (!mostrandoMoves) {
-    // 1. Ocultar conversación y mostrar los 4 cuadritos
+    // 1. Ocultar contenido y mostrar los 4 cartelitos
     sessionContent.setAttribute('visible', 'false');
     movesContainer.setAttribute('visible', 'true');
     
-    // 2. Cambiar el texto e interfaz del botón
-    btnText.setAttribute('value', 'Back to session');
-    btnPlane.setAttribute('color', '#4e54c8'); // Cambia a un color azul/morado opcional para indicar "regresar"
+    // 2. Cambiar UI del botón
+    btnText.setAttribute('text', 'value', "I'm ready \u2014 let's go \u2192");
+    btnPlane.setAttribute('color', '#00e5c0');
     
     mostrandoMoves = true;
   } else {
-    // 1. Mostrar conversación y ocultar los cuadritos
+    // 3. Resetear estados internos y regresar a la pantalla intermedia de forma segura
+    mostrandoMoves = false;
     sessionContent.setAttribute('visible', 'true');
     movesContainer.setAttribute('visible', 'false');
+    btnText.setAttribute('text', 'value', "See the moves");
+    btnPlane.setAttribute('color', '#ff5ca0');
     
-    // 2. Restaurar el botón original
-    btnText.setAttribute('value', 'See the moves');
-    btnPlane.setAttribute('color', '#ff5ca0'); // Regresa a tu rosa original
-    
-    mostrandoMoves = false;
+    // Transición limpia usando tu motor de navegación
+    showScreen('learn-work-practice');
   }
 }
-
-// Opcional: Asegúrate de resetear el estado si el usuario cambia totalmente de pantalla 
-// mediante tus funciones globales (como goWelcome), agregando:
-// mostrandoMoves = false;
 
 
 
