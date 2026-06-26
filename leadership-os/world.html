@@ -963,7 +963,20 @@ function funcionIntervReclamaciones() {
 
 
 
+<a-plane id="screen-history" position="0 1.6 -2" rotation="0 0 0" width="3.2" height="2" color="#0b0e26" material="opacity: 0.95; transparent: true; shader: flat; side: double" visible="false" scale="0 0 0">
+  
+  <a-text value="YOUR PROGRESS" align="center" color="#ffffff" width="4.5" position="0 0.8 0.01" bold="true"></a-text>
+  <a-text value="Sessions synced across devices." align="center" color="#c8d8ff" width="2.5" position="0 0.67 0.01"></a-text>
+  
+  <a-entity id="history-list-container" position="0 0.1 0.01"></a-entity>
 
+  <a-plane id="btn-history-back" class="clickable" position="0 -0.75 0.02" width="1" height="0.22" color="#1a2a6a" material="shader: flat"
+           onclick="goWelcome()"
+           animation__mouseenter="property: material.color; from: #1a2a6a; to: #2a3a7a; dur: 150; startEvents: mouseenter"
+           animation__mouseleave="property: material.color; from: #2a3a7a; to: #1a2a6a; dur: 150; startEvents: mouseleave">
+    <a-text value="<- Back" align="center" color="#ffffff" width="2.8" position="0 0 0.01"></a-text>
+  </a-plane>
+</a-plane>
 
 
 
@@ -1267,6 +1280,86 @@ async function handleVRSpeech(text) {
   }
 }
 
+function showHistoryVR() {
+  console.log("📊 Renderizando historial en el entorno VR...");
+  
+  // 1. Intentamos obtener las sesiones guardadas (igual que hace tu ui.js)
+  let sessions = [];
+  try {
+    sessions = JSON.parse(localStorage.getItem('ldr_sessions') || '[]');
+  } catch(e) {
+    console.error("Error leyendo ldr_sessions", e);
+  }
+
+  // 2. Buscamos el contenedor donde irán los textos en tu plano 3D
+  // Nota: Asegúrate de tener un <a-entity id="history-list-container"> dentro de tu <a-plane id="screen-history">
+  const container = document.getElementById('history-list-container');
+  if (!container) return;
+
+  // Limpiamos contenido VR anterior
+  container.innerHTML = '';
+
+  if (sessions.length === 0) {
+    // Si no hay sesiones, creamos un texto 3D indicándolo
+    const noSessionsText = document.createElement('a-text');
+    noSessionsText.setAttribute('value', 'No hay sesiones registradas aun. \x21Empieza a practicar!');
+    noSessionsText.setAttribute('align', 'center');
+    noSessionsText.setAttribute('color', '#c8d8ff');
+    noSessionsText.setAttribute('width', '3');
+    noSessionsText.setAttribute('position', '0 0 0');
+    container.appendChild(noSessionsText);
+    return;
+  }
+
+  function goHistory() {
+  console.log("dio click al goHistory (My Progress)");
+  
+  appState.agentHistory = [];
+  appState.currentMode = 'history';
+  appState.screen = 'history';
+
+  // 🚀 Renderizamos las tarjetas tridimensionales antes de mostrar la pantalla
+  showHistoryVR(); 
+
+  // Cambiamos el plano visual de A-Frame
+  cambiarPantallaVR('screen-history');
+  
+  // Feedback con Juanjolote
+  setJuanMood('happy');
+  var textoHistorial = 'Aqui tienes el registro de tus sesiones pasadas y tu progreso actual.';
+  setDialog('JUANJOLOTE', textoHistorial);
+  
+  if (typeof speakVR === 'function') {
+    speakVR(textoHistorial, 'daniel');
+  }
+}
+
+  // 3. Iteramos las últimas 3 o 4 sesiones para que quepan en el plano VR
+  sessions.slice(-4).reverse().forEach((session, index) => {
+    const yOffset = 0.4 - (index * 0.25); // Separación vertical en el espacio 3D
+
+    const entitySesion = document.createElement('a-entity');
+    entitySesion.setAttribute('position', `0 ${yOffset} 0`);
+
+    // Formateamos el texto de la tarjeta (Fecha - Técnica - Resultado)
+    const fecha = session.date ? session.date.substring(0,10) : 'Reciente';
+    const tecnica = session.technique || 'General';
+    const nivel = session.level || 'Novice';
+    const moodFinal = session.finalMood !== undefined ? `${session.finalMood}%` : 'N/A';
+
+    const textoLinea = `${fecha} | ${tecnica.toUpperCase()} (${nivel})\nOpenness Final: ${moodFinal}`;
+
+    entitySesion.setAttribute('text', {
+      value: textoLinea,
+      align: 'left',
+      color: '#00e5c0', // Color teal de tu paleta
+      width: 2.8,
+      font: 'monospace'
+    });
+
+    container.appendChild(entitySesion);
+  });
+}
 
 async function goEval(){
   showScreen('eval');
