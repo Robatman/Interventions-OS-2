@@ -982,18 +982,7 @@ function funcionIntervReclamaciones() {
 const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
 const SUPA_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
 
-let appState = {
-  screen:'welcome',
-  activeMenu:null,
-  currentArchetype:null,
-  currentScenario:null,
-  currentLevel:'novice',
-  agentHistory:[],
-  vrMood:30,boxState:'out',
-  conversationClosed:false,
-  hingesOpened:[]};
-
-  
+let appState = {screen:'welcome',activeMenu:null,currentArchetype:null,currentScenario:null,currentLevel:'novice',agentHistory:[],vrMood:30,boxState:'out',conversationClosed:false,hingesOpened:[]};
 let isRecording=false,isProcessing=false,mediaRecorder=null,audioChunks=[],audioStream=null,audioContext=null,analyser=null,silenceTimer=null;
 const SILENCE_THRESHOLD=38,SILENCE_DURATION=1900;
 
@@ -1029,20 +1018,27 @@ function toggleListeningMoves() {
     sessionContent.setAttribute('visible', 'false');
     movesContainer.setAttribute('visible', 'true');
     
-    // 2. Cambiar el texto del botón al call-to-action de avanzar
-    btnText.setAttribute('value', "I'm ready \u2014 let's go \u2192"); // Códigos Unicode limpios para "—" y "→" en A-Frame
-    btnPlane.setAttribute('color', '#00e5c0'); // Cambia a verde/turquesa de "listo" (opcional, puedes dejar el #ff5ca0 si prefieres)
+    // 2. Cambiar el texto e interfaz del botón
+    btnText.setAttribute('value', 'Back to session');
+    btnPlane.setAttribute('color', '#4e54c8'); // Cambia a un color azul/morado opcional para indicar "regresar"
     
     mostrandoMoves = true;
   } else {
-    // 3. Si ya estaba viendo los "moves" y presiona el botón, avanza a la siguiente pantalla
-    // Reseteamos la variable de estado para la próxima vez que se entre a esta sección
-    mostrandoMoves = false; 
+    // 1. Mostrar conversación y ocultar los cuadritos
+    sessionContent.setAttribute('visible', 'true');
+    movesContainer.setAttribute('visible', 'false');
     
-    // Ejecuta tu función para avanzar de pantalla
-    showScreen('learn-work-practice');
+    // 2. Restaurar el botón original
+    btnText.setAttribute('value', 'See the moves');
+    btnPlane.setAttribute('color', '#ff5ca0'); // Regresa a tu rosa original
+    
+    mostrandoMoves = false;
   }
 }
+
+// Opcional: Asegúrate de resetear el estado si el usuario cambia totalmente de pantalla 
+// mediante tus funciones globales (como goWelcome), agregando:
+// mostrandoMoves = false;
 
 
 
