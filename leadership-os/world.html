@@ -108,8 +108,13 @@ function ejecutarFuncionPorTecnica(tecnica) {
   cambiarPantallaVR(''); 
 
   switch(tecnica) {
-   case 'active-listening': selectAndPreviewVR('active_listening'); break;
-    case 'powerful-questions': selectAndPreviewVR('powerful_questions'); break;
+
+      case 'active-listening': 
+      appState.currentTechnique = 'active_listening';
+      selectAndPreviewVR('active_listening'); 
+      break;
+
+          case 'powerful-questions': selectAndPreviewVR('powerful_questions'); break;
     case 'motivational-interviewing': selectAndPreviewVR('motivational_interviewing'); break;
     case 'nonviolent-communication': selectAndPreviewVR('nonviolent_communication'); break;
     case 'radical-candor': selectAndPreviewVR('radical_candor'); break;
@@ -982,7 +987,22 @@ function funcionIntervReclamaciones() {
 const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
 const SUPA_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
 
-let appState = {screen:'welcome',activeMenu:null,currentArchetype:null,currentScenario:null,currentLevel:'novice',agentHistory:[],vrMood:30,boxState:'out',conversationClosed:false,hingesOpened:[]};
+let appState = {
+  screen: 'welcome',
+  activeMenu: null,
+  currentArchetype: null,
+  currentScenario: null,
+  currentLevel: 'novice',
+  agentHistory: [],
+  vrMood: 30,
+  boxState: 'out',
+  conversationClosed: false,
+  hingesOpened: [],
+  currentTechnique: null,
+  currentMode: null
+};
+
+
 let isRecording=false,isProcessing=false,mediaRecorder=null,audioChunks=[],audioStream=null,audioContext=null,analyser=null,silenceTimer=null;
 const SILENCE_THRESHOLD=38,SILENCE_DURATION=1900;
 
@@ -1005,7 +1025,7 @@ function pickRandomArchetype(){
 
 
 
-let mostrandoMoves = false;
+let mostrandoMoves = false; // Tu bandera de control original
 
 function toggleListeningMoves() {
   const sessionContent = document.getElementById('listening-session-content');
@@ -1014,22 +1034,22 @@ function toggleListeningMoves() {
   const btnPlane = document.getElementById('btn-toggle-active-listening');
 
   if (!mostrandoMoves) {
-    // 1. Ocultar conversación y mostrar los 4 cuadritos
     sessionContent.setAttribute('visible', 'false');
     movesContainer.setAttribute('visible', 'true');
-    
-    // 2. Cambiar el texto del botón al call-to-action de avanzar
-    btnText.setAttribute('value', "I'm ready \u2014 let's go \u2192"); // Códigos Unicode limpios para "—" y "→" en A-Frame
-    btnPlane.setAttribute('color', '#00e5c0'); // Cambia a verde/turquesa de "listo" (opcional, puedes dejar el #ff5ca0 si prefieres)
-    
+    btnText.setAttribute('value', "I'm ready \u2014 let's go \u2192");
+    btnPlane.setAttribute('color', '#00e5c0');
     mostrandoMoves = true;
   } else {
-    // 3. Si ya estaba viendo los "moves" y presiona el botón, avanza a la siguiente pantalla
-    // Reseteamos la variable de estado para la próxima vez que se entre a esta sección
-    mostrandoMoves = false; 
-    
-    // Ejecuta tu función para avanzar de pantalla
-    showScreen('learn-work-practice');
+    // Resetear visibilidad de los contenedores originales
+    sessionContent.setAttribute('visible', 'true');
+    movesContainer.setAttribute('visible', 'false');
+    btnText.setAttribute('value', 'Active Listening Moves');
+    btnPlane.setAttribute('color', '#444444');
+    mostrandoMoves = false;
+
+    // Redirección final: en lugar de la pantalla estática de los 3 botones,
+    // mandamos al usuario al entorno final de práctica
+    showScreen('practice');
   }
 }
 
@@ -1107,33 +1127,17 @@ function goMode(menuType){
   showScreen('mode');
 }
 
-function goLearn(){
-  appState.agentHistory=[];
-  var intro=appState.activeMenu==='interventions'
-    ?'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?'
-    :'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
-  showScreen('practice');
-  setJuanMood('happy');
-  setDialog('JUANJOLOTE',intro);
-  speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
-  appState.agentHistory.push({role:'assistant',content:intro});
-    console.log("dio click al goLearn")
-
-}
-
-function goWork(){
-  appState.agentHistory=[];
-  var intro='Cuentame, que situacion tienes con un agente ahora mismo?';
-  showScreen('practice');
-  setJuanMood('talking');
-  setDialog('JUANJOLOTE',intro);
-  speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
-  appState.agentHistory.push({role:'assistant',content:intro});
-    console.log("dio click al gowork")
-
-}
-
 function goPractice(){
+  console.log("dio click al goPractice");
+  appState.currentMode = 'practice'; // Guardamos el modo
+
+  // 🚀 SI ES ESCUCHA ACTIVA, DESVÍO A SU ACTIVIDAD COMPLETA
+  if (appState.currentTechnique === 'active_listening') {
+    showScreen('active-listening-activity');
+    return; // Detenemos la ejecución aquí para que no cargue el escenario aleatorio normal
+  }
+
+  // --- TU LÓGICA ORIGINAL INTACTA PARA LOS DEMÁS CASOS ---
   var arch=pickRandomArchetype();
   var scenario=pickRandomScenario(arch,appState.currentLevel);
   appState.currentArchetype=arch;
@@ -1150,7 +1154,52 @@ function goPractice(){
   showScreen('practice');
   setDialog(arch.name.toUpperCase(),opener);
   speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});
-  console.log("dio click al goPractice")
+}
+
+function goLearn(){
+  console.log("dio click al goLearn");
+  appState.currentMode = 'learn'; // Guardamos el modo
+
+  // 🚀 SI ES ESCUCHA ACTIVA, SE VA A LA ACTIVIDAD INTERACTIVA CONFIGURADA EN MODO APRENDER
+  if (appState.currentTechnique === 'active_listening') {
+    showScreen('active-listening-activity');
+    
+    // Forzamos visualmente a que se muestren los cuadritos (moves) en vez de la sesión normal
+    document.getElementById('listening-session-content').setAttribute('visible', 'false');
+    document.getElementById('moves-container').setAttribute('visible', 'true');
+    
+    mostrandoMoves = true;
+    var btnText = document.getElementById('text-btn-toggle-listening');
+    var btnPlane = document.getElementById('btn-toggle-active-listening');
+    if (btnText) btnText.setAttribute('value', "I'm ready \u2014 let's go \u2192");
+    if (btnPlane) btnPlane.setAttribute('color', '#00e5c0');
+    return; // Detenemos la ejecución aquí
+  }
+
+  // --- TU LÓGICA ORIGINAL INTACTA CON JUANJOLOTE ---
+  appState.agentHistory=[];
+  var intro=appState.activeMenu==='interventions'
+    ?'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?'
+    :'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
+  showScreen('practice');
+  setJuanMood('happy');
+  setDialog('JUANJOLOTE',intro);
+  speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
+  appState.agentHistory.push({role:'assistant',content:intro});
+}
+
+function goWork(){
+  console.log("dio click al gowork");
+  appState.currentMode = 'work'; // Guardamos el modo
+
+  // --- TU LÓGICA ORIGINAL INTACTA CON JUANJOLOTE ---
+  appState.agentHistory=[];
+  var intro='Cuentame, que situacion tienes con un agente ahora mismo?';
+  showScreen('practice');
+  setJuanMood('talking');
+  setDialog('JUANJOLOTE',intro);
+  speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
+  appState.agentHistory.push({role:'assistant',content:intro});
 }
 
   function go14button(){
