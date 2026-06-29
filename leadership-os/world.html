@@ -70,45 +70,38 @@ AFRAME.registerComponent('handler-botones-vr', {
   }
 });
 
+// 🚀 FUNCIÓN MAESTRA: Apaga colisiones y visibilidad de todas las pantallas
 function cambiarPantallaVR(pantallaMostrarId) {
+  // 🌟 Asegúrate de incluir AQUÍ los IDs exactos de TODAS tus pantallas
   const pantallas = [
     'screen-welcome', 
     'screen-mode', 
-    'screen-interventions-list', 
+    'screen-interventions-list', // Agregado por si acaso
     'screen-technique-list',
-    'interventions',
-    'screen-learn-work-practice'
+    'interventions'
   ];
   
   pantallas.forEach(id => {
     const elPantalla = document.getElementById(id);
     if (!elPantalla) return;
 
-    // Buscamos todos los elementos interactivos dentro de esta pantalla
-    const botonesEnPantalla = elPantalla.querySelectorAll('[handler-botones-vr], .sub-tecnica, .clickable');
-
     if (id === pantallaMostrarId) {
+      // Activamos por completo la pantalla seleccionada
       elPantalla.setAttribute('visible', 'true');
       elPantalla.setAttribute('scale', '1 1 1');
-      
-      // Habilitamos la clase para que el raycaster los detecte
-      botonesEnPantalla.forEach(b => b.classList.add('clickable'));
     } else {
+      // Desactivamos por completo todas las demás
       elPantalla.setAttribute('visible', 'false');
       elPantalla.setAttribute('scale', '0 0 0');
-      
-      // Removemos la clase para que el raycaster los ignore por completo
-      botonesEnPantalla.forEach(b => b.classList.remove('clickable'));
     }
   });
 
-  // Forzamos al raycaster a actualizarse inmediatamente
+  // Forzamos al raycaster de la escena a recalcular los botones activos inmediatamente
   const raycasterEl = document.querySelector('[raycaster]');
   if (raycasterEl && raycasterEl.components.raycaster) {
     raycasterEl.components.raycaster.refreshObjects();
   }
 }
-
 
 
 
@@ -349,7 +342,7 @@ function funcionIntervReclamaciones() {
     <a-entity id="btn-progress" position="0 0.45 -2.25" class="clickable">
       <a-plane width="1.2" height="0.24" color="#101830" material="opacity:0.86;shader:flat;side:double"></a-plane>
       <a-plane width="1.24" height="0.28" color="#4466ff" material="opacity:0.28;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="MY PROGRESsS" align="center" color="#4466ff" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
+      <a-text value="MY PROGRESS" align="center" color="#4466ff" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
     </a-entity>
     <a-entity position="-2.9 2.25 -2.5" rotation="0 30 0">
       <a-plane id="btn-logout" width="0.82" height="0.24" color="#1a0a30" material="opacity:0.84;shader:flat;side:double" class="clickable">
