@@ -1980,15 +1980,15 @@ if (btnAgain) {
   btnAgain.addEventListener('click', function(e) {
     e.stopPropagation();
 
-    // 💥 Ocultamos por completo la pantalla de evaluación para que no se quede encimada
+    // 💥 1. Ocultamos la pantalla de evaluación por completo
     var screenEval = document.getElementById('screen-eval');
     if (screenEval) {
       screenEval.setAttribute('visible', 'false');
-      // Si usas una clase para manejar los clics en los componentes interactivos:
+      screenEval.setAttribute('scale', '0 0 0');
       screenEval.classList.remove('clickable'); 
     }
 
-    // 🧠 Comprobamos el menú activo para redirigir
+    // 🧠 2. Comprobamos el menú activo original
     if (typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
       console.log("🔄 Regresando a las 4 opciones de Intervenciones...");
       
@@ -1997,28 +1997,42 @@ if (btnAgain) {
       } else if (typeof showScreen === 'function') {
         showScreen('interventions');
       }
-} else {
-      console.log("🔄 Regresando a los 14 botones de Técnicas...");
+    } else {
+      console.log("🔄 Regresando y despertando los 14 botones de Técnicas...");
       
-      // 1. 🧹 Forzamos el reinicio de las variables globales de la actividad de técnicas
-      if (typeof appState !== 'undefined') {
-        appState.currentQuestionIndex = 0; // Reinicia al principio si manejas un índice de preguntas
-        appState.selectedTechnique = null; // Limpia la técnica seleccionada anteriormente
-      }
-      
-      // Puedes llamar aquí a tu función de limpiar si tienes una (ej: reiniciarAtributos();)
-
-      // 2. 📺 Cambiamos a la pantalla de las técnicas
+      // 📺 Cambiamos a la pantalla contenedora oficial de técnicas
       if (typeof cambiarPantallaVR === 'function') {
         cambiarPantallaVR('screen-technique-list');
       } else if (typeof showScreen === 'function') {
         showScreen('techniques');
       }
 
-      // 3. 🛠️ VOLVEMOS A CONSTRUIR LOS 14 BOTONES Y RE-ASIGNAR SUS CLICKS
+      // 🔓 3. ¡EL TRUCO MAESTRO! Despertamos todos los sub-botones de técnicas
+      // Esto evita que el validador estricto de 'handler-botones-vr' los rechace
+      var subBotones = document.querySelectorAll('#screen-technique-list .sub-tecnica, #screen-technique-list a-plane');
+      subBotones.forEach(function(boton) {
+        boton.setAttribute('visible', 'true');
+        boton.setAttribute('scale', '1 1 1');
+        // Nos aseguramos de que mantengan su clase interactiva por si se borró
+        if (!boton.classList.contains('clickable')) {
+          boton.classList.add('clickable');
+        }
+      });
+
+      // 🧹 4. Forzamos el reinicio en tu gestor de estado si existe
+      if (typeof appState !== 'undefined') {
+        appState.currentQuestionIndex = 0;
+        appState.selectedTechnique = null;
+      }
+
+      // 🛠️ 5. Ejecutamos tu renderizador para re-vincular datos limpios
       if (typeof go14button === 'function') {
-        console.log("🛠️ Re-inicializando los 14 botones...");
         go14button(); 
+      }
+      
+      // Si tu backend maneja una función de reactivar componentes en techniques.js, la llamamos:
+      if (typeof reactivateTechniqueButtons === 'function') {
+        reactivateTechniqueButtons();
       }
     }
   });
