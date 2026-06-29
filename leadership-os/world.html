@@ -1450,77 +1450,67 @@ function goHistory() {
 
 
 
-// Asegúrate de que esta definición esté expuesta globalmente en tu bloque de scripts:
+// Reemplaza el bloque de la línea 1455 por esto:
 window.goHistory = function() {
-  console.log("📊 Ejecutando goHistory de forma global...");
+  console.log("🗣️ Mostrando panel de historial en el espacio VR...");
+  
+  // 1. Cambiar de pantalla visualmente en el entorno 3D
+  if (typeof cambiarPantallaVR === 'function') {
+    cambiarPantallaVR('screen-history');
+  } else {
+    console.error("❌ No se encontró la función cambiarPantallaVR");
+  }
 
-  // 1. Intentar obtener sesiones o crear mock data
+  // 2. Intentar obtener las sesiones del localStorage
   let localSessions = localStorage.getItem('interventions_sessions');
   let sessions = [];
 
   if (localSessions) {
     sessions = JSON.parse(localSessions);
   } else {
+    // SINO HAY SESIONES: Mock data limpia
     sessions = [
       {
         date: new Date().toISOString(),
-        intervention: "performance_review",
+        intervention: "performance_review", 
         technique: "active_listening",
         level: "mid",
         archetype: "ajolin",
         mood_final: 75,
-        eval_summary: "Excelente manejo de la objeción del colaborador. Se mantuvo la empatía en todo momento durante la simulación."
+        eval_summary: "Excelente manejo de la objecion del colaborador. Se mantuvo la empatia en todo momento."
       }
     ];
     localStorage.setItem('interventions_sessions', JSON.stringify(sessions));
   }
 
-  // 2. Buscar el contenedor. 
-  // Si en world.html no tienes un contenedor clásico, podemos crear uno flotante temporal 
-  // para verificar en consola que tu código funciona perfecto antes de pasarlo a los planos 3D de VR.
-  let container = document.getElementById('history-content');
-  
-  if (!container) {
-    console.warn("⚠️ No se encontró '#history-content'. Creando un contenedor flotante de pruebas...");
-    container = document.createElement('div');
-    container.id = 'history-content';
-    container.style.position = 'fixed';
-    container.style.top = '10px';
-    container.style.right = '10px';
-    container.style.width = '320px';
-    container.style.maxHeight = '80vh';
-    container.style.overflowY = 'auto';
-    container.style.background = 'rgba(10, 15, 45, 0.95)';
-    container.style.border = '2px solid #2a3a7a';
-    container.style.borderRadius = '12px';
-    container.style.padding = '15px';
-    container.style.zIndex = '9999';
-    container.style.color = '#fff';
-    container.style.fontFamily = 'sans-serif';
-    document.body.appendChild(container);
+  // 3. Renderizar el contenido directamente en el componente de texto 3D de A-Frame
+  const vrTextComponent = document.getElementById('history-content-text');
+  if (!vrTextComponent) {
+    console.error("⚠️ No se encontró la entidad de texto #history-content-text en la escena VR.");
+    return;
   }
 
-  // 3. Renderizar el HTML
-  container.innerHTML = `<h3 style="margin-top:0;font-size:14px;color:#00e5c0;">Historial Local</h3>` + 
-  sessions.map(s => {
+  if (sessions.length === 0) {
+    vrTextComponent.setAttribute('value', 'No tienes sesiones registradas aun.');
+    return;
+  }
+
+  // Mapeamos los datos con saltos de línea (\n) legibles en VR
+  const textVR = sessions.map(s => {
     const d = new Date(s.date || Date.now());
     const date = isNaN(d.getTime()) ? '—' : `${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
     const context = s.intervention || s.technique || '—';
-    const levelColor = s.level === 'adv' ? '#ff5b7f' : s.level === 'mid' ? '#ffb900' : '#00e5c0';
-    const moodColor = (s.mood_final || 0) < 50 ? '#ff5b7f' : '#00e5c0';
+    const level = (s.level || '—').toUpperCase();
+    const agentName = s.archetype || '—';
+    const mood = s.mood_final || 0;
+    
+    const summary = s.eval_summary ? `\n"${s.eval_summary.substring(0, 55)}..."` : '';
 
-    return `
-      <div style="border-bottom:1px solid rgba(255,255,255,0.1); padding:8px 0; font-size:12px;">
-        <div style="color:#8a9bc4; font-size:10px;">${date}</div>
-        <div style="font-weight:bold; margin:2px 0;">${context}</div>
-        <div style="font-size:11px;">
-          <span style="color:${levelColor}">${s.level}</span> · 
-          <span>Mood: <b style="color:${moodColor}">${s.mood_final}%</b></span>
-        </div>
-        <p style="margin:4px 0; color:#c8d8ff; font-style:italic;">"${s.eval_summary}"</p>
-      </div>
-    `;
-  }).join('');
+    return `* ${date} | ${context}\n  Nivel: ${level} | Agente: ${agentName} | Mood: ${mood}%\n  ${summary}`;
+  }).join('\n\n');
+
+  // Inyectamos el texto final en la entidad VR
+  vrTextComponent.setAttribute('value', textVR);
 };
 
 
