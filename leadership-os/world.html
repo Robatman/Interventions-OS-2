@@ -1365,86 +1365,120 @@ async function handleVRSpeech(text) {
   }
 }
 
-function showHistoryVR() {
-  console.log("📊 Renderizando historial en el entorno VR...");
+
+function guardarSesionDePrueba() {
+  let sessions = JSON.parse(localStorage.getItem('interventions_sessions') || '[]');
   
-  // 1. Intentamos obtener las sesiones guardadas (igual que hace tu ui.js)
+  // Añadimos una nueva sesión simulada
+  sessions.unshift({
+    date: new Date().toISOString(),
+    intervention: "Simulación de Retención",
+    technique: "Manejo de Objeciones",
+    level: "novice",
+    archetype: "ajolin",
+    mood_final: 88,
+    eval_summary: "¡Nueva sesión completada con éxito!"
+  });
+  
+  localStorage.setItem('interventions_sessions', JSON.stringify(sessions));
+}
+
+
+function goHistory() {
+  // 1. Cambiar de pantalla visualmente en el HTML normal
+  // Ocultamos la pantalla actual (ej. welcome) y mostramos la de historial
+  const welcomeScreen = document.getElementById('s-welcome');
+  const historyScreen = document.getElementById('s-history');
+  
+  if (welcomeScreen) welcomeScreen.style.display = 'none';
+  if (historyScreen) historyScreen.style.display = 'block';
+
+  // 2. Intentar obtener las sesiones del localStorage
+  let localSessions = localStorage.getItem('interventions_sessions');
   let sessions = [];
-  try {
-    sessions = JSON.parse(localStorage.getItem('ldr_sessions') || '[]');
-  } catch(e) {
-    console.error("Error leyendo ldr_sessions", e);
+
+  if (localSessions) {
+    sessions = JSON.parse(localSessions);
+  } else {
+    // SINO HAY SESIONES: Creamos unas de prueba para que no salga vacío
+    // con la estructura exacta que pide preview.js
+    sessions = [
+      {
+        date: new Date().toISOString(),
+        intervention: "performance_review", // O el ID que use tu sistema
+        technique: "active_listening",
+        level: "mid",
+        archetype: "ajolin",
+        mood_final: 75,
+        eval_summary: "Excelente manejo de la objeción del colaborador. Se mantuvo la empatía en todo momento durante la simulación."
+      },
+      {
+        date: new Date(Date.now() - 86400000).toISOString(), // Ayer
+        intervention: "disengagement",
+        technique: "growth_mindset",
+        level: "adv",
+        archetype: "juanjolote",
+        mood_final: 42,
+        eval_summary: "Faltó profundizar en los motivos de la baja motivación del agente, se recomienda usar preguntas abiertas."
+      }
+    ];
+    // Guardamos en localStorage para futuras cargas
+    localStorage.setItem('interventions_sessions', JSON.stringify(sessions));
   }
 
-  // 2. Buscamos el contenedor donde irán los textos en tu plano 3D
-  // Nota: Asegúrate de tener un <a-entity id="history-list-container"> dentro de tu <a-plane id="screen-history">
-  const container = document.getElementById('history-list-container');
+  // 3. Renderizar el contenido usando la lógica exacta de tu preview.js
+  const container = document.getElementById('history-content');
   if (!container) return;
 
-  // Limpiamos contenido VR anterior
-  container.innerHTML = '';
-
   if (sessions.length === 0) {
-    // Si no hay sesiones, creamos un texto 3D indicándolo
-    const noSessionsText = document.createElement('a-text');
-    noSessionsText.setAttribute('value', 'No hay sesiones registradas aun. \x21Empieza a practicar!');
-    noSessionsText.setAttribute('align', 'center');
-    noSessionsText.setAttribute('color', '#c8d8ff');
-    noSessionsText.setAttribute('width', '3');
-    noSessionsText.setAttribute('position', '0 0 0');
-    container.appendChild(noSessionsText);
+    container.innerHTML = `<div style="text-align:center;color:var(--text3);font-size:12px;padding:24px 0;">No sessions recorded yet.</div>`;
     return;
   }
 
-//   function goHistory() {
-//   console.log("dio click al goHistory (My Progress)");
-  
-//   appState.agentHistory = [];
-//   appState.currentMode = 'history';
-//   appState.screen = 'history';
-
-//   // 🚀 Renderizamos las tarjetas tridimensionales antes de mostrar la pantalla
-//   showHistoryVR(); 
-
-//   // Cambiamos el plano visual de A-Frame
-//   cambiarPantallaVR('screen-history');
-  
-//   // Feedback con Juanjolote
-//   setJuanMood('happy');
-//   var textoHistorial = 'Aqui tienes el registro de tus sesiones pasadas y tu progreso actual.';
-//   setDialog('JUANJOLOTE', textoHistorial);
-  
-//   if (typeof speakVR === 'function') {
-//     speakVR(textoHistorial, 'daniel');
-//   }
-// }
-
-  // 3. Iteramos las últimas 3 o 4 sesiones para que quepan en el plano VR
-  sessions.slice(-4).reverse().forEach((session, index) => {
-    const yOffset = 0.4 - (index * 0.25); // Separación vertical en el espacio 3D
-
-    const entitySesion = document.createElement('a-entity');
-    entitySesion.setAttribute('position', `0 ${yOffset} 0`);
-
-    // Formateamos el texto de la tarjeta (Fecha - Técnica - Resultado)
-    const fecha = session.date ? session.date.substring(0,10) : 'Reciente';
-    const tecnica = session.technique || 'General';
-    const nivel = session.level || 'Novice';
-    const moodFinal = session.finalMood !== undefined ? `${session.finalMood}%` : 'N/A';
-
-    const textoLinea = `${fecha} | ${tecnica.toUpperCase()} (${nivel})\nOpenness Final: ${moodFinal}`;
-
-    entitySesion.setAttribute('text', {
-      value: textoLinea,
-      align: 'left',
-      color: '#00e5c0', // Color teal de tu paleta
-      width: 2.8,
-      font: 'monospace'
-    });
-
-    container.appendChild(entitySesion);
-  });
+  // Mapeamos y generamos el HTML dinámico idéntico a preview.js
+  container.innerHTML = sessions.map(s => {
+    // Formatear la fecha
+    const d = new Date(s.date || Date.now());
+    const date = isNaN(d.getTime()) ? '—' : `${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+    
+    // Mapear el contexto (Intervención o Técnica)
+    // Si tienes diccionarios como INTERVENTIONS o TECHNIQUES los puedes usar, sino dejamos el texto plano
+    const context = s.intervention ? (s.intervention) : (s.technique || '—');
+    
+    // Colores de nivel
+    const levelColors = { novice: 'var(--teal)', mid: 'var(--amber)', adv: 'var(--coral)' };
+    const levelColor = levelColors[s.level] || 'var(--text3)';
+    
+    // Color del Mood (Emoción final)
+    const moodColor = (s.mood_final || 0) < 35 ? 'var(--coral)' : (s.mood_final || 0) < 60 ? 'var(--amber)' : 'var(--teal)';
+    
+    // Nombre del agente/arquetipo
+    const agentName = s.archetype ? s.archetype : '—';
+    
+    // Renderizado del renglón (Misma estructura CSS que tu preview.js)
+    return `
+      <div class="history-row" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding: 10px 0;">
+        <div class="history-date" style="font-size:10px; color:var(--text3);">${date}</div>
+        <div class="history-main">
+          <div class="history-context" style="font-size:13px; font-weight:600; color:var(--text1);">${context}</div>
+          <div class="history-meta" style="margin: 4px 0;">
+            <span style="color:${levelColor};font-size:10px;font-weight:600;text-transform:uppercase;">${s.level || '—'}</span>
+            <span style="color:var(--text3);font-size:10px;margin:0 4px;">·</span>
+            <span style="font-size:10px;color:var(--text3);">Agente: ${agentName}</span>
+            <span style="color:var(--text3);font-size:10px;margin:0 4px;">·</span>
+            <span style="font-size:10px;color:${moodColor};">Mood: ${s.mood_final}%</span>
+          </div>
+          ${s.eval_summary ? `
+            <div class="history-insight" style="font-size:11px; color:var(--text2); font-style:italic; background:rgba(255,255,255,0.02); padding:6px; border-radius:4px; margin-top:4px;">
+              "${s.eval_summary.substring(0, 80)}${s.eval_summary.length > 80 ? '...' : ''}"
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
 }
+
 
 async function goEval(){
   showScreen('eval');
