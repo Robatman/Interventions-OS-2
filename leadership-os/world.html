@@ -146,7 +146,15 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'work-together-intervention': goWork(); break;
     
     
-    case 'progress': console.log("📊 Abriendo historial de progreso..."); goHistory(); break;
+    case 'progress': 
+      console.log("📊 Abriendo historial de progreso..."); 
+      goHistory(); 
+      break;
+
+    case 'close-history':
+      console.log("🔄 Regresando a la pantalla de bienvenida...");
+      cambiarPantallaVR('screen-welcome');
+      break;
     
     
     // 🚨 El default SIEMPRE debe ir al último
@@ -988,20 +996,31 @@ function funcionIntervTenureRenewal() {
 
 
 
-<a-plane id="screen-history" position="0 1.6 -2" rotation="0 0 0" width="3.2" height="2" color="#0b0e26" material="opacity: 0.95; transparent: true; shader: flat; side: double" visible="false" scale="0 0 0">
-  
-  <a-text value="YOUR PROGRESS" align="center" color="#ffffff" width="4.5" position="0 0.8 0.01" bold="true"></a-text>
-  <a-text value="Sessions synced across devices." align="center" color="#c8d8ff" width="2.5" position="0 0.67 0.01"></a-text>
-  
-  <a-entity id="history-list-container" position="0 0.1 0.01"></a-entity>
+<a-entity id="screen-history" visible="false" scale="0 0 0" position="0 1.4 -2.5">
+  <a-plane width="2.5" height="1.6" color="#0b1230" material="opacity: 0.95; shader: flat; side: double">
+    <a-plane width="2.54" height="1.64" color="#4466ff" material="opacity: 0.4; shader: flat; side: double" position="0 0 -0.005"></a-plane>
+    
+    <a-text value="HISTORIAL DE PROGRESO" align="center" color="#4466ff" width="5.5" position="0 0.6 0.02" font="mozillavr"></a-text>
+    
+    <a-text id="history-content-text" 
+            value="Cargando tus ultimas interacciones...\n\n- Sesion de Retencion: 85%\n- Escucha Activa: Completado\n- Ultimo intento: Hoy 11:20 AM" 
+            align="center" color="#c8d8ff" width="3.8" position="0 0 0.02" font="mozillavr">
+    </a-text>
 
-  <a-plane id="btn-history-back" class="clickable" position="0 -0.75 0.02" width="1" height="0.22" color="#1a2a6a" material="shader: flat"
-           onclick="goWelcome()"
-           animation__mouseenter="property: material.color; from: #1a2a6a; to: #2a3a7a; dur: 150; startEvents: mouseenter"
-           animation__mouseleave="property: material.color; from: #2a3a7a; to: #1a2a6a; dur: 150; startEvents: mouseleave">
-    <a-text value="<- Back" align="center" color="#ffffff" width="2.8" position="0 0 0.01"></a-text>
+    <a-entity id="btn-close-history" position="0 -0.55 0.02">
+      <a-plane class="clickable" 
+               handler-botones-vr="mensaje: Cerrando historial; tecnica: close-history"
+               width="0.8" height="0.22" 
+               color="#1a0a30" 
+               material="opacity: 0.9; shader: flat; side: double"
+               animation__hover="property: scale; to: 1.05 1.05 1; startEvents: mouseenter; dur: 150"
+               animation__unhover="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 150">
+        <a-plane width="0.82" height="0.24" color="#ff5ca0" material="opacity: 0.4" position="0 0 -0.002"></a-plane>
+        <a-text value="CERRAR" color="#ff5ca0" align="center" width="3" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
   </a-plane>
-</a-plane>
+</a-entity>
 
 
 
@@ -1361,17 +1380,12 @@ function guardarSesionDePrueba() {
   localStorage.setItem('interventions_sessions', JSON.stringify(sessions));
 }
 
-
 function goHistory() {
-  // 1. Cambiar de pantalla visualmente en el HTML normal
-  // Ocultamos la pantalla actual (ej. welcome) y mostramos la de historial
-  const welcomeScreen = document.getElementById('s-welcome');
-  const historyScreen = document.getElementById('s-history');
-  
-  if (welcomeScreen) welcomeScreen.style.display = 'none';
-  if (historyScreen) historyScreen.style.display = 'block';
+  // 1. CAMBIO PARA VR: En lugar de manipular el estilo display del HTML plano,
+  // usamos tu función maestra tridimensional para activar la pantalla en el entorno virtual.
+  cambiarPantallaVR('screen-history');
 
-  // 2. Intentar obtener las sesiones del localStorage
+  // 2. Obtener las sesiones del localStorage (Mantenemos intacta tu lógica perfecta de datos)
   let localSessions = localStorage.getItem('interventions_sessions');
   let sessions = [];
 
@@ -1379,16 +1393,15 @@ function goHistory() {
     sessions = JSON.parse(localSessions);
   } else {
     // SINO HAY SESIONES: Creamos unas de prueba para que no salga vacío
-    // con la estructura exacta que pide preview.js
     sessions = [
       {
         date: new Date().toISOString(),
-        intervention: "performance_review", // O el ID que use tu sistema
+        intervention: "performance_review", 
         technique: "active_listening",
         level: "mid",
         archetype: "ajolin",
         mood_final: 75,
-        eval_summary: "Excelente manejo de la objeción del colaborador. Se mantuvo la empatía en todo momento durante la simulación."
+        eval_summary: "Excelente manejo de la objecion del colaborador. Se mantuvo la empatia en todo momento."
       },
       {
         date: new Date(Date.now() - 86400000).toISOString(), // Ayer
@@ -1397,66 +1410,42 @@ function goHistory() {
         level: "adv",
         archetype: "juanjolote",
         mood_final: 42,
-        eval_summary: "Faltó profundizar en los motivos de la baja motivación del agente, se recomienda usar preguntas abiertas."
+        eval_summary: "Falto profundizar en los motivos de la baja motivacion del agente, usar preguntas abiertas."
       }
     ];
-    // Guardamos en localStorage para futuras cargas
     localStorage.setItem('interventions_sessions', JSON.stringify(sessions));
   }
 
-  // 3. Renderizar el contenido usando la lógica exacta de tu preview.js
-  const container = document.getElementById('history-content');
-  if (!container) return;
+  // 3. ADAPTACIÓN VR: En vez de generar un contenedor HTML plano lleno de <div>,
+  // procesamos los strings limpios para meterlos dentro del atributo "value" de <a-text>
+  const vrTextComponent = document.getElementById('history-content-text');
+  if (!vrTextComponent) return;
 
   if (sessions.length === 0) {
-    container.innerHTML = `<div style="text-align:center;color:var(--text3);font-size:12px;padding:24px 0;">No sessions recorded yet.</div>`;
+    // Usamos setAttribute para cambiar el texto en el entorno 3D
+    vrTextComponent.setAttribute('value', 'No tienes sesiones registradas aun.');
     return;
   }
 
-  // Mapeamos y generamos el HTML dinámico idéntico a preview.js
-  container.innerHTML = sessions.map(s => {
-    // Formatear la fecha
+  // Mapeamos los datos simulando saltos de línea (\n) legibles en el espacio virtual
+  const textVR = sessions.map(s => {
     const d = new Date(s.date || Date.now());
     const date = isNaN(d.getTime()) ? '—' : `${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
-    
-    // Mapear el contexto (Intervención o Técnica)
-    // Si tienes diccionarios como INTERVENTIONS o TECHNIQUES los puedes usar, sino dejamos el texto plano
-    const context = s.intervention ? (s.intervention) : (s.technique || '—');
-    
-    // Colores de nivel
-    const levelColors = { novice: 'var(--teal)', mid: 'var(--amber)', adv: 'var(--coral)' };
-    const levelColor = levelColors[s.level] || 'var(--text3)';
-    
-    // Color del Mood (Emoción final)
-    const moodColor = (s.mood_final || 0) < 35 ? 'var(--coral)' : (s.mood_final || 0) < 60 ? 'var(--amber)' : 'var(--teal)';
-    
-    // Nombre del agente/arquetipo
+    const context = s.intervention ? s.intervention : (s.technique || '—');
+    const level = (s.level || '—').toUpperCase();
     const agentName = s.archetype ? s.archetype : '—';
+    const mood = s.mood_final || 0;
     
-    // Renderizado del renglón (Misma estructura CSS que tu preview.js)
-    return `
-      <div class="history-row" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding: 10px 0;">
-        <div class="history-date" style="font-size:10px; color:var(--text3);">${date}</div>
-        <div class="history-main">
-          <div class="history-context" style="font-size:13px; font-weight:600; color:var(--text1);">${context}</div>
-          <div class="history-meta" style="margin: 4px 0;">
-            <span style="color:${levelColor};font-size:10px;font-weight:600;text-transform:uppercase;">${s.level || '—'}</span>
-            <span style="color:var(--text3);font-size:10px;margin:0 4px;">·</span>
-            <span style="font-size:10px;color:var(--text3);">Agente: ${agentName}</span>
-            <span style="color:var(--text3);font-size:10px;margin:0 4px;">·</span>
-            <span style="font-size:10px;color:${moodColor};">Mood: ${s.mood_final}%</span>
-          </div>
-          ${s.eval_summary ? `
-            <div class="history-insight" style="font-size:11px; color:var(--text2); font-style:italic; background:rgba(255,255,255,0.02); padding:6px; border-radius:4px; margin-top:4px;">
-              "${s.eval_summary.substring(0, 80)}${s.eval_summary.length > 80 ? '...' : ''}"
-            </div>
-          ` : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
-}
+    // Simplificamos o recortamos el resumen para que quepa bien en el panel virtual
+    const summary = s.eval_summary ? `\n"${s.eval_summary.substring(0, 55)}..."` : '';
 
+    // Retornamos un renglón de texto plano formateado con saltos de línea (\n)
+    return `• ${date} | ${context}\n  Nivel: ${level} | Agente: ${agentName} | Mood: ${mood}%\n  ${summary}`;
+  }).join('\n\n'); // Separación doble entre renglones de historial
+
+  // ¡Inyectamos la cadena de texto final directamente en tu entidad VR!
+  vrTextComponent.setAttribute('value', textVR);
+}
 
 
 // Asegúrate de que esta definición esté expuesta globalmente en tu bloque de scripts:
