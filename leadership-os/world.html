@@ -1380,19 +1380,21 @@ function guardarSesionDePrueba() {
   localStorage.setItem('interventions_sessions', JSON.stringify(sessions));
 }
 
+// Asegúrate de reemplazar la función goHistory vieja por esta versión adaptada a VR:
 function goHistory() {
-  // 1. CAMBIO PARA VR: En lugar de manipular el estilo display del HTML plano,
-  // usamos tu función maestra tridimensional para activar la pantalla en el entorno virtual.
+  console.log("🗣️ Mostrando panel de historial en el espacio VR...");
+  
+  // 1. Cambiar de pantalla visualmente en el entorno 3D
   cambiarPantallaVR('screen-history');
 
-  // 2. Obtener las sesiones del localStorage (Mantenemos intacta tu lógica perfecta de datos)
+  // 2. Intentar obtener las sesiones del localStorage
   let localSessions = localStorage.getItem('interventions_sessions');
   let sessions = [];
 
   if (localSessions) {
     sessions = JSON.parse(localSessions);
   } else {
-    // SINO HAY SESIONES: Creamos unas de prueba para que no salga vacío
+    // SINO HAY SESIONES: Creamos unas de prueba con estructura limpia para VR
     sessions = [
       {
         date: new Date().toISOString(),
@@ -1404,7 +1406,7 @@ function goHistory() {
         eval_summary: "Excelente manejo de la objecion del colaborador. Se mantuvo la empatia en todo momento."
       },
       {
-        date: new Date(Date.now() - 86400000).toISOString(), // Ayer
+        date: new Date(Date.now() - 86400000).toISOString(), 
         intervention: "disengagement",
         technique: "growth_mindset",
         level: "adv",
@@ -1416,18 +1418,19 @@ function goHistory() {
     localStorage.setItem('interventions_sessions', JSON.stringify(sessions));
   }
 
-  // 3. ADAPTACIÓN VR: En vez de generar un contenedor HTML plano lleno de <div>,
-  // procesamos los strings limpios para meterlos dentro del atributo "value" de <a-text>
+  // 3. Renderizar el contenido directamente en el componente de texto 3D de A-Frame
   const vrTextComponent = document.getElementById('history-content-text');
-  if (!vrTextComponent) return;
+  if (!vrTextComponent) {
+    console.error("⚠️ No se encontró la entidad de texto #history-content-text en la escena VR.");
+    return;
+  }
 
   if (sessions.length === 0) {
-    // Usamos setAttribute para cambiar el texto en el entorno 3D
     vrTextComponent.setAttribute('value', 'No tienes sesiones registradas aun.');
     return;
   }
 
-  // Mapeamos los datos simulando saltos de línea (\n) legibles en el espacio virtual
+  // Mapeamos los datos simulando saltos de línea (\n) legibles en las gafas VR
   const textVR = sessions.map(s => {
     const d = new Date(s.date || Date.now());
     const date = isNaN(d.getTime()) ? '—' : `${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
@@ -1436,16 +1439,15 @@ function goHistory() {
     const agentName = s.archetype ? s.archetype : '—';
     const mood = s.mood_final || 0;
     
-    // Simplificamos o recortamos el resumen para que quepa bien en el panel virtual
     const summary = s.eval_summary ? `\n"${s.eval_summary.substring(0, 55)}..."` : '';
 
-    // Retornamos un renglón de texto plano formateado con saltos de línea (\n)
-    return `• ${date} | ${context}\n  Nivel: ${level} | Agente: ${agentName} | Mood: ${mood}%\n  ${summary}`;
-  }).join('\n\n'); // Separación doble entre renglones de historial
+    return `* ${date} | ${context}\n  Nivel: ${level} | Agente: ${agentName} | Mood: ${mood}%\n  ${summary}`;
+  }).join('\n\n');
 
-  // ¡Inyectamos la cadena de texto final directamente en tu entidad VR!
+  // Inyectamos el texto final en la entidad VR
   vrTextComponent.setAttribute('value', textVR);
 }
+
 
 
 // Asegúrate de que esta definición esté expuesta globalmente en tu bloque de scripts:
