@@ -140,7 +140,8 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interv-fidelizacion': funcionIntervFidelizacion(); break;
     case 'interv-soporte-critico': funcionIntervSoporteCritico(); break;
     case 'interv-reclamaciones': funcionIntervReclamaciones(); break;
-    
+    case 'interv-tenure-renewal': funcionIntervTenureRenewal(); break;
+
     case 'practice-intervention': goPractice(); break;
     case 'learn-intervention': goLearn(); break;
     case 'work-together-intervention': goWork(); break;
@@ -207,6 +208,12 @@ function funcionIntervSoporteCritico() {
 function funcionIntervReclamaciones() {
   console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
   console.log("Este es 5...");
+  showScreen('learn-work-practice'); // 👈 Cambiado aquí
+}
+
+function funcionIntervTenureRenewal() {
+  console.log("🤬 [Intervención] Cargando simulación:  Tenure Renewal...");
+  console.log("Este es 6...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 </script>
