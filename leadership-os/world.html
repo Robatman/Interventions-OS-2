@@ -145,6 +145,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'learn-intervention': goLearn(); break;
     case 'work-together-intervention': goWork(); break;
     
+    case 'practice-again': showScreen('screen-welcome'); break;
     
     case 'progress': 
       console.log("📊 Abriendo historial de progreso..."); 
@@ -1964,21 +1965,6 @@ if(btnTechBack)
   // var btnNew=document.getElementById('btn-new-session');if(btnNew)btnNew.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
   
   
-  // 1. Botón Practicar de nuevo (Debe mandar a los 14 botones de Técnicas)
-var btnAgain = document.getElementById('btn-practice-again');
-if (btnAgain) {
-  btnAgain.addEventListener('click', function(e) {
-    e.stopPropagation();
-    
-    // 🌟 ENCIENDE LA PANTALLA DE TÉCNICAS:
-    if (typeof cambiarPantallaVR === 'function') {
-      cambiarPantallaVR('screen-technique-list');
-    }
-    
-    // Ejecuta tu lógica original (vuelve a listar o resetear estados)
-    if (typeof go14button === 'function') go14button(); 
-  });
-}
 
 // 2. Botón Nueva Sesión / Volver al Inicio (Debe mandar al menú de bienvenida principal)
 var btnNewSession = document.getElementById('btn-new-session'); // Asegúrate de que el ID coincida con tu HTML
@@ -2000,21 +1986,6 @@ if (btnNewSession) {
     if (typeof goWelcome === 'function') goWelcome();
   });
 }
-// // 1. Botón Practicar de nuevo (Debe mandar a los 14 botones de Técnicas)
-// var btnAgain = document.getElementById('btn-practice-again');
-// if (btnAgain) {
-//   btnAgain.addEventListener('click', function(e) {
-//     e.stopPropagation();
-    
-//     // 🌟 ENCIENDE LA PANTALLA DE TÉCNICAS:
-//     if (typeof cambiarPantallaVR === 'function') {
-//       cambiarPantallaVR('screen-technique-list');
-//     }
-    
-//     // Ejecuta tu lógica original (vuelve a listar o resetear estados)
-//     if (typeof go14button === 'function') go14button(); 
-//   });
-// }
 
 // 2. Botón Nueva Sesión / Volver al Inicio (Debe mandar al menú de bienvenida principal)
 var btnNewSession = document.getElementById('btn-new-session'); // Asegúrate de que el ID coincida con tu HTML
