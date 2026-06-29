@@ -105,29 +105,6 @@ function cambiarPantallaVR(pantallaMostrarId) {
   }
 }
 
-function goHistory() {
-  console.log("dio click al goHistory (My Progress)");
-  
-  appState.agentHistory = [];
-  appState.currentMode = 'history';
-  appState.screen = 'history';
-
-  // 🚀 Renderizamos las tarjetas tridimensionales antes de mostrar la pantalla
-  showHistoryVR(); 
-
-  // Cambiamos el plano visual de A-Frame
-  cambiarPantallaVR('screen-history');
-  
-  // Feedback con Juanjolote
-  setJuanMood('happy');
-  var textoHistorial = 'Aqui tienes el registro de tus sesiones pasadas y tu progreso actual.';
-  setDialog('JUANJOLOTE', textoHistorial);
-  
-  if (typeof speakVR === 'function') {
-    speakVR(textoHistorial, 'daniel');
-  }
-}
-
 function ejecutarFuncionPorTecnica(tecnica) {
   console.log("⚡ Buscando técnica:", tecnica);
 
