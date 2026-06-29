@@ -1997,15 +1997,29 @@ if (btnAgain) {
       } else if (typeof showScreen === 'function') {
         showScreen('interventions');
       }
-    } else {
+} else {
       console.log("🔄 Regresando a los 14 botones de Técnicas...");
       
+      // 1. 🧹 Forzamos el reinicio de las variables globales de la actividad de técnicas
+      if (typeof appState !== 'undefined') {
+        appState.currentQuestionIndex = 0; // Reinicia al principio si manejas un índice de preguntas
+        appState.selectedTechnique = null; // Limpia la técnica seleccionada anteriormente
+      }
+      
+      // Puedes llamar aquí a tu función de limpiar si tienes una (ej: reiniciarAtributos();)
+
+      // 2. 📺 Cambiamos a la pantalla de las técnicas
       if (typeof cambiarPantallaVR === 'function') {
         cambiarPantallaVR('screen-technique-list');
       } else if (typeof showScreen === 'function') {
         showScreen('techniques');
       }
-      if (typeof go14button === 'function') go14button();
+
+      // 3. 🛠️ VOLVEMOS A CONSTRUIR LOS 14 BOTONES Y RE-ASIGNAR SUS CLICKS
+      if (typeof go14button === 'function') {
+        console.log("🛠️ Re-inicializando los 14 botones...");
+        go14button(); 
+      }
     }
   });
 }
