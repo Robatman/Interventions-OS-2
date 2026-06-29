@@ -1964,19 +1964,26 @@ if(btnTechBack)
   // var btnNew=document.getElementById('btn-new-session');if(btnNew)btnNew.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
   
   
-  // 1. Botón Practicar de nuevo (Debe mandar a los 14 botones de Técnicas)
 var btnAgain = document.getElementById('btn-practice-again');
 if (btnAgain) {
   btnAgain.addEventListener('click', function(e) {
     e.stopPropagation();
-    
-    // 🌟 ENCIENDE LA PANTALLA DE TÉCNICAS:
-    if (typeof cambiarPantallaVR === 'function') {
-      cambiarPantallaVR('screen-technique-list');
+
+    // 🧠 Validamos inteligentemente el menú activo original
+    if (typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
+      // Si venía de Intervenciones, lo mandamos a los 4 botones
+      if (typeof cambiarPantallaVR === 'function') {
+        cambiarPantallaVR('screen-interventions');
+      }
+    } else {
+      // Por defecto (o si venía de técnicas), lo mandamos a los 14 botones
+      if (typeof cambiarPantallaVR === 'function') {
+        cambiarPantallaVR('screen-technique-list');
+      }
+      if (typeof go14button === 'function') go14button();
     }
-    
-    // Ejecuta tu lógica original (vuelve a listar o resetear estados)
-    if (typeof go14button === 'function') go14button(); 
+
+    // Aquí puedes meter cualquier lógica extra de reinicio si existe (ej. reiniciarAtributos())
   });
 }
 
