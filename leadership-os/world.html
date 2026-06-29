@@ -1045,6 +1045,14 @@ function pickRandomArchetype(){
 let mostrandoMoves = false;
 
 function toggleListeningMoves() {
+  // 🛑 CANDADO DE SEGURIDAD PARA LA BIENVENIDA:
+  const welcomeScreen = document.getElementById('screen-welcome');
+  if (welcomeScreen && welcomeScreen.getAttribute('visible') === 'true') {
+    console.log("🚫 Click bloqueado: No puedes usar este botón mientras estés en la pantalla de bienvenida.");
+    return; // Detiene la función por completo y no hace nada de lo de abajo
+  }
+
+  // --- Tu código de abajo se queda exactamente igual ---
   const sessionContent = document.getElementById('listening-session-content');
   const movesContainer = document.getElementById('moves-container');
   const btnText = document.getElementById('text-btn-toggle-listening');
@@ -1072,7 +1080,6 @@ function toggleListeningMoves() {
     showScreen('learn-work-practice');
   }
 }
-
 
 
 function pickRandomScenario(archetype,level){
@@ -1160,7 +1167,15 @@ function showScreen(name) {
   }
 }
 
-function goWelcome(){showScreen('welcome');appState.agentHistory=[];appState.vrMood=30;}
+function goWelcome(){
+
+  showScreen('welcome');
+  appState.agentHistory=[];
+  appState.vrMood=30;
+  
+}
+
+
 
 function goMode(menuType){
   appState.activeMenu=menuType;
