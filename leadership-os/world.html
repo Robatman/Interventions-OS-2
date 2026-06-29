@@ -1980,9 +1980,17 @@ if (btnAgain) {
   btnAgain.addEventListener('click', function(e) {
     e.stopPropagation();
 
-    // 🧠 Comprobamos el menú que forzamos en el paso anterior
+    // 💥 Ocultamos por completo la pantalla de evaluación para que no se quede encimada
+    var screenEval = document.getElementById('screen-eval');
+    if (screenEval) {
+      screenEval.setAttribute('visible', 'false');
+      // Si usas una clase para manejar los clics en los componentes interactivos:
+      screenEval.classList.remove('clickable'); 
+    }
+
+    // 🧠 Comprobamos el menú activo para redirigir
     if (typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
-      console.log("🔄 El usuario venía de Intervenciones. Regresando a las 4 opciones...");
+      console.log("🔄 Regresando a las 4 opciones de Intervenciones...");
       
       if (typeof cambiarPantallaVR === 'function') {
         cambiarPantallaVR('screen-interventions'); 
@@ -1990,7 +1998,7 @@ if (btnAgain) {
         showScreen('interventions');
       }
     } else {
-      console.log("🔄 El usuario venía de Técnicas. Regresando a los 14 botones...");
+      console.log("🔄 Regresando a los 14 botones de Técnicas...");
       
       if (typeof cambiarPantallaVR === 'function') {
         cambiarPantallaVR('screen-technique-list');
