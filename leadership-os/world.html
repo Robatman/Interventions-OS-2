@@ -997,29 +997,62 @@ function funcionIntervTenureRenewal() {
 
 
 
-<a-entity id="screen-history" visible="false" scale="0 0 0" position="0 1.4 -2.5">
-  <a-plane width="2.5" height="1.6" color="#0b1230" material="opacity: 0.95; shader: flat; side: double">
-    <a-plane width="2.54" height="1.64" color="#4466ff" material="opacity: 0.4; shader: flat; side: double" position="0 0 -0.005"></a-plane>
-    
-    <a-text value="HISTORIAL DE PROGRESO" align="center" color="#4466ff" width="5.5" position="0 0.6 0.02" font="mozillavr"></a-text>
-    
-    <a-text id="history-content-text" 
-            value="Cargando tus ultimas interacciones...\n\n- Sesion de Retencion: 85%\n- Escucha Activa: Completado\n- Ultimo intento: Hoy 11:20 AM" 
-            align="center" color="#c8d8ff" width="3.8" position="0 0 0.02" font="mozillavr">
-    </a-text>
+<!-- SCREEN: HISTORY & LOGS -->
+<a-entity id="screen-history" position="0 1.6 -2" visible="false">
+  <!-- Fondo del contenedor principal (Mantiene el tamaño estándar de tus pantallas) -->
+  <a-plane width="3.4" height="2.4" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
+  
+  <!-- Título de la pantalla -->
+  <a-text value="Session History" align="center" position="0 1.05 0.01" width="4.5" font="exo2bold" color="#fff"></a-text>
 
-    <a-entity id="btn-close-history" position="0 -0.55 0.02">
-      <a-plane class="clickable" 
-               handler-botones-vr="mensaje: Cerrando historial; tecnica: close-history"
-               width="0.8" height="0.22" 
-               color="#1a0a30" 
-               material="opacity: 0.9; shader: flat; side: double"
-               animation__hover="property: scale; to: 1.05 1.05 1; startEvents: mouseenter; dur: 150"
-               animation__unhover="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 150">
-        <a-plane width="0.82" height="0.24" color="#ff5ca0" material="opacity: 0.4" position="0 0 -0.002"></a-plane>
-        <a-text value="CERRAR" color="#ff5ca0" align="center" width="3" position="0 0 0.01" font="mozillavr"></a-text>
-      </a-plane>
+  <!-- ================================================================= -->
+  <!-- COLUMNA IZQUIERDA: REGISTRO DE SESIONES RECIENTES -->
+  <!-- ================================================================= -->
+  <a-entity id="history-left-column" position="-0.75 0.05 0.01">
+    <!-- Panel contenedor izquierdo -->
+    <a-plane width="1.4" height="1.5" color="#0b1230" material="opacity: 0.8; shader: flat"></a-plane>
+    <a-text value="Recent Logs" align="left" position="-0.6 0.63 0.01" width="3" color="#00e5c0" font="exo2bold"></a-text>
+
+    <!-- Lista de Sesiones (Legible, texto grande, saltos de línea controlados) -->
+    <a-entity id="log-item-1" position="0 0.35 0.01">
+      <a-text value="• Session #03 - Active Listening\n  Score: 85% | Duration: 12min" 
+              align="left" position="-0.6 0 0" width="2.4" color="#fff" font="mozillavr" wrap-count="32"></a-text>
     </a-entity>
+
+    <a-entity id="log-item-2" position="0 -0.05 0.01">
+      <a-text value="• Session #02 - Validation Test\n  Score: 70% | Duration: 08min" 
+              align="left" position="-0.6 0 0" width="2.4" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
+    </a-entity>
+
+    <a-entity id="log-item-3" position="0 -0.45 0.01">
+      <a-text value="• Session #01 - Introduction\n  Score: 92% | Duration: 05min" 
+              align="left" position="-0.6 0 0" width="2.4" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
+    </a-entity>
+  </a-entity>
+
+  <!-- ================================================================= -->
+  <!-- COLUMNA DERECHA: ESTADÍSTICAS GLOBALES O DETALLES -->
+  <!-- ================================================================= -->
+  <a-entity id="history-right-column" position="0.75 0.05 0.01">
+    <!-- Panel contenedor derecho con borde destacado -->
+    <a-plane width="1.4" height="1.5" color="#0b1230" material="opacity: 0.9; shader: flat">
+      <a-plane width="1.42" height="1.52" color="#ff5ca0" material="opacity: 0.2; transparent: true; shader: flat" position="0 0 -0.005"></a-plane>
+    </a-plane>
+    
+    <a-text value="Performance Summary" align="left" position="-0.6 0.63 0.01" width="3" color="#ff5ca0" font="exo2bold"></a-text>
+
+    <!-- Texto de descripción general con un wrap-count balanceado para que la tipografía se vea grande -->
+    <a-text value="Overall progress shows stable communication metrics. Great improvement on 'Reflect Back' and 'Summarize' techinques.\n\nKeep practicing to increase validation consistency." 
+            align="left" position="-0.6 -0.05 0.01" width="2.4" color="#fff" font="mozillavr" wrap-count="26"></a-text>
+  </a-entity>
+
+  <!-- ================================================================= -->
+  <!-- BOTÓN DE ACCIÓN (Esquina inferior derecha, alineado con el botón anterior) -->
+  <!-- ================================================================= -->
+  <a-plane id="btn-back-history" class="clickable" 
+           width="1.3" height="0.26" color="#00e5c0" position="0.75 -0.95 0.02"
+           onclick="backToMainMenu()"> <!-- Cambia la función por tu lógica de navegación -->
+    <a-text value="Back to Menu" align="center" color="#0b1230" width="3.0" font="exo2bold"></a-text>
   </a-plane>
 </a-entity>
 
