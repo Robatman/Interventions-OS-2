@@ -72,13 +72,15 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 // 🚀 FUNCIÓN MAESTRA: Apaga colisiones y visibilidad de todas las pantallas
 function cambiarPantallaVR(pantallaMostrarId) {
-  // 🌟 Asegúrate de incluir AQUÍ los IDs exactos de TODAS tus pantallas
+  // 🌟 Agregamos 'screen-learn-work-practice' a la lista oficial de pantallas
   const pantallas = [
     'screen-welcome', 
     'screen-mode', 
-    'screen-interventions-list', // Agregado por si acaso
+    'screen-interventions-list', 
     'screen-technique-list',
-    'interventions'
+    'screen-interventions', // ID corregido de tu HTML
+    'screen-learn-work-practice', // 👈 ¡Listo! Controlada de forma segura
+    'screen-history'
   ];
   
   pantallas.forEach(id => {
@@ -90,7 +92,7 @@ function cambiarPantallaVR(pantallaMostrarId) {
       elPantalla.setAttribute('visible', 'true');
       elPantalla.setAttribute('scale', '1 1 1');
     } else {
-      // Desactivamos por completo todas las demás
+      // Desactivamos por completo todas las demás (escala 0 evita clicks fantasmas)
       elPantalla.setAttribute('visible', 'false');
       elPantalla.setAttribute('scale', '0 0 0');
     }
@@ -1069,40 +1071,65 @@ function pickRandomOpener(archetype,scenario){
   return vals[Math.floor(Math.random()*vals.length)]||'...';
 }
 
-function showScreen(name){
-  [
+function showScreen(name) {
+  console.log("🔄 Solicitando cambiar a la pantalla:", name);
+
+  // Lista oficial de tus pantallas basada en tu estructura actual
+  const pantallas = [
     'welcome',
     'mode',
     'practice',
     'eval',
     'interventions',
     'techniques',
-    'screen-mode',
+    'screen-mode', // Mantener tal cual como lo tenías por compatibilidad
     'learn-work-practice',
     'active-listening-activity'
-  
-  ].forEach(function(s){
-    var el=document.getElementById('screen-'+s);
-    if(el)el.setAttribute('visible',s===name);
+  ];
+
+  pantallas.forEach(function(s) {
+    // Determinamos si el ID ya viene con 'screen-' o si hay que construirlo
+    var idReal = s.startsWith('screen-') ? s : 'screen-' + s;
+    var el = document.getElementById(idReal);
+    
+    if (el) {
+      // Comparamos si es la pantalla actual que queremos mostrar
+      if (s === name || idReal === name) {
+        el.setAttribute('visible', 'true');
+        el.setAttribute('scale', '1 1 1'); // 🟢 Activa colisiones de forma segura en VR
+      } else {
+        el.setAttribute('visible', 'false');
+        el.setAttribute('scale', '0 0 0'); // 🔴 Apaga colisiones para evitar clicks fantasmas
+      }
+    }
   });
-  appState.screen=name;
 
+  // Forzamos al raycaster de A-Frame a recalcular qué objetos son clickeables ahora mismo
+  const raycasterEl = document.querySelector('[raycaster]');
+  if (raycasterEl && raycasterEl.components.raycaster) {
+    raycasterEl.components.raycaster.refreshObjects();
+  }
 
+  // Sincronizamos el estado de la aplicación
+  appState.screen = name;
+
+  // --- CONTROL DE CLASES Y DE INTERACCIÓN DE BOTONES DE TÉCNICAS ---
   var planosTecnicas = document.querySelectorAll('.sub-tecnica');
   
-if (name === 'technique-list') {
+  if (name === 'technique-list') {
     planosTecnicas.forEach(function(el) {
       el.classList.add('clickable');
       console.log("🟢 Botón de técnica ACTIVADO: " + el.id);
     });
     console.log("🟢 14 botones de técnicas específicos ACTIVADOS");
+
   } else if (name === 'interventions') {
     planosTecnicas.forEach(function(el) {
       el.classList.remove('clickable');
     });
     console.log("🔴 14 botones de técnicas específicos DESACTIVADOS por ingresar a Intervenciones");
 
-    const btnTecnicasGeneral = document.getElementById('btn-tecnicas'); // Cambia 'btn-tecnicas' por el ID real de tu botón
+    const btnTecnicasGeneral = document.getElementById('btn-tecnicas'); 
     if (btnTecnicasGeneral) {
       btnTecnicasGeneral.classList.remove('clickable');
       console.log("🔴 Botón general de técnicas DESACTIVADO");
@@ -1115,8 +1142,6 @@ if (name === 'technique-list') {
     console.log("🔴 14 botones de técnicas específicos DESACTIVADOS");
   }
 }
-
-
 
 function goWelcome(){showScreen('welcome');appState.agentHistory=[];appState.vrMood=30;}
 
