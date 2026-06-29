@@ -181,10 +181,21 @@ function ejecutarFuncionPorTecnica(tecnica) {
   function funcionSolutionFocusedCoaching() { console.log("🕊️ Iniciando Solution-Focused Coaching..."); goPractice(); }
   function funcionIntervPulseCheck() { console.log("🔄 Cargando herramienta Pulse Check..."); goPractice(); }
 
-  function funcionShowInterventions(){
-    console.log("🔄 Cambiando a la pantalla de Intervenciones...");
-    showScreen('interventions');  // <- Usa un método diferente llamado showScreen
+function funcionShowInterventions(){
+  console.log("🔄 Cambiando a la pantalla de Intervenciones...");
+  
+  // 🌟 REGISTRAMOS EL MENÚ ACTIVO PARA QUE NO SE OLVIDE
+  if (typeof appState !== 'undefined') {
+    appState.activeMenu = 'interventions';
   }
+  
+  // Usamos el cambiador oficial de pantallas VR
+  if (typeof cambiarPantallaVR === 'function') {
+    cambiarPantallaVR('screen-interventions');
+  } else {
+    showScreen('interventions');
+  }
+}
 
   function funcionShowtechniques(){
     console.log("🔄 Cambiando a la pantalla de Técnicas...");
@@ -1969,21 +1980,25 @@ if (btnAgain) {
   btnAgain.addEventListener('click', function(e) {
     e.stopPropagation();
 
-    // 🧠 Validamos inteligentemente el menú activo original
+    // 🧠 Comprobamos el menú que forzamos en el paso anterior
     if (typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
-      // Si venía de Intervenciones, lo mandamos a los 4 botones
+      console.log("🔄 El usuario venía de Intervenciones. Regresando a las 4 opciones...");
+      
       if (typeof cambiarPantallaVR === 'function') {
-        cambiarPantallaVR('screen-interventions');
+        cambiarPantallaVR('screen-interventions'); 
+      } else if (typeof showScreen === 'function') {
+        showScreen('interventions');
       }
     } else {
-      // Por defecto (o si venía de técnicas), lo mandamos a los 14 botones
+      console.log("🔄 El usuario venía de Técnicas. Regresando a los 14 botones...");
+      
       if (typeof cambiarPantallaVR === 'function') {
         cambiarPantallaVR('screen-technique-list');
+      } else if (typeof showScreen === 'function') {
+        showScreen('techniques');
       }
       if (typeof go14button === 'function') go14button();
     }
-
-    // Aquí puedes meter cualquier lógica extra de reinicio si existe (ej. reiniciarAtributos())
   });
 }
 
