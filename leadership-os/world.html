@@ -1185,6 +1185,7 @@ function showScreen(name) {
     'eval',
     'interventions',
     'techniques',
+    'technique-list', // 🟢 Se agrega aquí para mantener la compatibilidad y visibilidad
     'screen-mode', // Mantener tal cual como lo tenías por compatibilidad
     'learn-work-practice',
     'active-listening-activity'
@@ -1207,16 +1208,13 @@ function showScreen(name) {
     }
   });
 
-
-
-
   // Forzamos al raycaster de A-Frame a recalcular qué objetos son clickeables ahora mismo
   const raycasterEl = document.querySelector('[raycaster]');
   if (raycasterEl && raycasterEl.components.raycaster) {
     raycasterEl.components.raycaster.refreshObjects();
   }
 
-// Sincronizamos el estado de la aplicación
+  // Sincronizamos el estado de la aplicación
   appState.screen = name;
 
   // --- CONTROL DE CLASES Y DE INTERACCIÓN DE BOTONES DE TÉCNICAS ---
@@ -1250,7 +1248,6 @@ function showScreen(name) {
     console.log("🔴 14 botones de técnicas específicos DESACTIVADOS");
   }
 }
-
 
 
 
