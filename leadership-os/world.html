@@ -70,17 +70,20 @@ AFRAME.registerComponent('handler-botones-vr', {
   }
 });
 
-// 🚀 FUNCIÓN MAESTRA: Apaga colisiones y visibilidad de todas las pantallas
+// 🚀 FUNCIÓN MAESTRA CORREGIDA: Incluye todas las pantallas para evitar solapamientos y bloqueos
 function cambiarPantallaVR(pantallaMostrarId) {
-  // 🌟 Agregamos 'screen-learn-work-practice' a la lista oficial de pantallas
+  // 🌟 Agregamos TODAS las pantallas de la aplicación para un control absoluto
   const pantallas = [
     'screen-welcome', 
     'screen-mode', 
     'screen-interventions-list', 
     'screen-technique-list',
-    'screen-interventions', // ID corregido de tu HTML
-    'screen-learn-work-practice', // 👈 ¡Listo! Controlada de forma segura
-    'screen-history'
+    'screen-interventions', 
+    'screen-learn-work-practice', 
+    'screen-history',
+    'screen-practice',               // 👈 ¡Faltaba! Pantalla donde se hace la actividad
+    'screen-eval',                   // 👈 ¡Faltaba! Pantalla de evaluación al terminar
+    'screen-active-listening-activity' // 👈 ¡Faltaba! Pantalla de actividad de escucha activa
   ];
   
   pantallas.forEach(id => {
@@ -1136,7 +1139,10 @@ function pickRandomOpener(archetype,scenario){
 
 function showScreen(name) {
   console.log("🔄 Solicitando cambiar a la pantalla:", name);
-
+  var idReal = name.startsWith('screen-') ? name : 'screen-' + name;
+  
+  // Delegamos el control a nuestra función maestra corregida
+    cambiarPantallaVR(idReal);
   // Lista oficial de tus pantallas basada en tu estructura actual
   const pantallas = [
     'welcome',
