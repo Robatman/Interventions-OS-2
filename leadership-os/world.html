@@ -111,7 +111,11 @@ function ejecutarFuncionPorTecnica(tecnica) {
   // cambiarPantallaVR(''); 
 
   switch(tecnica) {
-    case 'active-listening': selectAndPreviewVR('active_listening'); break;
+    case 'active-listening': 
+     selectAndPreviewVR('active_listening'); 
+     cambiarPantallaVR('screen-learn-work-practice'); // O el ID de la pantalla que quieras mostrar
+     break;
+     
     case 'powerful-questions': selectAndPreviewVR('powerful_questions'); break;
     case 'motivational-interviewing': selectAndPreviewVR('motivational_interviewing'); break;
     case 'nonviolent-communication': selectAndPreviewVR('nonviolent_communication'); break;
