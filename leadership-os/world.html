@@ -184,12 +184,10 @@ function ejecutarFuncionPorTecnica(tecnica) {
 function funcionShowInterventions(){
   console.log("🔄 Cambiando a la pantalla de Intervenciones...");
   
-  // 🌟 REGISTRAMOS EL MENÚ ACTIVO PARA QUE NO SE OLVIDE
-  if (typeof appState !== 'undefined') {
-    appState.activeMenu = 'interventions';
-  }
+  // 🌟 Registramos el origen de los 4 botones
+  appState.activeMenu = 'interventions';
+  appState.origenActividad = '4-botones'; // 👈 Guardamos la marca
   
-  // Usamos el cambiador oficial de pantallas VR
   if (typeof cambiarPantallaVR === 'function') {
     cambiarPantallaVR('screen-interventions');
   } else {
@@ -197,10 +195,15 @@ function funcionShowInterventions(){
   }
 }
 
-  function funcionShowtechniques(){
-    console.log("🔄 Cambiando a la pantalla de Técnicas...");
-    cambiarPantallaVR('screen-technique-list'); // 👈 Aquí usamos el método seguro
-  }
+function funcionShowtechniques(){
+  console.log("🔄 Cambiando a la pantalla de Técnicas...");
+  
+  // 🌟 Registramos el origen de los 14 botones
+  appState.activeMenu = 'techniques';
+  appState.origenActividad = '14-botones'; // 👈 Guardamos la marca
+  
+  cambiarPantallaVR('screen-technique-list'); 
+}
 
 // ==========================================
 // 🚀 NUEVAS FUNCIONES DE INTERVENCIONES
@@ -1988,14 +1991,42 @@ function exitPreviewVR() {
 
 
 
-document.addEventListener('DOMContentLoaded',function(){
-  var micBtn=document.getElementById('mic-btn');
-  if(micBtn)micBtn.addEventListener('click',function(){
-    if(appState.screen==='practice'){
-      if(!isRecording&&!isProcessing)startRecording();
-      else if(isRecording)stopRecording();
+// Vincular el click del botón "Terminar" de la interfaz VR de manera dinámica
+document.addEventListener('DOMContentLoaded', () => {
+  const btnTerminar = document.getElementById('btn-end-practice');
+  if (btnTerminar) {
+    btnTerminar.addEventListener('click', function() {
+      finalizarActividadOS();
+    });
+  }
+});
+
+// 🚀 FUNCIÓN DE CONTROL DE CIERRE DE EVALUACIÓN
+function finalizarActividadOS() {
+  console.log("🏁 Procesando finalización de actividad...");
+
+  // Ocultamos la pantalla actual de práctica/actividad
+  cambiarPantallaVR(''); 
+
+  // 🧭 Evaluamos de dónde venía el usuario
+  if (appState.origenActividad === '4-botones') {
+    console.log("¡Viene de los 4 botones! Saltando evaluación e yendo a screen-welcome.");
+    
+    // 💥 Efecto directo: No mostramos eval, vamos directo a la bienvenida
+    cambiarPantallaVR('screen-welcome');
+    
+  } else {
+    console.log("Viene de los 14 botones (o genérico). Mostrando panel de evaluación estándar.");
+    
+    // Flujo normal previo para las 14 técnicas: muestra datos, actividad y el panel final
+    if (typeof cambiarPantallaVR === 'function') {
+      cambiarPantallaVR('screen-eval');
+    } else {
+      showScreen('eval');
     }
-  });
+  }
+}
+
   var btnInt=document.getElementById('btn-interventions');
 
   if(btnInt)btnInt.addEventListener('click',function(e){
