@@ -196,9 +196,8 @@ function funcionShowInterventions(){
 function funcionShowtechniques(){
     console.log("Cambiando a pantalla de tecnicas");
     appState.activeMenu = 'techniques';
-    appState.origenActividad = '14-botones';
-    // Forzamos el uso consistente usando showScreen o cambiarPantallaVR
-    showScreen('screen-technique-list'); 
+    appState.origenActividad = '14-botones'; // 👈 Añadimos esta línea
+    cambiarPantallaVR('screen-technique-list'); 
 }
 
 // ==========================================
@@ -1170,30 +1169,26 @@ function showScreen(name) {
     }
   });
 
-
-
-
   // Forzamos al raycaster de A-Frame a recalcular qué objetos son clickeables ahora mismo
   const raycasterEl = document.querySelector('[raycaster]');
   if (raycasterEl && raycasterEl.components.raycaster) {
     raycasterEl.components.raycaster.refreshObjects();
   }
 
-// Sincronizamos el estado de la aplicación
+  // Sincronizamos el estado de la aplicación
   appState.screen = name;
 
   // --- CONTROL DE CLASES Y DE INTERACCIÓN DE BOTONES DE TÉCNICAS ---
   var planosTecnicas = document.querySelectorAll('.sub-tecnica');
   
-  // ✅ CORRECCIÓN: Validamos tanto 'technique-list' como el ID real de la pantalla 'screen-technique-list'
-  if (name === 'technique-list' || name === 'screen-technique-list') {
+  if (name === 'technique-list') {
     planosTecnicas.forEach(function(el) {
       el.classList.add('clickable');
       console.log("🟢 Botón de técnica ACTIVADO: " + el.id);
     });
     console.log("🟢 14 botones de técnicas específicos ACTIVADOS");
 
-  } else if (name === 'interventions' || name === 'screen-interventions') {
+  } else if (name === 'interventions') {
     planosTecnicas.forEach(function(el) {
       el.classList.remove('clickable');
     });
@@ -1206,7 +1201,6 @@ function showScreen(name) {
     }
 
   } else {
-    // Solo remueve si no estás explícitamente en la lista de técnicas
     planosTecnicas.forEach(function(el) {
       el.classList.remove('clickable');
     });
@@ -1954,9 +1948,20 @@ function setupControllers(){
 
 
 function selectAndPreviewVR(techniqueId) {
+  
+      console.log("Entré a selectAndPreviewVR", techniqueId);
+
   // 1. Ocultar la lista de técnicas y mostrar la de Active Listening
-  document.querySelector('#screen-technique-list').setAttribute('visible', 'false');
-  document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'true');
+  cambiarPantallaVR('screen-active-listening-activity');
+
+  document.querySelector('#screen-active-listening-activity')
+    .setAttribute('scale', '1 1 1');
+
+    document.querySelector('#screen-technique-list')
+    .setAttribute('scale', '0 0 0');
+console.log("visible:", screen.getAttribute('visible'));
+console.log("scale:", screen.getAttribute('scale'));
+
 
   if (typeof TECHNIQUE_PREVIEWS === 'undefined') {
     console.error("No se encontró el objeto TECHNIQUE_PREVIEWS. Revisa el orden en tu HTML.");
@@ -1966,14 +1971,26 @@ function selectAndPreviewVR(techniqueId) {
   const techniqueData = TECHNIQUE_PREVIEWS[techniqueId];
   if (!techniqueData) return;
 
+  console.log(techniqueData);
+console.log(techniqueData.good);
+console.log(techniqueData.good.exchanges);
+
   const conversation = techniqueData.good.exchanges; 
   
   const stage = document.querySelector('#vr-preview-stage');
+  console.log(stage);
+  console.log(stage.getAttribute("visible"));
+console.log(stage.parentElement);
   if (!stage) {
     console.error("No se encontró el contenedor #vr-preview-stage en el HTML.");
     return;
   }
-  stage.innerHTML = ''; // Limpiar mensajes anteriores
+  console.log("Número de hijos:", stage.children.length);
+console.log(stage.innerHTML);
+
+  while(stage.firstChild){
+    stage.removeChild(stage.firstChild);
+} // Limpiar mensajes anteriores
 
   // 3. Renderizar en el espacio 3D de A-Frame
   let yOffset = 0.4; 
@@ -2001,9 +2018,7 @@ function selectAndPreviewVR(techniqueId) {
 }
 
 function exitPreviewVR() {
-  // Regresar de la conversación al menú de técnicas
-  document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'false');
-  document.querySelector('#screen-technique-list').setAttribute('visible', 'true');
+    cambiarPantallaVR('screen-technique-list');
 }
 
 
