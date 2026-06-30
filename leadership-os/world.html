@@ -182,27 +182,21 @@ function ejecutarFuncionPorTecnica(tecnica) {
   function funcionIntervPulseCheck() { console.log("🔄 Cargando herramienta Pulse Check..."); goPractice(); }
 
 function funcionShowInterventions(){
-  console.log("🔄 Cambiando a la pantalla de Intervenciones...");
-  
-  // 🌟 Registramos el origen de los 4 botones
-  appState.activeMenu = 'interventions';
-  appState.origenActividad = '4-botones'; // 👈 Guardamos la marca
-  
-  if (typeof cambiarPantallaVR === 'function') {
-    cambiarPantallaVR('screen-interventions');
-  } else {
-    showScreen('interventions');
-  }
+    console.log("Cambiando a pantalla de intervenciones");
+    appState.activeMenu = 'interventions';
+    appState.origenActividad = '4-botones'; // 👈 Añadimos esta línea
+    if(typeof cambiarPantallaVR==='function'){
+        cambiarPantallaVR('screen-interventions');
+    }else{
+        showScreen('interventions');
+    }
 }
 
 function funcionShowtechniques(){
-  console.log("🔄 Cambiando a la pantalla de Técnicas...");
-  
-  // 🌟 Registramos el origen de los 14 botones
-  appState.activeMenu = 'techniques';
-  appState.origenActividad = '14-botones'; // 👈 Guardamos la marca
-  
-  cambiarPantallaVR('screen-technique-list'); 
+    console.log("Cambiando a pantalla de tecnicas");
+    appState.activeMenu = 'techniques';
+    appState.origenActividad = '14-botones'; // 👈 Añadimos esta línea
+    cambiarPantallaVR('screen-technique-list'); 
 }
 
 // ==========================================
@@ -1065,7 +1059,7 @@ function funcionIntervTenureRenewal() {
 const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
 const SUPA_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
 
-let appState = {screen:'welcome',activeMenu:null,currentArchetype:null,currentScenario:null,currentLevel:'novice',agentHistory:[],vrMood:30,boxState:'out',conversationClosed:false,hingesOpened:[]};
+let appState = {screen:'welcome',activeMenu:null,origenActividad: null,currentArchetype:null,currentScenario:null,currentLevel:'novice',agentHistory:[],vrMood:30,boxState:'out',conversationClosed:false,hingesOpened:[]};
 let isRecording=false,isProcessing=false,mediaRecorder=null,audioChunks=[],audioStream=null,audioContext=null,analyser=null,silenceTimer=null;
 const SILENCE_THRESHOLD=38,SILENCE_DURATION=1900;
 
@@ -2083,7 +2077,19 @@ if(btnTechBack)
   var btnPractice=document.getElementById('btn-practice');if(btnPractice)btnPractice.addEventListener('click',function(e){e.stopPropagation();goPractice();});
   
   var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
-  var btnEnd=document.getElementById('btn-end-practice');if(btnEnd)btnEnd.addEventListener('click',function(e){e.stopPropagation();goEval();});
+  var btnEnd=document.getElementById('btn-end-practice').addEventListener('click', function() {
+    console.log("🏁 Botón Terminar presionado. Origen:", appState.origenActividad);
+
+    // Si viene de los 4 botones, saltamos directo a la bienvenida
+    if (appState.origenActividad === '4-botones') {
+        console.log("Saltando evaluación. Redirigiendo a screen-welcome...");
+        cambiarPantallaVR('screen-welcome');
+    } else {
+        // Si viene de los 14 botones (o cualquier otro lado), flujo normal con evaluación
+        console.log("Mostrando panel de evaluación estándar.");
+        cambiarPantallaVR('screen-eval');
+    }
+});
   // var btnNew=document.getElementById('btn-new-session');if(btnNew)btnNew.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
   
   
