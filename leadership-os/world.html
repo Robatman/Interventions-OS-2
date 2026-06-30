@@ -1474,7 +1474,10 @@ function goHistory() {
 }
 
 
-// Interceptamos las funciones de simulación para ocultar o mostrar Openness
+
+
+
+// 1. Interceptamos las funciones de inicio para ocultar OPENNESS si viene de intervenciones
 const originalGoPractice = window.goPractice;
 window.goPractice = function() {
   if (typeof originalGoPractice === 'function') originalGoPractice();
@@ -1493,28 +1496,40 @@ window.goWork = function() {
   evaluarVisibilidadOpenness();
 };
 
-// Función auxiliar para controlar el panel
 function evaluarVisibilidadOpenness() {
   const opennessPanel = document.getElementById('openness-panel');
   if (!opennessPanel) return;
 
-  // Si venimos del menú de intervenciones, lo ocultamos por completo
   if (typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
     opennessPanel.setAttribute('visible', 'false');
-    opennessPanel.setAttribute('scale', '0 0 0'); // Evita colisiones fantasmas
+    opennessPanel.setAttribute('scale', '0 0 0');
   } else {
-    // Para las técnicas se mantiene completamente visible
     opennessPanel.setAttribute('visible', 'true');
     opennessPanel.setAttribute('scale', '1 1 1');
   }
 }
 
-// Asegurar que regrese a la normalidad si volvemos al inicio o a técnicas
+// 2. ¡EL TRUCO CLAVE! Interceptamos cambiarPantallaVR para frenar la evaluación
 const originalCambiarPantallaVR = window.cambiarPantallaVR;
 window.cambiarPantallaVR = function(pantallaMostrarId) {
-  if (typeof originalCambiarPantallaVR === 'function') originalCambiarPantallaVR(pantallaMostrarId);
   
-  // Si regresa al welcome o entra a la lista de técnicas, restauramos la visibilidad base
+  // Si el sistema quiere mostrar la evaluación ("screen-eval") PERO venimos de Intervenciones...
+  if (pantallaMostrarId === 'screen-eval' && typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
+    console.log("Ruta Intervenciones detectada: Saltando panel de evaluación.");
+    
+    // En lugar de ir a la evaluación, mandamos al usuario directo al menú de inicio (o a donde prefieras)
+    if (typeof originalCambiarPantallaVR === 'function') {
+      originalCambiarPantallaVR('screen-welcome'); // <--- Cámbialo por 'screen-technique-list' si prefieres que vuelva a la lista
+    }
+    return; // Frenamos la ejecución para que NO se ejecute el "screen-eval"
+  }
+
+  // Si no se cumple la condición (o sea, son las 14 técnicas), corre el flujo normal
+  if (typeof originalCambiarPantallaVR === 'function') {
+    originalCambiarPantallaVR(pantallaMostrarId);
+  }
+  
+  // Restaurar el panel de Openness si regresa a las pantallas principales
   if (pantallaMostrarId === 'screen-welcome' || pantallaMostrarId === 'screen-technique-list') {
     const opennessPanel = document.getElementById('openness-panel');
     if (opennessPanel) {
@@ -1523,6 +1538,11 @@ window.cambiarPantallaVR = function(pantallaMostrarId) {
     }
   }
 };
+
+
+
+
+
 
 // Reemplaza el bloque de la línea 1455 por esto:
 window.goHistory = function() {
