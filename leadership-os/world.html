@@ -916,7 +916,7 @@ function funcionIntervTenureRenewal() {
       <a-text id="eval-mood" value="--%"  position="1.1 0.65 0.01" align="right" color="#00e5c0" width="2" font="mozillavr"></a-text>
       <a-plane width="2.4" height="0.004" color="#2a3a7a" material="shader:flat" position="0 0.48 0.01"></a-plane>
       <a-text id="eval-feedback" value="Analizando conversacion..." position="0 0.1 0.01" align="center" color="#e8eeff" width="4.8" wrap-count="50" font="mozillavr"></a-text>
-      <a-plane id="btn-new-session" width="1.1" heigh}66ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-plane id="btn-new-session" width="1.1" heigh66ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text value="Nueva sesion" color="#4466ff" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
       </a-plane>
        <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
@@ -2168,7 +2168,7 @@ if (btnAgain) {
 }
 
 // 2. Botón Nueva Sesión / Volver al Inicio (Debe mandar al menú de bienvenida principal)
-// var btnNewSession = document.getElementById('btn-new-session'); // Asegúrate de que el ID coincida con tu HTML
+var btnNewSession = document.getElementById('btn-new-session'); // Asegúrate de que el ID coincida con tu HTML
 if (!btnNewSession) {
   // Por si acaso en tu HTML se llama diferente, ej: 'btn-welcome' o 'btn-home'
   btnNewSession = document.getElementById('btn-welcome'); 
