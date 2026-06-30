@@ -1948,6 +1948,15 @@ function setupControllers(){
 
 
 function selectAndPreviewVR(techniqueId) {
+  console.log("Ocultando técnicas");
+
+document.querySelector("#screen-technique-list")
+    .setAttribute("visible", false);
+
+console.log("Mostrando preview");
+
+document.querySelector("#screen-preview")
+    .setAttribute("visible", true);
       console.log("Entré a selectAndPreviewVR", techniqueId);
 
   // 1. Ocultar la lista de técnicas y mostrar la de Active Listening
@@ -1969,6 +1978,9 @@ console.log(techniqueData.good.exchanges);
   const conversation = techniqueData.good.exchanges; 
   
   const stage = document.querySelector('#vr-preview-stage');
+  console.log(stage);
+  console.log(stage.getAttribute("visible"));
+console.log(stage.parentElement);
   if (!stage) {
     console.error("No se encontró el contenedor #vr-preview-stage en el HTML.");
     return;
