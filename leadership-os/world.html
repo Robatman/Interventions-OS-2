@@ -1513,44 +1513,6 @@ function evaluarVisibilidadOpenness() {
 
 
 
-// Interceptamos cambiarPantallaVR para frenar la evaluación y resetear estados
-const originalCambiarPantallaVR = window.cambiarPantallaVR;
-window.cambiarPantallaVR = function(pantallaMostrarId) {
-  
-  // 1. Si el sistema quiere mostrar la evaluación PERO venimos de Intervenciones...
-  if (pantallaMostrarId === 'screen-eval' && typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
-    console.log("Ruta Intervenciones detectada: Saltando panel de evaluación.");
-    
-    // Antes de mandar a welcome, limpiamos el activeMenu para que no afecte a las técnicas después
-    appState.activeMenu = 'welcome'; 
-    
-    if (typeof originalCambiarPantallaVR === 'function') {
-      originalCambiarPantallaVR('screen-welcome');
-    }
-    return; // Frenamos la ejecución para que NO abra el screen-eval
-  }
-
-  // 2. Si el usuario regresa manualmente al welcome desde cualquier lado, también reseteamos por seguridad
-  if (pantallaMostrarId === 'screen-welcome' && typeof appState !== 'undefined') {
-    appState.activeMenu = 'welcome';
-  }
-
-  // Si no es el caso especial de intervenciones, corre el flujo normal (las 14 técnicas pasarán por aquí)
-  if (typeof originalCambiarPantallaVR === 'function') {
-    originalCambiarPantallaVR(pantallaMostrarId);
-  }
-  
-  // Restaurar visualmente el panel de Openness si regresa a pantallas principales
-  if (pantallaMostrarId === 'screen-welcome' || pantallaMostrarId === 'screen-technique-list') {
-    const opennessPanel = document.getElementById('openness-panel');
-    if (opennessPanel) {
-      opennessPanel.setAttribute('visible', 'true');
-      opennessPanel.setAttribute('scale', '1 1 1');
-    }
-  }
-};
-
-
 
 
 // Buscamos interceptar la función que se ejecuta al dar click en "Terminar"
