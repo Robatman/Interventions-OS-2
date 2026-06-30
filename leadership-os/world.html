@@ -1524,36 +1524,43 @@ function evaluarVisibilidadOpenness() {
 
 
 
-// Buscamos interceptar la función que se ejecuta al dar click en "Terminar"
-// (Ajusta 'endActivity' si en tu script se llama diferente, ej: finalizarConversacion)
-if (typeof window.endActivity === 'function') {
-  const originalEndActivity = window.endActivity;
+// Busca donde interceptas originalEndActivity y déjalo exactamente así:
+if (typeof window.endActivity === 'function' && !window.originalEndActivity) {
+  window.originalEndActivity = window.endActivity;
   
   window.endActivity = function() {
-    // Si el usuario está en el flujo de los 4 botones de Intervenciones
-    if (typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
-      console.log("Botón Terminar presionado en Intervenciones. Limpiando y saliendo al inicio...");
-      
-      // 1. Detenemos cualquier proceso de audio/reconocimiento activo para que no se quede trabado
-      if (typeof stopMic === 'function') stopMic();
-      if (typeof detenerReconocimiento === 'function') detenerReconocimiento();
-      
-      // 2. Si tienes una función que reinicia el estado del juego/avatar, la ejecutamos
+    console.log("🏁 Botón Terminar presionado. Origen:", appState.origenActividad);
+
+    // Cancelamos voces si hay alguna activa
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+
+    if (appState.origenActividad === '4-botones') {
+      console.log("Módulo 4-botones: Saltando evaluación. Redirigiendo a pantalla de inicio...");
       if (typeof reiniciarAtributos === 'function') reiniciarAtributos();
       if (typeof resetGame === 'function') resetGame();
       
-      // 3. Mandamos directo a la pantalla principal sin pasar por la evaluación
       if (typeof cambiarPantallaVR === 'function') {
-        cambiarPantallaVR('screen-welcome'); 
+        cambiarPantallaVR('screen-welcome');
       }
-      return; // Interrumpimos aquí para que no intente procesar métricas ni abrir el 'screen-eval'
+      return; 
+    } else {
+      console.log("Módulo 14-botones (o genérico). Mostrando panel de evaluación estándar.");
+      
+      // 1. Cambiamos la pantalla visualmente
+      if (typeof cambiarPantallaVR === 'function') {
+        cambiarPantallaVR('screen-eval');
+      } else {
+        showScreen('eval');
+      }
+
+      // 2. 🚀 EL ARREGLO TRUCO: Ejecutamos la lógica nativa del backend/IA para evaluar
+      // Llamamos a la función original que procesa el historial y cambia el texto de "Analizando..."
+      window.originalEndActivity();
     }
-    
-    // Si son los 14 botones normales, sigue con su flujo tradicional (analizar, mandar a evaluación, etc.)
-    originalEndActivity();
   };
 }
-
 
 
 
