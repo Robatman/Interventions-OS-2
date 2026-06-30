@@ -1474,10 +1474,7 @@ function goHistory() {
 }
 
 
-
-
-
-// 1. Interceptamos las funciones de inicio para ocultar OPENNESS si viene de intervenciones
+// Interceptamos las funciones de simulación para ocultar o mostrar Openness
 const originalGoPractice = window.goPractice;
 window.goPractice = function() {
   if (typeof originalGoPractice === 'function') originalGoPractice();
@@ -1496,40 +1493,28 @@ window.goWork = function() {
   evaluarVisibilidadOpenness();
 };
 
+// Función auxiliar para controlar el panel
 function evaluarVisibilidadOpenness() {
   const opennessPanel = document.getElementById('openness-panel');
   if (!opennessPanel) return;
 
+  // Si venimos del menú de intervenciones, lo ocultamos por completo
   if (typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
     opennessPanel.setAttribute('visible', 'false');
-    opennessPanel.setAttribute('scale', '0 0 0');
+    opennessPanel.setAttribute('scale', '0 0 0'); // Evita colisiones fantasmas
   } else {
+    // Para las técnicas se mantiene completamente visible
     opennessPanel.setAttribute('visible', 'true');
     opennessPanel.setAttribute('scale', '1 1 1');
   }
 }
 
-// 2. ¡EL TRUCO CLAVE! Interceptamos cambiarPantallaVR para frenar la evaluación
+// Asegurar que regrese a la normalidad si volvemos al inicio o a técnicas
 const originalCambiarPantallaVR = window.cambiarPantallaVR;
 window.cambiarPantallaVR = function(pantallaMostrarId) {
+  if (typeof originalCambiarPantallaVR === 'function') originalCambiarPantallaVR(pantallaMostrarId);
   
-  // Si el sistema quiere mostrar la evaluación ("screen-eval") PERO venimos de Intervenciones...
-  if (pantallaMostrarId === 'screen-eval' && typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
-    console.log("Ruta Intervenciones detectada: Saltando panel de evaluación.");
-    
-    // En lugar de ir a la evaluación, mandamos al usuario directo al menú de inicio (o a donde prefieras)
-    if (typeof originalCambiarPantallaVR === 'function') {
-      originalCambiarPantallaVR('screen-welcome'); // <--- Cámbialo por 'screen-technique-list' si prefieres que vuelva a la lista
-    }
-    return; // Frenamos la ejecución para que NO se ejecute el "screen-eval"
-  }
-
-  // Si no se cumple la condición (o sea, son las 14 técnicas), corre el flujo normal
-  if (typeof originalCambiarPantallaVR === 'function') {
-    originalCambiarPantallaVR(pantallaMostrarId);
-  }
-  
-  // Restaurar el panel de Openness si regresa a las pantallas principales
+  // Si regresa al welcome o entra a la lista de técnicas, restauramos la visibilidad base
   if (pantallaMostrarId === 'screen-welcome' || pantallaMostrarId === 'screen-technique-list') {
     const opennessPanel = document.getElementById('openness-panel');
     if (opennessPanel) {
@@ -1540,6 +1525,37 @@ window.cambiarPantallaVR = function(pantallaMostrarId) {
 };
 
 
+
+
+// Buscamos interceptar la función que se ejecuta al dar click en "Terminar"
+// (Ajusta 'endActivity' si en tu script se llama diferente, ej: finalizarConversacion)
+if (typeof window.endActivity === 'function') {
+  const originalEndActivity = window.endActivity;
+  
+  window.endActivity = function() {
+    // Si el usuario está en el flujo de los 4 botones de Intervenciones
+    if (typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
+      console.log("Botón Terminar presionado en Intervenciones. Limpiando y saliendo al inicio...");
+      
+      // 1. Detenemos cualquier proceso de audio/reconocimiento activo para que no se quede trabado
+      if (typeof stopMic === 'function') stopMic();
+      if (typeof detenerReconocimiento === 'function') detenerReconocimiento();
+      
+      // 2. Si tienes una función que reinicia el estado del juego/avatar, la ejecutamos
+      if (typeof reiniciarAtributos === 'function') reiniciarAtributos();
+      if (typeof resetGame === 'function') resetGame();
+      
+      // 3. Mandamos directo a la pantalla principal sin pasar por la evaluación
+      if (typeof cambiarPantallaVR === 'function') {
+        cambiarPantallaVR('screen-welcome'); 
+      }
+      return; // Interrumpimos aquí para que no intente procesar métricas ni abrir el 'screen-eval'
+    }
+    
+    // Si son los 14 botones normales, sigue con su flujo tradicional (analizar, mandar a evaluación, etc.)
+    originalEndActivity();
+  };
+}
 
 
 
