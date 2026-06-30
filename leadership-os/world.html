@@ -156,28 +156,12 @@ function ejecutarFuncionPorTecnica(tecnica) {
       console.log("🔄 Regresando a la pantalla de bienvenida...");
       cambiarPantallaVR('screen-welcome');
       break;
-
-      case 'end-practice':
-      console.log("🏁 Finalizando práctica e iniciando evaluación...");
-      if (typeof goEval === 'function') {
-          goEval();
-      } else {
-          console.error("❌ La función goEval() no está definida en tus scripts actuales.");
-      }
-      break;
     
     
     // 🚨 El default SIEMPRE debe ir al último
     default: 
       console.log("⚡ Ejecutando función genérica de la academia.");
       break;
-
-
-
-
-
-
-
   }
 }
 
@@ -907,14 +891,12 @@ function funcionIntervTenureRenewal() {
       <a-circle id="vr-voice-dot" radius="0.07" color="#1a2a6a" material="shader:flat" position="-0.9 0 0.01"></a-circle>
       <a-text id="vr-voice-label" value="Listo Trigger para hablar" color="#c8d8ff" align="left" width="3.5" position="-0.75 0 0.01" font="mozillavr"></a-text>
     </a-entity>
-    <a-entity id="btn-end-practice">
-  <a-plane class="clickable" 
-           handler-botones-vr="mensaje: Finalizando simulación; tecnica: end-practice"
-           width="1.5" height="0.5" 
-           color="#ff5ca0">
-    <a-text value="TERMINAR" align="center" color="#fff" width="3" font="mozillavr"></a-text>
-  </a-plane>
-</a-entity>
+    <a-entity position="-2.5 2.0 -2.0" rotation="0 30 0">
+      <a-plane id="btn-end-practice" width="0.8" height="0.24" color="#1a0a20" material="opacity:0.85;shader:flat;side:double" class="clickable">
+        <a-plane width="0.82" height="0.26" color="#ff5ca0" material="opacity:0.35;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="Terminar" color="#ff5ca0" align="center" width="3" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
   </a-entity>
 
   <!-- SCREEN: EVAL -->
@@ -1013,17 +995,12 @@ function funcionIntervTenureRenewal() {
 
     </a-entity>
 
-   <!-- 🌟 BOTÓN CORREGIDO: Con interacción nativa VR y recalculado de eventos -->
-    <a-entity id="btn-toggle-active-listening" position="0.75 -0.85 0.05">
-      <a-plane class="clickable" 
-               handler-botones-vr="mensaje: Alternando vista de movimientos; tecnica: toggle-listening-moves"
-               width="1.3" height="0.26" 
-               color="#ff5ca0"
-               animation__hover="property:position;to:0 0.03 0;startEvents:mouseenter;dur:150"
-               animation__unhover="property:position;to:0 0 0;startEvents:mouseleave;dur:150">
-        <a-text id="text-btn-toggle-listening" value="See the moves" align="center" color="#fff" width="3.0" font="mozillavr"></a-text>
-      </a-plane>
-    </a-entity>
+    <!-- 🌟 BOTÓN MOVIDO A LA ESQUINA INFERIOR DERECHA: Ajustado en X (0.75) y Reducido en ancho (1.3) -->
+    <a-plane id="btn-toggle-active-listening" class="clickable" 
+             width="1.3" height="0.26" color="#ff5ca0" position="0.75 -0.95 0.02"
+             onclick="toggleListeningMoves()">
+      <a-text id="text-btn-toggle-listening" value="See the moves" align="center" color="#fff" width="3.0" font="mozillavr"></a-text>
+    </a-plane>
   </a-entity>
 
 
@@ -1547,43 +1524,36 @@ function evaluarVisibilidadOpenness() {
 
 
 
-// Busca donde interceptas originalEndActivity y déjalo exactamente así:
-if (typeof window.endActivity === 'function' && !window.originalEndActivity) {
-  window.originalEndActivity = window.endActivity;
+// Buscamos interceptar la función que se ejecuta al dar click en "Terminar"
+// (Ajusta 'endActivity' si en tu script se llama diferente, ej: finalizarConversacion)
+if (typeof window.endActivity === 'function') {
+  const originalEndActivity = window.endActivity;
   
   window.endActivity = function() {
-    console.log("🏁 Botón Terminar presionado. Origen:", appState.origenActividad);
-
-    // Cancelamos voces si hay alguna activa
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
-
-    if (appState.origenActividad === '4-botones') {
-      console.log("Módulo 4-botones: Saltando evaluación. Redirigiendo a pantalla de inicio...");
+    // Si el usuario está en el flujo de los 4 botones de Intervenciones
+    if (typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
+      console.log("Botón Terminar presionado en Intervenciones. Limpiando y saliendo al inicio...");
+      
+      // 1. Detenemos cualquier proceso de audio/reconocimiento activo para que no se quede trabado
+      if (typeof stopMic === 'function') stopMic();
+      if (typeof detenerReconocimiento === 'function') detenerReconocimiento();
+      
+      // 2. Si tienes una función que reinicia el estado del juego/avatar, la ejecutamos
       if (typeof reiniciarAtributos === 'function') reiniciarAtributos();
       if (typeof resetGame === 'function') resetGame();
       
+      // 3. Mandamos directo a la pantalla principal sin pasar por la evaluación
       if (typeof cambiarPantallaVR === 'function') {
-        cambiarPantallaVR('screen-welcome');
+        cambiarPantallaVR('screen-welcome'); 
       }
-      return; 
-    } else {
-      console.log("Módulo 14-botones (o genérico). Mostrando panel de evaluación estándar.");
-      
-      // 1. Cambiamos la pantalla visualmente
-      if (typeof cambiarPantallaVR === 'function') {
-        cambiarPantallaVR('screen-eval');
-      } else {
-        showScreen('eval');
-      }
-
-      // 2. 🚀 EL ARREGLO TRUCO: Ejecutamos la lógica nativa del backend/IA para evaluar
-      // Llamamos a la función original que procesa el historial y cambia el texto de "Analizando..."
-      window.originalEndActivity();
+      return; // Interrumpimos aquí para que no intente procesar métricas ni abrir el 'screen-eval'
     }
+    
+    // Si son los 14 botones normales, sigue con su flujo tradicional (analizar, mandar a evaluación, etc.)
+    originalEndActivity();
   };
 }
+
 
 
 
@@ -2108,52 +2078,37 @@ if(btnTechBack)
   var btnPractice=document.getElementById('btn-practice');if(btnPractice)btnPractice.addEventListener('click',function(e){e.stopPropagation();goPractice();});
   
   var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
-  var btnEnd=
-  
-document.getElementById('btn-end-practice').addEventListener('click', function() {
-    console.log("🏁 Botón Terminar presionado. Origen:", appState.origenActividad);
 
-    // Ocultamos la pantalla de la práctica actual
-    var screenPractice = document.getElementById('screen-practice');
-    if (screenPractice) {
-        screenPractice.setAttribute('visible', 'false');
-        screenPractice.setAttribute('scale', '0 0 0');
+var btnEnd = document.getElementById('btn-end-practice');
+if (btnEnd) {
+  btnEnd.addEventListener('click', async function(e) {
+    if (e) e.stopPropagation();
+    console.log("🏁 Botón Terminar presionado. Iniciando evaluación...");
+
+    // 1. Cambiamos visualmente a la pantalla de evaluación VR
+    if (typeof cambiarPantallaVR === 'function') {
+      cambiarPantallaVR('screen-eval');
+    } else if (typeof showScreen === 'function') {
+      showScreen('eval');
     }
 
-    if (window.speechSynthesis) {
-        window.speechSynthesis.cancel(); 
+    // 2. Colocamos un estado de carga temporal en el HUD o texto de feedback
+    var feedbackEl = document.getElementById('eval-feedback');
+    if (feedbackEl) {
+      feedbackEl.setAttribute('text', 'value', 'Analizando la conversación con Juanjolote... Por favor espera.');
     }
 
-    if (appState.origenActividad === '4-botones') {
-        console.log("Saltando evaluación. Redirigiendo y activando screen-welcome...");
-        cambiarPantallaVR('screen-welcome');
-
+    // 3. Ejecutamos la función de evaluación real que conecta con el LLM
+    if (typeof procesarEvaluacionAutomatica === 'function') {
+      await procesarEvaluacionAutomatica();
     } else {
-        console.log("Mostrando panel de evaluación estándar.");
-        
-        // 1. Cambiamos oficialmente a la pantalla de evaluación usando el sistema nativo
-        cambiarPantallaVR('screen-eval');
-        
-        // 2. 🚀 DISPARADOR DEL ANÁLISIS: 
-        // Vamos a buscar la función encargada de procesar el texto/API.
-        // Dependiendo de cómo se llame en tus archivos JS externos (interventions.js o preview.js),
-        // el sistema ejecutará la correcta de forma automática:
-        if (typeof procesarEvaluacion === 'function') {
-            procesarEvaluacion();
-        } else if (typeof calcularFeedback === 'function') {
-            calcularFeedback();
-        } else if (typeof triggerEvaluation === 'function') {
-            triggerEvaluation();
-        } else if (typeof finalizarSimulacion === 'function') {
-            finalizarSimulacion();
-        } else {
-            console.warn("⚠️ Advertencia: No se encontró una función automática para procesar la evaluación. Revisa cómo se llama en tus archivos .js externos.");
-        }
+      console.error("❌ No se encontró la función procesarEvaluacionAutomatica en el archivo.");
+      if (feedbackEl) {
+        feedbackEl.setAttribute('text', 'value', 'Error: No se pudo procesar la evaluación.');
+      }
     }
-});
-
-
-
+  });
+}
 
 
 
