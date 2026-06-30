@@ -1208,6 +1208,11 @@ function showScreen(name) {
   }
 }
 
+
+
+
+
+
 function goWelcome(){
 
   showScreen('welcome');
@@ -1943,6 +1948,8 @@ function setupControllers(){
 
 
 function selectAndPreviewVR(techniqueId) {
+      console.log("Entré a selectAndPreviewVR", techniqueId);
+
   // 1. Ocultar la lista de técnicas y mostrar la de Active Listening
   document.querySelector('#screen-technique-list').setAttribute('visible', 'false');
   document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'true');
@@ -1955,6 +1962,8 @@ function selectAndPreviewVR(techniqueId) {
   const techniqueData = TECHNIQUE_PREVIEWS[techniqueId];
   if (!techniqueData) return;
 
+
+  
   const conversation = techniqueData.good.exchanges; 
   
   const stage = document.querySelector('#vr-preview-stage');
@@ -2080,7 +2089,7 @@ if(btnTechBack)
   var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
   
   
-  var btnEnd=document.getElementById('btn-end-practice').addEventListener('click', function() {
+  var btnEnd = document.getElementById('btn-end-practice').addEventListener('click', function () {
     console.log("🏁 Botón Terminar presionado. Origen:", appState.origenActividad);
 
     // Ocultamos la pantalla de la práctica actual
@@ -2091,37 +2100,34 @@ if(btnTechBack)
     }
 
     if (window.speechSynthesis) {
-        window.speechSynthesis.cancel(); 
+        window.speechSynthesis.cancel();
     }
 
+    // ==========================
+    // CASO 4 BOTONES
+    // ==========================
     if (appState.origenActividad === '4-botones') {
-        console.log("Saltando evaluación. Redirigiendo y activando screen-welcome...");
+
+        console.log("Saltando evaluación. Redirigiendo a Welcome.");
         cambiarPantallaVR('screen-welcome');
 
-    } else {
-        console.log("Mostrando panel de evaluación estándar.");
-        
-        // 1. Cambiamos oficialmente a la pantalla de evaluación usando el sistema nativo
-        cambiarPantallaVR('screen-eval');
-        
-        // 2. 🚀 DISPARADOR DEL ANÁLISIS: 
-        // Vamos a buscar la función encargada de procesar el texto/API.
-        // Dependiendo de cómo se llame en tus archivos JS externos (interventions.js o preview.js),
-        // el sistema ejecutará la correcta de forma automática:
-        if (typeof procesarEvaluacion === 'function') {
-            procesarEvaluacion();
-        } else if (typeof calcularFeedback === 'function') {
-            calcularFeedback();
-        } else if (typeof triggerEvaluation === 'function') {
-            triggerEvaluation();
-        } else if (typeof finalizarSimulacion === 'function') {
-            finalizarSimulacion();
+    }
+    // ==========================
+    // CASO 14 BOTONES
+    // ==========================
+    else {
+
+        console.log("Mostrando evaluación con IA.");
+
+        // Esta función ya hace el showScreen('eval')
+        if (typeof goEval === 'function') {
+            goEval();
         } else {
-            console.warn("⚠️ Advertencia: No se encontró una función automática para procesar la evaluación. Revisa cómo se llama en tus archivos .js externos.");
+            console.warn("⚠️ No existe la función goEval().");
         }
+
     }
 });
-
 
 
   
