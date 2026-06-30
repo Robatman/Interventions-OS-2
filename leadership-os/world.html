@@ -148,10 +148,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'learn-intervention': goLearn(); break;
     case 'work-together-intervention': goWork(); break;
     
-    case 'practice-again': console.log("Este debe de mandar a la otra csoa jaja"); break;
-    case 'techniques-back': console.log("Salio de las tecniicas jaja"); break;
-
-    case 'progress': 
+     case 'progress': 
       console.log("📊 Abriendo historial de progreso..."); 
       goHistory(); 
       break;
@@ -1774,9 +1771,6 @@ function startRecording(){
   setHUD('rec','Grabando...');
   var btn=document.getElementById('mic-btn'); if(btn)btn.classList.add('recording');
   
-  console.log('[Grabación] Empezando detección de silencio...');
-  // startSilenceDetection();
-  
   setTimeout(function(){
     if(isRecording){
       console.log('[Grabación] Límite de 25 segundos alcanzado. Forzando parada.');
@@ -2004,6 +1998,27 @@ function exitPreviewVR() {
   // Regresar de la conversación al menú de técnicas
   document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'false');
   document.querySelector('#screen-technique-list').setAttribute('visible', 'true');
+}
+
+  
+  // Agrega esto junto a los demás addEventListener dentro de DOMContentLoaded:
+var btnInterventionsBack = document.getElementById('btn-techniques-back');
+if (btnInterventionsBack) {
+  btnInterventionsBack.addEventListener('click', function(e) {
+    e.stopPropagation();
+    goWelcome(); // Esto te manda directo a 'screen-welcome'
+  });
+}
+
+// Agrega esto también dentro de DOMContentLoaded:
+var btnPracticeAgain = document.getElementById('btn-practice-again');
+if (btnPracticeAgain) {
+  btnPracticeAgain.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (typeof go14button === 'function') {
+      go14button(); // Ejecuta tu función para mandarte a los 14 botones
+    }
+  });
 }
 
 
