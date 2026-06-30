@@ -80,7 +80,8 @@ function cambiarPantallaVR(pantallaMostrarId) {
     'screen-technique-list',
     'screen-interventions', // ID corregido de tu HTML
     'screen-learn-work-practice', // 👈 ¡Listo! Controlada de forma segura
-    'screen-history'
+    'screen-history',
+    'screen-eval'
   ];
   
   pantallas.forEach(id => {
@@ -2082,49 +2083,50 @@ if(btnTechBack)
 document.getElementById('btn-end-practice').addEventListener('click', function() {
     console.log("🏁 Botón Terminar presionado. Origen:", appState.origenActividad);
 
-    // 1. Ocultamos VISUALMENTE la pantalla de la práctica actual para que no se quede activa
+    // Ocultamos la pantalla de la práctica actual
     var screenPractice = document.getElementById('screen-practice');
     if (screenPractice) {
         screenPractice.setAttribute('visible', 'false');
         screenPractice.setAttribute('scale', '0 0 0');
     }
 
-    // 2. Detener cualquier audio o voz del agente que se haya quedado hablando
     if (window.speechSynthesis) {
         window.speechSynthesis.cancel(); 
     }
 
-    // 3. Direccionar según el origen de la actividad
     if (appState.origenActividad === '4-botones') {
         console.log("Saltando evaluación. Redirigiendo y activando screen-welcome...");
-        
-        // Activamos visualmente la pantalla de bienvenida
-        var screenWelcome = document.getElementById('screen-welcome');
-        if (screenWelcome) {
-            screenWelcome.setAttribute('visible', 'true');
-            screenWelcome.setAttribute('scale', '1 1 1');
-        }
-        
-        // Sincronizamos el estado de la aplicación
         cambiarPantallaVR('screen-welcome');
 
     } else {
         console.log("Mostrando panel de evaluación estándar.");
         
-        // Activamos visualmente la pantalla de evaluación (que antes no hacía nada porque se quedaba tapada)
-        var screenEval = document.getElementById('screen-eval');
-        if (screenEval) {
-            screenEval.setAttribute('visible', 'true');
-            screenEval.setAttribute('scale', '1 1 1');
-        }
-        
-        // Ejecutamos la lógica interna de evaluación para que calcule los puntajes
+        // 1. Cambiamos oficialmente a la pantalla de evaluación usando el sistema nativo
         cambiarPantallaVR('screen-eval');
         
-        // Si tienes una función específica para renderizar las estrellitas o datos del feedback, 
-        // puedes llamarla aquí (por ejemplo: mostrarFeedbackFinal(); si es que existe)
+        // 2. 🚀 DISPARADOR DEL ANÁLISIS: 
+        // Vamos a buscar la función encargada de procesar el texto/API.
+        // Dependiendo de cómo se llame en tus archivos JS externos (interventions.js o preview.js),
+        // el sistema ejecutará la correcta de forma automática:
+        if (typeof procesarEvaluacion === 'function') {
+            procesarEvaluacion();
+        } else if (typeof calcularFeedback === 'function') {
+            calcularFeedback();
+        } else if (typeof triggerEvaluation === 'function') {
+            triggerEvaluation();
+        } else if (typeof finalizarSimulacion === 'function') {
+            finalizarSimulacion();
+        } else {
+            console.warn("⚠️ Advertencia: No se encontró una función automática para procesar la evaluación. Revisa cómo se llama en tus archivos .js externos.");
+        }
     }
 });
+
+
+
+
+
+
   
 var btnAgain = document.getElementById('btn-practice-again');
 if (btnAgain) {
