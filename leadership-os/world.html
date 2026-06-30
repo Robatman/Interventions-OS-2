@@ -2078,38 +2078,47 @@ if(btnTechBack)
   var btnPractice=document.getElementById('btn-practice');if(btnPractice)btnPractice.addEventListener('click',function(e){e.stopPropagation();goPractice();});
   
   var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
+  
+  
+  var btnEnd = document.getElementById('btn-end-practice').addEventListener('click', function () {
+    console.log("🏁 Botón Terminar presionado. Origen:", appState.origenActividad);
 
-var btnEnd = document.getElementById('btn-end-practice');
-if (btnEnd) {
-  btnEnd.addEventListener('click', async function(e) {
-    if (e) e.stopPropagation();
-    console.log("🏁 Botón Terminar presionado. Iniciando evaluación...");
-
-    // 1. Cambiamos visualmente a la pantalla de evaluación VR
-    if (typeof cambiarPantallaVR === 'function') {
-      cambiarPantallaVR('screen-eval');
-    } else if (typeof showScreen === 'function') {
-      showScreen('eval');
+    // Ocultamos la pantalla de la práctica actual
+    var screenPractice = document.getElementById('screen-practice');
+    if (screenPractice) {
+        screenPractice.setAttribute('visible', 'false');
+        screenPractice.setAttribute('scale', '0 0 0');
     }
 
-    // 2. Colocamos un estado de carga temporal en el HUD o texto de feedback
-    var feedbackEl = document.getElementById('eval-feedback');
-    if (feedbackEl) {
-      feedbackEl.setAttribute('text', 'value', 'Analizando la conversación con Juanjolote... Por favor espera.');
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
     }
 
-    // 3. Ejecutamos la función de evaluación real que conecta con el LLM
-    if (typeof procesarEvaluacionAutomatica === 'function') {
-      await procesarEvaluacionAutomatica();
-    } else {
-      console.error("❌ No se encontró la función procesarEvaluacionAutomatica en el archivo.");
-      if (feedbackEl) {
-        feedbackEl.setAttribute('text', 'value', 'Error: No se pudo procesar la evaluación.');
-      }
-    }
-  });
-}
+    // ==========================
+    // CASO 4 BOTONES
+    // ==========================
+    if (appState.origenActividad === '4-botones') {
 
+        console.log("Saltando evaluación. Redirigiendo a Welcome.");
+        cambiarPantallaVR('screen-welcome');
+
+    }
+    // ==========================
+    // CASO 14 BOTONES
+    // ==========================
+    else {
+
+        console.log("Mostrando evaluación con IA.");
+
+        // Esta función ya hace el showScreen('eval')
+        if (typeof goEval === 'function') {
+            goEval();
+        } else {
+            console.warn("⚠️ No existe la función goEval().");
+        }
+
+    }
+});
 
 
   
