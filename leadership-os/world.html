@@ -880,7 +880,7 @@ function funcionIntervTenureRenewal() {
       <a-text id="dialog-speaker" value="CARLOS" position="-1.45 0.28 0.01" align="left" color="#9d5cff" width="2.5" font="mozillavr"></a-text>
       <a-text id="dialog-text" value="..." position="0 0 0.01" align="center" color="#e8eeff" width="5.5" wrap-count="55" font="mozillavr"></a-text>
     </a-entity>
-    <a-entity position="2.4 1.6 -2.2" rotation="0 -25 0">
+    <a-entity id="openness-panel" position="2.4 1.6 -2.2" rotation="0 -25 0">
       <a-plane width="0.9" height="0.65" color="#080e2a" material="opacity:0.88;shader:flat;side:double"></a-plane>
       <a-plane width="0.92" height="0.67" color="#2a3a7a" material="opacity:0.5;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
       <a-text value="OPENNESS" position="0 0.22 0.01" align="center" color="#c8d8ff" width="2.2" opacity="0.6" font="mozillavr"></a-text>
@@ -1474,6 +1474,55 @@ function goHistory() {
 }
 
 
+// Interceptamos las funciones de simulación para ocultar o mostrar Openness
+const originalGoPractice = window.goPractice;
+window.goPractice = function() {
+  if (typeof originalGoPractice === 'function') originalGoPractice();
+  evaluarVisibilidadOpenness();
+};
+
+const originalGoLearn = window.goLearn;
+window.goLearn = function() {
+  if (typeof originalGoLearn === 'function') originalGoLearn();
+  evaluarVisibilidadOpenness();
+};
+
+const originalGoWork = window.goWork;
+window.goWork = function() {
+  if (typeof originalGoWork === 'function') originalGoWork();
+  evaluarVisibilidadOpenness();
+};
+
+// Función auxiliar para controlar el panel
+function evaluarVisibilidadOpenness() {
+  const opennessPanel = document.getElementById('openness-panel');
+  if (!opennessPanel) return;
+
+  // Si venimos del menú de intervenciones, lo ocultamos por completo
+  if (typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
+    opennessPanel.setAttribute('visible', 'false');
+    opennessPanel.setAttribute('scale', '0 0 0'); // Evita colisiones fantasmas
+  } else {
+    // Para las técnicas se mantiene completamente visible
+    opennessPanel.setAttribute('visible', 'true');
+    opennessPanel.setAttribute('scale', '1 1 1');
+  }
+}
+
+// Asegurar que regrese a la normalidad si volvemos al inicio o a técnicas
+const originalCambiarPantallaVR = window.cambiarPantallaVR;
+window.cambiarPantallaVR = function(pantallaMostrarId) {
+  if (typeof originalCambiarPantallaVR === 'function') originalCambiarPantallaVR(pantallaMostrarId);
+  
+  // Si regresa al welcome o entra a la lista de técnicas, restauramos la visibilidad base
+  if (pantallaMostrarId === 'screen-welcome' || pantallaMostrarId === 'screen-technique-list') {
+    const opennessPanel = document.getElementById('openness-panel');
+    if (opennessPanel) {
+      opennessPanel.setAttribute('visible', 'true');
+      opennessPanel.setAttribute('scale', '1 1 1');
+    }
+  }
+};
 
 // Reemplaza el bloque de la línea 1455 por esto:
 window.goHistory = function() {
