@@ -1208,11 +1208,6 @@ function showScreen(name) {
   }
 }
 
-
-
-
-
-
 function goWelcome(){
 
   showScreen('welcome');
@@ -1948,20 +1943,9 @@ function setupControllers(){
 
 
 function selectAndPreviewVR(techniqueId) {
-  
-      console.log("Entré a selectAndPreviewVR", techniqueId);
-
   // 1. Ocultar la lista de técnicas y mostrar la de Active Listening
-  cambiarPantallaVR('screen-active-listening-activity');
-
-  document.querySelector('#screen-active-listening-activity')
-    .setAttribute('scale', '1 1 1');
-
-    document.querySelector('#screen-technique-list')
-    .setAttribute('scale', '0 0 0');
-console.log("visible:", screen.getAttribute('visible'));
-console.log("scale:", screen.getAttribute('scale'));
-
+  document.querySelector('#screen-technique-list').setAttribute('visible', 'false');
+  document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'true');
 
   if (typeof TECHNIQUE_PREVIEWS === 'undefined') {
     console.error("No se encontró el objeto TECHNIQUE_PREVIEWS. Revisa el orden en tu HTML.");
@@ -1971,26 +1955,14 @@ console.log("scale:", screen.getAttribute('scale'));
   const techniqueData = TECHNIQUE_PREVIEWS[techniqueId];
   if (!techniqueData) return;
 
-  console.log(techniqueData);
-console.log(techniqueData.good);
-console.log(techniqueData.good.exchanges);
-
   const conversation = techniqueData.good.exchanges; 
   
   const stage = document.querySelector('#vr-preview-stage');
-  console.log(stage);
-  console.log(stage.getAttribute("visible"));
-console.log(stage.parentElement);
   if (!stage) {
     console.error("No se encontró el contenedor #vr-preview-stage en el HTML.");
     return;
   }
-  console.log("Número de hijos:", stage.children.length);
-console.log(stage.innerHTML);
-
-  while(stage.firstChild){
-    stage.removeChild(stage.firstChild);
-} // Limpiar mensajes anteriores
+  stage.innerHTML = ''; // Limpiar mensajes anteriores
 
   // 3. Renderizar en el espacio 3D de A-Frame
   let yOffset = 0.4; 
@@ -2018,7 +1990,9 @@ console.log(stage.innerHTML);
 }
 
 function exitPreviewVR() {
-    cambiarPantallaVR('screen-technique-list');
+  // Regresar de la conversación al menú de técnicas
+  document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'false');
+  document.querySelector('#screen-technique-list').setAttribute('visible', 'true');
 }
 
 
@@ -2106,7 +2080,7 @@ if(btnTechBack)
   var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
   
   
-  var btnEnd = document.getElementById('btn-end-practice').addEventListener('click', function () {
+  var btnEnd=document.getElementById('btn-end-practice').addEventListener('click', function() {
     console.log("🏁 Botón Terminar presionado. Origen:", appState.origenActividad);
 
     // Ocultamos la pantalla de la práctica actual
@@ -2117,34 +2091,37 @@ if(btnTechBack)
     }
 
     if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
+        window.speechSynthesis.cancel(); 
     }
 
-    // ==========================
-    // CASO 4 BOTONES
-    // ==========================
     if (appState.origenActividad === '4-botones') {
-
-        console.log("Saltando evaluación. Redirigiendo a Welcome.");
+        console.log("Saltando evaluación. Redirigiendo y activando screen-welcome...");
         cambiarPantallaVR('screen-welcome');
 
-    }
-    // ==========================
-    // CASO 14 BOTONES
-    // ==========================
-    else {
-
-        console.log("Mostrando evaluación con IA.");
-
-        // Esta función ya hace el showScreen('eval')
-        if (typeof goEval === 'function') {
-            goEval();
+    } else {
+        console.log("Mostrando panel de evaluación estándar.");
+        
+        // 1. Cambiamos oficialmente a la pantalla de evaluación usando el sistema nativo
+        cambiarPantallaVR('screen-eval');
+        
+        // 2. 🚀 DISPARADOR DEL ANÁLISIS: 
+        // Vamos a buscar la función encargada de procesar el texto/API.
+        // Dependiendo de cómo se llame en tus archivos JS externos (interventions.js o preview.js),
+        // el sistema ejecutará la correcta de forma automática:
+        if (typeof procesarEvaluacion === 'function') {
+            procesarEvaluacion();
+        } else if (typeof calcularFeedback === 'function') {
+            calcularFeedback();
+        } else if (typeof triggerEvaluation === 'function') {
+            triggerEvaluation();
+        } else if (typeof finalizarSimulacion === 'function') {
+            finalizarSimulacion();
         } else {
-            console.warn("⚠️ No existe la función goEval().");
+            console.warn("⚠️ Advertencia: No se encontró una función automática para procesar la evaluación. Revisa cómo se llama en tus archivos .js externos.");
         }
-
     }
 });
+
 
 
   
