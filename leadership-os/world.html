@@ -854,14 +854,16 @@ function funcionIntervTenureRenewal() {
 
   </a-entity>
 
-  <a-entity id="btn-techniques-back" position="0 0.5 -2.5" class="clickable">
-    <a-plane width="0.82" height="0.26" color="#111830" material="opacity:0.9; shader:flat"
-             animation__mouseenter="property: material.color; to: #1c2a5e; dur: 150; startEvents: mouseenter"
-             animation__mouseleave="property: material.color; to: #111830; dur: 200; startEvents: mouseleave">
-      <a-text value="BACK" align="center" color="#4466ff" width="3" position="0 0 0.01" font="mozillavr" shader="msdf"></a-text>
-    </a-plane>
-    <a-plane width="0.86" height="0.30" color="#4466ff" material="opacity:0.4; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
-  </a-entity>
+ <a-entity id="btn-techniques-back" position="0 0.5 -2.5">
+  <a-plane class="clickable"
+           handler-botones-vr="mensaje: Regresando a la pantalla de bienvenida; tecnica: close-history"
+           width="0.82" height="0.26" color="#111830" material="opacity:0.9; shader:flat"
+           animation__mouseenter="property: material.color; to: #1c2a5e; dur: 150; startEvents: mouseenter"
+           animation__mouseleave="property: material.color; to: #111830; dur: 200; startEvents: mouseleave">
+    <a-text value="BACK" align="center" color="#4466ff" width="3" position="0 0 0.01" font="mozillavr" shader="msdf"></a-text>
+  </a-plane>
+  <a-plane width="0.86" height="0.30" color="#4466ff" material="opacity:0.4; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+</a-entity>
 </a-entity>
 
   <!-- SCREEN: PRACTICE -->
