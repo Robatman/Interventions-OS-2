@@ -196,8 +196,9 @@ function funcionShowInterventions(){
 function funcionShowtechniques(){
     console.log("Cambiando a pantalla de tecnicas");
     appState.activeMenu = 'techniques';
-    appState.origenActividad = '14-botones'; // 👈 Añadimos esta línea
-    cambiarPantallaVR('screen-technique-list'); 
+    appState.origenActividad = '14-botones';
+    // Forzamos el uso consistente usando showScreen o cambiarPantallaVR
+    showScreen('screen-technique-list'); 
 }
 
 // ==========================================
