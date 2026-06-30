@@ -1977,7 +1977,12 @@ console.log(stage.parentElement);
     console.error("No se encontró el contenedor #vr-preview-stage en el HTML.");
     return;
   }
-  stage.innerHTML = ''; // Limpiar mensajes anteriores
+  console.log("Número de hijos:", stage.children.length);
+console.log(stage.innerHTML);
+
+  while(stage.firstChild){
+    stage.removeChild(stage.firstChild);
+} // Limpiar mensajes anteriores
 
   // 3. Renderizar en el espacio 3D de A-Frame
   let yOffset = 0.4; 
