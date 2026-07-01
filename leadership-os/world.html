@@ -1236,7 +1236,7 @@ function goMode(menuType){
 function goLearn() {
   appState.agentHistory = [];
   
-  // 🚫 Ocultar el panel de Openness en modo Learn
+  // 🚫 Forzar que el panel de Openness SIEMPRE se oculte en Learn
   const opennessPanel = document.getElementById('openness-panel');
   if (opennessPanel) {
     opennessPanel.setAttribute('visible', 'false');
@@ -1251,7 +1251,23 @@ function goLearn() {
   setDialog('JUANJOLOTE', intro);
   speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
   appState.agentHistory.push({ role: 'assistant', content: intro });
-  console.log("dio click al goLearn");
+}
+
+function goWork() {
+  appState.agentHistory = [];
+  
+  // 🚫 Forzar que el panel de Openness SIEMPRE se oculte en Work Together
+  const opennessPanel = document.getElementById('openness-panel');
+  if (opennessPanel) {
+    opennessPanel.setAttribute('visible', 'false');
+  }
+
+  var intro = 'Cuentame, que situacion tienes con un agente ahora mismo?';
+  showScreen('practice');
+  setJuanMood('talking');
+  setDialog('JUANJOLOTE', intro);
+  speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
+  appState.agentHistory.push({ role: 'assistant', content: intro });
 }
 
 function goWork() {
@@ -1276,10 +1292,11 @@ function goPractice(){
 
   appState.agentHistory = [];
   
-  // 👁️ Forzar que el panel de Openness SÍ sea visible en Practice
+  // 👁️ Forzar que el panel de Openness SIEMPRE sea visible y tenga su escala correcta en Practice
   const opennessPanel = document.getElementById('openness-panel');
   if (opennessPanel) {
     opennessPanel.setAttribute('visible', 'true');
+    opennessPanel.setAttribute('scale', '1 1 1'); // Asegura que se renderice con su tamaño original
   }
 
   var arch=pickRandomArchetype();
@@ -1300,18 +1317,12 @@ function goPractice(){
   speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});
   console.log("dio click al goPractice");
 
-  // 👁️ Ocultar o mostrar el panel de OPENNESS según el origen
-  const panelOpenness = document.getElementById('openness-panel');
-  if (panelOpenness) {
-    if (appState.origenActividad === '4-botones') {
-      panelOpenness.setAttribute('visible', 'false');
-      panelOpenness.setAttribute('scale', '0 0 0'); // Evita bugs visuales
-    } else {
-      panelOpenness.setAttribute('visible', 'true');
-      panelOpenness.setAttribute('scale', '1 1 1');
-    }
-  }
+  // El bloque viejo que validaba '4-botones' ha sido eliminado de aquí 
+  // para evitar que oculte el panel de forma incorrecta.
 }
+
+
+
   function go14button(){
   console.log("Entro a go14Butones");
     showScreen('technique-list');
