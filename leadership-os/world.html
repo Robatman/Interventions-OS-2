@@ -157,22 +157,6 @@ function ejecutarFuncionPorTecnica(tecnica) {
       console.log("🔄 Regresando a la pantalla de bienvenida...");
       cambiarPantallaVR('screen-welcome');
       break;
-
-      // Modifica los casos existentes en tu switch de ejecutarFuncionPorTecnica:
-    case 'practice-intervention': 
-      appState.modoActual = 'practice'; // Aseguramos que se identifique como practice
-      goPractice(); 
-      break;
-
-    case 'learn-intervention': 
-      appState.modoActual = 'learn'; // Aquí le indicamos que es Learn
-      goLearn(); 
-      break;
-
-    case 'work-together-intervention': 
-      appState.modoActual = 'work-together'; // Aquí le indicamos que es Work Together
-      goWork(); 
-      break;
     
     
     // 🚨 El default SIEMPRE debe ir al último
@@ -249,41 +233,6 @@ function funcionIntervTenureRenewal() {
   console.log("Este es 6...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
-
-
-// Ejemplo de lógica a implementar donde arranca la simulación o el reconocimiento de voz
-function iniciarFlujoDeVozOActividad() {
-  // Identificamos si el modo actual requiere saltarse el openness
-  const esModoLearnOWork = (appState.modoActual === 'learn' || appState.modoActual === 'work-together');
-  
-  if (esModoLearnOWork) {
-    console.log("🚀 Modo Learn o Work Together detectado. Saltando validación de Openness...");
-    // Aquí inicias directamente la conversación o la actividad sin pasar por el paso de Openness
-    configurarSimulacionDirecta(); 
-  } else {
-    // Si es Practice (tanto para los 2, 4 o 14 botones), entra al flujo normal con Openness
-    console.log("🎯 Modo Practice detectado. Aplicando flujo con Openness.");
-    ejecutarValidacionOpenness();
-  }
-}
-
-function finalizarActividadSimulador() {
-  const esModoLearnOWork = (appState.modoActual === 'learn' || appState.modoActual === 'work-together');
-
-  if (esModoLearnOWork) {
-    console.log("🏁 Fin de Learn/Work. Saltando evaluación por petición del usuario.");
-    // En lugar de ir a la pantalla de evaluación, lo regresas al menú previo o al welcome
-    cambiarPantallaVR('screen-welcome'); 
-  } else {
-    // Para los botones de práctica de los 2, 4 y 14 se evalúa normalmente
-    console.log("📊 Generando evaluación para el modo Practice...");
-    cambiarPantallaVR('screen-eval');
-    mostrarResultadosDeEvaluacion();
-  }
-}
-
-
-
 
 </script>
 
@@ -1284,33 +1233,55 @@ function goMode(menuType){
   showScreen('mode');
 }
 
-function goLearn(){
-  appState.agentHistory=[];
-  var intro=appState.activeMenu==='interventions'
-    ?'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?'
-    :'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
+function goLearn() {
+  appState.agentHistory = [];
+  
+  // 🚫 Ocultar el panel de Openness en modo Learn
+  const opennessPanel = document.getElementById('openness-panel');
+  if (opennessPanel) {
+    opennessPanel.setAttribute('visible', 'false');
+  }
+
+  var intro = appState.activeMenu === 'interventions' 
+    ? 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?' 
+    : 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
+    
   showScreen('practice');
   setJuanMood('happy');
-  setDialog('JUANJOLOTE',intro);
-  speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
-  appState.agentHistory.push({role:'assistant',content:intro});
-    console.log("dio click al goLearn")
-
+  setDialog('JUANJOLOTE', intro);
+  speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
+  appState.agentHistory.push({ role: 'assistant', content: intro });
+  console.log("dio click al goLearn");
 }
 
-function goWork(){
-  appState.agentHistory=[];
-  var intro='Cuentame, que situacion tienes con un agente ahora mismo?';
+function goWork() {
+  appState.agentHistory = [];
+  
+  // 🚫 Ocultar el panel de Openness en modo Work Together
+  const opennessPanel = document.getElementById('openness-panel');
+  if (opennessPanel) {
+    opennessPanel.setAttribute('visible', 'false');
+  }
+
+  var intro = 'Cuentame, que situacion tienes con un agente ahora mismo?';
   showScreen('practice');
   setJuanMood('talking');
-  setDialog('JUANJOLOTE',intro);
-  speakVR(intro,'daniel',function(){setHUD('ready','Listo para responder');});
-  appState.agentHistory.push({role:'assistant',content:intro});
-    console.log("dio click al gowork")
-
+  setDialog('JUANJOLOTE', intro);
+  speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
+  appState.agentHistory.push({ role: 'assistant', content: intro });
+  console.log("dio click al gowork");
 }
 
 function goPractice(){
+
+  appState.agentHistory = [];
+  
+  // 👁️ Forzar que el panel de Openness SÍ sea visible en Practice
+  const opennessPanel = document.getElementById('openness-panel');
+  if (opennessPanel) {
+    opennessPanel.setAttribute('visible', 'true');
+  }
+
   var arch=pickRandomArchetype();
   var scenario=pickRandomScenario(arch,appState.currentLevel);
   appState.currentArchetype=arch;
