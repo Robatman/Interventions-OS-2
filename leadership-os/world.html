@@ -83,7 +83,8 @@ function cambiarPantallaVR(pantallaMostrarId) {
     'screen-history',
     'screen-practice',               // 👈 ¡Faltaba! Pantalla donde se hace la actividad
     'screen-eval',                   // 👈 ¡Faltaba! Pantalla de evaluación al terminar
-    'screen-active-listening-activity' // 👈 ¡Faltaba! Pantalla de actividad de escucha activa
+    'screen-active-listening-activity', // 👈 ¡Faltaba! Pantalla de actividad de escucha activa
+    'screen-level-selector'
   ];
   
   pantallas.forEach(id => {
@@ -144,7 +145,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interv-reclamaciones': funcionIntervReclamaciones(); break;
     case 'interv-tenure-renewal': funcionIntervTenureRenewal(); break;
 
-    case 'practice-intervention': goPractice(); break;
+    // case 'practice-intervention': goPractice(); break;
     case 'learn-intervention': goLearn(); break;
     case 'work-together-intervention': goWork(); break;
     
@@ -156,6 +157,34 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'close-history':
       console.log("🔄 Regresando a la pantalla de bienvenida...");
       cambiarPantallaVR('screen-welcome');
+      break;
+
+      case 'practice-intervention': 
+      console.log("🎚️ Abriendo selector de niveles para la práctica VR...");
+      cambiarPantallaVR('screen-level-selector'); 
+      break;
+
+
+      case 'level-novice':
+      appState.currentLevel = 'novice';
+      console.log("Dificultad fijada en: Novato");
+      goPractice(); // Inicia la simulación real de la actividad
+      break;
+
+    case 'level-intermediate':
+      appState.currentLevel = 'intermediate';
+      console.log("Dificultad fijada en: Intermedio");
+      goPractice(); 
+      break;
+
+    case 'level-expert':
+      appState.currentLevel = 'expert';
+      console.log("Dificultad fijada en: Experto");
+      goPractice(); 
+      break;
+
+    case 'back-to-learn-work':
+      cambiarPantallaVR('screen-learn-work-practice');
       break;
     
     
@@ -294,6 +323,7 @@ function funcionIntervTenureRenewal() {
     <a-sphere position="-13 8 -25" radius="0.03" color="#4466ff" material="shader:flat;opacity:0.4"></a-sphere>
     <a-sphere position="4 15 -28" radius="0.05" color="#9d5cff" material="shader:flat;opacity:0.3"></a-sphere>
   </a-entity>
+  
   <a-torus position="0 1 0" radius="6" radius-tubular="0.035" color="#2a3aaa" material="opacity:0.5;transparent:true;shader:flat" animation="property:rotation;to:0 360 0;loop:true;dur:25000;easing:linear"></a-torus>
   <a-torus position="0 1 0" rotation="65 0 0" radius="5" radius-tubular="0.025" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" animation="property:rotation;to:65 360 0;loop:true;dur:18000;easing:linear"></a-torus>
   <a-torus position="0 1 0" rotation="0 30 75" radius="7" radius-tubular="0.02" color="#9d5cff" material="opacity:0.2;transparent:true;shader:flat" animation="property:rotation;to:0 390 75;loop:true;dur:32000;easing:linear"></a-torus>
@@ -1010,6 +1040,80 @@ function funcionIntervTenureRenewal() {
 
 
 
+  <!-- SCREEN: VR LEVEL SELECTOR -->
+  <a-entity id="screen-level-selector" visible="false">
+    <a-text value="SELECCIONA TU NIVEL" position="0 2.5 -2.8" align="center" color="#e8eeff" width="6" font="exo2bold" shader="msdf"></a-text>
+    <a-text value="Elige la dificultad para tu simulación de práctica" position="0 2.18 -2.8" align="center" color="#c8d8ff" width="4.5" opacity="0.7" font="mozillavr" shader="msdf"></a-text>
+
+    <a-entity id="level-buttons-container">
+      
+      <!-- Nivel: Principiante (Novice) -->
+      <a-entity id="btn-level-novice" position="-1.65 1.3 -2.6" rotation="0 12 0">
+        <a-plane class="clickable" 
+                 handler-botones-vr="mensaje: Nivel Novato seleccionado; tecnica: level-novice"
+                 width="1.5" height="0.8" 
+                 color="#111830" 
+                 material="opacity: 0.8; shader: flat; transparent: true; side: double"
+                 animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+                 animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+                 animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+                 animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave">
+          <a-text value="PRINCIPIANTE" align="center" color="#ffffff" width="3" position="0 0.15 0.02" font="mozillavr" shader="msdf"></a-text>
+          <a-text value="Guías en pantalla\nCliente más dócil" align="center" color="#c8d8ff" width="2" position="0 -0.12 0.02" opacity="0.8" wrap-count="20" font="mozillavr"></a-text>
+          <a-plane width="1.3" height="0.02" color="#00e5c0" position="0 -0.32 0.03"></a-plane>
+        </a-plane>
+      </a-entity>
+
+      <!-- Nivel: Intermedio (Intermediate) -->
+      <a-entity id="btn-level-intermediate" position="0 1.3 -2.8" rotation="0 0 0">
+        <a-plane class="clickable" 
+                 handler-botones-vr="mensaje: Nivel Intermedio seleccionado; tecnica: level-intermediate"
+                 width="1.5" height="0.8" 
+                 color="#111830" 
+                 material="opacity: 0.8; shader: flat; transparent: true; side: double"
+                 animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+                 animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+                 animation__colorIn="property: material.color; to: #9d5cff; dur: 150; startEvents: mouseenter"
+                 animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave">
+          <a-text value="INTERMEDIO" align="center" color="#ffffff" width="3" position="0 0.15 0.02" font="mozillavr" shader="msdf"></a-text>
+          <a-text value="Menos ayudas\nRespuestas realistas" align="center" color="#c8d8ff" width="2" position="0 -0.12 0.02" opacity="0.8" wrap-count="20" font="mozillavr"></a-text>
+          <a-plane width="1.3" height="0.02" color="#9d5cff" position="0 -0.32 0.03"></a-plane>
+        </a-plane>
+      </a-entity>
+
+      <!-- Nivel: Experto (Expert) -->
+      <a-entity id="btn-level-expert" position="1.65 1.3 -2.6" rotation="0 -12 0">
+        <a-plane class="clickable" 
+                 handler-botones-vr="mensaje: Nivel Experto seleccionado; tecnica: level-expert"
+                 width="1.5" height="0.8" 
+                 color="#111830" 
+                 material="opacity: 0.8; shader: flat; transparent: true; side: double"
+                 animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+                 animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+                 animation__colorIn="property: material.color; to: #ff5ca0; dur: 150; startEvents: mouseenter"
+                 animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave">
+          <a-text value="EXPERTO" align="center" color="#ffffff" width="3" position="0 0.15 0.02" font="mozillavr" shader="msdf"></a-text>
+          <a-text value="Sin asistencia\nCliente de alta crisis" align="center" color="#c8d8ff" width="2" position="0 -0.12 0.02" opacity="0.8" wrap-count="20" font="mozillavr"></a-text>
+          <a-plane width="1.3" height="0.02" color="#ff5ca0" position="0 -0.32 0.03"></a-plane>
+        </a-plane>
+      </a-entity>
+
+    </a-entity>
+
+    <!-- Botón Regresar (Vuelve a las opciones LEARN/WORK/PRACTICE) -->
+    <a-entity id="btn-level-back" position="0 0.3 -2.5">
+      <a-plane class="clickable"
+               handler-botones-vr="mensaje: Regresando a opciones de intervención; tecnica: back-to-learn-work"
+               width="0.82" height="0.24" color="#111830" material="opacity:0.9; shader:flat">
+        <a-text value="BACK" align="center" color="#4466ff" width="3" position="0 0 0.01" font="mozillavr" shader="msdf"></a-text>
+      </a-plane>
+      <a-plane width="0.86" height="0.28" color="#4466ff" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+    </a-entity>
+  </a-entity>
+
+
+
+
 <!-- SCREEN: HISTORY & LOGS (VERSIÓN ANCHO COMPLETO - TEXTO AJUSTADO) -->
 <a-entity id="screen-history" position="0 1.6 -2" visible="false">
   <!-- Fondo del contenedor principal -->
@@ -1533,45 +1637,23 @@ function goHistory() {
 const originalGoPractice = window.goPractice;
 window.goPractice = function() {
   if (typeof originalGoPractice === 'function') originalGoPractice();
-  // evaluarVisibilidadOpenness();
 };
 
 const originalGoLearn = window.goLearn;
 window.goLearn = function() {
   if (typeof originalGoLearn === 'function') originalGoLearn();
-  // evaluarVisibilidadOpenness();
 };
 
 const originalGoWork = window.goWork;
 window.goWork = function() {
   if (typeof originalGoWork === 'function') originalGoWork();
-  // evaluarVisibilidadOpenness();
 };
 
-// // Función auxiliar para controlar el panel
-// function evaluarVisibilidadOpenness() {
-//   const opennessPanel = document.getElementById('openness-panel');
-//   if (!opennessPanel) return;
-
-//   // Si venimos del menú de intervenciones, lo ocultamos por completo
-//   if (typeof appState !== 'undefined' && appState.activeMenu === 'interventions') {
-//     opennessPanel.setAttribute('visible', 'false');
-//     opennessPanel.setAttribute('scale', '0 0 0'); // Evita colisiones fantasmas
-//   } else {
-//     // Para las técnicas se mantiene completamente visible
-//     opennessPanel.setAttribute('visible', 'true');
-//     opennessPanel.setAttribute('scale', '1 1 1');
-//   }
-// }
 
 
 
 
 
-
-
-// Buscamos interceptar la función que se ejecuta al dar click en "Terminar"
-// (Ajusta 'endActivity' si en tu script se llama diferente, ej: finalizarConversacion)
 if (typeof window.endActivity === 'function') {
   const originalEndActivity = window.endActivity;
   
