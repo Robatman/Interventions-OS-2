@@ -166,22 +166,25 @@ function ejecutarFuncionPorTecnica(tecnica) {
 
 
       case 'level-novice':
-      appState.currentLevel = 'novice';
-      console.log("Dificultad fijada en: Novato");
-      goPractice(); // Inicia la simulación real de la actividad
-      break;
+            appState.currentLevel = 'novice';
+            appState.evaluacionHabilitada = true; // 🌟 Activamos evaluación SOLO para práctica real
+            console.log("Dificultad fijada en: Novato. Evaluación Habilitada.");
+            goPractice(); 
+            break;
 
-    case 'level-intermediate':
-      appState.currentLevel = 'intermediate';
-      console.log("Dificultad fijada en: Intermedio");
-      goPractice(); 
-      break;
+          case 'level-intermediate':
+            appState.currentLevel = 'intermediate';
+            appState.evaluacionHabilitada = true; // 🌟 Activamos evaluación SOLO para práctica real
+            console.log("Dificultad fijada en: Intermedio. Evaluación Habilitada.");
+            goPractice(); 
+            break;
 
-    case 'level-expert':
-      appState.currentLevel = 'expert';
-      console.log("Dificultad fijada en: Experto");
-      goPractice(); 
-      break;
+          case 'level-expert':
+            appState.currentLevel = 'expert';
+            appState.evaluacionHabilitada = true; // 🌟 Activamos evaluación SOLO para práctica real
+            console.log("Dificultad fijada en: Experto. Evaluación Habilitada.");
+            goPractice(); 
+            break;
 
     case 'back-to-learn-work':
       cambiarPantallaVR('screen-learn-work-practice');
@@ -214,8 +217,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
 
 function funcionShowInterventions(){
     console.log("Cambiando a pantalla de intervenciones");
-    appState.activeMenu = 'interventions';
-    appState.origenActividad = '4-botones';
+    appState.activeMenu = 'interventions';    
     if(typeof cambiarPantallaVR==='function'){
         cambiarPantallaVR('screen-interventions');
     }else{
@@ -226,7 +228,6 @@ function funcionShowInterventions(){
 function funcionShowtechniques(){
     console.log("Cambiando a pantalla de tecnicas");
     appState.activeMenu = 'techniques';
-    appState.origenActividad = '14-botones';
     cambiarPantallaVR('screen-technique-list'); 
 }
 
