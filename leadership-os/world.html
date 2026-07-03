@@ -64,7 +64,7 @@ AFRAME.registerComponent('handler-botones-vr', {
       }
       evt.stopPropagation(); 
       
-      console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id || el.parentElement.id})`);
+      // console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id ||i8 el.parentElement.id})`);
       ejecutarFuncionPorTecnica(data.tecnica);
     });
   }
@@ -111,7 +111,7 @@ function cambiarPantallaVR(pantallaMostrarId) {
 
 
 function ejecutarFuncionPorTecnica(tecnica) {
-  console.log("⚡ Buscando técnica:", tecnica);
+  // console.log("⚡ Buscando técnica:", tecnica);
 
   // cambiarPantallaVR(''); 
 
@@ -150,17 +150,17 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'work-together-intervention': goWork(); break;
     
      case 'progress': 
-      console.log("📊 Abriendo historial de progreso..."); 
+      // console.log("📊 Abriendo historial de progreso..."); 
       goHistory(); 
       break;
 
     case 'close-history':
-      console.log("🔄 Regresando a la pantalla de bienvenida...");
+      // console.log("🔄 Regresando a la pantalla de bienvenida...");
       cambiarPantallaVR('screen-welcome');
       break;
 
       case 'practice-intervention': 
-      console.log("🎚️ Abriendo selector de niveles para la práctica VR...");
+      // console.log("🎚️ Abriendo selector de niveles para la práctica VR...");
       cambiarPantallaVR('screen-level-selector'); 
       break;
 
@@ -168,21 +168,21 @@ function ejecutarFuncionPorTecnica(tecnica) {
       case 'level-novice':
             appState.currentLevel = 'novice';
             appState.evaluacionHabilitada = true; // 🌟 Activamos evaluación SOLO para práctica real
-            console.log("Dificultad fijada en: Novato. Evaluación Habilitada.");
+            // console.log("Dificultad fijada en: Novato. Evaluación Habilitada.");
             goPractice(); 
             break;
 
           case 'level-intermediate':
             appState.currentLevel = 'intermediate';
             appState.evaluacionHabilitada = true; // 🌟 Activamos evaluación SOLO para práctica real
-            console.log("Dificultad fijada en: Intermedio. Evaluación Habilitada.");
+            // console.log("Dificultad fijada en: Intermedio. Evaluación Habilitada.");
             goPractice(); 
             break;
 
           case 'level-expert':
             appState.currentLevel = 'expert';
             appState.evaluacionHabilitada = true; // 🌟 Activamos evaluación SOLO para práctica real
-            console.log("Dificultad fijada en: Experto. Evaluación Habilitada.");
+            // console.log("Dificultad fijada en: Experto. Evaluación Habilitada.");
             goPractice(); 
             break;
 
@@ -193,30 +193,13 @@ function ejecutarFuncionPorTecnica(tecnica) {
     
     // 🚨 El default SIEMPRE debe ir al último
     default: 
-      console.log("⚡ Ejecutando función genérica de la academia.");
+      // console.log("⚡ Ejecutando función genérica de la academia.");
       break;
   }
 }
 
-  // Tus funciones de redirección adaptadas para usar el nuevo sistema seguro:
-  function funcionActiveListening() { console.log("🗣️ Activando entorno de Escucha Activa..."); goPractice(); }
-  function funcionPowerfulQuestions() { console.log("❓ Cargando batería de Preguntas Poderosas..."); goPractice(); }
-  function funcionMotivationalInterviewing() { console.log("🎯 Iniciando Entrevista Motivacional..."); goPractice(); }
-  function funcionNonviolentCommunication() { console.log("🕊️ Configurando Comunicación No Violenta..."); goPractice(); }
-  function funcionRadicalCandor() { console.log("🕊️ Iniciando El Radical Candor..."); goPractice(); }
-  function funcionCrucialConversations() { console.log("🕊️ Iniciando Crucial Conversations..."); goPractice(); }
-  function funcionTacticalEmpathy() { console.log("🕊️ Iniciando Tactical Empathy..."); goPractice(); }
-  function funcionScarfModel() { console.log("🕊️ Iniciando SCARF Model..."); goPractice(); }
-  function funcionImmunityToChange() { console.log("🕊️ Iniciando Immunity to Change..."); goPractice(); }
-  function funcionDramaTriangle() { console.log("🕊️ Iniciando Drama Triangle..."); goPractice(); }
-  function funcionGrowModel() { console.log("🕊️ Iniciando GROW Model..."); goPractice(); }
-  function funcionStrengthsBasedCoaching() { console.log("🕊️ Iniciando Strengths-Based Coaching..."); goPractice(); }
-  function funcionGrowthMindset() { console.log("🕊️ Iniciando Growth Mindset..."); goPractice(); }
-  function funcionSolutionFocusedCoaching() { console.log("🕊️ Iniciando Solution-Focused Coaching..."); goPractice(); }
-  function funcionIntervPulseCheck() { console.log("🔄 Cargando herramienta Pulse Check..."); goPractice(); }
-
 function funcionShowInterventions(){
-    console.log("Cambiando a pantalla de intervenciones");
+    // console.log("Cambiando a pantalla de intervenciones");
     appState.activeMenu = 'interventions';    
     if(typeof cambiarPantallaVR==='function'){
         cambiarPantallaVR('screen-interventions');
@@ -226,7 +209,7 @@ function funcionShowInterventions(){
 }
 
 function funcionShowtechniques(){
-    console.log("Cambiando a pantalla de tecnicas");
+    // console.log("Cambiando a pantalla de tecnicas");
     appState.activeMenu = 'techniques';
     cambiarPantallaVR('screen-technique-list'); 
 }
@@ -235,32 +218,32 @@ function funcionShowtechniques(){
 // 🚀 NUEVAS FUNCIONES DE INTERVENCIONES
 // ==========================================
 function funcionIntervRetencion() {
-  console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
-  console.log("Este es 2...");
+  // console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
+  // console.log("Este es 2...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
 function funcionIntervFidelizacion() {
-  console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
-  console.log("Este es 3...");
+  // console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
+  // console.log("Este es 3...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
 function funcionIntervSoporteCritico() {
-  console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
-  console.log("Este es 4...");
+  // console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
+  // console.log("Este es 4...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
 function funcionIntervReclamaciones() {
-  console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
-  console.log("Este es 5...");
+  // console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
+  // console.log("Este es 5...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
 function funcionIntervTenureRenewal() {
-  console.log("🤬 [Intervención] Cargando simulación:  Tenure Renewal...");
-  console.log("Este es 6...");
+  // console.log("🤬 [Intervención] Cargando simulación:  Tenure Renewal...");
+  // console.log("Este es 6...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
@@ -1198,7 +1181,7 @@ function toggleListeningMoves() {
   // 🛑 CANDADO DE SEGURIDAD PARA LA BIENVENIDA:
   const welcomeScreen = document.getElementById('screen-welcome');
   if (welcomeScreen && welcomeScreen.getAttribute('visible') === 'true') {
-    console.log("🚫 Click bloqueado: No puedes usar este botón mientras estés en la pantalla de bienvenida.");
+    // console.log("🚫 Click bloqueado: No puedes usar este botón mientras estés en la pantalla de bienvenida.");
     return; // Detiene la función por completo y no hace nada de lo de abajo
   }
 
@@ -1226,7 +1209,7 @@ function toggleListeningMoves() {
     btnText.setAttribute('text', 'value', "See the moves");
     btnPlane.setAttribute('color', '#ff5ca0');
     
-    console.log("Este es 1...");
+    // console.log("Este es 1...");
     showScreen('learn-work-practice');
   }
 }
@@ -1246,7 +1229,7 @@ function pickRandomOpener(archetype,scenario){
 }
 
 function showScreen(name) {
-  console.log("🔄 Solicitando cambiar a la pantalla:", name);
+  // console.log("🔄 Solicitando cambiar a la pantalla:", name);
   var idReal = name.startsWith('screen-') ? name : 'screen-' + name;
   
   // Delegamos el control a nuestra función maestra corregida
@@ -1296,27 +1279,27 @@ function showScreen(name) {
   if (name === 'technique-list') {
     planosTecnicas.forEach(function(el) {
       el.classList.add('clickable');
-      console.log("🟢 Botón de técnica ACTIVADO: " + el.id);
+      // console.log("🟢 Botón de técnica ACTIVADO: " + el.id);
     });
-    console.log("🟢 14 botones de técnicas específicos ACTIVADOS");
+    // console.log("🟢 14 botones de técnicas específicos ACTIVADOS");
 
   } else if (name === 'interventions') {
     planosTecnicas.forEach(function(el) {
       el.classList.remove('clickable');
     });
-    console.log("🔴 14 botones de técnicas específicos DESACTIVADOS por ingresar a Intervenciones");
+    // console.log("🔴 14 botones de técnicas específicos DESACTIVADOS por ingresar a Intervenciones");
 
     const btnTecnicasGeneral = document.getElementById('btn-tecnicas'); 
     if (btnTecnicasGeneral) {
       btnTecnicasGeneral.classList.remove('clickable');
-      console.log("🔴 Botón general de técnicas DESACTIVADO");
+      // console.log("🔴 Botón general de técnicas DESACTIVADO");
     }
 
   } else {
     planosTecnicas.forEach(function(el) {
       el.classList.remove('clickable');
     });
-    console.log("🔴 14 botones de técnicas específicos DESACTIVADOS");
+    // console.log("🔴 14 botones de técnicas específicos DESACTIVADOS");
   }
 }
 
@@ -1390,13 +1373,13 @@ function goWork() {
   setDialog('JUANJOLOTE', intro);
   speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
   appState.agentHistory.push({ role: 'assistant', content: intro });
-  console.log("dio click al gowork");
+  // console.log("dio click al gowork");
 }
 
 function goPractice(){
-  console.log("=== ENTRANDO A GOPRACTICE ===");
-  console.log("Origen actual de la actividad:", appState.origenActividad);
-  console.log("Menú activo:", appState.activeMenu);
+  // console.log("=== ENTRANDO A GOPRACTICE ===");
+  // console.log("Origen actual de la actividad:", appState.origenActividad);
+  // console.log("Menú activo:", appState.activeMenu);
 
   appState.agentHistory = [];
   
@@ -1405,7 +1388,7 @@ function goPractice(){
   setTimeout(() => {
     const opennessPanel = document.getElementById('openness-panel');
     if (opennessPanel) {
-      console.log("Forzando Openness a VISIBLE desde el setTimeout");
+      // console.log("Forzando Openness a VISIBLE desde el setTimeout");
       opennessPanel.setAttribute('visible', 'true');
       opennessPanel.setAttribute('scale', '1 1 1');
     } else {
@@ -1429,18 +1412,18 @@ function goPractice(){
   showScreen('practice');
   setDialog(arch.name.toUpperCase(),opener);
   speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});
-  console.log("dio click al goPractice al final de la función");
+  // console.log("dio click al goPractice al final de la función");
 }
 
 
 
   function go14button(){
-  console.log("Entro a go14Butones");
+  // console.log("Entro a go14Butones");
     showScreen('technique-list');
   }
 
   function goInterventions(){
-  console.log("Entro a goInterventions");
+  // console.log("Entro a goInterventions");
     showScreen('interventions');
   }
 
@@ -1567,7 +1550,7 @@ function guardarSesionDePrueba() {
 
 // Asegúrate de reemplazar la función goHistory vieja por esta versión adaptada a VR:
 function goHistory() {
-  console.log("🗣️ Mostrando panel de historial en el espacio VR...");
+  // console.log("🗣️ Mostrando panel de historial en el espacio VR...");
   
   // 1. Cambiar de pantalla visualmente en el entorno 3D
   cambiarPantallaVR('screen-history');
@@ -1661,7 +1644,7 @@ if (typeof window.endActivity === 'function') {
   window.endActivity = function() {
     // Si NO está habilitada la evaluación (es decir, NO es modo Práctica)
     if (typeof appState !== 'undefined' && !appState.evaluacionHabilitada) {
-      console.log("Botón Terminar presionado fuera de Práctica. Limpiando y saliendo al inicio...");
+      // console.log("Botón Terminar presionado fuera de Práctica. Limpiando y saliendo al inicio...");
       
       if (typeof stopMic === 'function') stopMic();
       if (typeof detenerReconocimiento === 'function') detenerReconocimiento();
@@ -1684,7 +1667,7 @@ if (typeof window.endActivity === 'function') {
 
 // Reemplaza el bloque de la línea 1455 por esto:
 window.goHistory = function() {
-  console.log("🗣️ Mostrando panel de historial en el espacio VR...");
+  // console.log("🗣️ Mostrando panel de historial en el espacio VR...");
   
   // 1. Cambiar de pantalla visualmente en el entorno 3D
   if (typeof cambiarPantallaVR === 'function') {
@@ -1797,7 +1780,7 @@ async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
   // traducir
   const englishText = await translateToEnglish(text);
 
-  console.log("Translated:", englishText);
+  // console.log("Translated:", englishText);
 
   // pedir audio
   const speechResponse = await fetch('/api/groq_speakvr', {
@@ -1844,18 +1827,18 @@ await audio.play();
 // =========================================================================
 async function setupMic(){
   try{
-    console.log('[Mic] Solicitando permisos de micrófono...');
+    // console.log('[Mic] Solicitando permisos de micrófono...');
     audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
-    console.log('[Mic] Permisos concedidos. Stream obtenido:', audioStream.id);
+    // console.log('[Mic] Permisos concedidos. Stream obtenido:', audioStream.id);
     
     audioContext=new (window.AudioContext||window.webkitAudioContext)();
-    console.log('[Mic] AudioContext estado inicial:', audioContext.state);
+    // console.log('[Mic] AudioContext estado inicial:', audioContext.state);
     
     analyser=audioContext.createAnalyser();
     analyser.fftSize=2048;
     audioContext.createMediaStreamSource(audioStream).connect(analyser);
     setHUD('ready','Listo para hablar');
-    console.log('[Mic] Configuración completa y Analyser conectado.');
+    // console.log('[Mic] Configuración completa y Analyser conectado.');
   } catch(e){
     setHUD('idle','Sin microfono - modo texto');
     console.error('[Mic] Error en setupMic:',e);
@@ -1863,25 +1846,25 @@ async function setupMic(){
 }
 
 function startRecording(){
-  console.log('[Grabación] Intento de iniciar grabación. Estado actual -> isRecording:', isRecording, 'isProcessing:', isProcessing, 'hasAudioStream:', !!audioStream);
+  // console.log('[Grabación] Intento de iniciar grabación. Estado actual -> isRecording:', isRecording, 'isProcessing:', isProcessing, 'hasAudioStream:', !!audioStream);
   if(isRecording||isProcessing||!audioStream) return;
   
   // Reactivar AudioContext por si el navegador lo suspendió (muy común)
   if (audioContext && audioContext.state === 'suspended') {
-    console.log('[Mic] AudioContext suspendido. Intentando reactivar...');
+    // console.log('[Mic] AudioContext suspendido. Intentando reactivar...');
     audioContext.resume();
   }
 
   audioChunks=[]; isRecording=true;
   var mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
-  console.log('[Grabación] Usando formato MIME:', mime);
+  // console.log('[Grabación] Usando formato MIME:', mime);
   
   mediaRecorder=new MediaRecorder(audioStream,{mimeType:mime});
   
   mediaRecorder.ondataavailable=function(e){
     if(e.data.size>0){
       audioChunks.push(e.data);
-      console.log('[Grabación] Chunk recibido. Tamaño:', e.data.size, 'bytes. Total chunks:', audioChunks.length);
+      // console.log('[Grabación] Chunk recibido. Tamaño:', e.data.size, 'bytes. Total chunks:', audioChunks.length);
     } else {
       console.warn('[Grabación] Chunk recibido pero está VACÍO (0 bytes)');
     }
@@ -1894,18 +1877,18 @@ function startRecording(){
   
   setTimeout(function(){
     if(isRecording){
-      console.log('[Grabación] Límite de 25 segundos alcanzado. Forzando parada.');
+      // console.log('[Grabación] Límite de 25 segundos alcanzado. Forzando parada.');
       stopRecording();
     }
   },25000);
 }
 
 function stopRecording(){
-  console.log('[Grabación] stopRecording invocado. ¿Registrando?:', isRecording);
+  // console.log('[Grabación] stopRecording invocado. ¿Registrando?:', isRecording);
   if(!isRecording||!mediaRecorder)return;
   isRecording=false;
   if(silenceTimer){
-    console.log('[Grabación] Limpiando temporizador de silencio.');
+    // console.log('[Grabación] Limpiando temporizador de silencio.');
     cancelAnimationFrame(silenceTimer);
     silenceTimer=null;
   }
@@ -1916,7 +1899,7 @@ function stopRecording(){
 
 function startSilenceDetection(){
   var data=new Uint8Array(analyser.frequencyBinCount),silenceMs=0,lastTime=performance.now();
-  console.log('[Silencio] Detección iniciada. Umbral (SILENCE_THRESHOLD):', typeof SILENCE_THRESHOLD !== 'undefined' ? SILENCE_THRESHOLD : 'No definido');
+  // console.log('[Silencio] Detección iniciada. Umbral (SILENCE_THRESHOLD):', typeof SILENCE_THRESHOLD !== 'undefined' ? SILENCE_THRESHOLD : 'No definido');
   
   function check(){
     if(!isRecording) return;
@@ -1930,7 +1913,7 @@ function startSilenceDetection(){
     if(avg<SILENCE_THRESHOLD){
       silenceMs+=dt;
       if(silenceMs>=SILENCE_DURATION){
-        console.log(`[Silencio] Silencio detectado por ${silenceMs}ms (Límite: ${SILENCE_DURATION}ms). Deteniendo grabación automáticamente.`);
+        // console.log(`[Silencio] Silencio detectado por ${silenceMs}ms (Límite: ${SILENCE_DURATION}ms). Deteniendo grabación automáticamente.`);
         stopRecording();
         return;
       }
@@ -1944,9 +1927,9 @@ function startSilenceDetection(){
 }
 
 async function onRecordingStop(){
-  console.log('[Grabación] MediaRecorder se ha detenido. Armando el Blob...');
+  // console.log('[Grabación] MediaRecorder se ha detenido. Armando el Blob...');
   var blob=new Blob(audioChunks,{type:'audio/webm'});
-  console.log('[Grabación] Archivo de audio generado -> Tamaño total:', blob.size, 'bytes');
+  // console.log('[Grabación] Archivo de audio generado -> Tamaño total:', blob.size, 'bytes');
   
   if(blob.size<800){
     console.error('[Grabación] El archivo de audio es DEMASIADO PEQUEÑO (menor a 800 bytes). Se cancela el envío.');
@@ -1956,9 +1939,9 @@ async function onRecordingStop(){
   
   isProcessing=true;
   try{
-    console.log('[Whisper] Enviando audio a transcribir...');
+    // console.log('[Whisper] Enviando audio a transcribir...');
     var text=await transcribeAudio(blob);
-    console.log('[Whisper] Respuesta cruda recibida de la función transcribir:', text);
+    // console.log('[Whisper] Respuesta cruda recibida de la función transcribir:', text);
     
     if(!text||text.trim().length<2){
       console.warn('[Whisper] La transcripción regresó vacía o demasiado corta.');
@@ -1967,18 +1950,18 @@ async function onRecordingStop(){
       return;
     }
     
-    console.log('[Whisper] Transcripción exitosa:', text);
+    // console.log('[Whisper] Transcripción exitosa:', text);
     if(appState.screen==='practice') setDialog('TU',text);
     setHUD('thinking','Pensando...');
     
-    console.log('[VR] Ejecutando handleVRSpeech con el texto...');
+    // console.log('[VR] Ejecutando handleVRSpeech con el texto...');
     await handleVRSpeech(text);
   } catch(e){
     console.error('[Voice] Error crítico en el flujo de parada/transcripción:', e);
     setHUD('ready','Error, intenta de nuevo');
   } finally {
     isProcessing=false;
-    console.log('[Grabación] Ciclo finalizado. Listo para la siguiente instrucción.');
+    // console.log('[Grabación] Ciclo finalizado. Listo para la siguiente instrucción.');
   }
 }
 
@@ -1986,14 +1969,14 @@ async function transcribeAudio(blob) {
   var form = new FormData();
   form.append('file', blob, 'rec.webm');
 
-  console.log('[Frontend] Enviando audio a nuestro backend seguro...');
+  // console.log('[Frontend] Enviando audio a nuestro backend seguro...');
   try {
     var res = await fetch('/api/transcribe', {
       method: 'POST',
       body: form // 👈 ¡ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ AQUÍ!
     });
 
-    console.log('[Frontend] Status Code de la API:', res.status);
+    // console.log('[Frontend] Status Code de la API:', res.status);
     var data = await res.status === 200 ? await res.json() : await res.json().catch(() => ({}));
 
     if (!res.ok) {
@@ -2009,7 +1992,7 @@ async function transcribeAudio(blob) {
 
 function setupControllers(){
   var scene=document.querySelector('a-scene');
-  console.log('[VR Controles] Inicializando controladores VR...');
+  // console.log('[VR Controles] Inicializando controladores VR...');
   
   // Mano Derecha
   var rc=document.createElement('a-entity');
@@ -2025,27 +2008,27 @@ function setupControllers(){
   
   [rc,lc].forEach(function(ctrl){
     ctrl.addEventListener('triggerdown',function(){
-      console.log('[VR Controles] Trigger presionado en:', ctrl.getAttribute('oculus-touch-controls'));
+      // console.log('[VR Controles] Trigger presionado en:', ctrl.getAttribute('oculus-touch-controls'));
       var hit=ctrl.components&&ctrl.components.raycaster&&ctrl.components.raycaster.intersectedEls&&ctrl.components.raycaster.intersectedEls[0];
       
       if(hit){
         if (hit.object3D && hit.object3D.visible === false) {
-          console.log("🔒 Clic fantasma bloqueado en elemento oculto:", hit.id);
+          // console.log("🔒 Clic fantasma bloqueado en elemento oculto:", hit.id);
           return; 
         }
-        console.log('[VR Controles] Clic ejecutado en elemento objetivo:', hit.id || hit.tagName);
+        // console.log('[VR Controles] Clic ejecutado en elemento objetivo:', hit.id || hit.tagName);
         hit.click();
         return;
       }
       
-      console.log('[VR Controles] Trigger al aire. ¿Pantalla actual es practice?:', appState.screen);
+      // console.log('[VR Controles] Trigger al aire. ¿Pantalla actual es practice?:', appState.screen);
       if(appState.screen==='practice'){
         if(!isRecording&&!isProcessing) {
-          console.log('[VR Controles] Iniciando grabación vía Trigger.');
+          // console.log('[VR Controles] Iniciando grabación vía Trigger.');
           startRecording();
         }
         else if(isRecording) {
-          console.log('[VR Controles] Deteniendo grabación vía Trigger.');
+          // console.log('[VR Controles] Deteniendo grabación vía Trigger.');
           stopRecording();
         }
       }
@@ -2054,7 +2037,7 @@ function setupControllers(){
   
   
   rc.addEventListener('abuttondown',function(){
-    console.log('[VR Controles] Botón A presionado en mano derecha.');
+    // console.log('[VR Controles] Botón A presionado en mano derecha.');
     if(appState.screen==='practice'){
       if(!isRecording&&!isProcessing) startRecording();
       else if(isRecording) stopRecording();
@@ -2154,13 +2137,13 @@ document.addEventListener('DOMContentLoaded',function(){
   });
 
   function finalizarActividadOS() {
-    console.log("🏁 Procesando finalización de actividad...");
+    // console.log("🏁 Procesando finalización de actividad...");
 
     cambiarPantallaVR(''); 
 
     // 🧭 Nueva validación basada estrictamente en si es una Práctica de nivel
     if (appState.evaluacionHabilitada === true) {
-      console.log("¡Viene de una práctica activa! Mostrando panel de evaluación estándar.");
+      // console.log("¡Viene de una práctica activa! Mostrando panel de evaluación estándar.");
       
       // Apagamos la bandera para la siguiente sesión
       appState.evaluacionHabilitada = false; 
@@ -2171,7 +2154,7 @@ document.addEventListener('DOMContentLoaded',function(){
         showScreen('eval');
       }
     } else {
-      console.log("No es una práctica (Learn/Work o flujo alterno). Saltando evaluación e yendo a screen-welcome.");
+      // console.log("No es una práctica (Learn/Work o flujo alterno). Saltando evaluación e yendo a screen-welcome.");
       cambiarPantallaVR('screen-welcome');
     }
   }
@@ -2184,7 +2167,7 @@ document.addEventListener('DOMContentLoaded',function(){
   if(btnInt)btnInt.addEventListener('click',function(e){
 
     e.stopPropagation();
-console.log("dio click al btnInt");
+// console.log("dio click al btnInt");
 showScreen('technique-list');
 
   });
@@ -2228,7 +2211,7 @@ if(btnTechBack)
   
   var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
 var btnEnd = document.getElementById('btn-end-practice').addEventListener('click', function () {
-    console.log("🏁 Botón Terminar presionado.");
+    // console.log("🏁 Botón Terminar presionado.");
 
     var screenPractice = document.getElementById('screen-practice');
     if (screenPractice) {
@@ -2244,7 +2227,7 @@ var btnEnd = document.getElementById('btn-end-practice').addEventListener('click
     // NUEVA VALIDACIÓN COMPARTIDA
     // ==========================================
     if (appState.evaluacionHabilitada === true) {
-        console.log("Mostrando evaluación con IA.");
+        // console.log("Mostrando evaluación con IA.");
         appState.evaluacionHabilitada = false; // Reset de bandera
 
         if (typeof goEval === 'function') {
@@ -2253,7 +2236,7 @@ var btnEnd = document.getElementById('btn-end-practice').addEventListener('click
             console.warn("⚠️ No existe la función goEval().");
         }
     } else {
-        console.log("Saltando evaluación. Redirigiendo a Welcome.");
+        // console.log("Saltando evaluación. Redirigiendo a Welcome.");
         cambiarPantallaVR('screen-welcome');
     }
 });
@@ -2326,11 +2309,11 @@ if (btnNewSession) {
 
  
     document.querySelector('a-scene').addEventListener('loaded', () => {
-      console.log("🚀 Sistema de rastreo de clics activado.");
+      // console.log("🚀 Sistema de rastreo de clics activado.");
       const botones = document.querySelectorAll('.clickable');
       botones.forEach(boton => {
         boton.addEventListener('click', (evento) => {
-          console.log(`🎯 ¡Click detectado! Le...`);
+          // console.log(`🎯 ¡Click detectado! Le...`);
           // ...
         });
       });
