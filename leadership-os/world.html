@@ -1995,31 +1995,34 @@ function setupControllers(){
 
 
 function selectAndPreviewVR(techniqueId) {
-  // ... (Toda tu lógica actual para cambiar de pantalla o cargar datos de la técnica) ...
+  // ... Tu lógica actual para cambiar pantallas, títulos, etc. ...
 
-  // EJEMPLO: Suponiendo que obtienes los datos de un objeto llamado 'techniquesData'
-  // Adaptalo a cómo extraes los textos en tu script actual:
-  const techniqueSelected = techniquesData[techniqueId]; 
-  
-  if (techniqueSelected && techniqueSelected.dialogues) {
-    // 1. Guardamos el arreglo de diálogos dinámicamente
-    currentConversationArray = techniqueSelected.dialogues; 
+  // Configura los diálogos dependiendo del ID de la técnica
+  if (techniqueId === 'active-listening') { // Cambia 'active-listening' por tu ID real
+    currentConversationArray = [
+      "Hola, ¿cómo estás?",
+      "Bien, ¿y tú?",
+      "Qué bueno, hablemos de escucha activa..."
+    ];
+  } else if (techniqueId === 'otra-tecnica') {
+    currentConversationArray = [
+      "Diálogo 1 de la otra técnica...",
+      "Diálogo 2 de la otra técnica..."
+    ];
   } else {
-    // Respaldo por si una técnica no tiene diálogos definidos
-    currentConversationArray = ["Iniciando simulación...", "Por favor presiona Siguiente."];
+    // Respaldo por si acaso
+    currentConversationArray = ["Iniciando simulación...", "Presiona siguiente."];
   }
 
-  // 2. Reseteamos los índices por seguridad al cargar una nueva técnica
+  // --- El resto del código de reseteo e inyección que pusimos antes ---
   currentDialogueIndex = 0;
   mostrandoMoves = false;
 
-  // 3. Pintamos de inmediato el primer renglón en la pantalla VR
   const dialogueText = document.getElementById('listening-dialogue-text');
   if (dialogueText) {
     dialogueText.setAttribute('text', 'value', currentConversationArray[0]);
   }
 
-  // 4. Aseguramos que el botón empiece limpio en "Next"
   const btnText = document.getElementById('text-btn-toggle-listening');
   const btnPlane = document.getElementById('btn-toggle-active-listening');
   if (btnText && btnPlane) {
@@ -2027,7 +2030,6 @@ function selectAndPreviewVR(techniqueId) {
     btnPlane.setAttribute('color', '#3d6bff');
   }
 }
-
 
 
 
