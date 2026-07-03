@@ -1141,43 +1141,68 @@ function pickRandomArchetype(){
 
 
 
-let mostrandoMoves = false;
+let currentConversationArray = []; // Aquí se guardará el diálogo de la técnica activa
+let currentDialogueIndex = 0;      // Rastreador del renglón actual
+let mostrandoMoves = false;        // Rastreador de si estamos viendo los 4 cuadritos
 
 function toggleListeningMoves() {
-  // 🛑 CANDADO DE SEGURIDAD PARA LA BIENVENIDA:
+  // Candado de seguridad para la bienvenida
   const welcomeScreen = document.getElementById('screen-welcome');
   if (welcomeScreen && welcomeScreen.getAttribute('visible') === 'true') {
-    console.log("🚫 Click bloqueado: No puedes usar este botón mientras estés en la pantalla de bienvenida.");
+    return;
+  }
+
+  // Si por alguna razón el arreglo está vacío, evitamos errores
+  if (!currentConversationArray || currentConversationArray.length === 0) {
+    console.warn("No hay diálogos cargados para esta técnica.");
     return;
   }
 
   const sessionContent = document.getElementById('listening-session-content');
   const movesContainer = document.getElementById('moves-container');
+  const dialogueText = document.getElementById('listening-dialogue-text');
   const btnText = document.getElementById('text-btn-toggle-listening');
   const btnPlane = document.getElementById('btn-toggle-active-listening');
 
+  // CASO A: Avanzar por el chat dinámico renglón por renglón
+  if (!mostrandoMoves && currentDialogueIndex < currentConversationArray.length - 1) {
+    currentDialogueIndex++;
+    dialogueText.setAttribute('text', 'value', currentConversationArray[currentDialogueIndex]);
+
+    // Si acabamos de mostrar el último renglón disponible en el arreglo
+    if (currentDialogueIndex === currentConversationArray.length - 1) {
+      btnText.setAttribute('text', 'value', "See the moves");
+      btnPlane.setAttribute('color', '#ff5ca0'); // Tu color rosa de atención
+    }
+    return;
+  }
+
+  // CASO B: Mostrar los 4 cartelitos (moves) al terminar el chat
   if (!mostrandoMoves) {
-    // 1. Ocultar contenido y mostrar los 4 cartelitos
     sessionContent.setAttribute('visible', 'false');
     movesContainer.setAttribute('visible', 'true');
     
-    // 2. Cambiar UI del botón
     btnText.setAttribute('text', 'value', "I'm ready \u2014 let's go \u2192");
-    btnPlane.setAttribute('color', '#00e5c0');
+    btnPlane.setAttribute('color', '#00e5c0'); // Verde/Turquesa listo
     
     mostrandoMoves = true;
-  } else {
-    // 3. Resetear estados internos y regresar a la pantalla intermedia de forma segura
+  } 
+  // CASO C: Salir de la actividad y resetear todo
+  else {
     mostrandoMoves = false;
+    currentDialogueIndex = 0;
+    
     sessionContent.setAttribute('visible', 'true');
     movesContainer.setAttribute('visible', 'false');
-    btnText.setAttribute('text', 'value', "See the moves");
-    btnPlane.setAttribute('color', '#ff5ca0');
+    
+    // Regresamos al primer diálogo del arreglo por si vuelve a entrar
+    dialogueText.setAttribute('text', 'value', currentConversationArray[0]);
+    btnText.setAttribute('text', 'value', "Next");
+    btnPlane.setAttribute('color', '#3d6bff');
     
     showScreen('learn-work-practice');
   }
 }
-
 
 function pickRandomScenario(archetype,level){
   var pool=archetype.briefings[level]||archetype.briefings['novice']||[];
@@ -1970,53 +1995,41 @@ function setupControllers(){
 
 
 function selectAndPreviewVR(techniqueId) {
-  // console.log("🎬 Iniciando simulación VR para:", tecnicaId);
+  // ... (Toda tu lógica actual para cambiar de pantalla o cargar datos de la técnica) ...
+
+  // EJEMPLO: Suponiendo que obtienes los datos de un objeto llamado 'techniquesData'
+  // Adaptalo a cómo extraes los textos en tu script actual:
+  const techniqueSelected = techniquesData[techniqueId]; 
   
-
-  cambiarPantallaVR('screen-active-listening-activity');
-  document.querySelector('#screen-technique-list').setAttribute('visible', 'false');
-  document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'true');
-
-  if (typeof TECHNIQUE_PREVIEWS === 'undefined') {
-    console.error("No se encontró el objeto TECHNIQUE_PREVIEWS. Revisa el orden en tu HTML.");
-    return;
+  if (techniqueSelected && techniqueSelected.dialogues) {
+    // 1. Guardamos el arreglo de diálogos dinámicamente
+    currentConversationArray = techniqueSelected.dialogues; 
+  } else {
+    // Respaldo por si una técnica no tiene diálogos definidos
+    currentConversationArray = ["Iniciando simulación...", "Por favor presiona Siguiente."];
   }
 
-  const techniqueData = TECHNIQUE_PREVIEWS[techniqueId];
-  if (!techniqueData) return;
+  // 2. Reseteamos los índices por seguridad al cargar una nueva técnica
+  currentDialogueIndex = 0;
+  mostrandoMoves = false;
 
-  const conversation = techniqueData.good.exchanges; 
-  
-  const stage = document.querySelector('#vr-preview-stage');
-  if (!stage) {
-    console.error("No se encontró el contenedor #vr-preview-stage en el HTML.");
-    return;
+  // 3. Pintamos de inmediato el primer renglón en la pantalla VR
+  const dialogueText = document.getElementById('listening-dialogue-text');
+  if (dialogueText) {
+    dialogueText.setAttribute('text', 'value', currentConversationArray[0]);
   }
-  stage.innerHTML = '';
 
-  let yOffset = 0.4; 
-  
-  conversation.forEach((msg) => {
-    const messageEntity = document.createElement('a-entity');
-    messageEntity.setAttribute('position', `0 ${yOffset} 0`);
-
-    const speakerName = msg.speaker === 'A' ? techniqueData.roleA : 'Agent';
-    const textValue = `${speakerName}: ${msg.text}`;
-    
-    const bubbleColor = msg.speaker === 'A' ? "#00adb5" : "#ffb347";
-
-    messageEntity.setAttribute('text', {
-      value: textValue,
-      align: 'left',
-      width: 2.6,
-      color: bubbleColor,
-      wrapCount: 35 
-    });
-
-    stage.appendChild(messageEntity);
-    yOffset -= 0.45;
-  });
+  // 4. Aseguramos que el botón empiece limpio en "Next"
+  const btnText = document.getElementById('text-btn-toggle-listening');
+  const btnPlane = document.getElementById('btn-toggle-active-listening');
+  if (btnText && btnPlane) {
+    btnText.setAttribute('text', 'value', "Next");
+    btnPlane.setAttribute('color', '#3d6bff');
+  }
 }
+
+
+
 
 function exitPreviewVR() {
   document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'false');
