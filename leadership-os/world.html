@@ -1141,68 +1141,43 @@ function pickRandomArchetype(){
 
 
 
-let currentConversationArray = []; // Aquí se guardará el diálogo de la técnica activa
-let currentDialogueIndex = 0;      // Rastreador del renglón actual
-let mostrandoMoves = false;        // Rastreador de si estamos viendo los 4 cuadritos
+let mostrandoMoves = false;
 
 function toggleListeningMoves() {
-  // Candado de seguridad para la bienvenida
+  // 🛑 CANDADO DE SEGURIDAD PARA LA BIENVENIDA:
   const welcomeScreen = document.getElementById('screen-welcome');
   if (welcomeScreen && welcomeScreen.getAttribute('visible') === 'true') {
-    return;
-  }
-
-  // Si por alguna razón el arreglo está vacío, evitamos errores
-  if (!currentConversationArray || currentConversationArray.length === 0) {
-    console.warn("No hay diálogos cargados para esta técnica.");
+    console.log("🚫 Click bloqueado: No puedes usar este botón mientras estés en la pantalla de bienvenida.");
     return;
   }
 
   const sessionContent = document.getElementById('listening-session-content');
   const movesContainer = document.getElementById('moves-container');
-  const dialogueText = document.getElementById('listening-dialogue-text');
   const btnText = document.getElementById('text-btn-toggle-listening');
   const btnPlane = document.getElementById('btn-toggle-active-listening');
 
-  // CASO A: Avanzar por el chat dinámico renglón por renglón
-  if (!mostrandoMoves && currentDialogueIndex < currentConversationArray.length - 1) {
-    currentDialogueIndex++;
-    dialogueText.setAttribute('text', 'value', currentConversationArray[currentDialogueIndex]);
-
-    // Si acabamos de mostrar el último renglón disponible en el arreglo
-    if (currentDialogueIndex === currentConversationArray.length - 1) {
-      btnText.setAttribute('text', 'value', "See the moves");
-      btnPlane.setAttribute('color', '#ff5ca0'); // Tu color rosa de atención
-    }
-    return;
-  }
-
-  // CASO B: Mostrar los 4 cartelitos (moves) al terminar el chat
   if (!mostrandoMoves) {
+    // 1. Ocultar contenido y mostrar los 4 cartelitos
     sessionContent.setAttribute('visible', 'false');
     movesContainer.setAttribute('visible', 'true');
     
+    // 2. Cambiar UI del botón
     btnText.setAttribute('text', 'value', "I'm ready \u2014 let's go \u2192");
-    btnPlane.setAttribute('color', '#00e5c0'); // Verde/Turquesa listo
+    btnPlane.setAttribute('color', '#00e5c0');
     
     mostrandoMoves = true;
-  } 
-  // CASO C: Salir de la actividad y resetear todo
-  else {
+  } else {
+    // 3. Resetear estados internos y regresar a la pantalla intermedia de forma segura
     mostrandoMoves = false;
-    currentDialogueIndex = 0;
-    
     sessionContent.setAttribute('visible', 'true');
     movesContainer.setAttribute('visible', 'false');
-    
-    // Regresamos al primer diálogo del arreglo por si vuelve a entrar
-    dialogueText.setAttribute('text', 'value', currentConversationArray[0]);
-    btnText.setAttribute('text', 'value', "Next");
-    btnPlane.setAttribute('color', '#3d6bff');
+    btnText.setAttribute('text', 'value', "See the moves");
+    btnPlane.setAttribute('color', '#ff5ca0');
     
     showScreen('learn-work-practice');
   }
 }
+
 
 function pickRandomScenario(archetype,level){
   var pool=archetype.briefings[level]||archetype.briefings['novice']||[];
@@ -1995,43 +1970,53 @@ function setupControllers(){
 
 
 function selectAndPreviewVR(techniqueId) {
-  // ... Tu lógica actual para cambiar pantallas, títulos, etc. ...
+  // console.log("🎬 Iniciando simulación VR para:", tecnicaId);
+  
 
-  // Configura los diálogos dependiendo del ID de la técnica
-  if (techniqueId === 'active-listening') { // Cambia 'active-listening' por tu ID real
-    currentConversationArray = [
-      "Hola, ¿cómo estás?",
-      "Bien, ¿y tú?",
-      "Qué bueno, hablemos de escucha activa..."
-    ];
-  } else if (techniqueId === 'otra-tecnica') {
-    currentConversationArray = [
-      "Diálogo 1 de la otra técnica...",
-      "Diálogo 2 de la otra técnica..."
-    ];
-  } else {
-    // Respaldo por si acaso
-    currentConversationArray = ["Iniciando simulación...", "Presiona siguiente."];
+  cambiarPantallaVR('screen-active-listening-activity');
+  document.querySelector('#screen-technique-list').setAttribute('visible', 'false');
+  document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'true');
+
+  if (typeof TECHNIQUE_PREVIEWS === 'undefined') {
+    console.error("No se encontró el objeto TECHNIQUE_PREVIEWS. Revisa el orden en tu HTML.");
+    return;
   }
 
-  // --- El resto del código de reseteo e inyección que pusimos antes ---
-  currentDialogueIndex = 0;
-  mostrandoMoves = false;
+  const techniqueData = TECHNIQUE_PREVIEWS[techniqueId];
+  if (!techniqueData) return;
 
-  const dialogueText = document.getElementById('listening-dialogue-text');
-  if (dialogueText) {
-    dialogueText.setAttribute('text', 'value', currentConversationArray[0]);
+  const conversation = techniqueData.good.exchanges; 
+  
+  const stage = document.querySelector('#vr-preview-stage');
+  if (!stage) {
+    console.error("No se encontró el contenedor #vr-preview-stage en el HTML.");
+    return;
   }
+  stage.innerHTML = '';
 
-  const btnText = document.getElementById('text-btn-toggle-listening');
-  const btnPlane = document.getElementById('btn-toggle-active-listening');
-  if (btnText && btnPlane) {
-    btnText.setAttribute('text', 'value', "Next");
-    btnPlane.setAttribute('color', '#3d6bff');
-  }
+  let yOffset = 0.4; 
+  
+  conversation.forEach((msg) => {
+    const messageEntity = document.createElement('a-entity');
+    messageEntity.setAttribute('position', `0 ${yOffset} 0`);
+
+    const speakerName = msg.speaker === 'A' ? techniqueData.roleA : 'Agent';
+    const textValue = `${speakerName}: ${msg.text}`;
+    
+    const bubbleColor = msg.speaker === 'A' ? "#00adb5" : "#ffb347";
+
+    messageEntity.setAttribute('text', {
+      value: textValue,
+      align: 'left',
+      width: 2.6,
+      color: bubbleColor,
+      wrapCount: 35 
+    });
+
+    stage.appendChild(messageEntity);
+    yOffset -= 0.45;
+  });
 }
-
-
 
 function exitPreviewVR() {
   document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'false');
