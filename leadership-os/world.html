@@ -1711,10 +1711,8 @@ function getVoice(character) {
 
 async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
 
-  // traducir
-  const englishText = await translateToEnglish(text);
-
-  // console.log("Translated:", englishText);
+  // ❌ ELIMINA O COMENTA ESTA LÍNEA (Ya no necesitas traducir un texto que ya viene en inglés):
+  // const englishText = await translateToEnglish(text);
 
   // pedir audio
   const speechResponse = await fetch('/api/groq_speakvr', {
@@ -1724,38 +1722,30 @@ async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
     },
     body: JSON.stringify({
       type: 'speech',
-      text: englishText,
+      text: text, //  <-- CAMBIA 'englishText' por 'text' para usar el texto original directo
       voice: voice
     })
   });
 
   if (!speechResponse.ok) {
-
     const err = await speechResponse.text();
-
     console.error("TTS ERROR:", err);
-
     return;
   }
 
   const blob = await speechResponse.blob();
-
   const url = URL.createObjectURL(blob);
-
   const audio = new Audio(url);
 
   audio.onended = () => {
-
     URL.revokeObjectURL(url);
-
     if (callback) {
       callback();
     }
   };
 
-await audio.play();
+  await audio.play();
 }
-  
 
 async function setupMic(){
   try{
