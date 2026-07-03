@@ -462,7 +462,10 @@ function funcionIntervTenureRenewal() {
 
   <!-- SCREEN: TECHNIQUES -->
 <!-- SCREEN: TECHNIQUES -->
-  <a-entity id="screen-technique-list" visible="false">
+<!-- ================================================================= -->
+<!-- SCREEN: TECHNIQUES -->
+<!-- ================================================================= -->
+<a-entity id="screen-technique-list" visible="false">
 
   <a-text value="TECHNIQUES"
           position="0 3.4 -2.8"
@@ -480,281 +483,281 @@ function funcionIntervTenureRenewal() {
           opacity="0.7"
           font="mozillavr">
   </a-text>
-<!-- ================= FILA 1 (Y = 2.6) ================= -->
 
-<!-- ACTIVE LISTENING -->
-<a-entity id="btn-active-listening" position="-1.7 2.6 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="ACTIVE LISTENING" align="center" color="#ffffff" width="3.2" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
+  <!-- ================= FILA 1 (Y = 2.6) ================= -->
 
-<!-- POWERFUL QUESTIONS -->
-<a-entity id="btn-powerful-questions" position="-0.9 2.6 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Abriendo panel de Preguntas Poderosas; tecnica: powerful-questions"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="POWERFUL QUESTIONS" align="center" color="#ffffff" width="3.2" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
+  <!-- ACTIVE LISTENING (Antes X = -2.7) -->
+  <a-entity id="btn-active-listening" position="-3.3 2.6 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="ACTIVE LISTENING" align="center" color="#ffffff" width="3.2" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
 
-<!-- MOTIVATIONAL INTERVIEWING -->
-<a-entity id="btn-motivational-interviewing" position="0.9 2.6 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Desplegando Entrevista Motivacional; tecnica: motivational-interviewing"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="MOTIVATIONAL INTERVIEWING" align="center" color="#ffffff" width="3" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
+  <!-- POWERFUL QUESTIONS (Antes X = -0.9) -->
+  <a-entity id="btn-powerful-questions" position="-1.1 2.6 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo panel de Preguntas Poderosas; tecnica: powerful-questions"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="POWERFUL QUESTIONS" align="center" color="#ffffff" width="3.2" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
 
-<!-- NONVIOLENT COMMUNICATION -->
-<a-entity id="btn-nonviolent-communication" position="2.7 2.6 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Iniciando Comunicación No Violenta; tecnica: nonviolent-communication"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="NONVIOLENT COMMUNICATION" align="center" color="#ffffff" width="3" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
+  <!-- MOTIVATIONAL INTERVIEWING (Antes X = 0.9) -->
+  <a-entity id="btn-motivational-interviewing" position="1.1 2.6 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Desplegando Entrevista Motivacional; tecnica: motivational-interviewing"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="MOTIVATIONAL INTERVIEWING" align="center" color="#ffffff" width="3" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
 
-
-<!-- ================= FILA 2 (Y = 1.9) ================= -->
-
-<!-- RADICAL CANDOR -->
-<a-entity id="btn-radical-candor" position="-2.7 1.9 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Abriendo Radical Candor; tecnica: radical-candor"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #a855f7; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="RADICAL CANDOR" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-text value="Care personally Challenge directly" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#a855f7" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
-
-<!-- CRUCIAL CONVERSATIONS -->
-<a-entity id="btn-crucial-conversations" position="-0.9 1.9 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Abriendo Crucial Conversations; tecnica: crucial-conversations"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #a855f7; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="CRUCIAL CONVERSATIONS" align="center" color="#ffffff" width="3" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-text value="Alto riesgo emociones fuertes" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#a855f7" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
-
-<!-- TACTICAL EMPATHY -->
-<a-entity id="btn-tactical-empathy" position="0.9 1.9 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Abriendo Tactical Empathy; tecnica: tactical-empathy"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #a855f7; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="TACTICAL EMPATHY" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-text value="Etiqueta emociones espeja pregunta" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#a855f7" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
-
-<!-- SCARF MODEL -->
-<a-entity id="btn-scarf-model" position="2.7 1.9 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Abriendo SCARF Model; tecnica: scarf-model"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #a855f7; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="SCARF MODEL" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-text value="Status Certainty Autonomy Relatedness" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#a855f7" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
+  <!-- NONVIOLENT COMMUNICATION (Antes X = 2.7) -->
+  <a-entity id="btn-nonviolent-communication" position="3.3 2.6 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Iniciando Comunicación No Violenta; tecnica: nonviolent-communication"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="NONVIOLENT COMMUNICATION" align="center" color="#ffffff" width="3" position="0 0.02 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
 
 
-<!-- ================= FILA 3 (Y = 1.2) ================= -->
+  <!-- ================= FILA 2 (Y = 1.9) ================= -->
 
-<!-- IMMUNITY TO CHANGE -->
-<a-entity id="btn-immunity-to-change" position="-2.7 1.2 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Abriendo Immunity to Change; tecnica: immunity-to-change"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="IMMUNITY TO CHANGE" align="center" color="#ffffff" width="3" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-text value="Compromisos ocultos que bloquean" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
+  <!-- RADICAL CANDOR -->
+  <a-entity id="btn-radical-candor" position="-3.3 1.9 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Radical Candor; tecnica: radical-candor"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #a855f7; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="RADICAL CANDOR" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="Care personally Challenge directly" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#a855f7" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
 
-<!-- DRAMA TRIANGLE -->
-<a-entity id="btn-drama-triangle" position="-0.9 1.2 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Abriendo Drama Triangle; tecnica: drama-triangle"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="DRAMA TRIANGLE" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-text value="Victima Rescatador Perseguidor" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
+  <!-- CRUCIAL CONVERSATIONS -->
+  <a-entity id="btn-crucial-conversations" position="-1.1 1.9 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Crucial Conversations; tecnica: crucial-conversations"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #a855f7; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="CRUCIAL CONVERSATIONS" align="center" color="#ffffff" width="3" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="Alto riesgo emociones fuertes" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#a855f7" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
 
-<!-- GROW MODEL -->
-<a-entity id="btn-grow-model" position="0.9 1.2 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Abriendo GROW Model; tecnica: grow-model"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="GROW MODEL" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-text value="Goal Reality Options Will" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
+  <!-- TACTICAL EMPATHY -->
+  <a-entity id="btn-tactical-empathy" position="1.1 1.9 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Tactical Empathy; tecnica: tactical-empathy"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #a855f7; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="TACTICAL EMPATHY" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="Etiqueta emociones espeja pregunta" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#a855f7" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
 
-<!-- STRENGTHS-BASED COACHING -->
-<a-entity id="btn-strengths-based-coaching" position="2.7 1.2 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Abriendo Strengths-Based Coaching; tecnica: strengths-based-coaching"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="STRENGTHS-BASED" align="center" color="#ffffff" width="3" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-text value="Construye desde lo que funciona" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
+  <!-- SCARF MODEL -->
+  <a-entity id="btn-scarf-model" position="3.3 1.9 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo SCARF Model; tecnica: scarf-model"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #a855f7; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="SCARF MODEL" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="Status Certainty Autonomy Relatedness" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#a855f7" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
 
 
-<!-- ================= FILA 4 (Y = 0.5) ================= -->
+  <!-- ================= FILA 3 (Y = 1.2) ================= -->
 
-<!-- GROWTH MINDSET -->
-<a-entity id="btn-growth-mindset" position="-0.9 0.5 -2.8">
-  <a-plane class="sub-tecnica" 
-           handler-botones-vr="mensaje: Abriendo Growth Mindset; tecnica: growth-mindset"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #ef4444; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="GROWTH MINDSET" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-text value="De fijo a fluido la habilidad" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#ef4444" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
+  <!-- IMMUNITY TO CHANGE -->
+  <a-entity id="btn-immunity-to-change" position="-3.3 1.2 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Immunity to Change; tecnica: immunity-to-change"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="IMMUNITY TO CHANGE" align="center" color="#ffffff" width="3" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="Compromisos ocultos que bloquean" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
 
-<!-- SOLUTION-FOCUSED COACHING -->
-<a-entity id="btn-solution-focused-coaching" position="0.9 0.5 -2.8">
-  <a-plane class="clickable sub-tecnica" 
-           handler-botones-vr="mensaje: Abriendo Solution-Focused Coaching; tecnica: solution-focused-coaching"
-           width="1.6" height="0.75" 
-           color="#ffffff" 
-           material="opacity: 0.18; shader: flat; transparent: true; side: double"
-           animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
-           animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
-           animation__colorIn="property: material.color; to: #ef4444; dur: 150; startEvents: mouseenter"
-           animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
-           animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
-    
-    <a-text value="SOLUTION-FOCUSED" align="center" color="#ffffff" width="3" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
-    <a-text value="Que ya esta funcionando Haz mas" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
-    <a-ring radius-inner="0.01" radius-outer="0.02" color="#ef4444" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
-  </a-plane>
-</a-entity>
+  <!-- DRAMA TRIANGLE -->
+  <a-entity id="btn-drama-triangle" position="-1.1 1.2 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Drama Triangle; tecnica: drama-triangle"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="DRAMA TRIANGLE" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="Victima Rescatador Perseguidor" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- GROW MODEL -->
+  <a-entity id="btn-grow-model" position="1.1 1.2 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo GROW Model; tecnica: grow-model"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="GROW MODEL" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="Goal Reality Options Will" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- STRENGTHS-BASED COACHING -->
+  <a-entity id="btn-strengths-based-coaching" position="3.3 1.2 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Strengths-Based Coaching; tecnica: strengths-based-coaching"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="STRENGTHS-BASED" align="center" color="#ffffff" width="3" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="Construye desde lo que funciona" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+
+  <!-- ================= FILA 4 (Y = 0.5) ================= -->
+
+  <!-- GROWTH MINDSET (Antes X = -0.9) -->
+  <a-entity id="btn-growth-mindset" position="-1.1 0.5 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Growth Mindset; tecnica: growth-mindset"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #ef4444; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="GROWTH MINDSET" align="center" color="#ffffff" width="3.2" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="De fijo a fluido la habilidad" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#ef4444" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- SOLUTION-FOCUSED COACHING (Antes X = 0.9) -->
+  <a-entity id="btn-solution-focused-coaching" position="1.1 0.5 -2.8">
+    <a-plane class="clickable sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Solution-Focused Coaching; tecnica: solution-focused-coaching"
+             width="1.6" height="0.75" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #ef4444; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="SOLUTION-FOCUSED" align="center" color="#ffffff" width="3" position="0 0.12 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="Que ya esta funcionando Haz mas" align="center" color="#e2e8f0" width="2.4" position="0 -0.12 0.05" opacity="0.8" wrap-count="24" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#ef4444" scale="35 1 1" position="0 -0.35 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
 
   <!-- BACK (Y = 0.1) -->
-
   <a-entity id="btn-tech-list-back"
             position="0 0.1 -2.4"
             class="clickable">
