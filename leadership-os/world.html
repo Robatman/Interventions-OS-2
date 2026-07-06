@@ -2185,6 +2185,8 @@ function selectAndPreviewVR(techniqueId) {
 
 // Variable global para controlar el paso actual de la conversación
 let activeListeningStep = 0;
+// Define aquí el número total de pasos de tu conversación (ej. si son 2 turnos, el máximo índice es 1)
+const MAX_CONVERSATION_STEPS = 1; 
 
 function initActiveListeningConversation() {
   activeListeningStep = 0;
@@ -2192,17 +2194,71 @@ function initActiveListeningConversation() {
   const juan = document.getElementById('activity-juan');
   const ajolin = document.getElementById('activity-ajolin');
   const speaker = document.getElementById('speaker-name');
+  const btnNext = document.getElementById('btn-next-conversation');
   
   // Juanjolote inicia visible a la izquierda
   if (juan) juan.setAttribute('visible', 'true');
   if (ajolin) ajolin.setAttribute('visible', 'false');
   
   if (speaker) {
-    speaker.setAttribute('value', ' ');
-    speaker.setAttribute('color', '#00e5c0'); // Color cian de Juanjolote
-    speaker.setAttribute('position', '-1.45 0.73 0.02'); // Alineado a la izquierda
+    speaker.setAttribute('value', 'JUANJOLOTE');
+    speaker.setAttribute('color', '#00e5c0');
+    speaker.setAttribute('position', '-1.45 0.73 0.02');
+  }
+
+  // 🔥 RESTAURAR EL BOTÓN NEXT (Por si venía desactivado de una sesión anterior)
+  if (btnNext) {
+    btnNext.classList.add('clickable');
+    btnNext.setAttribute('color', '#4F7CFF'); // Su color azul original
+    btnNext.setAttribute('material', 'opacity', '1.0');
   }
 }
+
+function avanzarConversacionActiva() {
+  // Si ya llegamos al límite del contenido, bloqueamos cualquier click extra
+  if (activeListeningStep >= MAX_CONVERSATION_STEPS) {
+    return; 
+  }
+
+  const juan = document.getElementById('activity-juan');
+  const ajolin = document.getElementById('activity-ajolin');
+  const speaker = document.getElementById('speaker-name');
+  const btnNext = document.getElementById('btn-next-conversation');
+  
+  // Avanzamos al paso 1 (Turno de Ajolín)
+  if (activeListeningStep === 0) {
+    if (juan) juan.setAttribute('visible', 'false');
+    if (ajolin) ajolin.setAttribute('visible', 'true');
+    
+    if (speaker) {
+      speaker.setAttribute('value', 'AJOLIN');
+      speaker.setAttribute('color', '#9d5cff');
+      speaker.setAttribute('position', '0.7 0.73 0.02');
+    }
+    
+    activeListeningStep = 1;
+  }
+
+  // 🛑 REGLA DE BLOQUEO: Si llegamos al último paso, congelamos el botón
+  if (activeListeningStep === MAX_CONVERSATION_STEPS) {
+    if (btnNext) {
+      btnNext.classList.remove('clickable'); // El raycaster ya no lo detectará
+      btnNext.setAttribute('color', '#555555'); // Cambia a gris apagado
+      btnNext.setAttribute('material', 'opacity', '0.5'); // Semi-transparente
+    }
+    
+    // Forzamos al raycaster a actualizarse para que pierda el foco del botón inmediatamente
+    const raycasterEl = document.querySelector('[raycaster]');
+    if (raycasterEl && raycasterEl.components.raycaster) {
+      raycasterEl.components.raycaster.refreshObjects();
+    }
+  }
+}
+
+
+
+
+
 
 function avanzarConversacionActiva() {
   const juan = document.getElementById('activity-juan');
