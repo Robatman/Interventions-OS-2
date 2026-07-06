@@ -97,10 +97,10 @@ function cambiarPantallaVR(pantallaMostrarId) {
       
       // 🌟 REGLA ESPECIAL PARA TU BOTÓN:
       // Si entramos a esta pantalla, nos aseguramos de que el botón empiece siendo visible
-      if (id === 'screen-active-listening-activity') {
-        const btnToggle = document.getElementById('btn-toggle-active-listening');
-        if (btnToggle) btnToggle.setAttribute('visible', 'true');
-      }
+      // if (id === 'screen-active-listening-activity') {
+      //   const btnToggle = document.getElementById('btn-toggle-active-listening');
+      //   if (btnToggle) btnToggle.setAttribute('visible', 'true');
+      // }
     } else {
       elPantalla.setAttribute('visible', 'false');
       elPantalla.setAttribute('scale', '0 0 0');
@@ -1312,13 +1312,16 @@ function toggleListeningMoves() {
     btnPlane.setAttribute('color', '#00e5c0');
     
     mostrandoMoves = true;
-  } else {
+ } else {
     // 3. Resetear estados internos y regresar a la pantalla intermedia de forma segura
     mostrandoMoves = false;
     sessionContent.setAttribute('visible', 'true');
     movesContainer.setAttribute('visible', 'false');
     btnText.setAttribute('text', 'value', "See the moves");
     btnPlane.setAttribute('color', '#ff5ca0');
+    
+    // Ocultamos el botón para que no sea visible en la pantalla 'learn-work-practice'
+    btnPlane.setAttribute('visible', 'false'); 
     
     showScreen('learn-work-practice');
   }
@@ -1405,6 +1408,10 @@ function showScreen(name) {
     // console.log("🔴 14 botones de técnicas específicos DESACTIVADOS");
   }
 }
+
+const btnToggle = document.getElementById('btn-toggle-active-listening');
+if (btnToggle) btnToggle.setAttribute('visible', 'true');
+
 
 function goWelcome(){
 
