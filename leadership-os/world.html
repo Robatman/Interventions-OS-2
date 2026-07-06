@@ -950,75 +950,166 @@ function funcionIntervTenureRenewal() {
 
 
 <!-- SCREEN: ACTIVE LISTENING ACTIVITY -->
-  <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
-    <!-- Fondo del contenedor principal MÁS GRANDE (Antes: 3.4 x 2.4) -->
-    <a-plane width="4.4" height="3.2" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
-    
-    <!-- Título reposicionado un poco más arriba para dar espacio -->
-    <a-text value="Session" align="center" position="0 1.4 0.01" width="5.0" font="exo2bold"></a-text>
-    
-    <a-entity id="listening-session-content" visible="true" position="0 0 0">
-      <a-entity id="vr-preview-stage" position="0 0.1 0.02">
-        <a-text value="[ Simulación de Conversación / Contenido de la Sesión ]" align="center" width="3.5" color="#fff" font="mozillavr"></a-text>
-      </a-entity>
-    </a-entity>
+ <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
 
-    <!-- ================================================================= -->
-    <!-- ESTADO 2: LOS 4 CUADRITOS (MÁS GRANDES Y MÁS SEPARADOS) -->
-    <!-- ================================================================= -->
-    <a-entity id="moves-container" position="0 0.15 0.01" visible="false">
-      
-      <!-- Cuadro 1: Pay Attention (Arriba Izquierda) - Posición y tamaño ajustados -->
-      <a-entity id="move-pay-attention" position="-1.0 0.5 0.01">
-        <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
-          <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
-          <a-text value="👁" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
-          <!-- Título un poco más pequeño (width de 3.6 a 4.2) -->
-          <a-text value="Pay Attention" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
-          <!-- Descripción un poco más pequeña (width de 2.4 a 2.8, wrap-count optimizado) -->
-          <a-text value="Be fully present \n no phone, no planning your next line" align="center" position="0 -0.15 0.01" width="2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
-        </a-plane>
-      </a-entity>
+  <!-- Fondo principal -->
+  <a-plane
+      width="4.4"
+      height="3.2"
+      color="#1a1a2e"
+      material="opacity:0.95; shader:flat">
+  </a-plane>
 
-      <!-- Cuadro 2: Reflect Back (Arriba Derecha) -->
-     <a-entity id="move-reflect-back" position="1.0 0.5 0.01">
-        <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
-          <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
-          <a-text value="🔄" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
-          <a-text value="Reflect Back" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
-          <a-text value="Repeat the core of what you heard \n in your own words" align="center" position="0 -0.15 0.01" width="2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
-        </a-plane>
-      </a-entity>
+  <!-- Título -->
+  <a-text
+      value="Session"
+      align="center"
+      position="0 1.4 0.01"
+      width="5"
+      font="exo2bold">
+  </a-text>
 
-      <!-- Cuadro 3: Validate (Abajo Izquierda) -->
-      <a-entity id="move-validate" position="-1.0 -0.5 0.01">
-        <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
-          <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
-          <a-text value="✅" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
-          <a-text value="Validate" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
-          <a-text value="Acknowledge their feeling makes sense \n even if you disagree" align="center" position="0 -0.15 0.01" width="2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
-        </a-plane>
+  <!-- ===================== -->
+  <!-- CONVERSACIÓN -->
+  <!-- ===================== -->
+
+  <a-entity id="listening-session-content" visible="true">
+
+      <!-- Fondo del chat -->
+      <a-plane
+          width="3.8"
+          height="2"
+          color="#101625"
+          material="opacity:0.9; shader:flat"
+          position="0 0.2 0.01">
+      </a-plane>
+
+      <!-- Aquí se crearán los mensajes dinámicamente -->
+      <a-entity
+          id="vr-preview-stage"
+          position="0 0.95 0.02">
       </a-entity>
 
-      <!-- Cuadro 4: Summarize (Abajo Derecha) -->
-     <a-entity id="move-summarize" position="1.0 -0.5 0.01">
-        <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
-          <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
-          <a-text value="📋" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
-          <a-text value="Summarize" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
-          <a-text value="Recap before you respond \n prevents misunderstanding" align="center" position="0 -0.15 0.01" width="2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
-        </a-plane>
-      </a-entity>
+      <!-- Botón Next -->
+      <a-plane
+          id="btn-next-conversation"
+          class="clickable"
+          width="0.9"
+          height="0.28"
+          color="#4F7CFF"
+          position="0 -0.95 0.02">
 
-    </a-entity>
+          <a-text
+              value="Next"
+              align="center"
+              color="#FFFFFF"
+              width="2.5"
+              font="mozillavr">
+          </a-text>
 
-    <!-- Botón de acción reposicionado abajo para que no interfiera con los cuadros -->
-    <a-plane id="btn-toggle-active-listening" class="clickable" 
-             width="1.4" height="0.3" color="#ff5ca0" position="0 -1.35 0.02"
-             onclick="toggleListeningMoves()">
-      <a-text id="text-btn-toggle-listening" value="See the moves" align="center" color="#fff" width="3.2" font="mozillavr"></a-text>
-    </a-plane>
+      </a-plane>
+
   </a-entity>
+
+  <!-- ===================== -->
+  <!-- MOVES -->
+  <!-- ===================== -->
+
+  <a-entity id="moves-container" position="0 0.15 0.01" visible="false">
+
+      <!-- Pay Attention -->
+      <a-entity id="move-pay-attention" position="-1.0 0.5 0.01">
+          <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
+              <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+              <a-text value="👁" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
+              <a-text value="Pay Attention" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
+              <a-text value="Be fully present&#10;no phone, no planning your next line"
+                      align="center"
+                      position="0 -0.15 0.01"
+                      width="2"
+                      color="#c8d8ff"
+                      font="mozillavr"
+                      wrap-count="32">
+              </a-text>
+          </a-plane>
+      </a-entity>
+
+      <!-- Reflect Back -->
+      <a-entity id="move-reflect-back" position="1.0 0.5 0.01">
+          <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
+              <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+              <a-text value="🔄" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
+              <a-text value="Reflect Back" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
+              <a-text value="Repeat the core of what you heard&#10;in your own words"
+                      align="center"
+                      position="0 -0.15 0.01"
+                      width="2"
+                      color="#c8d8ff"
+                      font="mozillavr"
+                      wrap-count="32">
+              </a-text>
+          </a-plane>
+      </a-entity>
+
+      <!-- Validate -->
+      <a-entity id="move-validate" position="-1.0 -0.5 0.01">
+          <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
+              <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+              <a-text value="✅" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
+              <a-text value="Validate" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
+              <a-text value="Acknowledge their feeling makes sense&#10;even if you disagree"
+                      align="center"
+                      position="0 -0.15 0.01"
+                      width="2"
+                      color="#c8d8ff"
+                      font="mozillavr"
+                      wrap-count="32">
+              </a-text>
+          </a-plane>
+      </a-entity>
+
+      <!-- Summarize -->
+      <a-entity id="move-summarize" position="1.0 -0.5 0.01">
+          <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
+              <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+              <a-text value="📋" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
+              <a-text value="Summarize" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
+              <a-text value="Recap before you respond&#10;prevents misunderstanding"
+                      align="center"
+                      position="0 -0.15 0.01"
+                      width="2"
+                      color="#c8d8ff"
+                      font="mozillavr"
+                      wrap-count="32">
+              </a-text>
+          </a-plane>
+      </a-entity>
+
+  </a-entity>
+
+  <!-- Botón See the Moves -->
+  <a-plane
+      id="btn-toggle-active-listening"
+      class="clickable"
+      width="1.4"
+      height="0.3"
+      color="#ff5ca0"
+      position="0 -1.35 0.02"
+      visible="false"
+      onclick="toggleListeningMoves()">
+
+      <a-text
+          id="text-btn-toggle-listening"
+          value="See the moves"
+          align="center"
+          color="#fff"
+          width="3.2"
+          font="mozillavr">
+      </a-text>
+
+  </a-plane>
+
+</a-entity>
 
 
 
@@ -1975,55 +2066,106 @@ function setupControllers(){
   });
 }
 
-
+let currentConversation = [];
+let currentTechniqueData = null;
+let currentMessageIndex = 0;
 
 function selectAndPreviewVR(techniqueId) {
-  // console.log("🎬 Iniciando simulación VR para:", tecnicaId);
-  
 
+  // Cambiar a la pantalla de la conversación
   cambiarPantallaVR('screen-active-listening-activity');
-  document.querySelector('#screen-technique-list').setAttribute('visible', 'false');
-  document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'true');
 
+  document.querySelector('#screen-technique-list')
+    .setAttribute('visible', 'false');
+
+  document.querySelector('#screen-active-listening-activity')
+    .setAttribute('visible', 'true');
+
+  // Verificar que exista el objeto
   if (typeof TECHNIQUE_PREVIEWS === 'undefined') {
-    console.error("No se encontró el objeto TECHNIQUE_PREVIEWS. Revisa el orden en tu HTML.");
+    console.error("❌ No se encontró el objeto TECHNIQUE_PREVIEWS.");
     return;
   }
 
+  // Obtener la información de la técnica
   const techniqueData = TECHNIQUE_PREVIEWS[techniqueId];
-  if (!techniqueData) return;
 
-  const conversation = techniqueData.good.exchanges; 
-  
-  const stage = document.querySelector('#vr-preview-stage');
-  if (!stage) {
-    console.error("No se encontró el contenedor #vr-preview-stage en el HTML.");
+  if (!techniqueData) {
+    console.error("❌ No existe la técnica:", techniqueId);
     return;
   }
-  stage.innerHTML = '';
 
-  let yOffset = 0.4; 
-  
-  conversation.forEach((msg) => {
-    const messageEntity = document.createElement('a-entity');
-    messageEntity.setAttribute('position', `0 ${yOffset} 0`);
+  // Guardar la conversación para usarla con el botón Next
+  currentConversation = techniqueData.good.exchanges;
+  currentTechniqueData = techniqueData;
+  currentMessageIndex = 0;
 
-    const speakerName = msg.speaker === 'A' ? techniqueData.roleA : 'Agent';
-    const textValue = `${speakerName}: ${msg.text}`;
-    
-    const bubbleColor = msg.speaker === 'A' ? "#00adb5" : "#ffb347";
+  // Limpiar el área donde aparecerán los mensajes
+  const stage = document.querySelector('#vr-preview-stage');
 
-    messageEntity.setAttribute('text', {
-      value: textValue,
-      align: 'left',
-      width: 2.6,
-      color: bubbleColor,
-      wrapCount: 35 
+  if (!stage) {
+    console.error("❌ No existe #vr-preview-stage");
+    return;
+  }
+
+  stage.innerHTML = "";
+
+  // Ocultar el botón "See the Moves"
+  document.querySelector('#btn-toggle-active-listening')
+    .setAttribute('visible', false);
+
+  // Mostrar el botón Next
+  document.querySelector('#btn-next-conversation')
+    .setAttribute('visible', true);
+
+  // Mostrar el primer mensaje
+  showNextConversation();
+}
+
+function showNextConversation() {
+
+    const stage = document.querySelector("#vr-preview-stage");
+
+    stage.innerHTML = "";
+
+    if(currentMessageIndex >= currentConversation.length){
+
+        document.querySelector("#btn-next-conversation")
+            .setAttribute("visible", false);
+
+        document.querySelector("#btn-toggle-active-listening")
+            .setAttribute("visible", true);
+
+        return;
+    }
+
+    const msg = currentConversation[currentMessageIndex];
+
+    const speakerName =
+        msg.speaker === "A"
+        ? currentTechniqueData.roleA
+        : "Agent";
+
+    const bubbleColor =
+        msg.speaker === "A"
+        ? "#00adb5"
+        : "#ffb347";
+
+    const entity = document.createElement("a-entity");
+
+    entity.setAttribute("position","0 0.2 0");
+
+    entity.setAttribute("text",{
+        value:`${speakerName}: ${msg.text}`,
+        align:"center",
+        width:3.2,
+        wrapCount:30,
+        color:bubbleColor
     });
 
-    stage.appendChild(messageEntity);
-    yOffset -= 0.45;
-  });
+    stage.appendChild(entity);
+
+    currentMessageIndex++;
 }
 
 function exitPreviewVR() {
@@ -2049,7 +2191,14 @@ if (btnPracticeAgain) {
   });
 }
 
+var btnNextConversation = document.getElementById("btn-next-conversation");
 
+if(btnNextConversation){
+    btnNextConversation.addEventListener("click", function(e){
+        e.stopPropagation();
+        showNextConversation();
+    });
+}
 
 document.addEventListener('DOMContentLoaded',function(){
   var micBtn=document.getElementById('mic-btn');
