@@ -861,3 +861,16 @@ function updateVRPreview(exchangeData) {
     </a-text>
   `;
 }
+
+// Ejemplo de cómo actualizar las expresiones según el estado actual en tu JS:
+function actualizarExpresionAvatar(personaje, emocion) {
+  if (personaje === 'juanjolote') {
+    // Si Juan habla, lo pones feliz/hablando y a Ajolin neutral
+    document.getElementById('vr-juan-avatar').setAttribute('src', `#juan-${emocion}`);
+    document.getElementById('vr-ajolin-avatar').setAttribute('src', '#ajolin-neutral');
+  } else {
+    // Si Ajolin responde, ella cambia de emoción y Juan se queda neutral
+    document.getElementById('vr-ajolin-avatar').setAttribute('src', `#ajolin-${emocion}`);
+    document.getElementById('vr-juan-avatar').setAttribute('src', '#juan-neutral');
+  }
+}
