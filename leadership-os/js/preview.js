@@ -817,3 +817,45 @@ async function renderHistory() {
     }).join('')}
     ${sessions.length > 10 ? `<div style="text-align:center;font-size:11px;color:var(--text3);margin-top:8px;">+ ${sessions.length - 10} more sessions</div>` : ''}`;
 }
+
+
+// Variable global simulada para controlar el índice actual de la preview
+let currentExchangeIndex = 0; 
+
+function updateVRPreview(exchangeData, totalExchanges) {
+  const juanImgEl = document.getElementById('preview-juan-img');
+  const ajolinImgEl = document.getElementById('preview-ajolin-img');
+  const speakerNameEl = document.getElementById('speaker-name');
+  const counterEl = document.getElementById('conversation-counter');
+  const stageEl = document.getElementById('vr-preview-stage');
+
+  if (!exchangeData) return;
+
+  // 1. Actualizar texto y contador
+  speakerNameEl.setAttribute('value', exchangeData.speaker.toUpperCase());
+  counterEl.setAttribute('value', `${currentExchangeIndex + 1} / ${totalExchanges}`);
+  
+  // Limpiar e inyectar nuevo texto de diálogo
+  stageEl.innerHTML = `<a-text value="${exchangeData.text}" align="center" width="2.2" color="#e8eeff" font="mozillavr" wrap-count="30"></a-text>`;
+
+  // 2. Control dinámico de estados de ánimo y opacidad según quién hable
+  if (exchangeData.speaker === 'Juanjolote') {
+    // Juanjolote habla: Actualiza su humor y se destaca en pantalla
+    juanImgEl.setAttribute('src', `#juan-${exchangeData.mood}`);
+    juanImgEl.setAttribute('material', 'opacity', '1.0');
+    
+    // Ajolin escucha: Se pone en neutral y se atenúa un poco
+    ajolinImgEl.setAttribute('src', '#ajolin-neutral');
+    ajolinImgEl.setAttribute('material', 'opacity', '0.5');
+    speakerNameEl.setAttribute('color', '#00e5c0'); // Color de Juanjolote
+  } else {
+    // Ajolin habla: Actualiza su humor y se destaca en pantalla
+    ajolinImgEl.setAttribute('src', `#ajolin-${exchangeData.mood}`);
+    ajolinImgEl.setAttribute('material', 'opacity', '1.0');
+    
+    // Juanjolote escucha: Se pone en neutral y se atenúa
+    juanImgEl.setAttribute('src', '#juan-neutral');
+    juanImgEl.setAttribute('material', 'opacity', '0.5');
+    speakerNameEl.setAttribute('color', '#9d5cff'); // Color de Ajolin
+  }
+}
