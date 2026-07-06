@@ -994,7 +994,7 @@ function funcionIntervTenureRenewal() {
         src="#juan-neutral" 
         width="0.8" 
         height="0.8" 
-        position="-2.5 0.5 0.05" 
+        position="-2 0.5 0.05" 
         visible="true">
     </a-image>
 
@@ -1003,7 +1003,7 @@ function funcionIntervTenureRenewal() {
         src="#ajolin-neutral" 
         width="0.8" 
         height="0.8" 
-        position="2.5 0.5 0.05" 
+        position="2 0.5 0.05" 
         visible="false">
     </a-image>
 
@@ -2181,7 +2181,7 @@ function initActiveListeningConversation() {
   if (ajolin) ajolin.setAttribute('visible', 'false');
   
   if (speaker) {
-    speaker.setAttribute('value', 'JUANJOLOTE');
+    speaker.setAttribute('value', ' ');
     speaker.setAttribute('color', '#00e5c0'); // Color cian de Juanjolote
     speaker.setAttribute('position', '-1.45 0.73 0.02'); // Alineado a la izquierda
   }
@@ -2198,7 +2198,7 @@ function avanzarConversacionActiva() {
     if (ajolin) ajolin.setAttribute('visible', 'true');
     
     if (speaker) {
-      speaker.setAttribute('value', 'AJOLIN');
+      speaker.setAttribute('value', ' ');
       speaker.setAttribute('color', '#9d5cff'); // Color morado de Ajolin
       speaker.setAttribute('position', '0.7 0.73 0.02'); // Lo movemos un poco a la derecha
     }
