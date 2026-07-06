@@ -70,9 +70,9 @@ AFRAME.registerComponent('handler-botones-vr', {
   }
 });
 
-// 🚀 FUNCIÓN MAESTRA CORREGIDA: Incluye todas las pantallas para evitar solapamientos y bloqueos
+
+
 function cambiarPantallaVR(pantallaMostrarId) {
-  // 🌟 Agregamos TODAS las pantallas de la aplicación para un control absoluto
   const pantallas = [
     'screen-welcome', 
     'screen-mode', 
@@ -81,9 +81,9 @@ function cambiarPantallaVR(pantallaMostrarId) {
     'screen-interventions', 
     'screen-learn-work-practice', 
     'screen-history',
-    'screen-practice',               // 👈 ¡Faltaba! Pantalla donde se hace la actividad
-    'screen-eval',                   // 👈 ¡Faltaba! Pantalla de evaluación al terminar
-    'screen-active-listening-activity', // 👈 ¡Faltaba! Pantalla de actividad de escucha activa
+    'screen-practice',               
+    'screen-eval',                   
+    'screen-active-listening-activity', // 👈 ¡Ya la tenías aquí! Excelente.
     'screen-level-selector'
   ];
   
@@ -92,11 +92,16 @@ function cambiarPantallaVR(pantallaMostrarId) {
     if (!elPantalla) return;
 
     if (id === pantallaMostrarId) {
-      // Activamos por completo la pantalla seleccionada
       elPantalla.setAttribute('visible', 'true');
       elPantalla.setAttribute('scale', '1 1 1');
+      
+      // 🌟 REGLA ESPECIAL PARA TU BOTÓN:
+      // Si entramos a esta pantalla, nos aseguramos de que el botón empiece siendo visible
+      if (id === 'screen-active-listening-activity') {
+        const btnToggle = document.getElementById('btn-toggle-active-listening');
+        if (btnToggle) btnToggle.setAttribute('visible', 'true');
+      }
     } else {
-      // Desactivamos por completo todas las demás (escala 0 evita clicks fantasmas)
       elPantalla.setAttribute('visible', 'false');
       elPantalla.setAttribute('scale', '0 0 0');
     }
@@ -948,7 +953,6 @@ function funcionIntervTenureRenewal() {
 
 
 
-
 <!-- SCREEN: ACTIVE LISTENING ACTIVITY -->
 <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
 
@@ -960,7 +964,6 @@ function funcionIntervTenureRenewal() {
         material="opacity:0.95; shader:flat"
         position="0 0.4 0"> <!-- El segundo número (0.4) lo desplaza hacia arriba -->
     </a-plane>
-
 
     <!-- Título -->
     <a-text
@@ -983,7 +986,6 @@ function funcionIntervTenureRenewal() {
     <!-- ===================== -->
     <!-- CONVERSACIÓN (Ajustada y Compacta) -->
     <!-- ===================== -->
-
     <a-entity id="listening-session-content" visible="true">
 
         <!-- Fondo del chat (Reducido a la mitad de altura para un solo texto) -->
@@ -1048,7 +1050,6 @@ function funcionIntervTenureRenewal() {
     <!-- ===================== -->
     <!-- MOVES (Mantienen su posición original) -->
     <!-- ===================== -->
-
     <a-entity id="moves-container" position="0 0.15 0.01" visible="false">
 
         <!-- Pay Attention -->
@@ -1121,7 +1122,9 @@ function funcionIntervTenureRenewal() {
 
     </a-entity>
 
-    <!-- Botón See the Moves -->
+    <!-- ===================== -->
+    <!-- BOTÓN INTERACTIVO (Dentro de la Jerarquía) -->
+    <!-- ===================== -->
     <a-plane
         id="btn-toggle-active-listening"
         class="clickable"
