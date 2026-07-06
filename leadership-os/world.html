@@ -2168,20 +2168,29 @@ function selectAndPreviewVR(techniqueId) {
 
   stage.innerHTML = "";
 
-  // Ocultar el botón "See the Moves"
-  document.querySelector('#btn-toggle-active-listening')
-    .setAttribute('visible', false);
+  // 🛠️ SOLUCIÓN AQUÍ: Desactivar el botón "See the Moves" por completo y mandarlo lejos
+  const toggleBtn = document.querySelector('#btn-toggle-active-listening');
+  if (toggleBtn) {
+    toggleBtn.setAttribute('visible', false);
+    toggleBtn.classList.remove('raycastable'); 
+    
+    // Lo mandamos al fondo (Z = -99) para que no bloquee físicamente a "My progress"
+    toggleBtn.setAttribute('position', '0 1.5 -2');
+  }
 
   // Mostrar el botón Next y asegurar que su texto inicial sea el correcto
   const nextBtn = document.querySelector('#btn-next-conversation');
-  nextBtn.setAttribute('visible', true);
-  const nextBtnText = nextBtn.querySelector('a-text');
-  if (nextBtnText) nextBtnText.setAttribute('value', '▶ Next');
+  if (nextBtn) {
+    nextBtn.setAttribute('visible', true);
+    nextBtn.classList.add('raycastable'); 
+    
+    const nextBtnText = nextBtn.querySelector('a-text');
+    if (nextBtnText) nextBtnText.setAttribute('value', '▶ Next');
+  }
 
   // Mostrar el primer mensaje
   showNextConversation();
 }
-
 
 // Variable global para controlar el paso actual de la conversación
 let activeListeningStep = 0;
