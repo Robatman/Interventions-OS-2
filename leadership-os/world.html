@@ -983,7 +983,9 @@ function funcionIntervTenureRenewal() {
         position="0 1.18 0.01">
     </a-plane>
 
-
+   <!-- ===================== -->
+    <!-- CONVERSACIÓN (Limpia sin nombres ni contadores) -->
+    <!-- ===================== -->
     <a-entity id="listening-session-content" visible="true">
 
         <!-- Fondo del chat -->
@@ -992,64 +994,27 @@ function funcionIntervTenureRenewal() {
             height="0.65"
             color="#101625"
             material="opacity:0.95; shader:flat"
-            position="0 0.5 0.01">
+            position="0 0.45 0.01">
         </a-plane>
 
-        <!-- AVATAR IZQUIERDA: JUANJOLOTE -->
-        <a-image 
-            id="preview-juan-img" 
-            src="#juan-neutral" 
-            width="0.5" 
-            height="0.5" 
-            position="-1.2 0.5 0.02">
-        </a-image>
+        <!-- Contenedor dinámico para el Avatar activo -->
+        <a-entity id="vr-avatar-stage"></a-entity>
 
-        <!-- AVATAR DERECHA: AJOLIN -->
-        <a-image 
-            id="preview-ajolin-img" 
-            src="#ajolin-neutral" 
-            width="0.5" 
-            height="0.5" 
-            position="1.2 0.5 0.02">
-        </a-image>
-
-        <!-- Nombre del hablante -->
-        <a-text
-            id="speaker-name"
-            value="Juanjolote"
-            align="center"
-            position="0 0.75 0.02"
-            width="2.5"
-            color="#00e5c0"
-            font="exo2bold">
-        </a-text>
-
-        <!-- Contenedor del texto del mensaje -->
+        <!-- Contenedor dinámico para el Texto del mensaje -->
         <a-entity
             id="vr-preview-stage"
             position="0 0.45 0.03">
-            <!-- Aquí tu JS inyectará el componente a-text con el texto actual -->
+            <!-- El JS inyectará el texto aquí -->
         </a-entity>
 
-        <!-- Contador -->
-        <a-text
-            id="conversation-counter"
-            value="1 / 4"
-            align="right"
-            position="1.35 0.05 0.02"
-            width="1.6"
-            color="#8ca6d8"
-            font="mozillavr">
-        </a-text>
-
-        <!-- Botón Next -->
+        <!-- Botón Next (Centrado y ajustado al diseño limpio) -->
         <a-plane
             id="btn-next-conversation"
             class="clickable"
             width="0.65"
             height="0.22"
             color="#4F7CFF"
-            position="0 0.05 0.02"
+            position="0 0.02 0.02"
             material="shader:flat">
             <a-text
                 value="▶ Next"
