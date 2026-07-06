@@ -953,6 +953,7 @@ function funcionIntervTenureRenewal() {
 
 
 
+
 <!-- SCREEN: ACTIVE LISTENING ACTIVITY -->
 <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
 
@@ -964,6 +965,7 @@ function funcionIntervTenureRenewal() {
         material="opacity:0.95; shader:flat"
         position="0 0.4 0"> <!-- El segundo número (0.4) lo desplaza hacia arriba -->
     </a-plane>
+
 
     <!-- Título -->
     <a-text
@@ -983,39 +985,59 @@ function funcionIntervTenureRenewal() {
         position="0 1.18 0.01">
     </a-plane>
 
-   <!-- ===================== -->
-    <!-- CONVERSACIÓN (Limpia sin nombres ni contadores) -->
     <!-- ===================== -->
+    <!-- CONVERSACIÓN (Ajustada y Compacta) -->
+    <!-- ===================== -->
+
     <a-entity id="listening-session-content" visible="true">
 
-        <!-- Fondo del chat -->
+        <!-- Fondo del chat (Reducido a la mitad de altura para un solo texto) -->
         <a-plane
             width="3.3"
             height="0.65"
             color="#101625"
             material="opacity:0.95; shader:flat"
-            position="0 0.45 0.01">
+            position="0 0.5 0.01">
         </a-plane>
 
-        <!-- Contenedor dinámico para el Avatar activo -->
-        <a-entity id="vr-avatar-stage"></a-entity>
+        <!-- Nombre del hablante (Bajado un poco para alinearse con el nuevo fondo) -->
+        <a-text
+            id="speaker-name"
+            value=""
+            align="left"
+            position="-1.45 0.73 0.02"
+            width="2.2"
+            color="#00e5c0"
+            font="exo2bold">
+        </a-text>
 
-        <!-- Contenedor dinámico para el Texto del mensaje -->
+        <!-- Contenedor del mensaje (Centrado verticalmente en el nuevo fondo) -->
         <a-entity
             id="vr-preview-stage"
-            position="0 0.45 0.03">
-            <!-- El JS inyectará el texto aquí -->
+            position="0 0.48 0.03">
         </a-entity>
 
-        <!-- Botón Next (Centrado y ajustado al diseño limpio) -->
+        <!-- Contador (Alineado justo debajo de la caja de texto) -->
+        <a-text
+            id="conversation-counter"
+            value=""
+            align="right"
+            position="1.35 0.05 0.02"
+            width="1.6"
+            color="#8ca6d8"
+            font="mozillavr">
+        </a-text>
+
+        <!-- Botón Next (Subido para mantener la cohesión visual) -->
         <a-plane
             id="btn-next-conversation"
             class="clickable"
             width="0.65"
             height="0.22"
             color="#4F7CFF"
-            position="0 0.02 0.02"
+            position="0 0.05 0.02"
             material="shader:flat">
+
             <a-text
                 value="▶ Next"
                 align="center"
@@ -1023,6 +1045,7 @@ function funcionIntervTenureRenewal() {
                 width="2"
                 font="mozillavr">
             </a-text>
+
         </a-plane>
 
     </a-entity>
@@ -1030,6 +1053,7 @@ function funcionIntervTenureRenewal() {
     <!-- ===================== -->
     <!-- MOVES (Mantienen su posición original) -->
     <!-- ===================== -->
+
     <a-entity id="moves-container" position="0 0.15 0.01" visible="false">
 
         <!-- Pay Attention -->
@@ -1102,9 +1126,7 @@ function funcionIntervTenureRenewal() {
 
     </a-entity>
 
-    <!-- ===================== -->
-    <!-- BOTÓN INTERACTIVO (Dentro de la Jerarquía) -->
-    <!-- ===================== -->
+    <!-- Botón See the Moves -->
     <a-plane
         id="btn-toggle-active-listening"
         class="clickable"
