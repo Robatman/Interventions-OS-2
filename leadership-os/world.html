@@ -81,9 +81,9 @@ function cambiarPantallaVR(pantallaMostrarId) {
     'screen-interventions', 
     'screen-learn-work-practice', 
     'screen-history',
-    'screen-practice',               
+    'screen-practice',              
     'screen-eval',                   
-    'screen-active-listening-activity', // 👈 ¡Ya la tenías aquí! Excelente.
+    'screen-active-listening-activity',
     'screen-level-selector'
   ];
   
@@ -95,11 +95,15 @@ function cambiarPantallaVR(pantallaMostrarId) {
       elPantalla.setAttribute('visible', 'true');
       elPantalla.setAttribute('scale', '1 1 1');
       
-      // 🌟 REGLA ESPECIAL PARA TU BOTÓN:
-      // Si entramos a esta pantalla, nos aseguramos de que el botón empiece siendo visible
+      // 🌟 REGLA ESPECIAL PARA TU BOTÓN Y PERSONAJES:
       if (id === 'screen-active-listening-activity') {
         const btnToggle = document.getElementById('btn-toggle-active-listening');
         if (btnToggle) btnToggle.setAttribute('visible', 'true');
+        
+        // Inicializa el estado para que Juanjolote siempre empiece del lado izquierdo
+        if (typeof initActiveListeningConversation === 'function') {
+          initActiveListeningConversation();
+        }
       }
     } else {
       elPantalla.setAttribute('visible', 'false');
@@ -113,7 +117,6 @@ function cambiarPantallaVR(pantallaMostrarId) {
     raycasterEl.components.raycaster.refreshObjects();
   }
 }
-
 
 function ejecutarFuncionPorTecnica(tecnica) {
   // console.log("⚡ Buscando técnica:", tecnica);
@@ -963,9 +966,8 @@ function funcionIntervTenureRenewal() {
         height="1.3"
         color="#1a1a2e"
         material="opacity:0.95; shader:flat"
-        position="0 0.4 0"> <!-- El segundo número (0.4) lo desplaza hacia arriba -->
+        position="0 0.4 0">
     </a-plane>
-
 
     <!-- Título -->
     <a-text
@@ -985,13 +987,33 @@ function funcionIntervTenureRenewal() {
         position="0 1.18 0.01">
     </a-plane>
 
-    <!-- ===================== -->
-    <!-- CONVERSACIÓN (Ajustada y Compacta) -->
-    <!-- ===================== -->
+    <!-- ============================================= -->
+    <!-- PERSONAJES DE LA CONVERSACIÓN (Izquierda y Derecha) -->
+    <!-- ============================================= -->
+    <a-image 
+        id="activity-juan" 
+        src="#juan-neutral" 
+        width="0.8" 
+        height="0.8" 
+        position="-1.1 0.5 0.05" 
+        visible="true">
+    </a-image>
 
+    <a-image 
+        id="activity-ajolin" 
+        src="#ajolin-neutral" 
+        width="0.8" 
+        height="0.8" 
+        position="1.1 0.5 0.05" 
+        visible="false">
+    </a-image>
+
+    <!-- ===================== -->
+    <!-- CONVERSACIÓN -->
+    <!-- ===================== -->
     <a-entity id="listening-session-content" visible="true">
 
-        <!-- Fondo del chat (Reducido a la mitad de altura para un solo texto) -->
+        <!-- Fondo del chat -->
         <a-plane
             width="3.3"
             height="0.65"
@@ -1000,10 +1022,10 @@ function funcionIntervTenureRenewal() {
             position="0 0.5 0.01">
         </a-plane>
 
-        <!-- Nombre del hablante (Bajado un poco para alinearse con el nuevo fondo) -->
+        <!-- Nombre del hablante -->
         <a-text
             id="speaker-name"
-            value=""
+            value="JUANJOLOTE"
             align="left"
             position="-1.45 0.73 0.02"
             width="2.2"
@@ -1011,13 +1033,13 @@ function funcionIntervTenureRenewal() {
             font="exo2bold">
         </a-text>
 
-        <!-- Contenedor del mensaje (Centrado verticalmente en el nuevo fondo) -->
+        <!-- Contenedor del mensaje -->
         <a-entity
             id="vr-preview-stage"
             position="0 0.48 0.03">
         </a-entity>
 
-        <!-- Contador (Alineado justo debajo de la caja de texto) -->
+        <!-- Contador -->
         <a-text
             id="conversation-counter"
             value=""
@@ -1028,7 +1050,7 @@ function funcionIntervTenureRenewal() {
             font="mozillavr">
         </a-text>
 
-        <!-- Botón Next (Subido para mantener la cohesión visual) -->
+        <!-- Botón Next (Vinculado a la nueva función de avance) -->
         <a-plane
             id="btn-next-conversation"
             class="clickable"
@@ -1036,7 +1058,8 @@ function funcionIntervTenureRenewal() {
             height="0.22"
             color="#4F7CFF"
             position="0 0.05 0.02"
-            material="shader:flat">
+            material="shader:flat"
+            onclick="avanzarConversacionActiva()">
 
             <a-text
                 value="▶ Next"
@@ -1051,25 +1074,16 @@ function funcionIntervTenureRenewal() {
     </a-entity>
 
     <!-- ===================== -->
-    <!-- MOVES (Mantienen su posición original) -->
+    <!-- MOVES -->
     <!-- ===================== -->
-
     <a-entity id="moves-container" position="0 0.15 0.01" visible="false">
-
         <!-- Pay Attention -->
         <a-entity id="move-pay-attention" position="-1.0 0.5 0.01">
             <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
                 <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
                 <a-text value="👁" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
                 <a-text value="Pay Attention" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
-                <a-text value="Be fully present&#10;no phone, no planning your next line"
-                        align="center"
-                        position="0 -0.15 0.01"
-                        width="1.2"
-                        color="#c8d8ff"
-                        font="mozillavr"
-                        wrap-count="32">
-                </a-text>
+                <a-text value="Be fully present&#10;no phone, no planning your next line" align="center" position="0 -0.15 0.01" width="1.2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
             </a-plane>
         </a-entity>
 
@@ -1079,14 +1093,7 @@ function funcionIntervTenureRenewal() {
                 <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
                 <a-text value="🔄" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
                 <a-text value="Reflect Back" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
-                <a-text value="Repeat the core of what you heard&#10;in your own words"
-                        align="center"
-                        position="0 -0.15 0.01"
-                        width="1.2"
-                        color="#c8d8ff"
-                        font="mozillavr"
-                        wrap-count="32">
-                </a-text>
+                <a-text value="Repeat the core of what you heard&#10;in your own words" align="center" position="0 -0.15 0.01" width="1.2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
             </a-plane>
         </a-entity>
 
@@ -1096,14 +1103,7 @@ function funcionIntervTenureRenewal() {
                 <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
                 <a-text value="✅" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
                 <a-text value="Validate" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
-                <a-text value="Acknowledge their feeling makes sense&#10;even if you disagree"
-                        align="center"
-                        position="0 -0.15 0.01"
-                        width="1.2"
-                        color="#c8d8ff"
-                        font="mozillavr"
-                        wrap-count="32">
-                </a-text>
+                <a-text value="Acknowledge their feeling makes sense&#10;even if you disagree" align="center" position="0 -0.15 0.01" width="1.2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
             </a-plane>
         </a-entity>
 
@@ -1113,17 +1113,9 @@ function funcionIntervTenureRenewal() {
                 <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
                 <a-text value="📋" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
                 <a-text value="Summarize" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
-                <a-text value="Recap before you respond&#10;prevents misunderstanding"
-                        align="center"
-                        position="0 -0.15 0.01"
-                        width="1.2"
-                        color="#c8d8ff"
-                        font="mozillavr"
-                        wrap-count="32">
-                </a-text>
+                <a-text value="Recap before you respond&#10;prevents misunderstanding" align="center" position="0 -0.15 0.01" width="1.2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
             </a-plane>
         </a-entity>
-
     </a-entity>
 
     <!-- Botón See the Moves -->
@@ -2164,6 +2156,50 @@ function selectAndPreviewVR(techniqueId) {
 
   // Mostrar el primer mensaje
   showNextConversation();
+}
+
+
+// Variable global para controlar el paso actual de la conversación
+let activeListeningStep = 0;
+
+function initActiveListeningConversation() {
+  activeListeningStep = 0;
+  
+  const juan = document.getElementById('activity-juan');
+  const ajolin = document.getElementById('activity-ajolin');
+  const speaker = document.getElementById('speaker-name');
+  
+  // Juanjolote inicia visible a la izquierda
+  if (juan) juan.setAttribute('visible', 'true');
+  if (ajolin) ajolin.setAttribute('visible', 'false');
+  
+  if (speaker) {
+    speaker.setAttribute('value', 'JUANJOLOTE');
+    speaker.setAttribute('color', '#00e5c0'); // Color cian de Juanjolote
+    speaker.setAttribute('position', '-1.45 0.73 0.02'); // Alineado a la izquierda
+  }
+}
+
+function avanzarConversacionActiva() {
+  const juan = document.getElementById('activity-juan');
+  const ajolin = document.getElementById('activity-ajolin');
+  const speaker = document.getElementById('speaker-name');
+  
+  if (activeListeningStep === 0) {
+    // Cambiamos el turno a Ajolin (Derecha)
+    if (juan) juan.setAttribute('visible', 'false');
+    if (ajolin) ajolin.setAttribute('visible', 'true');
+    
+    if (speaker) {
+      speaker.setAttribute('value', 'AJOLIN');
+      speaker.setAttribute('color', '#9d5cff'); // Color morado de Ajolin
+      speaker.setAttribute('position', '0.7 0.73 0.02'); // Lo movemos un poco a la derecha
+    }
+    activeListeningStep = 1;
+  } else {
+    // Si vuelven a dar Next, reinicia el ciclo (o puedes añadir más pasos si lo requieres)
+    initActiveListeningConversation();
+  }
 }
 
 function showNextConversation() {
