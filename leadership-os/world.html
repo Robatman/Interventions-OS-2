@@ -2101,6 +2101,8 @@ function setupControllers(){
 let currentConversation = [];
 let currentTechniqueData = null;
 let currentMessageIndex = 0;
+// Nueva variable para controlar el flujo secuencial de la simulación
+let currentSimulationPhase = 'bad'; 
 
 function selectAndPreviewVR(techniqueId) {
 
@@ -2127,9 +2129,10 @@ function selectAndPreviewVR(techniqueId) {
     return;
   }
 
-  // Guardar la conversación para usarla con el botón Next
-  currentConversation = techniqueData.good.exchanges;
+  // CONFIGURACIÓN INICIAL: Empezamos siempre con la fase 'bad'
+  currentSimulationPhase = 'bad';
   currentTechniqueData = techniqueData;
+  currentConversation = techniqueData.bad.exchanges; // Cargar primero los diálogos "bad"
   currentMessageIndex = 0;
 
   // Limpiar el área donde aparecerán los mensajes
@@ -2146,58 +2149,105 @@ function selectAndPreviewVR(techniqueId) {
   document.querySelector('#btn-toggle-active-listening')
     .setAttribute('visible', false);
 
-  // Mostrar el botón Next
-  document.querySelector('#btn-next-conversation')
-    .setAttribute('visible', true);
+  // Mostrar el botón Next y asegurar que su texto inicial sea el correcto
+  const nextBtn = document.querySelector('#btn-next-conversation');
+  nextBtn.setAttribute('visible', true);
+  const nextBtnText = nextBtn.querySelector('a-text');
+  if (nextBtnText) nextBtnText.setAttribute('value', '▶ Next');
 
   // Mostrar el primer mensaje
   showNextConversation();
 }
 
 function showNextConversation() {
+  const stage = document.querySelector("#vr-preview-stage");
+  stage.innerHTML = "";
 
-    const stage = document.querySelector("#vr-preview-stage");
+  const nextBtn = document.querySelector("#btn-next-conversation");
+  const nextBtnText = nextBtn ? nextBtn.querySelector('a-text') : null;
 
-    stage.innerHTML = "";
+  // --- LÓGICA DE CONTROL DE FLUJO SECUENCIAL ---
 
-    if(currentMessageIndex >= currentConversation.length){
+  // 1. Si terminamos los diálogos de la conversación MALA
+  if (currentSimulationPhase === 'bad' && currentMessageIndex >= currentConversation.length) {
+    currentSimulationPhase = 'insight_bad';
+    
+    // Inyectar visualmente el primer Insight en el escenario
+    renderInsightText(stage, currentTechniqueData.bad.insight);
 
-        document.querySelector("#btn-next-conversation")
-            .setAttribute("visible", false);
+    // Cambiar el texto del botón Next
+    if (nextBtnText) nextBtnText.setAttribute('value', 'See it done right →');
+    return;
+  }
 
-        document.querySelector("#btn-toggle-active-listening")
-            .setAttribute("visible", true);
+  // 2. Si el usuario hace click estando en el Insight de la mala -> Pasar a la BUENA
+  if (currentSimulationPhase === 'insight_bad') {
+    currentSimulationPhase = 'good';
+    currentConversation = currentTechniqueData.good.exchanges; // Cargamos la conversación "good"
+    currentMessageIndex = 0;
+    
+    // Restaurar texto del botón original
+    if (nextBtnText) nextBtnText.setAttribute('value', '▶ Next');
+  }
 
-        return;
+  // 3. Si terminamos los diálogos de la conversación BUENA
+  if (currentSimulationPhase === 'good' && currentMessageIndex >= currentConversation.length) {
+    currentSimulationPhase = 'insight_good';
+
+    // Inyectar visualmente el segundo Insight en el escenario
+    renderInsightText(stage, currentTechniqueData.good.insight);
+
+    // Desaparecer botón Next e iluminar el botón definitivo "See the moves"
+    if (nextBtn) nextBtn.setAttribute("visible", false);
+    
+    const toggleBtn = document.querySelector("#btn-toggle-active-listening");
+    if (toggleBtn) {
+      toggleBtn.setAttribute("visible", true);
+      const toggleText = toggleBtn.querySelector('a-text');
+      if (toggleText) toggleText.setAttribute('value', 'See the moves');
     }
+    return;
+  }
 
-    const msg = currentConversation[currentMessageIndex];
+  // --- RENDERIZADO REGULAR DE DIÁLOGOS (Turnos normales) ---
+  const msg = currentConversation[currentMessageIndex];
 
-    const speakerName =
-        msg.speaker === "A"
-        ? currentTechniqueData.roleA
-        : "Agent";
+  const speakerName =
+    msg.speaker === "A"
+      ? currentTechniqueData.roleA
+      : "Agent";
 
-    const bubbleColor =
-        msg.speaker === "A"
-        ? "#00adb5"
-        : "#ffb347";
+  const bubbleColor =
+    msg.speaker === "A"
+      ? "#00adb5"
+      : "#ffb347";
 
-    const entity = document.createElement("a-entity");
+  const entity = document.createElement("a-entity");
+  entity.setAttribute("position", "0 0.2 0");
+  entity.setAttribute("text", {
+    value: `${speakerName}: ${msg.text}`,
+    align: "center",
+    width: 3.2,
+    wrapCount: 30,
+    color: bubbleColor
+  });
 
-    entity.setAttribute("position","0 0.2 0");
+  stage.appendChild(entity);
+  currentMessageIndex++;
+}
 
-    entity.setAttribute("text",{
-        value:`${speakerName}: ${msg.text}`,
-        align:"center",
-        width:3.2,
-        wrapCount:30,
-        color:bubbleColor
-    });
-
-    stage.appendChild(entity);
-
-    currentMessageIndex++;
+// Función auxiliar para pintar los Insights de manera limpia y uniforme
+function renderInsightText(stage, textContent) {
+  const entity = document.createElement("a-entity");
+  entity.setAttribute("position", "0 0.2 0");
+  entity.setAttribute("text", {
+    value: `INSIGHT:\n${textContent}`,
+    align: "center",
+    width: 3.2,
+    wrapCount: 30,
+    color: "#ffedd5" // Color distinguible y cálido para las reflexiones
+  });
+  stage.appendChild(entity);
 }
 
 function exitPreviewVR() {
