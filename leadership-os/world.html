@@ -1283,37 +1283,45 @@ function pickRandomArchetype(){
 let mostrandoMoves = false;
 
 function toggleListeningMoves() {
+  // 🛑 CANDADO DE SEGURIDAD PARA LA BIENVENIDA:
+  const welcomeScreen = document.getElementById('screen-welcome');
+  if (welcomeScreen && welcomeScreen.getAttribute('visible') === 'true') {
+    console.log("🚫 Click bloqueado: No puedes usar este botón mientras estés en la pantalla de bienvenida.");
+    return;
+  }
+
+  const sessionContent = document.getElementById('listening-session-content');
   const movesContainer = document.getElementById('moves-container');
-  const chatContent = document.getElementById('listening-session-content');
   const btnText = document.getElementById('text-btn-toggle-listening');
+  const btnPlane = document.getElementById('btn-toggle-active-listening');
   
-  // Referencias a los ajolotes
+  // Referencias a tus ajolotes
   const juan = document.getElementById('activity-juan');
   const ajolin = document.getElementById('activity-ajolin');
 
-  if (!movesContainer) return;
-
-  // Verificamos si actualmente están ocultos los moves
-  const isShowingMoves = movesContainer.getAttribute('visible') === 'true';
-
-  if (!isShowingMoves) {
-    // 1. MOSTRAR LOS MOVES Y OCULTAR EL CHAT
-    movesContainer.setAttribute('visible', 'true');
-    if (chatContent) chatContent.setAttribute('visible', 'false');
-    if (btnText) btnText.setAttribute('value', 'Back to conversation');
-
+  if (!mostrandoMoves) {
+    // 1. Ocultar contenido y mostrar los 4 cartelitos
+    if (sessionContent) sessionContent.setAttribute('visible', 'false');
+    if (movesContainer) movesContainer.setAttribute('visible', 'true');
+    
     // 🛑 OCULTAR LOS AJOLOTES INMEDIATAMENTE
     if (juan) juan.setAttribute('visible', 'false');
     if (ajolin) ajolin.setAttribute('visible', 'false');
-
+    
+    // 2. Cambiar UI del botón al estilo listo
+    if (btnText) btnText.setAttribute('text', 'value', "I'm ready \u2014 let's go \u2192");
+    if (btnPlane) btnPlane.setAttribute('color', '#00e5c0');
+    
+    mostrandoMoves = true;
   } else {
-    // 2. REGRESAR A LA CONVERSACIÓN
-    movesContainer.setAttribute('visible', 'false');
-    if (chatContent) chatContent.setAttribute('visible', 'true');
-    if (btnText) btnText.setAttribute('value', 'See the moves');
-
-    // 🔄 RESTAURAR VISIBILIDAD SEGÚN EL TURNO ACTUAL
-    // Usamos el estado actual de activeListeningStep que ya programamos antes
+    // 3. Resetear estados internos y regresar a la pantalla intermedia de forma segura
+    mostrandoMoves = false;
+    if (sessionContent) sessionContent.setAttribute('visible', 'true');
+    if (movesContainer) movesContainer.setAttribute('visible', 'false');
+    if (btnText) btnText.setAttribute('text', 'value', "See the moves");
+    if (btnPlane) btnPlane.setAttribute('color', '#ff5ca0');
+    
+    // 🔄 RESTAURAR VISIBILIDAD DE LOS AJOLOTES SEGÚN EL TURNO ACTUAL ANTES DE IRNOS
     if (typeof activeListeningStep !== 'undefined') {
       if (activeListeningStep === 0) {
         if (juan) juan.setAttribute('visible', 'true');
@@ -1323,8 +1331,17 @@ function toggleListeningMoves() {
         if (ajolin) ajolin.setAttribute('visible', 'true');
       }
     }
+    
+    // Tu redirección original intacta
+    if (typeof showScreen === 'function') {
+      showScreen('learn-work-practice');
+    } else if (typeof cambiarPantallaVR === 'function') {
+      // Por si usas la otra función en este script
+      cambiarPantallaVR('screen-learn-work-practice');
+    }
   }
 }
+
 
 function pickRandomScenario(archetype,level){
   var pool=archetype.briefings[level]||archetype.briefings['novice']||[];
