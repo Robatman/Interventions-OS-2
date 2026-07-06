@@ -461,7 +461,8 @@ function funcionIntervTenureRenewal() {
     </a-entity>
 
 
-<a-entity id="screen-technique-list" visible="false">
+<!-- Subimos todo el contenedor sumándole altura en el eje Y (segundo valor de position) -->
+<a-entity id="screen-technique-list" position="0 0.8 0" visible="false">
 
   <!-- CABECERA -->
   <a-text value="TECHNIQUES"
@@ -762,7 +763,7 @@ function funcionIntervTenureRenewal() {
   </a-entity>
 
 
-  <!-- BOTÓN REGRESAR (Alineado abajo y centrado) -->
+  <!-- BOTÓN REGRESAR -->
   <a-entity id="btn-tech-list-back"
             position="0 -1.1 -2.4"
             class="clickable">
@@ -791,6 +792,7 @@ function funcionIntervTenureRenewal() {
   </a-entity>
 
 </a-entity>
+
 
 <a-entity id="screen-interventions" visible="false">
   <a-text value="INTERVENCIONES" position="0 2.6 -2.8" align="center" color="#ffffff" width="6.5" font="exo2bold" shader="msdf"></a-text>
