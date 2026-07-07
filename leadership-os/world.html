@@ -192,6 +192,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
             break;
 
     case 'back-to-learn-work':
+      console.log("Aquí 2 pero no creo");
       cambiarPantallaVR('screen-learn-work-practice');
       break;
     
@@ -1337,6 +1338,7 @@ function toggleListeningMoves() {
       showScreen('learn-work-practice');
     } else if (typeof cambiarPantallaVR === 'function') {
       // Por si usas la otra función en este script
+      console.log("Aquí 1");
       cambiarPantallaVR('screen-learn-work-practice');
     }
   }
