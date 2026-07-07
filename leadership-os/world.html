@@ -98,11 +98,9 @@ function cambiarPantallaVR(pantallaMostrarId) {
       // 🌟 REGLA ESPECIAL PARA TU BOTÓN Y PERSONAJES:
       if (id === 'screen-active-listening-activity') {
         const btnToggle = document.getElementById('btn-toggle-active-listening');
-        if (btnToggle) {
-          btnToggle.setAttribute('visible', 'true');
-          btnToggle.setAttribute('scale', '1 1 1'); // Nos aseguramos de restaurar su escala
-        }
+        if (btnToggle) btnToggle.setAttribute('visible', 'true');
         
+        // Inicializa el estado para que Juanjolote siempre empiece del lado izquierdo
         if (typeof initActiveListeningConversation === 'function') {
           initActiveListeningConversation();
         }
@@ -113,23 +111,12 @@ function cambiarPantallaVR(pantallaMostrarId) {
     }
   });
 
-  // 🛑 NUEVA REGLA: Ocultar y desactivar el botón si volvemos a la pantalla de bienvenida
-  if (pantallaMostrarId === 'screen-welcome') {
-    const btnToggle = document.getElementById('btn-toggle-active-listening');
-    if (btnToggle) {
-      btnToggle.setAttribute('visible', 'false');
-      btnToggle.setAttribute('scale', '0 0 0'); // Poner la escala en 0 evita que reciba clics fantasma
-    }
-  }
-
   // Forzamos al raycaster de la escena a recalcular los botones activos inmediatamente
   const raycasterEl = document.querySelector('[raycaster]');
   if (raycasterEl && raycasterEl.components.raycaster) {
     raycasterEl.components.raycaster.refreshObjects();
   }
 }
-
-
 
 function ejecutarFuncionPorTecnica(tecnica) {
   // console.log("⚡ Buscando técnica:", tecnica);
@@ -255,7 +242,7 @@ function funcionIntervReclamaciones() {
 }
 
 function funcionIntervTenureRenewal() {
-  // console.log("🤬 [Intervención] Cargando simulación:  Tenure Renewal...");
+  console.log("🤬 [Intervención] Cargando simulación:  Tenure Renewal...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
@@ -1354,6 +1341,9 @@ function toggleListeningMoves() {
     }
   }
 }
+
+
+
 function pickRandomScenario(archetype,level){
   var pool=archetype.briefings[level]||archetype.briefings['novice']||[];
   if(!pool.length)return null;
@@ -2526,7 +2516,7 @@ if (btnNewSession) {
 });
 
     document.querySelector('a-scene').addEventListener('loaded', () => {
-      // console.log("🚀 Sistema de rastreo de clics activado.");
+       console.log("🚀 Sistema de rastreo de clics activado.");
       const botones = document.querySelectorAll('.clickable');
       botones.forEach(boton => {
         boton.addEventListener('click', (evento) => {
