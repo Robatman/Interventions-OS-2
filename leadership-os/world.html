@@ -1333,15 +1333,21 @@ function toggleListeningMoves() {
       }
     }
     
-    // Tu redirección original intacta
-    if (typeof showScreen === 'function') {
-      console.log("Aquí no se cual es jaja");
-      showScreen('learn-work-practice');
-    } else if (typeof cambiarPantallaVR === 'function') {
-      // Por si usas la otra función en este script
-      console.log("Aquí 1");
-      cambiarPantallaVR('screen-learn-work-practice');
-    }
+    // // Tu redirección original intacta
+    // if (typeof showScreen === 'function') {
+    //   console.log("Aquí no se cual es jaja");
+    //   showScreen('learn-work-practice');
+    // } else if (typeof cambiarPantallaVR === 'function') {
+    //   // Por si usas la otra función en este script
+    //   console.log("Aquí 1");
+    //   cambiarPantallaVR('screen-learn-work-practice');
+    // }
+    if (typeof cambiarPantallaVR === 'function') {
+  cambiarPantallaVR('screen-history');
+} else if (typeof showScreen === 'function') {
+  showScreen('history'); // O 'screen-history', dependiendo de tu enrutador 2D
+}
+
   }
 }
 
