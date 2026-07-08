@@ -223,22 +223,22 @@ function funcionShowtechniques(){
 // 🚀 NUEVAS FUNCIONES DE INTERVENCIONES
 // ==========================================
 function funcionIntervRetencion() {
-  // console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
+  console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
 function funcionIntervFidelizacion() {
-  // console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
+  console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
 function funcionIntervSoporteCritico() {
-  // console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
+  console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
 function funcionIntervReclamaciones() {
-  // console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
+  console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
@@ -1335,6 +1335,7 @@ function toggleListeningMoves() {
     
     // Tu redirección original intacta
     if (typeof showScreen === 'function') {
+      console.log("Aquí no se cual es jaja");
       showScreen('learn-work-practice');
     } else if (typeof cambiarPantallaVR === 'function') {
       // Por si usas la otra función en este script
