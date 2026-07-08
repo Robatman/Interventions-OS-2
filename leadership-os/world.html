@@ -958,8 +958,10 @@ function funcionIntervTenureRenewal() {
 
 
 
+<!-- SCREEN: ACTIVE LISTENING ACTIVITY -->
 <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
 
+    <!-- Fondo principal -->
     <a-plane
         width="3.5"
         height="1.3"
@@ -968,6 +970,7 @@ function funcionIntervTenureRenewal() {
         position="0 0.4 0">
     </a-plane>
 
+    <!-- Título -->
     <a-text
         value="Conversation"
         align="center"
@@ -977,6 +980,7 @@ function funcionIntervTenureRenewal() {
         font="exo2bold">
     </a-text>
 
+    <!-- Línea decorativa -->
     <a-plane
         width="3.2"
         height="0.015"
@@ -984,6 +988,8 @@ function funcionIntervTenureRenewal() {
         position="0 1.18 0.01">
     </a-plane>
 
+
+    
     <a-image 
         id="activity-juan" 
         src="#juan-neutral" 
@@ -1002,8 +1008,12 @@ function funcionIntervTenureRenewal() {
         visible="false">
     </a-image>
 
+    <!-- ===================== -->
+    <!-- CONVERSACIÓN -->
+    <!-- ===================== -->
     <a-entity id="listening-session-content" visible="true">
 
+        <!-- Fondo del chat -->
         <a-plane
             width="3.3"
             height="0.65"
@@ -1012,6 +1022,7 @@ function funcionIntervTenureRenewal() {
             position="0 0.5 0.01">
         </a-plane>
 
+        <!-- Nombre del hablante -->
         <a-text
             id="speaker-name"
             value="JUANJOLOTE"
@@ -1022,11 +1033,13 @@ function funcionIntervTenureRenewal() {
             font="exo2bold">
         </a-text>
 
+        <!-- Contenedor del mensaje -->
         <a-entity
             id="vr-preview-stage"
             position="0 0.48 0.03">
         </a-entity>
 
+        <!-- Contador -->
         <a-text
             id="conversation-counter"
             value=""
@@ -1037,6 +1050,7 @@ function funcionIntervTenureRenewal() {
             font="mozillavr">
         </a-text>
 
+        <!-- Botón Next (Vinculado a la nueva función de avance) -->
         <a-plane
             id="btn-next-conversation"
             class="clickable"
@@ -1046,6 +1060,7 @@ function funcionIntervTenureRenewal() {
             position="0 0.05 0.02"
             material="shader:flat"
             onclick="avanzarConversacionActiva()">
+
             <a-text
                 value="▶ Next"
                 align="center"
@@ -1053,29 +1068,16 @@ function funcionIntervTenureRenewal() {
                 width="2"
                 font="mozillavr">
             </a-text>
-        </a-plane>
 
-        <a-plane
-            id="btn-see-moves"
-            class="clickable"
-            width="1.4"
-            height="0.3"
-            color="#ff5ca0"
-            position="0 -0.5 0.02"
-            visible="false"
-            onclick="mostrarCartelesMoves()">
-            <a-text
-                value="See the moves"
-                align="center"
-                color="#fff"
-                width="3.2"
-                font="mozillavr">
-            </a-text>
         </a-plane>
 
     </a-entity>
 
+    <!-- ===================== -->
+    <!-- MOVES -->
+    <!-- ===================== -->
     <a-entity id="moves-container" position="0 0.15 0.01" visible="false">
+        <!-- Pay Attention -->
         <a-entity id="move-pay-attention" position="-1.0 0.5 0.01">
             <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
                 <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
@@ -1085,6 +1087,7 @@ function funcionIntervTenureRenewal() {
             </a-plane>
         </a-entity>
 
+        <!-- Reflect Back -->
         <a-entity id="move-reflect-back" position="1.0 0.5 0.01">
             <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
                 <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
@@ -1094,6 +1097,7 @@ function funcionIntervTenureRenewal() {
             </a-plane>
         </a-entity>
 
+        <!-- Validate -->
         <a-entity id="move-validate" position="-1.0 -0.5 0.01">
             <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
                 <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
@@ -1103,6 +1107,7 @@ function funcionIntervTenureRenewal() {
             </a-plane>
         </a-entity>
 
+        <!-- Summarize -->
         <a-entity id="move-summarize" position="1.0 -0.5 0.01">
             <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
                 <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
@@ -1111,25 +1116,29 @@ function funcionIntervTenureRenewal() {
                 <a-text value="Recap before you respond&#10;prevents misunderstanding" align="center" position="0 -0.15 0.01" width="1.2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
             </a-plane>
         </a-entity>
-
-        <a-plane
-            id="btn-ready-go"
-            class="clickable"
-            width="1.8"
-            height="0.3"
-            color="#00e5c0"
-            position="0 -1.1 0.02"
-            onclick="finalizarYSalirAMenu()">
-            <a-text
-                value="I'm ready — let's go →"
-                align="center"
-                color="#fff"
-                width="3.2"
-                font="mozillavr">
-            </a-text>
-        </a-plane>
-
     </a-entity>
+
+    <!-- Botón See the Moves -->
+    <a-plane
+        id="btn-toggle-active-listening"
+        class="clickable"
+        width="1.4"
+        height="0.3"
+        color="#ff5ca0"
+        position="0 -0.2 0"
+        visible="false"
+        onclick="toggleListeningMoves()">
+
+        <a-text
+            id="text-btn-toggle-listening"
+            value="See the moves"
+            align="center"
+            color="#fff"
+            width="3.2"
+            font="mozillavr">
+        </a-text>
+
+    </a-plane>
 
 </a-entity>
 
@@ -1274,158 +1283,68 @@ function pickRandomArchetype(){
 
 let mostrandoMoves = false;
 
-// function toggleListeningMoves() {
-//   // 🛑 CANDADO DE SEGURIDAD PARA LA BIENVENIDA:
-//   const welcomeScreen = document.getElementById('screen-welcome');
-//   if (welcomeScreen && welcomeScreen.getAttribute('visible') === 'true') {
-//     console.log("🚫 Click bloqueado: No puedes usar este botón mientras estés en la pantalla de bienvenida.");
-//     return;
-//   }
+function toggleListeningMoves() {
+  // 🛑 CANDADO DE SEGURIDAD PARA LA BIENVENIDA:
+  const welcomeScreen = document.getElementById('screen-welcome');
+  if (welcomeScreen && welcomeScreen.getAttribute('visible') === 'true') {
+    console.log("🚫 Click bloqueado: No puedes usar este botón mientras estés en la pantalla de bienvenida.");
+    return;
+  }
 
-//   const sessionContent = document.getElementById('listening-session-content');
-//   const movesContainer = document.getElementById('moves-container');
-//   const btnText = document.getElementById('text-btn-toggle-listening');
-//   const btnPlane = document.getElementById('btn-toggle-active-listening');
-  
-//   // Referencias a tus ajolotes
-//   const juan = document.getElementById('activity-juan');
-//   const ajolin = document.getElementById('activity-ajolin');
-
-//   if (!mostrandoMoves) {
-//     // 1. Ocultar contenido y mostrar los 4 cartelitos
-//     if (sessionContent) sessionContent.setAttribute('visible', 'false');
-//     if (movesContainer) movesContainer.setAttribute('visible', 'true');
-    
-//     // 🛑 OCULTAR LOS AJOLOTES INMEDIATAMENTE
-//     if (juan) juan.setAttribute('visible', 'false');
-//     if (ajolin) ajolin.setAttribute('visible', 'false');
-    
-//     // 2. Cambiar UI del botón al estilo listo
-//     if (btnText) btnText.setAttribute('text', 'value', "I'm ready \u2014 let's go \u2192");
-//     if (btnPlane) btnPlane.setAttribute('color', '#00e5c0');
-    
-//     mostrandoMoves = true;
-//   } else {
-//     // 3. Resetear estados internos y regresar a la pantalla intermedia de forma segura
-//     mostrandoMoves = false;
-//     if (sessionContent) sessionContent.setAttribute('visible', 'true');
-//     if (movesContainer) movesContainer.setAttribute('visible', 'false');
-//     if (btnText) btnText.setAttribute('text', 'value', "See the moves");
-//     if (btnPlane) btnPlane.setAttribute('color', '#ff5ca0');
-    
-//     // 🔄 RESTAURAR VISIBILIDAD DE LOS AJOLOTES SEGÚN EL TURNO ACTUAL ANTES DE IRNOS
-//     if (typeof activeListeningStep !== 'undefined') {
-//       if (activeListeningStep === 0) {
-//         if (juan) juan.setAttribute('visible', 'true');
-//         if (ajolin) ajolin.setAttribute('visible', 'false');
-//       } else {
-//         if (juan) juan.setAttribute('visible', 'false');
-//         if (ajolin) ajolin.setAttribute('visible', 'true');
-//       }
-//     }
-    
-//     // Tu redirección original intacta
-//     if (typeof showScreen === 'function') {
-//       console.log("Aquí no se cual es jaja");
-//       showScreen('learn-work-practice');
-//     } else if (typeof cambiarPantallaVR === 'function') {
-//       // Por si usas la otra función en este script
-//       console.log("Aquí 1");
-//       cambiarPantallaVR('screen-learn-work-practice');
-//     }
-//   }
-// }
-
-
-
-
-// Acción cuando presionan "See the moves"
-function mostrarCartelesMoves() {
   const sessionContent = document.getElementById('listening-session-content');
   const movesContainer = document.getElementById('moves-container');
+  const btnText = document.getElementById('text-btn-toggle-listening');
+  const btnPlane = document.getElementById('btn-toggle-active-listening');
+  
+  // Referencias a tus ajolotes
   const juan = document.getElementById('activity-juan');
   const ajolin = document.getElementById('activity-ajolin');
 
-  // Ocultar chat, barra de conversación y ajolotes
-  if (sessionContent) sessionContent.setAttribute('visible', 'false');
-  if (juan) juan.setAttribute('visible', 'false');
-  if (ajolin) ajolin.setAttribute('visible', 'false');
-
-  // Mostrar los 4 carteles y el botón verde "I'm ready"
-  if (movesContainer) movesContainer.setAttribute('visible', 'true');
-}
-
-// Acción cuando presionan "I'm ready — let's go →"
-function finalizarYSalirAMenu() {
-  const sessionContent = document.getElementById('listening-session-content');
-  const movesContainer = document.getElementById('moves-container');
-
-  // Ocultar los carteles
-  if (movesContainer) movesContainer.setAttribute('visible', 'false');
-  // Dejar listo el panel de conversación para la próxima vez
-  if (sessionContent) sessionContent.setAttribute('visible', 'true');
-
-  // Redirección al menú de práctica intacto
-  if (typeof showScreen === 'function') {
-    showScreen('learn-work-practice');
-  } else if (typeof cambiarPantallaVR === 'function') {
-    cambiarPantallaVR('screen-learn-work-practice');
-  }
-}
-
-// Modificar ligeramente esta función para que encienda tu nuevo botón rosa independiente al terminar los diálogos buenos
-function showNextConversation() {
-  const stage = document.querySelector("#vr-preview-stage");
-  stage.innerHTML = "";
-
-  const nextBtn = document.querySelector("#btn-next-conversation");
-  const nextBtnText = nextBtn ? nextBtn.querySelector('a-text') : null;
-
-  if (currentSimulationPhase === 'bad' && currentMessageIndex >= currentConversation.length) {
-    currentSimulationPhase = 'insight_bad';
-    renderInsightText(stage, currentTechniqueData.bad.insight);
-    if (nextBtnText) nextBtnText.setAttribute('value', 'See it done right →');
-    return;
-  }
-
-  if (currentSimulationPhase === 'insight_bad') {
-    currentSimulationPhase = 'good';
-    currentConversation = currentTechniqueData.good.exchanges;
-    currentMessageIndex = 0;
-    if (nextBtnText) nextBtnText.setAttribute('value', '▶ Next');
-  }
-
-  if (currentSimulationPhase === 'good' && currentMessageIndex >= currentConversation.length) {
-    currentSimulationPhase = 'insight_good';
-    renderInsightText(stage, currentTechniqueData.good.insight);
-
-    // Ocultamos el botón Next normal
-    if (nextBtn) nextBtn.setAttribute("visible", false);
+  if (!mostrandoMoves) {
+    // 1. Ocultar contenido y mostrar los 4 cartelitos
+    if (sessionContent) sessionContent.setAttribute('visible', 'false');
+    if (movesContainer) movesContainer.setAttribute('visible', 'true');
     
-    // CAMBIO AQUÍ: Encendemos tu nuevo botón rosa independiente de "See the Moves"
-    const seeMovesBtn = document.querySelector("#btn-see-moves");
-    if (seeMovesBtn) seeMovesBtn.setAttribute("visible", true);
+    // 🛑 OCULTAR LOS AJOLOTES INMEDIATAMENTE
+    if (juan) juan.setAttribute('visible', 'false');
+    if (ajolin) ajolin.setAttribute('visible', 'false');
     
-    return;
+    // 2. Cambiar UI del botón al estilo listo
+    if (btnText) btnText.setAttribute('text', 'value', "I'm ready \u2014 let's go \u2192");
+    if (btnPlane) btnPlane.setAttribute('color', '#00e5c0');
+    
+    mostrandoMoves = true;
+  } else {
+    // 3. Resetear estados internos y regresar a la pantalla intermedia de forma segura
+    mostrandoMoves = false;
+    if (sessionContent) sessionContent.setAttribute('visible', 'true');
+    if (movesContainer) movesContainer.setAttribute('visible', 'false');
+    if (btnText) btnText.setAttribute('text', 'value', "See the moves");
+    if (btnPlane) btnPlane.setAttribute('color', '#ff5ca0');
+    
+    // 🔄 RESTAURAR VISIBILIDAD DE LOS AJOLOTES SEGÚN EL TURNO ACTUAL ANTES DE IRNOS
+    if (typeof activeListeningStep !== 'undefined') {
+      if (activeListeningStep === 0) {
+        if (juan) juan.setAttribute('visible', 'true');
+        if (ajolin) ajolin.setAttribute('visible', 'false');
+      } else {
+        if (juan) juan.setAttribute('visible', 'false');
+        if (ajolin) ajolin.setAttribute('visible', 'true');
+      }
+    }
+    
+    // Tu redirección original intacta
+    if (typeof showScreen === 'function') {
+      console.log("Aquí no se cual es jaja");
+      showScreen('learn-work-practice');
+    } else if (typeof cambiarPantallaVR === 'function') {
+      // Por si usas la otra función en este script
+      console.log("Aquí 1");
+      cambiarPantallaVR('screen-learn-work-practice');
+    }
   }
-
-  const msg = currentConversation[currentMessageIndex];
-  const speakerName = msg.speaker === "A" ? currentTechniqueData.roleA : "Agent";
-  const bubbleColor = msg.speaker === "A" ? "#00adb5" : "#ffb347";
-
-  const entity = document.createElement("a-entity");
-  entity.setAttribute("position", "0 0.2 0");
-  entity.setAttribute("text", {
-    value: `${speakerName}: ${msg.text}`,
-    align: "center",
-    width: 3.2,
-    wrapCount: 30,
-    color: bubbleColor
-  });
-
-  stage.appendChild(entity);
-  currentMessageIndex++;
 }
+
 
 
 function pickRandomScenario(archetype,level){
