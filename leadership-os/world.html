@@ -98,7 +98,11 @@ function cambiarPantallaVR(pantallaMostrarId) {
       // 🌟 REGLA ESPECIAL PARA TU BOTÓN Y PERSONAJES:
       if (id === 'screen-active-listening-activity') {
         const btnToggle = document.getElementById('btn-toggle-active-listening');
-        if (btnToggle) btnToggle.setAttribute('visible', 'true');
+        if (btnToggle) {
+          btnToggle.setAttribute('visible', 'true');
+          // Añadimos la clase a la fuerza cuando la pantalla está activa
+          btnToggle.classList.add('clickable'); 
+        }
         
         // Inicializa el estado para que Juanjolote siempre empiece del lado izquierdo
         if (typeof initActiveListeningConversation === 'function') {
@@ -108,6 +112,14 @@ function cambiarPantallaVR(pantallaMostrarId) {
     } else {
       elPantalla.setAttribute('visible', 'false');
       elPantalla.setAttribute('scale', '0 0 0');
+      
+      // 🔒 Si nos estamos saliendo de la pantalla o cargando otra, le quitamos la clase clickable
+      if (pantallaMostrarId !== 'screen-active-listening-activity') {
+        const btnToggle = document.getElementById('btn-toggle-active-listening');
+        if (btnToggle) {
+          btnToggle.classList.remove('clickable');
+        }
+      }
     }
   });
 
@@ -117,6 +129,9 @@ function cambiarPantallaVR(pantallaMostrarId) {
     raycasterEl.components.raycaster.refreshObjects();
   }
 }
+
+
+
 
 function ejecutarFuncionPorTecnica(tecnica) {
   // console.log("⚡ Buscando técnica:", tecnica);
@@ -1121,7 +1136,7 @@ function funcionIntervTenureRenewal() {
     <!-- Botón See the Moves -->
     <a-plane
         id="btn-toggle-active-listening"
-        class="clickable"
+        
         width="1.4"
         height="0.3"
         color="#ff5ca0"
