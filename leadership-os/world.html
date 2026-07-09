@@ -135,7 +135,7 @@ function cambiarPantallaVR(pantallaMostrarId) {
 
 function ejecutarFuncionPorTecnica(tecnica) {
   // console.log("⚡ Buscando técnica:", tecnica);
-
+  appState.tecnicaSeleccionada = tecnica;
   // cambiarPantallaVR(''); 
 
   switch(tecnica) {
@@ -1269,7 +1269,7 @@ function funcionIntervTenureRenewal() {
 const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
 const SUPA_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
 
-let appState = {screen:'welcome',activeMenu:null,origenActividad: null,currentArchetype:null,currentScenario:null,currentLevel:'novice',agentHistory:[],vrMood:30,boxState:'out',conversationClosed:false,hingesOpened:[]};
+let appState = {screen:'welcome',activeMenu:null,origenActividad: null,tecnicaSeleccionada: null,currentArchetype:null,currentScenario:null,currentLevel:'novice',agentHistory:[],vrMood:30,boxState:'out',conversationClosed:false,hingesOpened:[]};
 let isRecording=false,isProcessing=false,mediaRecorder=null,audioChunks=[],audioStream=null,audioContext=null,analyser=null,silenceTimer=null;
 const SILENCE_THRESHOLD=38,SILENCE_DURATION=1900;
 
