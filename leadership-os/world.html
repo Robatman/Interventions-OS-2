@@ -1599,86 +1599,18 @@ function updateVRMood(val){
 }
 
 async function callGroqLLM(mode){
-
-  let systemPrompt = '';
-
-  if(mode === 'practice'){
-
-    systemPrompt = PROMPTS.avatar(appState.currentLevel);
-
+  var systemPrompt='';
+  if(mode==='practice'){
+    systemPrompt=PROMPTS.avatar(appState.currentLevel);
+  } else if(mode==='learn'){
+    systemPrompt='Eres Juanjolote, coach de liderazgo calido y directo en Centris Neural Academy. Estas ensenando sobre '+(appState.activeMenu==='interventions'?'intervenciones de retencion':'tecnicas de comunicacion')+'. Habla en espanol. Conversacional, maximo 3 oraciones. Haz preguntas. Nunca des conferencias. Conecta todo a situaciones reales de call center.';
+  } else if(mode==='work'){
+    systemPrompt='Eres Juanjolote, coach socratico en Centris Neural Academy. Tu rol es hacer preguntas que ayuden al manager a descubrir sus propios insights. NUNCA des consejos directos. Haz UNA pregunta a la vez. Maximo 2 oraciones. Habla en espanol. Se calido pero directo.';
   }
-  else if(mode === 'learn'){
-
-    if(appState.activeMenu === 'interventions'){
-
-      systemPrompt = PROMPTS.learnIntervention();
-
-    }else{
-
-      // Buscar la técnica seleccionada
-      currentTechnique = techniques.find(
-        t => t.id === appState.tecnicaSeleccionada
-      );
-
-      if(!currentTechnique){
-        console.warn("No se encontró la técnica:", appState.tecnicaSeleccionada);
-
-        // Como respaldo usa la primera técnica
-        currentTechnique = techniques[0];
-      }
-
-      systemPrompt = PROMPTS.learn();
-
-    }
-
-  }
-  else if(mode === 'work'){
-
-    systemPrompt =
-      'Eres Juanjolote, coach socratico en Centris Neural Academy. ' +
-      'Tu rol es hacer preguntas que ayuden al manager a descubrir sus propios insights. ' +
-      'NUNCA des consejos directos. ' +
-      'Haz UNA pregunta a la vez. ' +
-      'Maximo 2 oraciones. ' +
-      'Habla en espanol. ' +
-      'Se calido pero directo.';
-
-  }
-
-  const res = await fetch('/api/groq', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt
-        },
-        ...appState.agentHistory.slice(-12)
-      ],
-      max_tokens: 150,
-      temperature: 0.88
-    })
-  });
-
-  const data = await res.json();
-
-  return (
-    data.choices &&
-    data.choices[0] &&
-    data.choices[0].message &&
-    data.choices[0].message.content
-  ) || '...';
+  var res=await fetch('/api/groq',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemPrompt},...appState.agentHistory.slice(-12)],max_tokens:150,temperature:0.88})});
+  var data=await res.json();
+  return (data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'...';
 }
-
-
-
-
-
-
 
 function parseAgentReply(raw){
   var moodMatch=raw.match(/\[MOOD:(\d+)\]/),boxMatch=raw.match(/\[BOX:(in|out)\]/);
