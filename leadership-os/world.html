@@ -1067,24 +1067,22 @@ function funcionIntervTenureRenewal() {
 
         <!-- Botón Next (Vinculado a la nueva función de avance) -->
         <a-plane
-            id="btn-next-conversation"
-            class="clickable"
-            width="0.65"
-            height="0.22"
-            color="#4F7CFF"
-            position="0 0.05 0.02"
-            material="shader:flat"
-            onclick="avanzarConversacionActiva()">
+        id="btn-next-conversation"
+        class="clickable"
+        width="0.65"
+        height="0.22"
+        color="#4F7CFF"
+        position="0 0.05 0.02"
+        material="shader:flat">
 
-            <a-text
-                value="▶ Next"
-                align="center"
-                color="#FFF"
-                width="2"
-                font="mozillavr">
-            </a-text>
-
-        </a-plane>
+        <a-text
+            value="▶ Next"
+            align="center"
+            color="#FFF"
+            width="2"
+            font="mozillavr">
+        </a-text>
+    </a-plane>
 
     </a-entity>
 
@@ -2254,15 +2252,29 @@ function showNextConversation() {
 
   const nextBtn = document.querySelector("#btn-next-conversation");
   const nextBtnText = nextBtn ? nextBtn.querySelector('a-text') : null;
+  
+  // Referencias a los personajes y etiquetas
+  const juan = document.getElementById('activity-juan');
+  const ajolin = document.getElementById('activity-ajolin');
+  const speakerLabel = document.getElementById('speaker-name');
 
   // --- LÓGICA DE CONTROL DE FLUJO SECUENCIAL ---
 
-  // 1. Si terminamos los diálogos de la conversación MALA
+  // 1. Si terminamos los diálogos de la conversación MALA (Muestra el Insight de la mala)
   if (currentSimulationPhase === 'bad' && currentMessageIndex >= currentConversation.length) {
     currentSimulationPhase = 'insight_bad';
     
     // Inyectar visualmente el primer Insight en el escenario
     renderInsightText(stage, currentTechniqueData.bad.insight);
+
+    // 👨‍🏫 CONTROL DE AJOLOTES EN INSIGHT: Lo narra Juanjolote (Coach)
+    if (juan) juan.setAttribute('visible', 'true');
+    if (ajolin) ajolin.setAttribute('visible', 'false');
+    if (speakerLabel) {
+      speakerLabel.setAttribute('value', 'JUANJOLOTE (INSIGHT)');
+      speakerLabel.setAttribute('color', '#00e5c0'); // Color Cyan
+      speakerLabel.setAttribute('position', '-1.45 0.73 0.02');
+    }
 
     // Cambiar el texto del botón Next
     if (nextBtnText) nextBtnText.setAttribute('value', 'See it done right →');
@@ -2279,28 +2291,37 @@ function showNextConversation() {
     if (nextBtnText) nextBtnText.setAttribute('value', '▶ Next');
   }
 
-  // 3. Si terminamos los diálogos de la conversación BUENA
+  // 3. Si terminamos los diálogos de la conversación BUENA (Muestra el Insight de la buena)
   if (currentSimulationPhase === 'good' && currentMessageIndex >= currentConversation.length) {
     currentSimulationPhase = 'insight_good';
 
     // Inyectar visualmente el segundo Insight en el escenario
     renderInsightText(stage, currentTechniqueData.good.insight);
 
+    // 👨‍🏫 CONTROL DE AJOLOTES EN INSIGHT: Lo narra Juanjolote (Coach)
+    if (juan) juan.setAttribute('visible', 'true');
+    if (ajolin) ajolin.setAttribute('visible', 'false');
+    if (speakerLabel) {
+      speakerLabel.setAttribute('value', 'JUANJOLOTE (INSIGHT)');
+      speakerLabel.setAttribute('color', '#00e5c0'); // Color Cyan
+      speakerLabel.setAttribute('position', '-1.45 0.73 0.02');
+    }
+
     // Desaparecer botón Next e iluminar el botón definitivo "See the moves"
     if (nextBtn) {
       nextBtn.setAttribute("visible", false);
-      nextBtn.classList.remove("clickable"); // ❌ Quitamos la clase para que el raycaster lo ignore
+      nextBtn.classList.remove("clickable"); 
     }
     
     const toggleBtn = document.querySelector("#btn-toggle-active-listening");
     if (toggleBtn) {
       toggleBtn.setAttribute("visible", true);
-      toggleBtn.classList.add("clickable"); // 🌟 Aseguramos que el nuevo botón sí sea interactivo
+      toggleBtn.classList.add("clickable"); 
       const toggleText = toggleBtn.querySelector('a-text');
       if (toggleText) toggleText.setAttribute('value', 'See the moves');
     }
 
-    // 🔄 Forzar al raycaster de la escena a actualizarse inmediatamente
+    // Forzar al raycaster a actualizarse
     const raycasterEl = document.querySelector('[raycaster]');
     if (raycasterEl && raycasterEl.components.raycaster) {
       raycasterEl.components.raycaster.refreshObjects();
@@ -2311,16 +2332,39 @@ function showNextConversation() {
   // --- RENDERIZADO REGULAR DE DIÁLOGOS (Turnos normales) ---
   const msg = currentConversation[currentMessageIndex];
 
-  const speakerName =
-    msg.speaker === "A"
-      ? currentTechniqueData.roleA
-      : "Agent";
+  let speakerName = "";
+  let bubbleColor = "";
 
-  const bubbleColor =
-    msg.speaker === "A"
-      ? "#00adb5"
-      : "#ffb347";
+  // 🎯 ASIGNACIÓN ESTRICTA BASADA EN EL SPEAKER DEL ARCHIVO PREVIEW.JS
+  if (msg.speaker === "A") {
+    // 🟢 TURNO DE JUANJOLOTE (COACH)
+    speakerName = currentTechniqueData.roleA || "Coach";
+    bubbleColor = "#00adb5"; // Cian/Azul
 
+    if (juan) juan.setAttribute('visible', 'true');
+    if (ajolin) ajolin.setAttribute('visible', 'false');
+    
+    if (speakerLabel) {
+      speakerLabel.setAttribute('value', speakerName.toUpperCase());
+      speakerLabel.setAttribute('color', '#00e5c0'); // Match con Juanjolote
+      speakerLabel.setAttribute('position', '-1.45 0.73 0.02'); // Alineado Izquierda
+    }
+  } else {
+    // 🟣 TURNO DE AJOLÍN (AGENT)
+    speakerName = "Agent";
+    bubbleColor = "#ffb347"; // Naranja/Amarillo
+
+    if (juan) juan.setAttribute('visible', 'false');
+    if (ajolin) ajolin.setAttribute('visible', 'true');
+    
+    if (speakerLabel) {
+      speakerLabel.setAttribute('value', speakerName.toUpperCase());
+      speakerLabel.setAttribute('color', '#9d5cff'); // Match con Ajolín (Morado)
+      speakerLabel.setAttribute('position', '0.7 0.73 0.02'); // Desplazado a la Derecha
+    }
+  }
+
+  // Imprimir el diálogo en el panel VR
   const entity = document.createElement("a-entity");
   entity.setAttribute("position", "0 0.2 0");
   entity.setAttribute("text", {
@@ -2334,7 +2378,6 @@ function showNextConversation() {
   stage.appendChild(entity);
   currentMessageIndex++;
 }
-
 
 
 // Función auxiliar para pintar los Insights de manera limpia y uniforme
