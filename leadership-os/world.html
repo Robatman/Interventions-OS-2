@@ -2260,20 +2260,21 @@ function showNextConversation() {
 
   // --- LÓGICA DE CONTROL DE FLUJO SECUENCIAL ---
 
-  // 1. Si terminamos los diálogos de la conversación MALA (Muestra el Insight de la mala)
+  // 1. Si terminamos los diálogos de la conversación MALA
   if (currentSimulationPhase === 'bad' && currentMessageIndex >= currentConversation.length) {
     currentSimulationPhase = 'insight_bad';
     
     // Inyectar visualmente el primer Insight en el escenario
     renderInsightText(stage, currentTechniqueData.bad.insight);
 
-    // 👨‍🏫 CONTROL DE AJOLOTES EN INSIGHT: Lo narra Juanjolote (Coach)
+    // CONTROL DE AJOLOTES EN INSIGHT: Lo narra Juanjolote (Coach)
     if (juan) juan.setAttribute('visible', 'true');
     if (ajolin) ajolin.setAttribute('visible', 'false');
+    
     if (speakerLabel) {
       speakerLabel.setAttribute('value', 'JUANJOLOTE (INSIGHT)');
-      speakerLabel.setAttribute('color', '#00e5c0'); // Color Cyan
-      speakerLabel.setAttribute('position', '-1.45 0.73 0.02');
+      speakerLabel.setAttribute('align', 'center');          // 🎯 Centrado
+      speakerLabel.setAttribute('position', '0 -0.25 0.02');  // 🎯 Posición fija abajo
     }
 
     // Cambiar el texto del botón Next
@@ -2291,20 +2292,21 @@ function showNextConversation() {
     if (nextBtnText) nextBtnText.setAttribute('value', '▶ Next');
   }
 
-  // 3. Si terminamos los diálogos de la conversación BUENA (Muestra el Insight de la buena)
+  // 3. Si terminamos los diálogos de la conversación BUENA
   if (currentSimulationPhase === 'good' && currentMessageIndex >= currentConversation.length) {
     currentSimulationPhase = 'insight_good';
 
     // Inyectar visualmente el segundo Insight en el escenario
     renderInsightText(stage, currentTechniqueData.good.insight);
 
-    // 👨‍🏫 CONTROL DE AJOLOTES EN INSIGHT: Lo narra Juanjolote (Coach)
+    // CONTROL DE AJOLOTES EN INSIGHT: Lo narra Juanjolote (Coach)
     if (juan) juan.setAttribute('visible', 'true');
     if (ajolin) ajolin.setAttribute('visible', 'false');
+    
     if (speakerLabel) {
       speakerLabel.setAttribute('value', 'JUANJOLOTE (INSIGHT)');
-      speakerLabel.setAttribute('color', '#00e5c0'); // Color Cyan
-      speakerLabel.setAttribute('position', '-1.45 0.73 0.02');
+      speakerLabel.setAttribute('align', 'center');          // 🎯 Centrado
+      speakerLabel.setAttribute('position', '0 -0.25 0.02');  // 🎯 Posición fija abajo
     }
 
     // Desaparecer botón Next e iluminar el botón definitivo "See the moves"
@@ -2333,35 +2335,27 @@ function showNextConversation() {
   const msg = currentConversation[currentMessageIndex];
 
   let speakerName = "";
-  let bubbleColor = "";
 
   // 🎯 ASIGNACIÓN ESTRICTA BASADA EN EL SPEAKER DEL ARCHIVO PREVIEW.JS
   if (msg.speaker === "A") {
-    // 🟢 TURNO DE JUANJOLOTE (COACH)
+    // Turno de Juanjolote (Coach)
     speakerName = currentTechniqueData.roleA || "Coach";
-    bubbleColor = "#00adb5"; // Cian/Azul
 
     if (juan) juan.setAttribute('visible', 'true');
     if (ajolin) ajolin.setAttribute('visible', 'false');
-    
-    if (speakerLabel) {
-      speakerLabel.setAttribute('value', speakerName.toUpperCase());
-      speakerLabel.setAttribute('color', '#00e5c0'); // Match con Juanjolote
-      speakerLabel.setAttribute('position', '-1.45 0.73 0.02'); // Alineado Izquierda
-    }
   } else {
-    // 🟣 TURNO DE AJOLÍN (AGENT)
+    // Turno de Ajolín (Agent)
     speakerName = "Agent";
-    bubbleColor = "#ffb347"; // Naranja/Amarillo
 
     if (juan) juan.setAttribute('visible', 'false');
     if (ajolin) ajolin.setAttribute('visible', 'true');
-    
-    if (speakerLabel) {
-      speakerLabel.setAttribute('value', speakerName.toUpperCase());
-      speakerLabel.setAttribute('color', '#9d5cff'); // Match con Ajolín (Morado)
-      speakerLabel.setAttribute('position', '0.7 0.73 0.02'); // Desplazado a la Derecha
-    }
+  }
+
+  // 🎯 CONFIGURAMOS EL NOMBRE ABAJO Y AL CENTRO SIEMPRE
+  if (speakerLabel) {
+    speakerLabel.setAttribute('value', speakerName.toUpperCase());
+    speakerLabel.setAttribute('align', 'center');          // 🎯 Asegura que el texto se alinee al centro
+    speakerLabel.setAttribute('position', '0 -0.25 0.02');  // 🎯 Coordenada fija abajo para ambos
   }
 
   // Imprimir el diálogo en el panel VR
@@ -2371,14 +2365,12 @@ function showNextConversation() {
     value: `${speakerName}: ${msg.text}`,
     align: "center",
     width: 3.2,
-    wrapCount: 30,
-    color: bubbleColor
+    wrapCount: 30
   });
 
   stage.appendChild(entity);
   currentMessageIndex++;
 }
-
 
 // Función auxiliar para pintar los Insights de manera limpia y uniforme
 function renderInsightText(stage, textContent) {
