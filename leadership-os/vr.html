@@ -1,572 +1,2598 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
+<title>Centris · Neural Academy</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Centris Leadership OS · VR</title>
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #000; overflow: hidden; font-family: Arial, sans-serif; }
-  canvas { display: block; }
-
-  #overlay {
-    position: fixed; inset: 0;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    background: radial-gradient(ellipse at center, #070d1f 0%, #000 100%);
-    z-index: 10;
-    transition: opacity .8s ease;
-  }
-  #overlay.hidden { opacity: 0; pointer-events: none; }
-
-  .overlay-status {
-    font-size: 13px; letter-spacing: .15em;
-    color: rgba(255,255,255,.4);
-    text-transform: uppercase;
-    margin-bottom: 32px;
-    margin-top: 16px;
-  }
-
-  .vr-btn {
-    background: linear-gradient(135deg, #1a3aff, #7c3aff);
-    color: white; border: none; border-radius: 50px;
-    padding: 16px 48px; font-size: 16px; font-weight: 700;
-    letter-spacing: .08em; cursor: pointer;
-    box-shadow: 0 0 40px rgba(26,58,255,.4);
-    transition: transform .2s, box-shadow .2s;
-    margin-bottom: 16px;
-  }
-  .vr-btn:hover { transform: scale(1.04); box-shadow: 0 0 60px rgba(26,58,255,.6); }
-  .vr-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
-
-  .no-vr-btn {
-    background: none; border: 1px solid rgba(255,255,255,.2);
-    color: rgba(255,255,255,.5); border-radius: 50px;
-    padding: 10px 32px; font-size: 13px; cursor: pointer;
-    transition: all .2s;
-  }
-  .no-vr-btn:hover { border-color: rgba(255,255,255,.5); color: white; }
-
-  #flat-mode {
-    display: none; position: fixed; inset: 0;
-    background: #070d1f;
-    flex-direction: column; align-items: center; justify-content: center;
-    gap: 24px;
-  }
-  #flat-mode.active { display: flex; }
-
-  .agent-bubble {
-    max-width: 480px; width: 90%;
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 20px; padding: 20px 24px;
-    font-size: 15px; line-height: 1.7; color: rgba(255,255,255,.85);
-    min-height: 80px;
-  }
-
-  .agent-name {
-    font-size: 11px; letter-spacing: .12em;
-    color: #00c49a; text-transform: uppercase; margin-bottom: 8px;
-  }
-
-  .mic-btn {
-    width: 80px; height: 80px; border-radius: 50%;
-    background: linear-gradient(135deg, #1a3aff, #7c3aff);
-    border: none; cursor: pointer; font-size: 32px;
-    box-shadow: 0 0 30px rgba(26,58,255,.5);
-    transition: all .2s; display: flex; align-items: center; justify-content: center;
-  }
-  .mic-btn.listening {
-    background: linear-gradient(135deg, #ff3c2f, #ff7c2f);
-    box-shadow: 0 0 40px rgba(255,60,47,.6);
-    animation: pulse-mic .8s ease-in-out infinite;
-  }
-  @keyframes pulse-mic { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
-
-  .mood-bar-wrap {
-    width: min(360px, 88vw);
-    display: flex; align-items: center; gap: 12px;
-  }
-  .mood-label { font-size: 11px; color: rgba(255,255,255,.4); letter-spacing:.08em; width:64px; }
-  .mood-track { flex: 1; height: 6px; background: rgba(255,255,255,.1); border-radius: 3px; overflow: hidden; }
-  .mood-fill { height: 100%; border-radius: 3px; transition: width .6s ease, background .6s ease; }
-  .mood-pct { font-size: 12px; color: rgba(255,255,255,.5); width: 36px; text-align: right; }
-
-  .exit-btn {
-    position: fixed; top: 20px; left: 20px;
-    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
-    color: rgba(255,255,255,.5); border-radius: 20px;
-    padding: 8px 16px; font-size: 12px; cursor: pointer;
-  }
-
-  .transcript {
-    width: min(360px, 88vw); font-size: 13px;
-    color: rgba(255,255,255,.35); font-style: italic;
-    text-align: center; min-height: 20px;
-  }
-
-  /* Logo SVG inline en overlay */
-  .overlay-logo-wrap {
-    width: min(320px, 80vw);
-    margin-bottom: 8px;
-    animation: float 3.5s ease-in-out infinite;
-  }
-  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#060818;}
+  a-scene{width:100%;height:100%;}
+  #voice-hud{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:10px;background:rgba(15,20,50,0.85);border:1px solid #2a3a7a;border-radius:40px;padding:9px 22px;font-family:monospace;font-size:0.8rem;color:#c8d8ff;pointer-events:none;backdrop-filter:blur(8px);}
+  #voice-dot{width:11px;height:11px;border-radius:50%;background:#1a2a6a;transition:all 0.2s;}
+  #voice-dot.ready{background:#00e5c0;box-shadow:0 0 10px #00e5c0;}
+  #voice-dot.rec{background:#ff5ca0;box-shadow:0 0 14px #ff5ca0;animation:pulse 0.8s infinite alternate;}
+  #voice-dot.thinking{background:#9d5cff;box-shadow:0 0 12px #9d5cff;animation:pulse 1.2s infinite alternate;}
+  @keyframes pulse{from{opacity:1}to{opacity:0.3}}
+  #mic-btn{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:51;background:linear-gradient(135deg,#3d6bff,#9d5cff);color:#fff;border:none;border-radius:50%;width:54px;height:54px;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 24px rgba(100,100,255,0.5);display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+  #mic-btn:hover{transform:translateX(-50%) scale(1.1);}
+  #mic-btn.recording{background:linear-gradient(135deg,#ff5ca0,#ff3c6b);box-shadow:0 0 24px #ff5ca0;}
+  
+  
 </style>
 </head>
 <body>
-
-<!-- ── ENTRY OVERLAY ───────────────────── -->
-<div id="overlay">
-  <!-- Logo SVG inline — no depende de carga de archivo -->
-  <div class="overlay-logo-wrap">
-    <svg viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
-      <style>
-        @keyframes vp { 0%,100%{opacity:.1} 50%{opacity:.3} }
-        @keyframes vs { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-        @keyframes vb { 0%,100%{opacity:.4} 50%{opacity:1} }
-        .vr1{animation:vs 14s linear infinite;transform-origin:340px 190px;}
-        .vr2{animation:vs 9s linear infinite reverse;transform-origin:340px 190px;}
-        .vo1{animation:vp 2.5s ease-in-out infinite;}
-        .vo2{animation:vp 2.5s ease-in-out infinite .6s;}
-        .vo3{animation:vp 2.5s ease-in-out infinite 1.2s;}
-        .vn1{animation:vb 1.8s ease-in-out infinite;}
-        .vn2{animation:vb 1.8s ease-in-out infinite .6s;}
-        .vn3{animation:vb 1.8s ease-in-out infinite 1.2s;}
-        .vn4{animation:vb 1.8s ease-in-out infinite .3s;}
-        .vn5{animation:vb 1.8s ease-in-out infinite .9s;}
-      </style>
-      <circle cx="140" cy="90" r="90" fill="#1a3aff" class="vo1"/>
-      <circle cx="540" cy="300" r="110" fill="#00c49a" class="vo2"/>
-      <circle cx="340" cy="360" r="70" fill="#7c3aff" class="vo3"/>
-      <g class="vr1"><circle cx="340" cy="190" r="155" fill="none" stroke="#1a3aff" stroke-width="1.5" stroke-dasharray="10 10" opacity=".25"/></g>
-      <g class="vr2"><circle cx="340" cy="190" r="125" fill="none" stroke="#00c49a" stroke-width="1" stroke-dasharray="5 15" opacity=".2"/></g>
-      <circle cx="340" cy="190" r="88" fill="#070d1f" opacity=".92"/>
-      <circle cx="340" cy="190" r="84" fill="none" stroke="#1a3aff" stroke-width="1.5" opacity=".35"/>
-      <line x1="300" y1="165" x2="340" y2="190" stroke="#1a3aff" stroke-width="1" opacity=".3"/>
-      <line x1="300" y1="215" x2="340" y2="190" stroke="#1a3aff" stroke-width="1" opacity=".3"/>
-      <line x1="340" y1="190" x2="372" y2="165" stroke="#00c49a" stroke-width="1" opacity=".3"/>
-      <line x1="340" y1="190" x2="372" y2="190" stroke="#7c3aff" stroke-width="1" opacity=".3"/>
-      <line x1="340" y1="190" x2="372" y2="215" stroke="#00c49a" stroke-width="1" opacity=".3"/>
-      <circle cx="300" cy="165" r="7" fill="#1a3aff" class="vn1"/>
-      <circle cx="300" cy="215" r="7" fill="#1a3aff" class="vn2"/>
-      <circle cx="340" cy="190" r="11" fill="#ffffff" opacity=".95"/>
-      <circle cx="340" cy="190" r="7" fill="#1a3aff"/>
-      <circle cx="372" cy="165" r="7" fill="#00c49a" class="vn3"/>
-      <circle cx="372" cy="190" r="7" fill="#7c3aff" class="vn4"/>
-      <circle cx="372" cy="215" r="7" fill="#00c49a" class="vn5"/>
-      <line x1="325" y1="148" x2="355" y2="148" stroke="white" stroke-width="2" opacity=".5"/>
-      <polygon points="340,138 328,148 352,148" fill="white" opacity=".4"/>
-      <text x="340" y="332" text-anchor="middle" font-family="'Arial Black',Arial,sans-serif" font-weight="900" font-size="36" letter-spacing="10" fill="#0d1855">CENTRIS</text>
-      <rect x="268" y="344" width="144" height="22" rx="11" fill="#1a3aff" opacity=".12"/>
-      <text x="340" y="360" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="11" letter-spacing="4" fill="#1a3aff" opacity=".75">LEADERSHIP OS</text>
-    </svg>
-  </div>
-
-  <div class="overlay-status" id="overlay-status">Ready to enter</div>
-  <button class="vr-btn" id="enter-vr-btn" onclick="enterVR()">🥽 Enter VR</button>
-  <button class="no-vr-btn" onclick="enterFlat()">Continue without VR</button>
-</div>
-
-
-<!-- ── FLAT MODE ──────────────────────── -->
-<div id="flat-mode">
-  <button class="exit-btn" onclick="exitToOverlay()">← Exit</button>
-
-  <div style="text-align:center;">
-    <div style="font-size:28px;margin-bottom:4px;" id="archetype-emoji">😤</div>
-    <div style="font-size:13px;color:rgba(255,255,255,.4);letter-spacing:.08em;" id="archetype-name">CARLOS MENDOZA</div>
-  </div>
-
-  <div class="agent-bubble">
-    <div class="agent-name">Agent</div>
-    <div id="agent-text">...</div>
-  </div>
-
-  <div class="transcript" id="user-transcript"></div>
-
-  <div style="display:flex;gap:8px;width:min(360px,88vw);">
-    <input id="text-input" type="text" placeholder="Type your response here..."
-      style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
-             border-radius:24px;padding:10px 18px;color:white;font-size:14px;outline:none;"
-      onkeydown="if(event.key==='Enter') sendText()">
-    <button onclick="sendText()"
-      style="background:linear-gradient(135deg,#1a3aff,#7c3aff);border:none;
-             border-radius:24px;padding:10px 20px;color:white;font-size:13px;font-weight:700;cursor:pointer;">
-      Send
-    </button>
-  </div>
-
-  <button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤</button>
-
-  <div class="mood-bar-wrap">
-    <span class="mood-label">Openness</span>
-    <div class="mood-track">
-      <div class="mood-fill" id="vr-mood-fill" style="width:30%;background:#ff6b6b;"></div>
-    </div>
-    <span class="mood-pct" id="vr-mood-pct">30%</span>
-  </div>
-</div>
-
-<!-- ── THREE.JS CANVAS ────────────────── -->
-<canvas id="vr-canvas" style="display:none;"></canvas>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// ─── STATE ────────────────────────────────
-let vrSession    = null;
-let renderer     = null;
-let scene        = null;
-let camera       = null;
-let logoMesh     = null;
-let isListening  = false;
-let recognition  = null;
-let vrMood       = 30;
-let agentHistory = [];
-let GROQ_KEY     = localStorage.getItem('groq_key') || '';
+(function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
+</script>
 
-// ─── VR CHECK ─────────────────────────────
-window.addEventListener('DOMContentLoaded', async () => {
-  const btn    = document.getElementById('enter-vr-btn');
-  const status = document.getElementById('overlay-status');
 
-  if (!navigator.xr) {
-    status.textContent = 'WebXR not supported in this browser';
-    btn.disabled = true;
-    return;
-  }
 
-  const supported = await navigator.xr.isSessionSupported('immersive-vr').catch(() => false);
-  if (!supported) {
-    status.textContent = 'VR headset not detected — use flat mode';
-    btn.disabled = true;
-  } else {
-    status.textContent = 'Quest 3 detected — ready';
+<script>  
+AFRAME.registerComponent('handler-botones-vr', {
+  schema: {
+    mensaje: {type: 'string', default: 'Botón presionado'},
+    tecnica: {type: 'string', default: 'generica'}
+  },
+  
+  init: function () {
+    var el = this.el;
+    var data = this.data;
+
+    el.addEventListener('click', function (evt) {
+      // 🔒 Validamos que el botón pertenezca a una jerarquía completamente visible y con escala real
+      if (el.object3D) {
+        let current = el.object3D;
+        let isHierarchyActive = true;
+        
+        while (current) {
+          if (current.visible === false || current.scale.x === 0) {
+            isHierarchyActive = false;
+            break;
+          }
+          current = current.parent;
+        }
+
+        if (!isHierarchyActive) {
+          return; // Detiene por completo la ejecución si la pantalla está inactiva
+        }
+      }
+
+      if (evt.detail && evt.detail.sourceEvent) {
+        evt.detail.sourceEvent.stopPropagation();
+        evt.detail.sourceEvent.preventDefault();
+      }
+      evt.stopPropagation(); 
+      
+      // console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id ||i8 el.parentElement.id})`);
+      ejecutarFuncionPorTecnica(data.tecnica);
+    });
   }
 });
 
-// ─── ENTER VR ─────────────────────────────
-async function enterVR() {
-  try {
-    const canvas = document.getElementById('vr-canvas');
-    canvas.style.display = 'block';
 
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(window.devicePixelRatio || 1);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.xr.enabled = true;
-    scene  = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 1.6, 0);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const dirLight = new THREE.DirectionalLight(0x4466ff, 1);
-    dirLight.position.set(2, 4, 3);
-    scene.add(dirLight);
-
-    buildStars();
-    buildLogoPlane();
-    buildFloatingDots();
-
-    vrSession = await navigator.xr.requestSession('immersive-vr', {
-      optionalFeatures: ['hand-tracking', 'bounded-floor']
-    });
-    renderer.xr.setSession(vrSession);
-    renderer.xr.setReferenceSpaceType("local-floor");
-
-    document.getElementById('overlay').classList.add('hidden');
-    renderer.setAnimationLoop(vrRenderLoop);
-    setTimeout(startVRPractice, 4000);
-
-  } catch (e) {
-    console.error('VR error:', e);
-    alert('Could not start VR: ' + e.message);
-  }
-}
-
-// ─── STARFIELD ────────────────────────────
-function buildStars() {
-  const geo = new THREE.BufferGeometry();
-  const pos = new Float32Array(800 * 3);
-  for (let i = 0; i < pos.length; i++) pos[i] = (Math.random() - 0.5) * 40;
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.04, transparent: true, opacity: 0.6 })));
-}
-
-// ─── LOGO 3D NATIVO ───────────────────────
-function buildLogoPlane() {
-  const group = new THREE.Group();
-  group.position.set(0, 1.6, -3);
-  scene.add(group);
-  logoMesh = group;
-
-  // Fondo oscuro
-  group.add(new THREE.Mesh(
-    new THREE.CircleGeometry(0.55, 64),
-    new THREE.MeshBasicMaterial({ color: 0x070d1f, transparent: true, opacity: 0.92 })
-  ));
-
-  // Nodos
-  const positions = [
-    { p: [-0.25,  0.12, 0.01], c: 0x1a3aff, tag: 'n1' },
-    { p: [-0.25, -0.12, 0.01], c: 0x1a3aff, tag: 'n2' },
-    { p: [ 0.25,  0.15, 0.01], c: 0x00c49a, tag: 'n3' },
-    { p: [ 0.25,  0,    0.01], c: 0x7c3aff, tag: 'n4' },
-    { p: [ 0.25, -0.15, 0.01], c: 0x00c49a, tag: 'n5' },
+function cambiarPantallaVR(pantallaMostrarId) {
+  const pantallas = [
+    'screen-welcome', 
+    'screen-mode', 
+    'screen-interventions-list', 
+    'screen-technique-list',
+    'screen-interventions', 
+    'screen-learn-work-practice', 
+    'screen-history',
+    'screen-practice',              
+    'screen-eval',                   
+    'screen-active-listening-activity',
+    'screen-level-selector'
   ];
-  positions.forEach((n, i) => {
-    const mesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.045, 12, 12),
-      new THREE.MeshBasicMaterial({ color: n.c, transparent: true, opacity: 0.8 })
-    );
-    mesh.position.set(...n.p);
-    mesh.userData.pulse = i * (Math.PI * 2 / 5);
-    mesh.userData.isNode = true;
-    group.add(mesh);
-  });
+  
+  pantallas.forEach(id => {
+    const elPantalla = document.getElementById(id);
+    if (!elPantalla) return;
 
-  // Centro blanco + azul
-  const cw = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-  cw.position.set(0, 0, 0.01);
-  group.add(cw);
-  const cb = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 12), new THREE.MeshBasicMaterial({ color: 0x1a3aff }));
-  cb.position.set(0, 0, 0.02);
-  group.add(cb);
-
-  // Conexiones
-  const conns = [
-    [[-0.25, 0.12, 0], [0, 0, 0], 0x1a3aff],
-    [[-0.25,-0.12, 0], [0, 0, 0], 0x1a3aff],
-    [[0, 0, 0], [ 0.25,  0.15, 0], 0x00c49a],
-    [[0, 0, 0], [ 0.25,  0,    0], 0x7c3aff],
-    [[0, 0, 0], [ 0.25, -0.15, 0], 0x00c49a],
-  ];
-  conns.forEach(([a, b, c]) => {
-    const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a), new THREE.Vector3(...b)]);
-    group.add(new THREE.Line(geo, new THREE.LineBasicMaterial({ color: c, transparent: true, opacity: 0.35 })));
-  });
-
-  // Anillos
-  const rings = [
-    { r: 0.58, t: 0.008, c: 0x1a3aff, op: 0.5,  spin:  0.004, rx: 0,           ry: 0 },
-    { r: 0.48, t: 0.005, c: 0x00c49a, op: 0.35, spin: -0.006, rx: Math.PI/3,   ry: 0 },
-    { r: 0.52, t: 0.004, c: 0x7c3aff, op: 0.25, spin:  0.003, rx: 0,           ry: Math.PI/4 },
-  ];
-  rings.forEach(r => {
-    const mesh = new THREE.Mesh(
-      new THREE.TorusGeometry(r.r, r.t, 16, 80),
-      new THREE.MeshBasicMaterial({ color: r.c, transparent: true, opacity: r.op })
-    );
-    mesh.rotation.x = r.rx;
-    mesh.rotation.y = r.ry;
-    mesh.userData.spin = r.spin;
-    group.add(mesh);
-  });
-
-  // Puntos orbitando
-  [0x1a3aff, 0x00c49a, 0x7c3aff, 0xff3c2f].forEach((color, i) => {
-    const dot = new THREE.Mesh(
-      new THREE.SphereGeometry(0.025, 8, 8),
-      new THREE.MeshBasicMaterial({ color })
-    );
-    const angle = (i / 4) * Math.PI * 2;
-    dot.position.set(Math.cos(angle) * 0.65, Math.sin(angle) * 0.65, 0);
-    dot.userData.orbit = { radius: 0.65, speed: 0.008, offset: angle };
-    group.add(dot);
-  });
-}
-
-// ─── FLOATING DOTS ────────────────────────
-function buildFloatingDots() {
-  [-0.12, 0, 0.12].forEach((x, i) => {
-    const dot = new THREE.Mesh(
-      new THREE.SphereGeometry(0.018, 8, 8),
-      new THREE.MeshBasicMaterial({ color: 0x00c49a, transparent: true, opacity: 0.7 })
-    );
-    dot.position.set(x, -0.9, -3);
-    dot.userData.pulse = i * (Math.PI * 2 / 3);
-    scene.add(dot);
-  });
-}
-
-// ─── VR RENDER LOOP ───────────────────────
-let vrClock = 0;
-function vrRenderLoop() {
-  vrClock += 0.016;
-
-  if (logoMesh) {
-    logoMesh.position.y = Math.sin(vrClock * 0.5) * 0.06;
-    logoMesh.rotation.y = Math.sin(vrClock * 0.2) * 0.04;
-
-    logoMesh.children.forEach(obj => {
-      if (obj.userData.spin)   obj.rotation.z += obj.userData.spin;
-      if (obj.userData.isNode && obj.material) {
-        obj.material.opacity = 0.5 + Math.sin(vrClock * 2 + (obj.userData.pulse || 0)) * 0.4;
+    if (id === pantallaMostrarId) {
+      elPantalla.setAttribute('visible', 'true');
+      elPantalla.setAttribute('scale', '1 1 1');
+      
+      // 🌟 REGLA ESPECIAL PARA TU BOTÓN Y PERSONAJES:
+      if (id === 'screen-active-listening-activity') {
+        const btnToggle = document.getElementById('btn-toggle-active-listening');
+        if (btnToggle) {
+          btnToggle.setAttribute('visible', 'true');
+          // Añadimos la clase a la fuerza cuando la pantalla está activa
+          btnToggle.classList.add('clickable'); 
+        }
+        
+        // Inicializa el estado para que Juanjolote siempre empiece del lado izquierdo
+        if (typeof initActiveListeningConversation === 'function') {
+          initActiveListeningConversation();
+        }
       }
-      if (obj.userData.orbit) {
-        obj.userData.orbit.offset += obj.userData.orbit.speed;
-        obj.position.x = Math.cos(obj.userData.orbit.offset) * obj.userData.orbit.radius;
-        obj.position.y = Math.sin(obj.userData.orbit.offset) * obj.userData.orbit.radius;
+    } else {
+      elPantalla.setAttribute('visible', 'false');
+      elPantalla.setAttribute('scale', '0 0 0');
+      
+      // 🔒 Si nos estamos saliendo de la pantalla o cargando otra, le quitamos la clase clickable
+      if (pantallaMostrarId !== 'screen-active-listening-activity') {
+        const btnToggle = document.getElementById('btn-toggle-active-listening');
+        if (btnToggle) {
+          btnToggle.classList.remove('clickable');
+        }
       }
-    });
-  }
-
-  scene.children.forEach(obj => {
-    if (obj.userData.pulse !== undefined && !logoMesh?.children.includes(obj)) {
-      obj.material.opacity = 0.4 + Math.sin(vrClock * 2 + obj.userData.pulse) * 0.3;
     }
   });
 
-  renderer.render(scene, camera);
-}
-
-// ─── START VR PRACTICE ────────────────────
-function startVRPractice() {
-  initVoicePractice();
-}
-
-// ─── ENTER FLAT MODE ──────────────────────
-function enterFlat() {
-  document.getElementById('overlay').classList.add('hidden');
-  document.getElementById('flat-mode').classList.add('active');
-  initVoicePractice();
-}
-
-function exitToOverlay() {
-  document.getElementById('flat-mode').classList.remove('active');
-  document.getElementById('overlay').classList.remove('hidden');
-  stopListening();
-  agentHistory = [];
-}
-
-// ─── VOICE PRACTICE ───────────────────────
-async function initVoicePractice() {
-  const opener = "...Yeah? You wanted to see me?";
-  showAgentText(opener);
-  agentHistory = [{ role: 'assistant', content: opener }];
-  speakText(opener);
-}
-
-function showAgentText(text) {
-  document.getElementById('agent-text').textContent = text;
-}
-
-function updateVRMood(val) {
-  vrMood = Math.max(0, Math.min(100, val));
-  const fill = document.getElementById('vr-mood-fill');
-  fill.style.width      = vrMood + '%';
-  fill.style.background = vrMood < 35 ? '#ff6b6b' : vrMood < 60 ? '#f5a623' : '#1ec99a';
-  document.getElementById('vr-mood-pct').textContent = vrMood + '%';
-}
-
-// ─── TEXT FALLBACK ────────────────────────
-function sendText() {
-  const input = document.getElementById('text-input');
-  const text  = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  document.getElementById('user-transcript').textContent = `You: ${text}`;
-  handleUserSpeech(text);
-}
-
-// ─── MIC ──────────────────────────────────
-function toggleMic() {
-  isListening ? stopListening() : startListening();
-}
-
-function startListening() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Speech recognition not supported.'); return; }
-
-  recognition = new SR();
-  recognition.lang = 'es-MX';
-  recognition.continuous = false;
-  recognition.interimResults = true;
-
-  recognition.onstart  = () => { isListening = true; document.getElementById('mic-btn').classList.add('listening'); document.getElementById('user-transcript').textContent = 'Listening...'; };
-  recognition.onresult = (e) => {
-    const t = Array.from(e.results).map(r => r[0].transcript).join('');
-    document.getElementById('user-transcript').textContent = t;
-    if (e.results[e.results.length - 1].isFinal) handleUserSpeech(t);
-  };
-  recognition.onend    = () => { isListening = false; document.getElementById('mic-btn').classList.remove('listening'); };
-  recognition.onerror  = (e) => { isListening = false; document.getElementById('mic-btn').classList.remove('listening'); };
-  recognition.start();
-}
-
-function stopListening() {
-  if (recognition) recognition.stop();
-  isListening = false;
-  document.getElementById('mic-btn').classList.remove('listening');
-}
-
-// ─── HANDLE SPEECH ────────────────────────
-async function handleUserSpeech(text) {
-  if (!text.trim()) return;
-  agentHistory.push({ role: 'user', content: text });
-  showAgentText('...');
-
-  try {
-    const reply = await callGroq();
-    const { msg, newMood } = parseVRReply(reply);
-    agentHistory.push({ role: 'assistant', content: reply });
-    showAgentText(msg);
-    updateVRMood(newMood);
-    speakText(msg);
-  } catch (e) {
-    showAgentText('(Connection error)');
+  // Forzamos al raycaster de la escena a recalcular los botones activos inmediatamente
+  const raycasterEl = document.querySelector('[raycaster]');
+  if (raycasterEl && raycasterEl.components.raycaster) {
+    raycasterEl.components.raycaster.refreshObjects();
   }
 }
 
-// ─── GROQ via proxy /api/groq ─────────────
-async function callGroq() {
-  const systemPrompt = `You are Carlos Mendoza, a defensive call center agent with 2 years at the company.
-You care about your work but feel blamed for metrics you can't control. You want to study systems engineering but feel trapped. You have two young kids.
-Respond naturally and emotionally — defensive, guarded, but capable of opening up if the supervisor is genuinely empathetic.
-At the end of EVERY response add EXACTLY: [MOOD:XX] where XX is 0-100 representing emotional openness.
-Start at 30. Increase if supervisor listens well. Decrease if they pressure or blame.
-Keep responses SHORT — 1-3 sentences max. This is a spoken VR conversation.`;
 
-  const res = await fetch('/api/groq', {
+
+
+function ejecutarFuncionPorTecnica(tecnica) {
+  // console.log("⚡ Buscando técnica:", tecnica);
+
+  // cambiarPantallaVR(''); 
+
+  switch(tecnica) {
+   case 'active-listening': selectAndPreviewVR('active_listening'); break;
+    case 'powerful-questions': selectAndPreviewVR('powerful_questions'); break;
+    case 'motivational-interviewing': selectAndPreviewVR('motivational_interviewing'); break;
+    case 'nonviolent-communication': selectAndPreviewVR('nonviolent_communication'); break;
+    case 'radical-candor': selectAndPreviewVR('radical_candor'); break;
+    case 'crucial-conversations': selectAndPreviewVR('crucial_conversations'); break;
+    case 'tactical-empathy': selectAndPreviewVR('tactical_empathy'); break;
+    case 'scarf-model': selectAndPreviewVR('scarf_model'); break;
+    case 'immunity-to-change': selectAndPreviewVR('immunity_to_change'); break;
+    case 'drama-triangle': selectAndPreviewVR('drama_triangle'); break;
+    case 'grow-model': selectAndPreviewVR('grow_model'); break;
+    case 'strengths-based-coaching': selectAndPreviewVR('strengths_based_coaching'); break;
+    case 'growth-mindset': selectAndPreviewVR('growth_mindset'); break;
+    case 'solution-focused-coaching': selectAndPreviewVR('solution_focused_coaching'); break;
+    
+
+    case 'interv-pulse-check': funcionIntervPulseCheck(); break;
+    case 'interventions': funcionShowInterventions(); break;
+    case 'techniques': funcionShowtechniques(); break;
+
+
+    case 'interv-retencion': funcionIntervRetencion(); break;
+    case 'interv-fidelizacion': funcionIntervFidelizacion(); break;
+    case 'interv-soporte-critico': funcionIntervSoporteCritico(); break;
+    case 'interv-reclamaciones': funcionIntervReclamaciones(); break;
+    case 'interv-tenure-renewal': funcionIntervTenureRenewal(); break;
+
+    case 'learn-intervention': goLearn(); break;
+    case 'work-together-intervention': goWork(); break;
+    
+     case 'progress': 
+      // console.log("📊 Abriendo historial de progreso..."); 
+      goHistory(); 
+      break;
+
+    case 'close-history':
+      // console.log("🔄 Regresando a la pantalla de bienvenida...");
+      cambiarPantallaVR('screen-welcome');
+      break;
+
+      case 'practice-intervention': 
+      // console.log("🎚️ Abriendo selector de niveles para la práctica VR...");
+      cambiarPantallaVR('screen-level-selector'); 
+      break;
+
+
+      case 'level-novice':
+            appState.currentLevel = 'novice';
+            appState.evaluacionHabilitada = true;
+            // console.log("Dificultad fijada en: Novato. Evaluación Habilitada.");
+            goPractice(); 
+            break;
+
+          case 'level-intermediate':
+            appState.currentLevel = 'intermediate';
+            appState.evaluacionHabilitada = true;
+            // console.log("Dificultad fijada en: Intermedio. Evaluación Habilitada.");
+            goPractice(); 
+            break;
+
+          case 'level-expert':
+            appState.currentLevel = 'expert';
+            appState.evaluacionHabilitada = true;
+            // console.log("Dificultad fijada en: Experto. Evaluación Habilitada.");
+            goPractice(); 
+            break;
+
+    case 'back-to-learn-work':
+      console.log("Aquí 2 pero no creo");
+      cambiarPantallaVR('screen-learn-work-practice');
+      break;
+    
+    
+    default: 
+      // console.log("⚡ Ejecutando función genérica de la academia.");
+      break;
+  }
+}
+
+function funcionShowInterventions(){
+    // console.log("Cambiando a pantalla de intervenciones");
+    appState.activeMenu = 'interventions';    
+    if(typeof cambiarPantallaVR==='function'){
+        cambiarPantallaVR('screen-interventions');
+    }else{
+        showScreen('interventions');
+    }
+}
+
+function funcionShowtechniques(){
+    // console.log("Cambiando a pantalla de tecnicas");
+    appState.activeMenu = 'techniques';
+    cambiarPantallaVR('screen-technique-list'); 
+}
+
+// ==========================================
+// 🚀 NUEVAS FUNCIONES DE INTERVENCIONES
+// ==========================================
+function funcionIntervRetencion() {
+  // console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
+  showScreen('learn-work-practice'); // 👈 Cambiado aquí
+}
+
+function funcionIntervFidelizacion() {
+  // console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
+  showScreen('learn-work-practice'); // 👈 Cambiado aquí
+}
+
+function funcionIntervSoporteCritico() {
+  // console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
+  showScreen('learn-work-practice'); // 👈 Cambiado aquí
+}
+
+function funcionIntervReclamaciones() {
+  // console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
+  showScreen('learn-work-practice'); // 👈 Cambiado aquí
+}
+
+function funcionIntervTenureRenewal() {
+  console.log("🤬 [Intervención] Cargando simulación:  Tenure Renewal...");
+  showScreen('learn-work-practice'); // 👈 Cambiado aquí
+}
+
+</script>
+
+
+
+
+<script src="js/interventions.js"></script>
+<script src="js/archetypes.js"></script>
+<script src="js/techniques.js"></script>
+<script src="js/prompts.js"></script>
+<script src="js/preview.js"></script>
+<div id="voice-hud"><div id="voice-dot" class="idle"></div><span id="voice-label">Iniciando Neural Academy...</span></div>
+<button id="mic-btn" title="Hablar">&#127908;</button>
+<a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018">
+  <a-assets>
+    <img id="juan-neutral"    src="assets/juanjolote_neutral.png">
+    <img id="juan-happy"      src="assets/juanjolote_happy.png">
+    <img id="juan-talking"    src="assets/juanjolote_talking.png">
+    <img id="juan-sad"        src="assets/juanjolote_sad.png">
+    <img id="ajolin-neutral"  src="assets/ajolin_neutral.png">
+    <img id="ajolin-happy"    src="assets/ajolin_happy.png">
+    <img id="ajolin-talking"  src="assets/ajolin_talking.png">
+    <img id="ajolin-sad"      src="assets/ajolin_sad.png">
+    <img id="ajolin-surprised" src="assets/ajolin_surprised.png">
+  </a-assets>
+  <a-light type="ambient" color="#1a1050" intensity="1.5"></a-light>
+  <a-light type="point" position="0 5 0" color="#4466ff" intensity="1.2" distance="20"></a-light>
+  <a-light type="point" position="-4 2 -4" color="#00e5c0" intensity="0.7" distance="12"></a-light>
+  <a-light type="point" position="4 2 -4" color="#9d5cff" intensity="0.6" distance="12"></a-light>
+  <a-light type="point" position="0 1 3" color="#ff5ca0" intensity="0.3" distance="8"></a-light>
+  <a-plane position="0 0 0" rotation="-90 0 0" width="40" height="40" color="#080c1f" material="shader:flat;opacity:1"></a-plane>
+  <a-entity position="0 0.01 0"><a-plane rotation="-90 0 0" width="40" height="40" material="color:#1a2a6a;opacity:0.25;transparent:true;shader:flat;wireframe:true"></a-plane></a-entity>
+  <a-sphere radius="30" color="#0a0a2a" material="opacity:1;shader:flat;side:back"></a-sphere>
+  <a-sphere position="-8 4 -18" radius="5" color="#1a0a4a" material="opacity:0.6;transparent:true;shader:flat"></a-sphere>
+  <a-sphere position="10 3 -20" radius="6" color="#0a1a3a" material="opacity:0.5;transparent:true;shader:flat"></a-sphere>
+  <a-sphere position="0 8 -22" radius="7" color="#0a2a2a" material="opacity:0.4;transparent:true;shader:flat"></a-sphere>
+  <a-entity id="stars-1">
+    <a-sphere position="-7 5 -14" radius="0.04" color="#00e5c0" material="shader:flat;opacity:0.9"></a-sphere>
+    <a-sphere position="5 7 -16" radius="0.03" color="#9d5cff" material="shader:flat;opacity:0.8"></a-sphere>
+    <a-sphere position="-12 4 -18" radius="0.05" color="#4466ff" material="shader:flat;opacity:0.7"></a-sphere>
+    <a-sphere position="9 6 -13" radius="0.03" color="#00e5c0" material="shader:flat;opacity:0.6"></a-sphere>
+    <a-sphere position="-5 9 -15" radius="0.04" color="#ff5ca0" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="13 5 -17" radius="0.03" color="#4466ff" material="shader:flat;opacity:0.7"></a-sphere>
+    <a-sphere position="-3 11 -20" radius="0.04" color="#9d5cff" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="7 8 -19" radius="0.05" color="#00e5c0" material="shader:flat;opacity:0.4"></a-sphere>
+    <a-sphere position="-14 6 -16" radius="0.03" color="#c8d8ff" material="shader:flat;opacity:0.6"></a-sphere>
+    <a-sphere position="3 13 -23" radius="0.04" color="#4466ff" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="-9 2 -11" radius="0.03" color="#9d5cff" material="shader:flat;opacity:0.8"></a-sphere>
+    <a-sphere position="11 10 -22" radius="0.04" color="#00e5c0" material="shader:flat;opacity:0.3"></a-sphere>
+    <a-sphere position="0 14 -26" radius="0.05" color="#4466ff" material="shader:flat;opacity:0.4"></a-sphere>
+    <a-sphere position="-17 5 -20" radius="0.03" color="#c8d8ff" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="15 3 -14" radius="0.04" color="#9d5cff" material="shader:flat;opacity:0.6"></a-sphere>
+    <a-sphere position="-6 6 -9" radius="0.03" color="#00e5c0" material="shader:flat;opacity:0.9"></a-sphere>
+    <a-sphere position="6 4 -10" radius="0.04" color="#4466ff" material="shader:flat;opacity:0.7"></a-sphere>
+    <a-sphere position="-10 12 -24" radius="0.03" color="#ff5ca0" material="shader:flat;opacity:0.4"></a-sphere>
+    <a-sphere position="17 2 -18" radius="0.05" color="#c8d8ff" material="shader:flat;opacity:0.3"></a-sphere>
+    <a-sphere position="-2 7 -12" radius="0.03" color="#9d5cff" material="shader:flat;opacity:0.7"></a-sphere>
+    <a-sphere position="8 11 -21" radius="0.04" color="#00e5c0" material="shader:flat;opacity:0.5"></a-sphere>
+    <a-sphere position="-13 8 -25" radius="0.03" color="#4466ff" material="shader:flat;opacity:0.4"></a-sphere>
+    <a-sphere position="4 15 -28" radius="0.05" color="#9d5cff" material="shader:flat;opacity:0.3"></a-sphere>
+  </a-entity>
+  
+  <a-torus position="0 1 0" radius="6" radius-tubular="0.035" color="#2a3aaa" material="opacity:0.5;transparent:true;shader:flat" animation="property:rotation;to:0 360 0;loop:true;dur:25000;easing:linear"></a-torus>
+  <a-torus position="0 1 0" rotation="65 0 0" radius="5" radius-tubular="0.025" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" animation="property:rotation;to:65 360 0;loop:true;dur:18000;easing:linear"></a-torus>
+  <a-torus position="0 1 0" rotation="0 30 75" radius="7" radius-tubular="0.02" color="#9d5cff" material="opacity:0.2;transparent:true;shader:flat" animation="property:rotation;to:0 390 75;loop:true;dur:32000;easing:linear"></a-torus>
+  <a-torus position="0 1 0" rotation="45 15 0" radius="4" radius-tubular="0.018" color="#ff5ca0" material="opacity:0.2;transparent:true;shader:flat" animation="property:rotation;to:405 15 0;loop:true;dur:22000;easing:linear"></a-torus>
+  <a-sphere position="4.5 1.8 -3" radius="0.15" color="#4466ff" material="opacity:0.85;shader:flat" animation="property:position;to:4.5 2.4 -3;loop:true;dur:3200;dir:alternate;easing:easeInOutSine"></a-sphere>
+  <a-sphere position="-4.5 1.5 -2" radius="0.12" color="#00e5c0" material="opacity:0.85;shader:flat" animation="property:position;to:-4.5 2.1 -2;loop:true;dur:2700;dir:alternate;easing:easeInOutSine"></a-sphere>
+  <a-sphere position="3.5 2.2 3.5" radius="0.10" color="#9d5cff" material="opacity:0.85;shader:flat" animation="property:position;to:3.5 2.8 3.5;loop:true;dur:3800;dir:alternate;easing:easeInOutSine"></a-sphere>
+  <a-sphere position="-3 1.2 2.5" radius="0.09" color="#ff5ca0" material="opacity:0.8;shader:flat" animation="property:position;to:-3 1.8 2.5;loop:true;dur:2900;dir:alternate;easing:easeInOutSine"></a-sphere>
+  <a-sphere position="0 3.5 -5" radius="0.14" color="#00e5c0" material="opacity:0.7;shader:flat" animation="property:position;to:0 4.2 -5;loop:true;dur:4200;dir:alternate;easing:easeInOutSine"></a-sphere>
+
+  <!-- SCREEN: WELCOME -->
+  <a-entity id="screen-welcome">
+    <a-entity id="juanjolote-entity" position="-3.9 0 -2.9">
+      <a-image id="juan-img" src="#juan-neutral" width="1.45" height="1.45" position="0 0.72 0" look-at="[camera]" animation="property:position;to:0 0.82 0;loop:true;dur:3000;dir:alternate;easing:easeInOutSine"></a-image>
+      <a-circle position="0 0.05 0" radius="0.85" rotation="-90 0 0" color="#00e5c0" material="opacity:0.08;transparent:true;shader:flat"></a-circle>
+      <a-torus position="0 0.05 0" radius="0.9" radius-tubular="0.014" rotation="-90 0 0" color="#00e5c0" material="opacity:0.35;transparent:true;shader:flat" animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:8000;easing:linear"></a-torus>
+      <a-text value="JUANJOLOTE" position="0 1.52 0" align="center" color="#00e5c0" width="3.5" font="mozillavr"></a-text>
+      <a-text value="Tu Coach VR" position="0 1.30 0" align="center" color="#c8d8ff" width="2.8" opacity="0.7" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="ajolin-entity" position="1.9 0 -2.9">
+      <a-image id="ajolin-img" src="#ajolin-neutral" width="1.45" height="1.45" position="0 0.72 0" look-at="[camera]" animation="property:position;to:0 0.82 0;loop:true;dur:2700;dir:alternate;easing:easeInOutSine"></a-image>
+      <a-circle position="0 0.05 0" radius="0.85" rotation="-90 0 0" color="#9d5cff" material="opacity:0.08;transparent:true;shader:flat"></a-circle>
+      <a-torus position="0 0.05 0" radius="0.9" radius-tubular="0.014" rotation="-90 0 0" color="#9d5cff" material="opacity:0.35;transparent:true;shader:flat" animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:6000;easing:linear"></a-torus>
+      <a-text value="AJOLIN" position="0 1.52 0" align="center" color="#9d5cff" width="3.5" font="mozillavr"></a-text>
+      <a-text value="Agente IA" position="0 1.30 0" align="center" color="#c8d8ff" width="2.8" opacity="0.7" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity position="0 3 -3.3" animation="property:position;to:0 2.73 -3.3;loop:true;dur:4000;dir:alternate;easing:easeInOutSine">
+      <a-text value="NEURAL ACADEMY" align="center" color="#e8eeff" font="exo2bold" width="7.5" opacity="0.98"></a-text>
+    </a-entity>
+    <a-text value="Centris Leadership OS" position="0 2.45 -3.3" align="center" color="#00e5c0" width="5" opacity="0.8" font="mozillavr"></a-text>
+    <a-text id="welcome-user-status" value="Retention Training Platform" position="0 2.17 -3.3" align="center" color="#c8d8ff" width="4" opacity="0.65" font="mozillavr"></a-text>
+    <a-entity position="0 1.72 -2.8">
+      <a-plane width="3" height="0.42" color="#0b1230" material="opacity:0.82;shader:flat;side:double"></a-plane>
+      <a-plane width="3.04" height="0.3" color="#2a3a7a" material="opacity:0.35;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
+      <a-text value="Choose your training path" align="center" color="#e8eeff" width="4.5" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+
+   <a-entity id="btn-interventions" position="-1.2 1.02 -2.4">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Iniciando módulo de Intervenciones; tecnica: interventions"
+           width="1.8" height="0.72" 
+           color="#0d2060" 
+           material="opacity:0.93;shader:flat;side:double"
+           animation__hover="property:position;to:0 0.1 0;startEvents:mouseenter;dur:180" 
+           animation__unhover="property:position;to:0 0 0;startEvents:mouseleave;dur:180">
+    
+    <a-plane width="1.84" height="0.76" color="#00e5c0" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
+    
+    <a-text value="INTERVENCIONES" align="center" color="#00e5c0" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
+    <a-text value="| Interview Anchoring" align="center" color="#c8d8ff" width="2" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
+  </a-plane>
+</a-entity>
+
+
+
+  <a-entity id="btn-techniques" position="1.2 1.02 -2.4">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo menú de Técnicas; tecnica: techniques"
+           width="1.8" height="0.72" 
+           color="#150d40" 
+           material="opacity:0.93;shader:flat;side:double"
+           animation__hover="property:position;to:0 0.1 0;startEvents:mouseenter;dur:180" 
+           animation__unhover="property:position;to:0 0 0;startEvents:mouseleave;dur:180">
+    
+    <a-plane width="1.84" height="0.76" color="#9d5cff" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
+    
+    <a-text value="TECNICAS" align="center" color="#9d5cff" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
+    <a-text value="14 herramientas de comunicacion" align="center" color="#c8d8ff" width="2" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
+  </a-plane>
+</a-entity>
+
+
+  <a-entity id="btn-progress" position="0 0.45 -2.25">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Abriendo historial de progreso; tecnica: progress"
+           width="1.2" height="0.24" 
+           color="#101830" 
+           material="opacity:0.86;shader:flat;side:double"
+           animation__hover="property:position;to:0 0.05 0;startEvents:mouseenter;dur:180" 
+           animation__unhover="property:position;to:0 0 0;startEvents:mouseleave;dur:180">
+    
+    <a-plane width="1.24" height="0.28" color="#4466ff" material="opacity:0.28;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+    <a-text value="MY PROGRESS" align="center" color="#4466ff" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
+  </a-plane>
+</a-entity>
+
+
+    <a-entity position="-2.9 2.25 -2.5" rotation="0 30 0">
+      <a-plane id="btn-logout" width="0.82" height="0.24" color="#1a0a30" material="opacity:0.84;shader:flat;side:double" class="clickable">
+        <a-plane width="0.84" height="0.26" color="#ff5ca0" material="opacity:0.35;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="SALIR" color="#ff5ca0" align="center" width="2.8" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+  </a-entity>
+
+
+  <a-entity id="screen-learn-work-practice" visible="false">
+  <a-entity id="practice-buttons-container">
+    
+    <a-entity id="btn-practice-intervention" position="-1.65 1.4 -2.6" rotation="0 12 0">
+      <a-plane class="sub-tecnica" 
+               handler-botones-vr="mensaje: Abriendo Practice Intervention; tecnica: practice-intervention"
+               width="1.55" height="0.9" 
+               color="#111830" 
+               material="opacity: 0.7; shader: flat; transparent: true; side: double"
+               animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+               animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+               animation__colorIn="property: material.color; to: #221d15; dur: 150; startEvents: mouseenter"
+               animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave"
+               animation__click="property: scale; to: 0.95 0.95 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+        
+        <a-text value="PRACTICE" align="center" color="#ffffff" width="3.2" position="0 0.18 0.02" font="mozillavr" shader="msdf"></a-text>
+        <a-text value="Compromisos ocultos que bloquean" align="center" color="#ffedd5" width="1.3" position="0 -0.10 0.02" opacity="0.75" wrap-count="22" font="mozillavr" shader="msdf"></a-text>
+        <a-plane width="1.35" height="0.02" color="#f59e0b" position="0 -0.32 0.03" material="opacity: 0.8"></a-plane>
+      </a-plane>
+    </a-entity>
+
+    <a-entity id="btn-learn-intervention" position="0 1.4 -2.8" rotation="0 0 0">
+      <a-plane class="sub-tecnica" 
+               handler-botones-vr="mensaje: Abriendo Learn Intervention; tecnica: learn-intervention"
+               width="1.55" height="0.9" 
+               color="#111830" 
+               material="opacity: 0.7; shader: flat; transparent: true; side: double"
+               animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+               animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+               animation__colorIn="property: material.color; to: #221d15; dur: 150; startEvents: mouseenter"
+               animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave"
+               animation__click="property: scale; to: 0.95 0.95 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+        
+        <a-text value="LEARN" align="center" color="#ffffff" width="3.2" position="0 0.18 0.02" font="mozillavr" shader="msdf"></a-text>
+        <a-text value="Victima Rescatador Perseguidor" align="center" color="#ffedd5" width="1.3" position="0 -0.10 0.02" opacity="0.75" wrap-count="22" font="mozillavr" shader="msdf"></a-text>
+        <a-plane width="1.35" height="0.02" color="#f59e0b" position="0 -0.32 0.03" material="opacity: 0.8"></a-plane>
+      </a-plane>
+    </a-entity>
+
+    <a-entity id="btn-work-together-intervention" position="1.65 1.4 -2.6" rotation="0 -12 0">
+      <a-plane class="sub-tecnica" 
+               handler-botones-vr="mensaje: Abriendo Work Together Intervention; tecnica: work-together-intervention"
+               width="1.55" height="0.9" 
+               color="#111830" 
+               material="opacity: 0.7; shader: flat; transparent: true; side: double"
+               animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+               animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+               animation__colorIn="property: material.color; to: #221d15; dur: 150; startEvents: mouseenter"
+               animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave"
+               animation__click="property: scale; to: 0.95 0.95 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+        
+        <a-text value="WORK TOGETHER" align="center" color="#ffffff" width="3" position="0 0.18 0.02" font="mozillavr" shader="msdf"></a-text>
+        <a-text value="Collaboration Communication Problem-Solving" align="center" color="#ffedd5" width="1.3" position="0 -0.10 0.02" opacity="0.75" wrap-count="22" font="mozillavr" shader="msdf"></a-text>
+        <a-plane width="1.35" height="0.02" color="#f59e0b" position="0 -0.32 0.03" material="opacity: 0.8"></a-plane>
+      </a-plane>
+    </a-entity>
+
+  </a-entity>
+</a-entity>
+
+
+  <!-- SCREEN: MODE -->
+  <a-entity id="screen-mode" visible="false">
+    </a-entity>
+
+
+<!-- Subimos todo el contenedor sumándole altura en el eje Y (segundo valor de position) -->
+<a-entity id="screen-technique-list" position="0 0.8 0" visible="false">
+
+  <!-- CABECERA -->
+  <a-text value="TECHNIQUES"
+          position="0 3.8 -2.8"
+          align="center"
+          color="#e8eeff"
+          width="6"
+          font="exo2bold">
+  </a-text>
+
+  <a-text value="Choose a technique to practice"
+          position="0 3.5 -2.8"
+          align="center"
+          color="#c8d8ff"
+          width="4.5"
+          opacity="0.7"
+          font="mozillavr">
+  </a-text>
+
+  <!-- ================================================================= -->
+  <!-- COLUMNA 1: VERDE (X = -2.2)                                       -->
+  <!-- ================================================================= -->
+
+  <!-- ACTIVE LISTENING -->
+  <a-entity id="btn-active-listening" position="-2.2 2.8 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="👂 ACTIVE LISTENING" align="center" color="#ffffff" width="3" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#00e5c0" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- POWERFUL QUESTIONS -->
+  <a-entity id="btn-powerful-questions" position="-2.2 2.15 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo panel de Preguntas Poderosas; tecnica: powerful-questions"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="❓ POWERFUL QUESTIONS" align="center" color="#ffffff" width="3" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#00e5c0" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- MOTIVATIONAL INTERVIEWING -->
+  <a-entity id="btn-motivational-interviewing" position="-2.2 1.5 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Desplegando Entrevista Motivacional; tecnica: motivational-interviewing"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="🔥 MOTIVATIONAL INT." align="center" color="#ffffff" width="3" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#00e5c0" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- NONVIOLENT COMMUNICATION -->
+  <a-entity id="btn-nonviolent-communication" position="-2.2 0.85 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Iniciando Comunicación No Violenta; tecnica: nonviolent-communication"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="🕊️ NONVIOLENT COM." align="center" color="#ffffff" width="3" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#00e5c0" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- RADICAL CANDOR -->
+  <a-entity id="btn-radical-candor" position="-2.2 0.2 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Radical Candor; tecnica: radical-candor"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="💬 RADICAL CANDOR" align="center" color="#ffffff" width="3" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#00e5c0" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- CRUCIAL CONVERSATIONS -->
+  <a-entity id="btn-crucial-conversations" position="-2.2 -0.45 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Crucial Conversations; tecnica: crucial-conversations"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="⚡ CRUCIAL CONV." align="center" color="#ffffff" width="3" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#00e5c0" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#00e5c0" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+
+  <!-- ================================================================= -->
+  <!-- COLUMNA 2: MORADA (X = 0)                                         -->
+  <!-- ================================================================= -->
+
+  <!-- TACTICAL EMPATHY -->
+  <a-entity id="btn-tactical-empathy" position="0 2.8 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Tactical Empathy; tecnica: tactical-empathy"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #a855f7; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="🎯 TACTICAL EMPATHY" align="center" color="#ffffff" width="3" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#a855f7" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#a855f7" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- SCARF MODEL -->
+  <a-entity id="btn-scarf-model" position="0 2.15 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo SCARF Model; tecnica: scarf-model"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #a855f7; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="🧠 SCARF MODEL" align="center" color="#ffffff" width="3" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#a855f7" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#a855f7" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- IMMUNITY TO CHANGE -->
+  <a-entity id="btn-immunity-to-change" position="0 1.5 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Immunity to Change; tecnica: immunity-to-change"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #a855f7; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="🔄 IMMUNITY TO CHANGE" align="center" color="#ffffff" width="2.8" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#a855f7" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#a855f7" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- DRAMA TRIANGLE -->
+  <a-entity id="btn-drama-triangle" position="0 0.85 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Drama Triangle; tecnica: drama-triangle"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #a855f7; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="🎭 DRAMA TRIANGLE" align="center" color="#ffffff" width="3" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#a855f7" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#a855f7" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+
+  <!-- ================================================================= -->
+  <!-- COLUMNA 3: NARANJA (X = 2.2)                                      -->
+  <!-- ================================================================= -->
+
+  <!-- GROW MODEL -->
+  <a-entity id="btn-grow-model" position="2.2 2.8 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo GROW Model; tecnica: grow-model"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="🌱 GROW MODEL" align="center" color="#ffffff" width="3" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#f59e0b" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- STRENGTHS-BASED COACHING -->
+  <a-entity id="btn-strengths-based-coaching" position="2.2 2.15 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Strengths-Based Coaching; tecnica: strengths-based-coaching"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="💪 STRENGTHS-BASED" align="center" color="#ffffff" width="2.8" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#f59e0b" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- GROWTH MINDSET -->
+  <a-entity id="btn-growth-mindset" position="2.2 1.5 -2.8">
+    <a-plane class="sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Growth Mindset; tecnica: growth-mindset"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="🌀 GROWTH MINDSET" align="center" color="#ffffff" width="3" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#f59e0b" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+  <!-- SOLUTION-FOCUSED COACHING -->
+  <a-entity id="btn-solution-focused-coaching" position="2.2 0.85 -2.8">
+    <a-plane class="clickable sub-tecnica" 
+             handler-botones-vr="mensaje: Abriendo Solution-Focused Coaching; tecnica: solution-focused-coaching"
+             width="1.8" height="0.55" 
+             color="#ffffff" 
+             material="opacity: 0.18; shader: flat; transparent: true; side: double"
+             animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+             animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+             animation__colorIn="property: material.color; to: #f59e0b; dur: 150; startEvents: mouseenter"
+             animation__colorOut="property: material.color; to: #ffffff; dur: 200; startEvents: mouseleave"
+             animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+      
+      <a-text value="🔭 SOLUTION-FOCUSED" align="center" color="#ffffff" width="2.8" position="0 0.08 0.05" font="mozillavr" shader="msdf"></a-text>
+      <a-text value="DISPONIBLE" align="center" color="#f59e0b" width="1.8" position="0 -0.14 0.05" font="mozillavr"></a-text>
+      <a-ring radius-inner="0.01" radius-outer="0.02" color="#f59e0b" scale="40 1 1" position="0 -0.25 0.01" material="opacity:0.6"></a-ring>
+    </a-plane>
+  </a-entity>
+
+
+  <!-- BOTÓN REGRESAR -->
+  <a-entity id="btn-tech-list-back"
+            position="0 -1.1 -2.4"
+            class="clickable">
+
+    <a-plane width="0.82"
+             height="0.24"
+             color="#111830"
+             material="opacity:0.85;shader:flat">
+    </a-plane>
+
+    <a-plane width="0.86"
+             height="0.28"
+             color="#4466ff"
+             material="opacity:0.3;transparent:true;shader:flat"
+             position="0 0 -0.005">
+    </a-plane>
+
+    <a-text value="BACK"
+            align="center"
+            color="#4466ff"
+            width="3"
+            position="0 0.01 0.01"
+            font="mozillavr">
+    </a-text>
+
+  </a-entity>
+
+</a-entity>
+
+
+<a-entity id="screen-interventions" visible="false">
+  <a-text value="INTERVENCIONES" position="0 2.6 -2.8" align="center" color="#ffffff" width="6.5" font="exo2bold" shader="msdf"></a-text>
+  <a-text value="Which intervention do you want to work on?\nEach has its own moment, owner, and objective." position="0 2.2 -2.8" align="center" color="#c8d8ff" width="4" opacity="0.8" font="mozillavr" shader="msdf"></a-text>
+
+  <a-entity id="buttons-container">
+    
+    <a-entity id="btn-interv-retencion" position="-2.5 1.4 -2.6" rotation="0 15 0">
+      <a-plane class="sub-tecnica" 
+               handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: interv-retencion"
+               width="1.5" height="0.8" 
+               color="#111830" 
+               material="opacity: 0.7; shader: flat; transparent: true; side: double; strokeColor: #4466ff; strokeWidth: 2"
+               animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+               animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+               animation__colorIn="property: material.color; to: #16224f; dur: 150; startEvents: mouseenter"
+               animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave"
+               animation__click="property: scale; to: 0.95 0.95 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+        
+        <a-text value="PULSE CHECK" align="center" color="#ffffff" width="3.2" position="0 0.05 0.02" font="mozillavr" shader="msdf"></a-text>
+        <a-plane width="1.3" height="0.02" color="#00e5c0" position="0 -0.25 0.03" material="opacity: 0.8"></a-plane>
+      </a-plane>
+    </a-entity>
+
+    <a-entity id="btn-interv-soporte-critico" position="-0.85 1.4 -2.8" rotation="0 5 0">
+      <a-plane class="sub-tecnica" 
+               handler-botones-vr="mensaje: Abriendo panel de Preguntas Poderosas; tecnica: interv-soporte-critico"
+               width="1.5" height="0.8" 
+               color="#111830" 
+               material="opacity: 0.7; shader: flat; transparent: true; side: double"
+               animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+               animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+               animation__colorIn="property: material.color; to: #16224f; dur: 150; startEvents: mouseenter"
+               animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave"
+               animation__click="property: scale; to: 0.95 0.95 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+        
+        <a-text value="Anchoring" align="center" color="#ffffff" width="3.2" position="0 0.05 0.02" font="mozillavr" shader="msdf"></a-text>
+        <a-plane width="1.3" height="0.02" color="#00e5c0" position="0 -0.25 0.03" material="opacity: 0.8"></a-plane>
+      </a-plane>
+    </a-entity>
+
+    <a-entity id="btn-interv-reclamaciones" position="0.85 1.4 -2.8" rotation="0 -5 0">
+      <a-plane class="sub-tecnica" 
+               handler-botones-vr="mensaje: Desplegando Entrevista Motivacional; tecnica: interv-reclamaciones"
+               width="1.5" height="0.8" 
+               color="#111830" 
+               material="opacity: 0.7; shader: flat; transparent: true; side: double"
+               animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+               animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+               animation__colorIn="property: material.color; to: #16224f; dur: 150; startEvents: mouseenter"
+               animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave"
+               animation__click="property: scale; to: 0.95 0.95 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+        
+        <a-text value="Stay Interview" align="center" color="#ffffff" width="3.2" position="0 0.05 0.02" font="mozillavr" shader="msdf"></a-text>
+        <a-plane width="1.3" height="0.02" color="#00e5c0" position="0 -0.25 0.03" material="opacity: 0.8"></a-plane>
+      </a-plane>
+    </a-entity>
+
+    <a-entity id="btn-interv-tenure-renewal" position="2.5 1.4 -2.6" rotation="0 -15 0">
+      <a-plane class="sub-tecnica" 
+               handler-botones-vr="mensaje: Iniciando Comunicación No Violenta; tecnica: interv-tenure-renewal"
+               width="1.5" height="0.8" 
+               color="#111830" 
+               material="opacity: 0.7; shader: flat; transparent: true; side: double"
+               animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+               animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+               animation__colorIn="property: material.color; to: #16224f; dur: 150; startEvents: mouseenter"
+               animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave"
+               animation__click="property: scale; to: 0.95 0.95 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+        
+        <a-text value="Tenure Renewal" align="center" color="#ffffff" width="3.2" position="0 0.05 0.02" font="mozillavr" shader="msdf"></a-text>
+        <a-plane width="1.3" height="0.02" color="#00e5c0" position="0 -0.25 0.03" material="opacity: 0.8"></a-plane>
+      </a-plane>
+    </a-entity>
+
+  </a-entity>
+
+ <a-entity id="btn-techniques-back" position="0 0.5 -2.5">
+  <a-plane class="clickable"
+           handler-botones-vr="mensaje: Regresando a la pantalla de bienvenida; tecnica: close-history"
+           width="0.82" height="0.26" color="#111830" material="opacity:0.9; shader:flat"
+           animation__mouseenter="property: material.color; to: #1c2a5e; dur: 150; startEvents: mouseenter"
+           animation__mouseleave="property: material.color; to: #111830; dur: 200; startEvents: mouseleave">
+    <a-text value="BACK" align="center" color="#4466ff" width="3" position="0 0 0.01" font="mozillavr" shader="msdf"></a-text>
+  </a-plane>
+  <a-plane width="0.86" height="0.30" color="#4466ff" material="opacity:0.4; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+</a-entity>
+</a-entity>
+
+  <!-- SCREEN: PRACTICE -->
+  <a-entity id="screen-practice" visible="false">
+    <a-entity id="agent-entity" position="0 0 -2.5">
+      <a-image id="agent-img" src="#ajolin-neutral" width="1.5" height="1.5" position="0 0.75 0" look-at="[camera]" animation="property:position;to:0 0.85 0;loop:true;dur:3000;dir:alternate;easing:easeInOutSine"></a-image>
+      <a-circle position="0 0.06 0" radius="1.0" rotation="-90 0 0" id="agent-halo" color="#9d5cff" material="opacity:0.06;transparent:true;shader:flat"></a-circle>
+      <a-torus position="0 0.06 0" id="agent-ring" radius="1.05" radius-tubular="0.015" rotation="-90 0 0" color="#9d5cff" material="opacity:0.3;transparent:true;shader:flat" animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:7000;easing:linear"></a-torus>
+      <a-text id="agent-name" value="Carlos Mendoza" position="0 1.65 0" align="center" color="#c8d8ff" width="3.5" font="mozillavr"></a-text>
+      <a-text id="agent-role" value="Agente 2 anos" position="0 1.45 0" align="center" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="dialog-panel" position="0 2.35 -2.5" visible="false">
+      <a-plane width="3.2" height="0.85" color="#080e2a" material="opacity:0.95;shader:flat;side:double"></a-plane>
+      <a-plane width="3.24" height="0.89" id="dialog-border" color="#9d5cff" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
+      <a-text id="dialog-speaker" value="CARLOS" position="-1.45 0.28 0.01" align="left" color="#9d5cff" width="2.5" font="mozillavr"></a-text>
+      <a-text id="dialog-text" value="..." position="0 0 0.01" align="center" color="#e8eeff" width="5.5" wrap-count="55" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="openness-panel" position="2.4 1.6 -2.2" rotation="0 -25 0">
+      <a-plane width="0.9" height="0.65" color="#080e2a" material="opacity:0.88;shader:flat;side:double"></a-plane>
+      <a-plane width="0.92" height="0.67" color="#2a3a7a" material="opacity:0.5;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="OPENNESS" position="0 0.22 0.01" align="center" color="#c8d8ff" width="2.2" opacity="0.6" font="mozillavr"></a-text>
+      <a-plane width="0.7" height="0.07" color="#0d1530" material="shader:flat" position="0 0.02 0.01"></a-plane>
+      <a-plane id="mood-fill" width="0.21" height="0.07" color="#ff5ca0" material="shader:flat" position="-0.245 0.02 0.015"></a-plane>
+      <a-text id="mood-pct" value="30%" position="0 -0.16 0.01" align="center" color="#c8d8ff" width="1.8" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity id="vr-voice-bar" position="0 0.45 -2.2" visible="false">
+      <a-plane width="2.2" height="0.22" color="#080e2a" material="opacity:0.9;shader:flat;side:double"></a-plane>
+      <a-circle id="vr-voice-dot" radius="0.07" color="#1a2a6a" material="shader:flat" position="-0.9 0 0.01"></a-circle>
+      <a-text id="vr-voice-label" value="Listo Trigger para hablar" color="#c8d8ff" align="left" width="3.5" position="-0.75 0 0.01" font="mozillavr"></a-text>
+    </a-entity>
+    <a-entity position="-2.5 2.0 -2.0" rotation="0 30 0">
+      <a-plane id="btn-end-practice" width="0.8" height="0.24" color="#1a0a20" material="opacity:0.85;shader:flat;side:double" class="clickable">
+        <a-plane width="0.82" height="0.26" color="#ff5ca0" material="opacity:0.35;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="Terminar" color="#ff5ca0" align="center" width="3" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
+  </a-entity>
+
+  <!-- SCREEN: EVAL -->
+  <a-entity id="screen-eval" visible="false">
+    <a-entity position="-1.4 0 -2.5">
+      <a-image id="juan-eval-img" src="#juan-talking" width="1.2" height="1.2" position="0 0.6 0" look-at="[camera]" animation="property:position;to:0 0.7 0;loop:true;dur:3000;dir:alternate;easing:easeInOutSine"></a-image>
+      <a-torus position="0 0.06 0" radius="0.75" radius-tubular="0.012" rotation="-90 0 0" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:8000;easing:linear"></a-torus>
+    </a-entity>
+
+   <a-entity position="0.8 1.5 -2.5">
+      <a-plane width="2.8" height="2.2" color="#080e2a" material="opacity:0.96;shader:flat;side:double"></a-plane>
+      <a-plane width="2.84" height="2.24" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="SESION COMPLETADA" position="0 0.95 0.01" align="center" color="#00e5c0" width="4.5" font="mozillavr"></a-text>
+      <a-text value="Openness final:" position="-1.25 0.65 0.01" align="left" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr"></a-text>
+      <a-text id="eval-mood" value="--%"  position="1.1 0.65 0.01" align="right" color="#00e5c0" width="2" font="mozillavr"></a-text>
+      <a-plane width="2.4" height="0.004" color="#2a3a7a" material="shader:flat" position="0 0.48 0.01"></a-plane>
+      <a-text id="eval-feedback" value="Analizando conversacion..." position="0 0.1 0.01" align="center" color="#e8eeff" width="4.8" wrap-count="50" font="mozillavr"></a-text>
+      <a-plane id="btn-new-session" width="1.1" height="0.22" color="#0d2060" material="opacity:0.9;shader:flat;side:double" position="-0.65 -0.88 0.01" class="clickable">
+        <a-plane width="1.12" height="0.24" color="#4466ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="Nueva sesion" color="#4466ff" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+       <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
+        <a-plane width="1.12" height="0.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="Practicar de nuevo" color="#00e5c0" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane> 
+    </a-entity>
+  </a-entity>
+
+
+
+
+
+
+<!-- SCREEN: ACTIVE LISTENING ACTIVITY -->
+<a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
+
+    <!-- Fondo principal -->
+    <a-plane
+        width="3.5"
+        height="1.3"
+        color="#1a1a2e"
+        material="opacity:0.95; shader:flat"
+        position="0 0.4 0">
+    </a-plane>
+
+    <!-- Título -->
+    <a-text
+        value=""
+        align="center"
+        position="0 1.38 0.01"
+        width="4.6"
+        color="#FFFFFF"
+        font="exo2bold">
+    </a-text>
+
+    <!-- Línea decorativa -->
+    <a-plane
+        width="3.2"
+        height="0.015"
+        color="#00e5c0"
+        position="0 1.18 0.01">
+    </a-plane>
+
+
+    
+    <a-image 
+        id="activity-juan" 
+        src="#juan-neutral" 
+        width="0.8" 
+        height="0.8" 
+        position="-2 0.5 0.05" 
+        visible="true">
+    </a-image>
+
+    <a-image 
+        id="activity-ajolin" 
+        src="#ajolin-neutral" 
+        width="0.8" 
+        height="0.8" 
+        position="2 0.5 0.05" 
+        visible="false">
+    </a-image>
+
+    <!-- ===================== -->
+    <!-- CONVERSACIÓN -->
+    <!-- ===================== -->
+    <a-entity id="listening-session-content" visible="true">
+
+        <!-- Fondo del chat -->
+        <a-plane
+            width="3.3"
+            height="0.65"
+            color="#101625"
+            material="opacity:0.95; shader:flat"
+            position="0 0.5 0.01">
+        </a-plane>
+
+        <!-- Nombre del hablante -->
+        <a-text
+            id="speaker-name"
+            value="JUANJOLOTE"
+            align="left"
+            position="-1.45 0.73 0.02"
+            width="2.2"
+            color="#00e5c0"
+            font="exo2bold">
+        </a-text>
+
+        <!-- Contenedor del mensaje -->
+        <a-entity
+            id="vr-preview-stage"
+            position="0 0.48 0.03">
+        </a-entity>
+
+        <!-- Contador -->
+        <a-text
+            id="conversation-counter"
+            value=""
+            align="right"
+            position="1.35 0.05 0.02"
+            width="1.6"
+            color="#8ca6d8"
+            font="mozillavr">
+        </a-text>
+
+        <!-- Botón Next (Vinculado a la nueva función de avance) -->
+        <a-plane
+        id="btn-next-conversation"
+        class="clickable"
+        width="0.65"
+        height="0.22"
+        color="#4F7CFF"
+        position="0 0.05 0.02"
+        material="shader:flat">
+
+        <a-text
+            value="▶ Next"
+            align="center"
+            color="#FFF"
+            width="2"
+            font="mozillavr">
+        </a-text>
+    </a-plane>
+
+    </a-entity>
+
+    <!-- ===================== -->
+    <!-- MOVES -->
+    <!-- ===================== -->
+    <a-entity id="moves-container" position="0 0.15 0.01" visible="false">
+        <!-- Pay Attention -->
+        <a-entity id="move-pay-attention" position="-1.0 0.5 0.01">
+            <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
+                <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+                <a-text value="👁" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
+                <a-text value="Pay Attention" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
+                <a-text value="Be fully present&#10;no phone, no planning your next line" align="center" position="0 -0.15 0.01" width="1.2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
+            </a-plane>
+        </a-entity>
+
+        <!-- Reflect Back -->
+        <a-entity id="move-reflect-back" position="1.0 0.5 0.01">
+            <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
+                <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+                <a-text value="🔄" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
+                <a-text value="Reflect Back" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
+                <a-text value="Repeat the core of what you heard&#10;in your own words" align="center" position="0 -0.15 0.01" width="1.2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
+            </a-plane>
+        </a-entity>
+
+        <!-- Validate -->
+        <a-entity id="move-validate" position="-1.0 -0.5 0.01">
+            <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
+                <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+                <a-text value="✅" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
+                <a-text value="Validate" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
+                <a-text value="Acknowledge their feeling makes sense&#10;even if you disagree" align="center" position="0 -0.15 0.01" width="1.2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
+            </a-plane>
+        </a-entity>
+
+        <!-- Summarize -->
+        <a-entity id="move-summarize" position="1.0 -0.5 0.01">
+            <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
+                <a-plane width="1.63" height="0.73" color="#00e5c0" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+                <a-text value="📋" align="center" position="0 0.23 0.01" width="4.5" font="mozillavr"></a-text>
+                <a-text value="Summarize" align="center" position="0 0.05 0.01" width="4.2" color="#00e5c0" font="exo2bold"></a-text>
+                <a-text value="Recap before you respond&#10;prevents misunderstanding" align="center" position="0 -0.15 0.01" width="1.2" color="#c8d8ff" font="mozillavr" wrap-count="32"></a-text>
+            </a-plane>
+        </a-entity>
+    </a-entity>
+
+    <!-- Botón See the Moves -->
+    <a-plane
+        id="btn-toggle-active-listening"
+        
+        width="1.4"
+        height="0.3"
+        color="#ff5ca0"
+        position="0 -1.35 0.02
+        visible="false"
+        onclick="toggleListeningMoves()">
+
+        <a-text
+            id="text-btn-toggle-listening"
+            value="See the moves"
+            align="center"
+            color="#fff"
+            width="3.2"
+            font="mozillavr">
+        </a-text>
+
+    </a-plane>
+
+</a-entity>
+
+
+
+
+  <!-- SCREEN: VR LEVEL SELECTOR -->
+  <a-entity id="screen-level-selector" visible="false">
+    <a-text value="SELECCIONA TU NIVEL" position="0 2.5 -2.8" align="center" color="#e8eeff" width="6" font="exo2bold" shader="msdf"></a-text>
+    <a-text value="Elige la dificultad para tu simulación de práctica" position="0 2.18 -2.8" align="center" color="#c8d8ff" width="4.5" opacity="0.7" font="mozillavr" shader="msdf"></a-text>
+
+    <a-entity id="level-buttons-container">
+      
+      <a-entity id="btn-level-novice" position="-1.65 1.3 -2.6" rotation="0 12 0">
+        <a-plane class="clickable" 
+                 handler-botones-vr="mensaje: Nivel Novato seleccionado; tecnica: level-novice"
+                 width="1.5" height="0.8" 
+                 color="#111830" 
+                 material="opacity: 0.8; shader: flat; transparent: true; side: double"
+                 animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+                 animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+                 animation__colorIn="property: material.color; to: #00e5c0; dur: 150; startEvents: mouseenter"
+                 animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave">
+          <a-text value="PRINCIPIANTE" align="center" color="#ffffff" width="3" position="0 0.15 0.02" font="mozillavr" shader="msdf"></a-text>
+          <a-text value="Guias en pantalla\nCliente más docil" align="center" color="#c8d8ff" width="1.5" position="0 -0.12 0.02" opacity="0.8" wrap-count="20" font="mozillavr"></a-text>
+          <a-plane width="1.3" height="0.02" color="#00e5c0" position="0 -0.32 0.03"></a-plane>
+        </a-plane>
+      </a-entity>
+
+      <a-entity id="btn-level-intermediate" position="0 1.3 -2.8" rotation="0 0 0">
+        <a-plane class="clickable" 
+                 handler-botones-vr="mensaje: Nivel Intermedio seleccionado; tecnica: level-intermediate"
+                 width="1.5" height="0.8" 
+                 color="#111830" 
+                 material="opacity: 0.8; shader: flat; transparent: true; side: double"
+                 animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+                 animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+                 animation__colorIn="property: material.color; to: #9d5cff; dur: 150; startEvents: mouseenter"
+                 animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave">
+          <a-text value="INTERMEDIO" align="center" color="#ffffff" width="3" position="0 0.15 0.02" font="mozillavr" shader="msdf"></a-text>
+          <a-text value="Menos ayudas\nRespuestas realistas" align="center" color="#c8d8ff" width="1.5" position="0 -0.12 0.02" opacity="0.8" wrap-count="20" font="mozillavr"></a-text>
+          <a-plane width="1.3" height="0.02" color="#9d5cff" position="0 -0.32 0.03"></a-plane>
+        </a-plane>
+      </a-entity>
+
+      <a-entity id="btn-level-expert" position="1.65 1.3 -2.6" rotation="0 -12 0">
+        <a-plane class="clickable" 
+                 handler-botones-vr="mensaje: Nivel Experto seleccionado; tecnica: level-expert"
+                 width="1.5" height="0.8" 
+                 color="#111830" 
+                 material="opacity: 0.8; shader: flat; transparent: true; side: double"
+                 animation__mouseenter="property: position; to: 0 0 0.08; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+                 animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+                 animation__colorIn="property: material.color; to: #ff5ca0; dur: 150; startEvents: mouseenter"
+                 animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave">
+          <a-text value="EXPERTO" align="center" color="#ffffff" width="3" position="0 0.15 0.02" font="mozillavr" shader="msdf"></a-text>
+          <a-text value="Sin asistencia\nCliente de alta crisis" align="center" color="#c8d8ff" width="1.5" position="0 -0.12 0.02" opacity="0.8" wrap-count="20" font="mozillavr"></a-text>
+          <a-plane width="1.3" height="0.02" color="#ff5ca0" position="0 -0.32 0.03"></a-plane>
+        </a-plane>
+      </a-entity>
+
+    </a-entity>
+
+    <a-entity id="btn-level-back" position="0 0.3 -2.5">
+      <a-plane class="clickable"
+               handler-botones-vr="mensaje: Regresando a opciones de intervención; tecnica: back-to-learn-work"
+               width="0.82" height="0.24" color="#111830" material="opacity:0.9; shader:flat">
+        <a-text value="BACK" align="center" color="#4466ff" width="3" position="0 0 0.01" font="mozillavr" shader="msdf"></a-text>
+      </a-plane>
+      <a-plane width="0.86" height="0.28" color="#4466ff" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+    </a-entity>
+  </a-entity>
+
+
+
+
+<!-- SCREEN: HISTORY & LOGS (VERSIÓN ANCHO COMPLETO - TEXTO AJUSTADO) -->
+<a-entity id="screen-history" position="0 1.6 -2" visible="false">
+  <a-plane width="3.4" height="2.4" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
+  
+  <a-text value="Session History" align="center" position="0 1.05 0.01" width="4.5" font="exo2bold" color="#00e5c0"></a-text>
+
+  <a-entity id="history-content-wrapper" position="0 0.05 0.01">
+    <a-plane width="3.0" height="1.5" color="#0b1230" material="opacity: 0.85; shader: flat">
+      <a-plane width="3.02" height="1.52" color="#ff5ca0" material="opacity: 0.15; transparent: true; shader: flat" position="0 0 -0.005"></a-plane>
+    </a-plane>
+
+    <a-text value="• [Session #03]: Active Listening Activity completed successfully. The user demonstrated high proficiency in the 'Reflect Back' technique, though consistency in the 'Validate' stage can be further optimized. Total duration: 12 minutes.\n\n• [Session #02]: Validation Test. Identified area of opportunity: avoid jumping straight into planning the next line. Focus on being fully present.\n\n• [Session #01]: System Introduction & Calibration completed." 
+            align="left" 
+            position="-1.35 0.1 0.01" 
+            width="2.7" 
+            color="#fff" 
+            font="mozillavr" 
+            wrap-count="45">
+    </a-text>
+  </a-entity>
+
+  <a-plane id="btn-back-history" class="clickable" 
+           width="1.3" height="0.26" color="#ff5ca0" position="-0.75 -0.95 0.02"
+           onclick="cambiarPantallaVR('screen-welcome');">
+    <a-text value="Back to Menu" align="center" color="#fff" width="3.0" font="exo2bold"></a-text>
+  </a-plane>
+</a-entity>
+
+
+
+
+
+
+  <a-camera id="main-camera" position="0 1.6 0" look-controls wasd-controls="enabled:false">
+    <a-entity geometry="primitive:ring;radiusInner:0.007;radiusOuter:0.012" material="color:#00e5c0;shader:flat;opacity:0.85" position="0 0 -1.0"></a-entity>
+    <a-cursor id="vr-cursor" raycaster="objects: .clickable, .sub-tecnica; far:6" fuse="false" color="#00e5c0" opacity="0" position="0 0 -1.0" geometry="primitive:ring;radiusInner:0.009;radiusOuter:0.014" material="color:#00e5c0;shader:flat;opacity:0"></a-cursor>    
+  </a-camera>
+</a-scene>
+
+<script>
+const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
+const SUPA_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
+
+let appState = {screen:'welcome',activeMenu:null,origenActividad: null,currentArchetype:null,currentScenario:null,currentLevel:'novice',agentHistory:[],vrMood:30,boxState:'out',conversationClosed:false,hingesOpened:[]};
+let isRecording=false,isProcessing=false,mediaRecorder=null,audioChunks=[],audioStream=null,audioContext=null,analyser=null,silenceTimer=null;
+const SILENCE_THRESHOLD=38,SILENCE_DURATION=1900;
+
+function setHUD(state,label){
+  var dot=document.getElementById('voice-dot'),lbl=document.getElementById('voice-label');
+  if(dot){dot.className='';dot.classList.add(state);}
+  if(lbl)lbl.textContent=label;
+  var vDot=document.getElementById('vr-voice-dot'),vLbl=document.getElementById('vr-voice-label'),vBar=document.getElementById('vr-voice-bar');
+  var colors={idle:'#1a2a6a',ready:'#00e5c0',rec:'#ff5ca0',thinking:'#9d5cff'};
+  if(vDot)vDot.setAttribute('color',colors[state]||'#1a2a6a');
+  if(vLbl)vLbl.setAttribute('text','value',label);
+  if(vBar)vBar.setAttribute('visible',state!=='idle');
+}
+
+function pickRandomArchetype(){
+  var ids=Object.keys(ARCHETYPES).filter(function(id){return ARCHETYPES[id].available;});
+  return ARCHETYPES[ids[Math.floor(Math.random()*ids.length)]];
+}
+
+
+
+
+let mostrandoMoves = false;
+
+function toggleListeningMoves() {
+  // 🛑 CANDADO DE SEGURIDAD PARA LA BIENVENIDA:
+  const welcomeScreen = document.getElementById('screen-welcome');
+  if (welcomeScreen && welcomeScreen.getAttribute('visible') === 'true') {
+    console.log("🚫 Click bloqueado: No puedes usar este botón mientras estés en la pantalla de bienvenida.");
+    return;
+  }
+
+  const sessionContent = document.getElementById('listening-session-content');
+  const movesContainer = document.getElementById('moves-container');
+  const btnText = document.getElementById('text-btn-toggle-listening');
+  const btnPlane = document.getElementById('btn-toggle-active-listening');
+  
+  // Referencias a tus ajolotes
+  const juan = document.getElementById('activity-juan');
+  const ajolin = document.getElementById('activity-ajolin');
+
+  if (!mostrandoMoves) {
+    // 1. Ocultar contenido y mostrar los 4 cartelitos
+    if (sessionContent) sessionContent.setAttribute('visible', 'false');
+    if (movesContainer) movesContainer.setAttribute('visible', 'true');
+    
+    // 🛑 OCULTAR LOS AJOLOTES INMEDIATAMENTE
+    if (juan) juan.setAttribute('visible', 'false');
+    if (ajolin) ajolin.setAttribute('visible', 'false');
+    
+    // 2. Cambiar UI del botón al estilo listo
+    if (btnText) btnText.setAttribute('text', 'value', "I'm ready \u2014 let's go \u2192");
+    if (btnPlane) btnPlane.setAttribute('color', '#00e5c0');
+    
+    mostrandoMoves = true;
+  } else {
+    // 3. Resetear estados internos y regresar a la pantalla intermedia de forma segura
+    mostrandoMoves = false;
+    if (sessionContent) sessionContent.setAttribute('visible', 'true');
+    if (movesContainer) movesContainer.setAttribute('visible', 'false');
+    if (btnText) btnText.setAttribute('text', 'value', "See the moves");
+    if (btnPlane) btnPlane.setAttribute('color', '#ff5ca0');
+    
+    // 🔄 RESTAURAR VISIBILIDAD DE LOS AJOLOTES SEGÚN EL TURNO ACTUAL ANTES DE IRNOS
+    if (typeof activeListeningStep !== 'undefined') {
+      if (activeListeningStep === 0) {
+        if (juan) juan.setAttribute('visible', 'true');
+        if (ajolin) ajolin.setAttribute('visible', 'false');
+      } else {
+        if (juan) juan.setAttribute('visible', 'false');
+        if (ajolin) ajolin.setAttribute('visible', 'true');
+      }
+    }
+    
+    // Tu redirección original intacta
+    if (typeof showScreen === 'function') {
+      showScreen('learn-work-practice');
+    } else if (typeof cambiarPantallaVR === 'function') {
+      // Por si usas la otra función en este script
+      console.log("Aquí 1");
+      cambiarPantallaVR('screen-learn-work-practice');
+    }
+  }
+}
+
+
+
+function pickRandomScenario(archetype,level){
+  var pool=archetype.briefings[level]||archetype.briefings['novice']||[];
+  if(!pool.length)return null;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function pickRandomOpener(archetype,scenario){
+  var state=(scenario&&(scenario.carlosState||scenario.agentState))||'guarded-tired';
+  if(archetype.openers&&archetype.openers[state])return archetype.openers[state];
+  var vals=Object.values(archetype.openers||{});
+  return vals[Math.floor(Math.random()*vals.length)]||'...';
+}
+
+function showScreen(name) {
+  // console.log("🔄 Solicitando cambiar a la pantalla:", name);
+  var idReal = name.startsWith('screen-') ? name : 'screen-' + name;
+  
+    cambiarPantallaVR(idReal);
+  const pantallas = [
+    'welcome',
+    'mode',
+    'practice',
+    'eval',
+    'interventions',
+    'techniques',
+    'screen-mode',
+    'learn-work-practice',
+    'active-listening-activity'
+  ];
+
+  pantallas.forEach(function(s) {
+    var idReal = s.startsWith('screen-') ? s : 'screen-' + s;
+    var el = document.getElementById(idReal);
+    
+    if (el) {
+      if (s === name || idReal === name) {
+        el.setAttribute('visible', 'true');
+        el.setAttribute('scale', '1 1 1');
+      } else {
+        el.setAttribute('visible', 'false');
+        el.setAttribute('scale', '0 0 0');
+      }
+    }
+  });
+
+  const raycasterEl = document.querySelector('[raycaster]');
+  if (raycasterEl && raycasterEl.components.raycaster) {
+    raycasterEl.components.raycaster.refreshObjects();
+  }
+
+  appState.screen = name;
+
+  var planosTecnicas = document.querySelectorAll('.sub-tecnica');
+  
+  if (name === 'technique-list') {
+    planosTecnicas.forEach(function(el) {
+      el.classList.add('clickable');
+      // console.log("🟢 Botón de técnica ACTIVADO: " + el.id);
+    });
+    // console.log("🟢 14 botones de técnicas específicos ACTIVADOS");
+
+  } else if (name === 'interventions') {
+    planosTecnicas.forEach(function(el) {
+      el.classList.remove('clickable');
+    });
+    // console.log("🔴 14 botones de técnicas específicos DESACTIVADOS por ingresar a Intervenciones");
+
+    const btnTecnicasGeneral = document.getElementById('btn-tecnicas'); 
+    if (btnTecnicasGeneral) {
+      btnTecnicasGeneral.classList.remove('clickable');
+      // console.log("🔴 Botón general de técnicas DESACTIVADO");
+    }
+
+  } else {
+    planosTecnicas.forEach(function(el) {
+      el.classList.remove('clickable');
+    });
+    // console.log("🔴 14 botones de técnicas específicos DESACTIVADOS");
+  }
+}
+
+function goWelcome(){
+
+  showScreen('welcome');
+  appState.agentHistory=[];
+  appState.vrMood=30;
+  
+}
+
+
+
+function goMode(menuType){
+  appState.activeMenu=menuType;
+  if(menuType==='interventions')appState.currentIntervention=(typeof interventions!=='undefined'&&interventions[0])||null;
+  if(menuType==='techniques')appState.currentTechnique=(typeof techniques!=='undefined'&&techniques[0])||null;
+  if(typeof updateModeScreen==='function')updateModeScreen();
+  showScreen('mode');
+}
+
+function goLearn() {
+  appState.agentHistory = [];
+  
+  const opennessPanel = document.getElementById('openness-panel');
+  if (opennessPanel) {
+    opennessPanel.setAttribute('visible', 'false');
+  }
+
+  var intro = appState.activeMenu === 'interventions' 
+    ? 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?' 
+    : 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
+    
+  showScreen('practice');
+  setJuanMood('happy');
+  setDialog('JUANJOLOTE', intro);
+  speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
+  appState.agentHistory.push({ role: 'assistant', content: intro });
+}
+
+function goWork() {
+  appState.agentHistory = [];
+  
+  const opennessPanel = document.getElementById('openness-panel');
+  if (opennessPanel) {
+    opennessPanel.setAttribute('visible', 'false');
+  }
+
+  var intro = 'Cuentame, que situacion tienes con un agente ahora mismo?';
+  showScreen('practice');
+  setJuanMood('talking');
+  setDialog('JUANJOLOTE', intro);
+  speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
+  appState.agentHistory.push({ role: 'assistant', content: intro });
+}
+
+function goWork() {
+  appState.agentHistory = [];
+  
+  const opennessPanel = document.getElementById('openness-panel');
+  if (opennessPanel) {
+    opennessPanel.setAttribute('visible', 'false');
+  }
+
+  var intro = 'Cuentame, que situacion tienes con un agente ahora mismo?';
+  showScreen('practice');
+  setJuanMood('talking');
+  setDialog('JUANJOLOTE', intro);
+  speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
+  appState.agentHistory.push({ role: 'assistant', content: intro });
+  // console.log("dio click al gowork");
+}
+
+function goPractice(){
+  // console.log("=== ENTRANDO A GOPRACTICE ===");
+  // console.log("Origen actual de la actividad:", appState.origenActividad);
+  // console.log("Menú activo:", appState.activeMenu);
+
+  appState.agentHistory = [];
+
+  setTimeout(() => {
+    const opennessPanel = document.getElementById('openness-panel');
+    if (opennessPanel) {
+      // console.log("Forzando Openness a VISIBLE desde el setTimeout");
+      opennessPanel.setAttribute('visible', 'true');
+      opennessPanel.setAttribute('scale', '1 1 1');
+    } else {
+      console.error("¡El elemento #openness-panel no existe en el DOM en este momento!");
+    }
+  }, 50);
+
+  var arch=pickRandomArchetype();
+  var scenario=pickRandomScenario(arch,appState.currentLevel);
+  appState.currentArchetype=arch;
+  appState.currentScenario=scenario;
+  appState.agentHistory=[];
+  appState.vrMood=(scenario&&scenario.startMood)||30;
+  appState.hingesOpened=[];
+  appState.conversationClosed=false;
+  if(typeof currentArchetype!=='undefined')currentArchetype=arch;
+  updateAgentAvatar(arch);
+  updateVRMood(appState.vrMood);
+  var opener=pickRandomOpener(arch,scenario);
+  appState.agentHistory.push({role:'assistant',content:opener});
+  showScreen('practice');
+  setDialog(arch.name.toUpperCase(),opener);
+  speakVR(opener,getVoice('agent'),function(){setHUD('ready','Listo para hablar');});
+  // console.log("dio click al goPractice al final de la función");
+}
+
+
+
+  function go14button(){
+    showScreen('technique-list');
+  }
+
+  function goInterventions(){
+    showScreen('interventions');
+  }
+
+function updateAgentAvatar(arch){
+  var nameEl=document.getElementById('agent-name'),roleEl=document.getElementById('agent-role');
+  var imgEl=document.getElementById('agent-img'),halo=document.getElementById('agent-halo'),ring=document.getElementById('agent-ring');
+  if(nameEl)nameEl.setAttribute('text','value',arch.name);
+  if(roleEl)roleEl.setAttribute('text','value',arch.role);
+  var colors={carlos:'#ff5ca0',valeria:'#9d5cff',miguel:'#00e5c0',sandra:'#f5a623'};
+  var col=colors[arch.id]||'#9d5cff';
+  if(halo)halo.setAttribute('color',col);
+  if(ring)ring.setAttribute('color',col);
+  if(imgEl)imgEl.setAttribute('src','#ajolin-neutral');
+}
+
+function setDialog(speaker,text){
+  var panel=document.getElementById('dialog-panel');
+  if(panel)panel.setAttribute('visible',true);
+  var sp=document.getElementById('dialog-speaker'),tx=document.getElementById('dialog-text');
+  if(sp)sp.setAttribute('text','value',speaker);
+  if(tx)tx.setAttribute('text','value',text);
+}
+
+function setJuanMood(mood){
+  var map={neutral:'#juan-neutral',happy:'#juan-happy',talking:'#juan-talking',sad:'#juan-sad'};
+  var el=document.getElementById('juan-img')||document.getElementById('juan-eval-img');
+  if(el)el.setAttribute('src',map[mood]||'#juan-neutral');
+}
+
+function setAjolinMood(mood){
+  var map={neutral:'#ajolin-neutral',happy:'#ajolin-happy',talking:'#ajolin-talking',sad:'#ajolin-sad',surprised:'#ajolin-surprised'};
+  var el=document.getElementById('agent-img');
+  if(el)el.setAttribute('src',map[mood]||'#ajolin-neutral');
+}
+
+function updateVRMood(val){
+  appState.vrMood=Math.max(0,Math.min(100,val));
+  var pct=appState.vrMood/100;
+  var color=appState.vrMood<35?'#ff5ca0':appState.vrMood<60?'#f5a623':'#00e5c0';
+  var w=0.07+pct*0.63,x=-0.315+pct*0.315;
+  var fill=document.getElementById('mood-fill'),pctEl=document.getElementById('mood-pct');
+  if(fill){fill.setAttribute('color',color);fill.setAttribute('width',w);fill.setAttribute('position',x+' 0.02 0.015');}
+  if(pctEl)pctEl.setAttribute('text','value',appState.vrMood+'%');
+}
+
+async function callGroqLLM(mode){
+  var systemPrompt='';
+  if(mode==='practice'){
+    systemPrompt=PROMPTS.avatar(appState.currentLevel);
+  } else if(mode==='learn'){
+    systemPrompt='Eres Juanjolote, coach de liderazgo calido y directo en Centris Neural Academy. Estas ensenando sobre '+(appState.activeMenu==='interventions'?'intervenciones de retencion':'tecnicas de comunicacion')+'. Habla en espanol. Conversacional, maximo 3 oraciones. Haz preguntas. Nunca des conferencias. Conecta todo a situaciones reales de call center.';
+  } else if(mode==='work'){
+    systemPrompt='Eres Juanjolote, coach socratico en Centris Neural Academy. Tu rol es hacer preguntas que ayuden al manager a descubrir sus propios insights. NUNCA des consejos directos. Haz UNA pregunta a la vez. Maximo 2 oraciones. Habla en espanol. Se calido pero directo.';
+  }
+  var res=await fetch('/api/groq',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemPrompt},...appState.agentHistory.slice(-12)],max_tokens:150,temperature:0.88})});
+  var data=await res.json();
+  return (data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'...';
+}
+
+function parseAgentReply(raw){
+  var moodMatch=raw.match(/\[MOOD:(\d+)\]/),boxMatch=raw.match(/\[BOX:(in|out)\]/);
+  var msg=raw.replace(/\[MOOD:\d+\]/g,'').replace(/\[BOX:(in|out)\]/g,'').replace(/\[TRIGGER:\w+\]/g,'').replace(/\[CLOSED:(true|false)\]/g,'').trim();
+  return {msg:msg,newMood:moodMatch?parseInt(moodMatch[1]):appState.vrMood,boxState:boxMatch?boxMatch[1]:appState.boxState};
+}
+
+async function handleVRSpeech(text) {
+  if (!text.trim()) return;
+  var mode = appState.currentArchetype ? 'practice' : 'learn';
+  appState.agentHistory.push({ role: 'user', content: text });
+  
+  try {
+    var reply = await callGroqLLM(mode === 'practice' ? 'practice' : appState.activeMenu ? 'learn' : 'work');
+    var parsed = mode === 'practice' ? parseAgentReply(reply) : { msg: reply, newMood: appState.vrMood, boxState: 'out' };
+    appState.agentHistory.push({ role: 'assistant', content: reply });
+    
+    if (mode === 'practice') {
+      updateVRMood(parsed.newMood);
+      appState.boxState = parsed.boxState;
+      if (parsed.newMood > 60) setAjolinMood('happy');
+      else if (parsed.newMood < 30) setAjolinMood('sad');
+      else setAjolinMood('talking');
+      setDialog(appState.currentArchetype.name.toUpperCase(), parsed.msg);
+    } else {
+      setJuanMood('talking');
+      setDialog('JUANJOLOTE', parsed.msg);
+    }
+
+    speakVR(
+      parsed.msg,
+      getVoice(mode === 'practice' ? 'agent' : 'juan'),
+      function () {
+        setHUD('ready', 'Listo para hablar');
+        if (mode === 'practice') {
+          setAjolinMood('neutral');
+        } else {
+          setJuanMood('neutral');
+        }
+      }
+    );
+
+  } catch (e) {
+    console.error('[LLM]', e);
+    setHUD('ready', 'Error, intenta de nuevo');
+  }
+}
+
+
+function guardarSesionDePrueba() {
+  let sessions = JSON.parse(localStorage.getItem('interventions_sessions') || '[]');
+  
+  sessions.unshift({
+    date: new Date().toISOString(),
+    intervention: "Simulación de Retención",
+    technique: "Manejo de Objeciones",
+    level: "novice",
+    archetype: "ajolin",
+    mood_final: 88,
+    eval_summary: "¡Nueva sesión completada con éxito!"
+  });
+  
+  localStorage.setItem('interventions_sessions', JSON.stringify(sessions));
+}
+
+function goHistory() {
+  // console.log("🗣️ Mostrando panel de historial en el espacio VR...");
+  
+  cambiarPantallaVR('screen-history');
+
+  let localSessions = localStorage.getItem('interventions_sessions');
+  let sessions = [];
+
+  if (localSessions) {
+    sessions = JSON.parse(localSessions);
+  } else {
+    sessions = [
+      {
+        date: new Date().toISOString(),
+        intervention: "performance_review", 
+        technique: "active_listening",
+        level: "mid",
+        archetype: "ajolin",
+        mood_final: 75,
+        eval_summary: "Excelente manejo de la objecion del colaborador. Se mantuvo la empatia en todo momento."
+      },
+      {
+        date: new Date(Date.now() - 86400000).toISOString(), 
+        intervention: "disengagement",
+        technique: "growth_mindset",
+        level: "adv",
+        archetype: "juanjolote",
+        mood_final: 42,
+        eval_summary: "Falto profundizar en los motivos de la baja motivacion del agente, usar preguntas abiertas."
+      }
+    ];
+    localStorage.setItem('interventions_sessions', JSON.stringify(sessions));
+  }
+
+  const vrTextComponent = document.getElementById('history-content-text');
+  if (!vrTextComponent) {
+    console.error("⚠️ No se encontró la entidad de texto #history-content-text en la escena VR.");
+    return;
+  }
+
+  if (sessions.length === 0) {
+    vrTextComponent.setAttribute('value', 'No tienes sesiones registradas aun.');
+    return;
+  }
+
+  const textVR = sessions.map(s => {
+    const d = new Date(s.date || Date.now());
+    const date = isNaN(d.getTime()) ? '—' : `${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+    const context = s.intervention ? s.intervention : (s.technique || '—');
+    const level = (s.level || '—').toUpperCase();
+    const agentName = s.archetype ? s.archetype : '—';
+    const mood = s.mood_final || 0;
+    
+    const summary = s.eval_summary ? `\n"${s.eval_summary.substring(0, 55)}..."` : '';
+
+    return `* ${date} | ${context}\n  Nivel: ${level} | Agente: ${agentName} | Mood: ${mood}%\n  ${summary}`;
+  }).join('\n\n');
+
+  vrTextComponent.setAttribute('value', textVR);
+}
+
+
+const originalGoPractice = window.goPractice;
+window.goPractice = function() {
+  if (typeof originalGoPractice === 'function') originalGoPractice();
+};
+
+const originalGoLearn = window.goLearn;
+window.goLearn = function() {
+  if (typeof originalGoLearn === 'function') originalGoLearn();
+};
+
+const originalGoWork = window.goWork;
+window.goWork = function() {
+  if (typeof originalGoWork === 'function') originalGoWork();
+};
+
+
+if (typeof window.endActivity === 'function') {
+  const originalEndActivity = window.endActivity;
+  
+  window.endActivity = function() {
+    if (typeof appState !== 'undefined' && !appState.evaluacionHabilitada) {
+      // console.log("Botón Terminar presionado fuera de Práctica. Limpiando y saliendo al inicio...");
+      
+      if (typeof stopMic === 'function') stopMic();
+      if (typeof detenerReconocimiento === 'function') detenerReconocimiento();
+      if (typeof reiniciarAtributos === 'function') reiniciarAtributos();
+      if (typeof resetGame === 'function') resetGame();
+      
+      if (typeof cambiarPantallaVR === 'function') {
+        cambiarPantallaVR('screen-welcome'); 
+      }
+      return; 
+    }
+    
+    if (typeof appState !== 'undefined') appState.evaluacionHabilitada = false;
+    originalEndActivity();
+  };
+}
+
+
+window.goHistory = function() {
+  // console.log("🗣️ Mostrando panel de historial en el espacio VR...");
+  
+  if (typeof cambiarPantallaVR === 'function') {
+    cambiarPantallaVR('screen-history');
+  } else {
+    console.error("❌ No se encontró la función cambiarPantallaVR");
+  }
+
+  let localSessions = localStorage.getItem('interventions_sessions');
+  let sessions = [];
+
+  if (localSessions) {
+    sessions = JSON.parse(localSessions);
+  } else {
+    // SINO HAY SESIONES: Mock data limpia
+    sessions = [
+      {
+        date: new Date().toISOString(),
+        intervention: "performance_review", 
+        technique: "active_listening",
+        level: "mid",
+        archetype: "ajolin",
+        mood_final: 75,
+        eval_summary: "Excelente manejo de la objecion del colaborador. Se mantuvo la empatia en todo momento."
+      }
+    ];
+    localStorage.setItem('interventions_sessions', JSON.stringify(sessions));
+  }
+
+  const vrTextComponent = document.getElementById('history-content-text');
+  if (!vrTextComponent) {
+    console.error("⚠️ No se encontró la entidad de texto #history-content-text en la escena VR.");
+    return;
+  }
+
+  if (sessions.length === 0) {
+    vrTextComponent.setAttribute('value', 'No tienes sesiones registradas aun.');
+    return;
+  }
+
+  const textVR = sessions.map(s => {
+    const d = new Date(s.date || Date.now());
+    const date = isNaN(d.getTime()) ? '—' : `${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+    const context = s.intervention || s.technique || '—';
+    const level = (s.level || '—').toUpperCase();
+    const agentName = s.archetype || '—';
+    const mood = s.mood_final || 0;
+    
+    const summary = s.eval_summary ? `\n"${s.eval_summary.substring(0, 55)}..."` : '';
+
+    return `* ${date} | ${context}\n  Nivel: ${level} | Agente: ${agentName} | Mood: ${mood}%\n  ${summary}`;
+  }).join('\n\n');
+
+  vrTextComponent.setAttribute('value', textVR);
+};
+
+
+async function goEval(){
+  showScreen('eval');
+  var evalMoodEl=document.getElementById('eval-mood');
+  if(evalMoodEl)evalMoodEl.setAttribute('text','value',appState.vrMood+'%');
+  setJuanMood('talking');
+  var evalText='Analiza esta conversacion de practica. Agente: '+((appState.currentArchetype&&appState.currentArchetype.name)||'Agente')+' ('+((appState.currentArchetype&&appState.currentArchetype.trait)||'')+'). Mood final: '+appState.vrMood+'/100. Historial: '+appState.agentHistory.length+' turnos. Da feedback en 3 puntos concretos en espanol, maximo 4 oraciones total. Se directo y especifico. No uses lenguaje generico de coaching.';
+  try{
+    var res=await fetch('/api/groq',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Eres Juanjolote, coach directo y honesto. Evalua conversaciones de practica de liderazgo. Espanol. Concreto. Sin formalidades.'},{role:'user',content:evalText},...appState.agentHistory.slice(-8)],max_tokens:200,temperature:0.7})});
+    var data=await res.json();
+    var feedback=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'Sesion completada.';
+    var feedbackEl=document.getElementById('eval-feedback');
+    if(feedbackEl)feedbackEl.setAttribute('text','value',feedback);
+speakVR(feedback,getVoice('juan'));
+  } catch(e){
+    var feedbackEl2=document.getElementById('eval-feedback');
+    if(feedbackEl2)feedbackEl2.setAttribute('text','value','Sesion completada. Buen trabajo.');
+  }
+}
+
+async function translateToEnglish(text) {
+  const res = await fetch('/api/groq_speakvr', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({
-      model: 'llama-3.1-8b-instant',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...agentHistory.slice(-10)
-      ],
-      max_tokens: 120,
-      temperature: 0.85
+      type: 'translate',
+      text: text
     })
   });
 
   const data = await res.json();
-  return data.choices?.[0]?.message?.content || '...';
+
+  return data.translation || text;
 }
 
-function parseVRReply(raw) {
-  const moodMatch = raw.match(/\[MOOD:(\d+)\]/);
-  const newMood   = moodMatch ? parseInt(moodMatch[1]) : vrMood;
-  const msg       = raw.replace(/\[MOOD:\d+\]/g, '').trim();
-  return { msg, newMood };
+function getVoice(character) {
+
+  return {
+     juan: "daniel",
+     agent: "diana"
+  }[character] || "Fritz-PlayAI";
 }
 
-// ─── TTS ──────────────────────────────────
-function speakText(text) {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const utt  = new SpeechSynthesisUtterance(text);
-  utt.lang   = 'es-MX';
-  utt.rate   = 0.92;
-  utt.pitch  = 0.9;
-  const voices  = window.speechSynthesis.getVoices();
-  const spanish = voices.find(v => v.lang.startsWith('es') && v.name.toLowerCase().includes('male'))
-    || voices.find(v => v.lang.startsWith('es')) || null;
-  if (spanish) utt.voice = spanish;
-  window.speechSynthesis.speak(utt);
+async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
+
+  // ❌ ELIMINA O COMENTA ESTA LÍNEA (Ya no necesitas traducir un texto que ya viene en inglés):
+  // const englishText = await translateToEnglish(text);
+
+  // pedir audio
+  const speechResponse = await fetch('/api/groq_speakvr', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      type: 'speech',
+      text: text, //  <-- CAMBIA 'englishText' por 'text' para usar el texto original directo
+      voice: voice
+    })
+  });
+
+  if (!speechResponse.ok) {
+    const err = await speechResponse.text();
+    console.error("TTS ERROR:", err);
+    return;
+  }
+
+  const blob = await speechResponse.blob();
+  const url = URL.createObjectURL(blob);
+  const audio = new Audio(url);
+
+  audio.onended = () => {
+    URL.revokeObjectURL(url);
+    if (callback) {
+      callback();
+    }
+  };
+
+  await audio.play();
 }
-window.speechSynthesis?.addEventListener('voiceschanged', () => {});
+
+async function setupMic(){
+  try{
+    // console.log('[Mic] Solicitando permisos de micrófono...');
+    audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+    // console.log('[Mic] Permisos concedidos. Stream obtenido:', audioStream.id);
+    
+    audioContext=new (window.AudioContext||window.webkitAudioContext)();
+    // console.log('[Mic] AudioContext estado inicial:', audioContext.state);
+    
+    analyser=audioContext.createAnalyser();
+    analyser.fftSize=2048;
+    audioContext.createMediaStreamSource(audioStream).connect(analyser);
+    setHUD('ready','Listo para hablar');
+    // console.log('[Mic] Configuración completa y Analyser conectado.');
+  } catch(e){
+    setHUD('idle','Sin microfono - modo texto');
+    console.error('[Mic] Error en setupMic:',e);
+  }
+}
+
+function startRecording(){
+   console.log('[Grabación] Intento de iniciar grabación. Estado actual -> isRecording:', isRecording, 'isProcessing:', isProcessing, 'hasAudioStream:', !!audioStream);
+  if(isRecording||isProcessing||!audioStream) return;
+  
+  if (audioContext && audioContext.state === 'suspended') {
+    console.log('[Mic] AudioContext suspendido. Intentando reactivar...');
+    audioContext.resume();
+  }
+
+  audioChunks=[]; isRecording=true;
+  var mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
+  console.log('[Grabación] Usando formato MIME:', mime);
+  
+  mediaRecorder=new MediaRecorder(audioStream,{mimeType:mime});
+  
+  mediaRecorder.ondataavailable=function(e){
+    if(e.data.size>0){
+      audioChunks.push(e.data);
+      console.log('[Grabación] Chunk recibido. Tamaño:', e.data.size, 'bytes. Total chunks:', audioChunks.length);
+    } else {
+      console.warn('[Grabación] Chunk recibido pero está VACÍO (0 bytes)');
+    }
+  };
+  
+  mediaRecorder.onstop=onRecordingStop;
+  mediaRecorder.start();
+  setHUD('rec','Grabando...');
+  var btn=document.getElementById('mic-btn'); if(btn)btn.classList.add('recording');
+  
+  setTimeout(function(){
+    if(isRecording){
+      console.log('[Grabación] Límite de 25 segundos alcanzado. Forzando parada.');
+      stopRecording();
+    }
+  },25000);
+}
+
+function stopRecording(){
+   console.log('[Grabación] stopRecording invocado. ¿Registrando?:', isRecording);
+  if(!isRecording||!mediaRecorder)return;
+  isRecording=false;
+  if(silenceTimer){
+    console.log('[Grabación] Limpiando temporizador de silencio.');
+    cancelAnimationFrame(silenceTimer);
+    silenceTimer=null;
+  }
+  mediaRecorder.stop();
+  var btn=document.getElementById('mic-btn');if(btn)btn.classList.remove('recording');
+  setHUD('thinking','Procesando...');
+}
+
+function startSilenceDetection(){
+  var data=new Uint8Array(analyser.frequencyBinCount),silenceMs=0,lastTime=performance.now();
+  console.log('[Silencio] Detección iniciada. Umbral (SILENCE_THRESHOLD):', typeof SILENCE_THRESHOLD !== 'undefined' ? SILENCE_THRESHOLD : 'No definido');
+  
+  function check(){
+    if(!isRecording) return;
+    analyser.getByteFrequencyData(data);
+    var avg=data.reduce(function(a,b){return a+b;},0)/data.length;
+    var now=performance.now(),dt=now-lastTime; lastTime=now;
+    
+    // console.log('[Silencio] Volumen promedio actual:', avg);
+    
+    if(avg<SILENCE_THRESHOLD){
+      silenceMs+=dt;
+      if(silenceMs>=SILENCE_DURATION){
+        console.log(`[Silencio] Silencio detectado por ${silenceMs}ms (Límite: ${SILENCE_DURATION}ms). Deteniendo grabación automáticamente.`);
+        stopRecording();
+        return;
+      }
+    } else {
+      if(silenceMs > 0) console.log('[Silencio] Ruido detectado, reseteando contador de silencio. Volumen:', avg);
+      silenceMs=0;
+    }
+    silenceTimer=requestAnimationFrame(check);
+  }
+  check();
+}
+
+async function onRecordingStop(){
+  console.log('[Grabación] MediaRecorder se ha detenido. Armando el Blob...');
+  var blob=new Blob(audioChunks,{type:'audio/webm'});
+  // console.log('[Grabación] Archivo de audio generado -> Tamaño total:', blob.size, 'bytes');
+  
+  if(blob.size<800){
+    console.error('[Grabación] El archivo de audio es DEMASIADO PEQUEÑO (menor a 800 bytes). Se cancela el envío.');
+    setHUD('ready','No te escuche, intenta de nuevo');
+    return;
+  }
+  
+  isProcessing=true;
+  try{
+    // console.log('[Whisper] Enviando audio a transcribir...');
+    var text=await transcribeAudio(blob);
+    // console.log('[Whisper] Respuesta cruda recibida de la función transcribir:', text);
+    
+    if(!text||text.trim().length<2){
+      console.warn('[Whisper] La transcripción regresó vacía o demasiado corta.');
+      setHUD('ready','No entendi, intenta de nuevo');
+      isProcessing=false;
+      return;
+    }
+    
+    console.log('[Whisper] Transcripción exitosa:', text);
+    if(appState.screen==='practice') setDialog('TU',text);
+    setHUD('thinking','Pensando...');
+    
+    // console.log('[VR] Ejecutando handleVRSpeech con el texto...');
+    await handleVRSpeech(text);
+  } catch(e){
+    console.error('[Voice] Error crítico en el flujo de parada/transcripción:', e);
+    setHUD('ready','Error, intenta de nuevo');
+  } finally {
+    isProcessing=false;
+    // console.log('[Grabación] Ciclo finalizado. Listo para la siguiente instrucción.');
+  }
+}
+
+async function transcribeAudio(blob) {
+  var form = new FormData();
+  form.append('file', blob, 'rec.webm');
+
+  // console.log('[Frontend] Enviando audio a nuestro backend seguro...');
+  try {
+    var res = await fetch('/api/transcribe', {
+      method: 'POST',
+      body: form // 👈 ¡ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ AQUÍ!
+    });
+
+    console.log('[Frontend] Status Code de la API:', res.status);
+    var data = await res.status === 200 ? await res.json() : await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Error desconocido en el servidor');
+    }
+
+    return data.text || '';
+  } catch (fetchError) {
+    console.error('[Frontend] Error de conexión o procesamiento:', fetchError);
+    throw fetchError;
+  }
+}
+
+function setupControllers(){
+  var scene=document.querySelector('a-scene');
+  console.log('[VR Controles] Inicializando controladores VR...');
+  
+  // Mano Derecha
+  var rc=document.createElement('a-entity');
+  rc.setAttribute('oculus-touch-controls','hand:right');
+  rc.setAttribute('raycaster','objects: .clickable; far:6; showLine:true; lineColor:#00e5c0; lineOpacity:0.7');
+  scene.appendChild(rc);
+  
+  // Mano Izquierda
+  var lc=document.createElement('a-entity');
+  lc.setAttribute('oculus-touch-controls','hand:left');
+  lc.setAttribute('raycaster','objects: .clickable; far:6; showLine:true; lineColor:#9d5cff; lineOpacity:0.5');
+  scene.appendChild(lc);
+  
+  [rc,lc].forEach(function(ctrl){
+    ctrl.addEventListener('triggerdown',function(){
+      // console.log('[VR Controles] Trigger presionado en:', ctrl.getAttribute('oculus-touch-controls'));
+      var hit=ctrl.components&&ctrl.components.raycaster&&ctrl.components.raycaster.intersectedEls&&ctrl.components.raycaster.intersectedEls[0];
+      
+      if(hit){
+        if (hit.object3D && hit.object3D.visible === false) {
+          // console.log("🔒 Clic fantasma bloqueado en elemento oculto:", hit.id);
+          return; 
+        }
+        // console.log('[VR Controles] Clic ejecutado en elemento objetivo:', hit.id || hit.tagName);
+        hit.click();
+        return;
+      }
+      
+      // console.log('[VR Controles] Trigger al aire. ¿Pantalla actual es practice?:', appState.screen);
+      if(appState.screen==='practice'){
+        if(!isRecording&&!isProcessing) {
+          // console.log('[VR Controles] Iniciando grabación vía Trigger.');
+          startRecording();
+        }
+        else if(isRecording) {
+          // console.log('[VR Controles] Deteniendo grabación vía Trigger.');
+          stopRecording();
+        }
+      }
+    });
+  });
+  
+  
+  rc.addEventListener('abuttondown',function(){
+    // console.log('[VR Controles] Botón A presionado en mano derecha.');
+    if(appState.screen==='practice'){
+      if(!isRecording&&!isProcessing) startRecording();
+      else if(isRecording) stopRecording();
+    }
+  });
+}
+
+let currentConversation = [];
+let currentTechniqueData = null;
+let currentMessageIndex = 0;
+// Nueva variable para controlar el flujo secuencial de la simulación
+let currentSimulationPhase = 'bad'; 
+
+function selectAndPreviewVR(techniqueId) {
+
+  // Cambiar a la pantalla de la conversación
+  cambiarPantallaVR('screen-active-listening-activity');
+
+  document.querySelector('#screen-technique-list')
+    .setAttribute('visible', 'false');
+
+  document.querySelector('#screen-active-listening-activity')
+    .setAttribute('visible', 'true');
+
+  // Verificar que exista el objeto
+  if (typeof TECHNIQUE_PREVIEWS === 'undefined') {
+    console.error("❌ No se encontró el objeto TECHNIQUE_PREVIEWS.");
+    return;
+  }
+
+  // Obtener la información de la técnica
+  const techniqueData = TECHNIQUE_PREVIEWS[techniqueId];
+
+  if (!techniqueData) {
+    console.error("❌ No existe la técnica:", techniqueId);
+    return;
+  }
+
+  // CONFIGURACIÓN INICIAL: Empezamos siempre con la fase 'bad'
+  currentSimulationPhase = 'bad';
+  currentTechniqueData = techniqueData;
+  currentConversation = techniqueData.bad.exchanges; // Cargar primero los diálogos "bad"
+  currentMessageIndex = 0;
+
+  // Limpiar el área donde aparecerán los mensajes
+  const stage = document.querySelector('#vr-preview-stage');
+
+  if (!stage) {
+    console.error("❌ No existe #vr-preview-stage");
+    return;
+  }
+
+  stage.innerHTML = "";
+
+  // Ocultar el botón "See the Moves"
+  document.querySelector('#btn-toggle-active-listening')
+    .setAttribute('visible', false);
+
+// Busca estas líneas en tu código (donde se prepara el botón para iniciar):
+const nextBtn = document.querySelector('#btn-next-conversation');
+if (nextBtn) {
+  nextBtn.setAttribute('visible', true);
+  nextBtn.classList.add('clickable'); // 🌟 Le devolvemos la clase para que el raycaster lo detecte de nuevo
+  
+  const nextBtnText = nextBtn.querySelector('a-text');
+  if (nextBtnText) nextBtnText.setAttribute('value', '▶ Next');
+}
+
+// Mostrar el primer mensaje
+showNextConversation();
+}
+
+
+// Variable global para controlar el paso actual de la conversación
+let activeListeningStep = 0;
+
+function initActiveListeningConversation() {
+  activeListeningStep = 0;
+  
+  const juan = document.getElementById('activity-juan');
+  const ajolin = document.getElementById('activity-ajolin');
+  const speaker = document.getElementById('speaker-name');
+  
+  // Juanjolote inicia visible a la izquierda
+  if (juan) juan.setAttribute('visible', 'true');
+  if (ajolin) ajolin.setAttribute('visible', 'false');
+  
+  if (speaker) {
+    speaker.setAttribute('value', ' ');
+    speaker.setAttribute('color', '#00e5c0'); // Color cian de Juanjolote
+    speaker.setAttribute('position', '-1.45 0.73 0.02'); // Alineado a la izquierda
+  }
+}
+
+function avanzarConversacionActiva() {
+  const juan = document.getElementById('activity-juan');
+  const ajolin = document.getElementById('activity-ajolin');
+  const speaker = document.getElementById('speaker-name');
+  
+  if (activeListeningStep === 0) {
+    // Cambiamos el turno a Ajolin (Derecha)
+    if (juan) juan.setAttribute('visible', 'false');
+    if (ajolin) ajolin.setAttribute('visible', 'true');
+    
+    if (speaker) {
+      speaker.setAttribute('value', ' ');
+      speaker.setAttribute('color', '#9d5cff'); // Color morado de Ajolin
+      speaker.setAttribute('position', '0.7 0.73 0.02'); // Lo movemos un poco a la derecha
+    }
+    activeListeningStep = 1;
+  } else {
+    // Si vuelven a dar Next, reinicia el ciclo (o puedes añadir más pasos si lo requieres)
+    initActiveListeningConversation();
+  }
+}
+
+function showNextConversation() {
+  const stage = document.querySelector("#vr-preview-stage");
+  stage.innerHTML = "";
+
+  const nextBtn = document.querySelector("#btn-next-conversation");
+  const nextBtnText = nextBtn ? nextBtn.querySelector('a-text') : null;
+  
+  // Referencias a los personajes y etiquetas
+  const juan = document.getElementById('activity-juan');
+  const ajolin = document.getElementById('activity-ajolin');
+  const speakerLabel = document.getElementById('speaker-name');
+
+  // --- LÓGICA DE CONTROL DE FLUJO SECUENCIAL ---
+
+  // 1. Si terminamos los diálogos de la conversación MALA
+  if (currentSimulationPhase === 'bad' && currentMessageIndex >= currentConversation.length) {
+    currentSimulationPhase = 'insight_bad';
+    
+    // Inyectar visualmente el primer Insight en el escenario
+    renderInsightText(stage, currentTechniqueData.bad.insight);
+
+    // CONTROL DE AJOLOTES EN INSIGHT: Lo narra Juanjolote (Coach)
+    if (juan) juan.setAttribute('visible', 'true');
+    if (ajolin) ajolin.setAttribute('visible', 'false');
+    
+    if (speakerLabel) {
+      speakerLabel.setAttribute('value', '(INSIGHT)');
+      speakerLabel.setAttribute('align', 'center');          // 🎯 Centrado
+      speakerLabel.setAttribute('position', '0 -0.25 0.02');  // 🎯 Posición fija abajo
+    }
+
+    // Cambiar el texto del botón Next
+    if (nextBtnText) nextBtnText.setAttribute('value', 'See it done right →');
+    return;
+  }
+
+  // 2. Si el usuario hace click estando en el Insight de la mala -> Pasar a la BUENA
+  if (currentSimulationPhase === 'insight_bad') {
+    currentSimulationPhase = 'good';
+    currentConversation = currentTechniqueData.good.exchanges; // Cargamos la conversación "good"
+    currentMessageIndex = 0;
+    
+    // Restaurar texto del botón original
+    if (nextBtnText) nextBtnText.setAttribute('value', '▶ Next');
+  }
+
+  // 3. Si terminamos los diálogos de la conversación BUENA
+  if (currentSimulationPhase === 'good' && currentMessageIndex >= currentConversation.length) {
+    currentSimulationPhase = 'insight_good';
+
+    // Inyectar visualmente el segundo Insight en el escenario
+    renderInsightText(stage, currentTechniqueData.good.insight);
+
+    // CONTROL DE AJOLOTES EN INSIGHT: Lo narra Juanjolote (Coach)
+    if (juan) juan.setAttribute('visible', 'true');
+    if (ajolin) ajolin.setAttribute('visible', 'false');
+    
+    if (speakerLabel) {
+      speakerLabel.setAttribute('value', 'JUANJOLOTE (INSIGHT)');
+      speakerLabel.setAttribute('align', 'center');          // 🎯 Centrado
+      speakerLabel.setAttribute('position', '0 -0.25 0.02');  // 🎯 Posición fija abajo
+    }
+
+    // Desaparecer botón Next e iluminar el botón definitivo "See the moves"
+    if (nextBtn) {
+      nextBtn.setAttribute("visible", false);
+      nextBtn.classList.remove("clickable"); 
+    }
+    
+    const toggleBtn = document.querySelector("#btn-toggle-active-listening");
+    if (toggleBtn) {
+      toggleBtn.setAttribute("visible", true);
+      toggleBtn.classList.add("clickable"); 
+      const toggleText = toggleBtn.querySelector('a-text');
+      if (toggleText) toggleText.setAttribute('value', 'See the moves');
+    }
+
+    // Forzar al raycaster a actualizarse
+    const raycasterEl = document.querySelector('[raycaster]');
+    if (raycasterEl && raycasterEl.components.raycaster) {
+      raycasterEl.components.raycaster.refreshObjects();
+    }
+    return;
+  }
+
+  // --- RENDERIZADO REGULAR DE DIÁLOGOS (Turnos normales) ---
+  const msg = currentConversation[currentMessageIndex];
+
+  let speakerName = "";
+
+  // 🎯 ASIGNACIÓN ESTRICTA BASADA EN EL SPEAKER DEL ARCHIVO PREVIEW.JS
+  if (msg.speaker === "A") {
+    // Turno de Juanjolote (Coach)
+    speakerName = currentTechniqueData.roleA || "Coach";
+
+    if (juan) juan.setAttribute('visible', 'true');
+    if (ajolin) ajolin.setAttribute('visible', 'false');
+  } else {
+    // Turno de Ajolín (Agent)
+    speakerName = "Agent";
+
+    if (juan) juan.setAttribute('visible', 'false');
+    if (ajolin) ajolin.setAttribute('visible', 'true');
+  }
+
+  // 🎯 CONFIGURAMOS EL NOMBRE ABAJO Y AL CENTRO SIEMPRE
+  if (speakerLabel) {
+    speakerLabel.setAttribute('value', speakerName.toUpperCase());
+    speakerLabel.setAttribute('align', 'center');          // 🎯 Asegura que el texto se alinee al centro
+    speakerLabel.setAttribute('position', '0 -0.25 0.02');  // 🎯 Coordenada fija abajo para ambos
+  }
+
+  // Imprimir el diálogo en el panel VR
+  const entity = document.createElement("a-entity");
+  entity.setAttribute("position", "0 0.2 0");
+  entity.setAttribute("text", {
+    value: `${speakerName}: ${msg.text}`,
+    align: "center",
+    width: 3.2,
+    wrapCount: 30
+  });
+
+  stage.appendChild(entity);
+  currentMessageIndex++;
+}
+
+// Función auxiliar para pintar los Insights de manera limpia y uniforme
+function renderInsightText(stage, textContent) {
+  const entity = document.createElement("a-entity");
+  entity.setAttribute("position", "0 0.2 0");
+  entity.setAttribute("text", {
+    value: `INSIGHT:\n${textContent}`,
+    align: "center",
+    width: 3.2,
+    wrapCount: 30,
+    color: "#ffedd5" // Color distinguible y cálido para las reflexiones
+  });
+  stage.appendChild(entity);
+}
+
+function exitPreviewVR() {
+  document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'false');
+  document.querySelector('#screen-technique-list').setAttribute('visible', 'true');
+}
+
+var btnInterventionsBack = document.getElementById('btn-techniques-back');
+if (btnInterventionsBack) {
+  btnInterventionsBack.addEventListener('click', function(e) {
+    e.stopPropagation();
+    goWelcome();
+  });
+}
+
+var btnPracticeAgain = document.getElementById('btn-practice-again');
+if (btnPracticeAgain) {
+  btnPracticeAgain.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (typeof go14button === 'function') {
+      go14button();
+    }
+  });
+}
+
+var btnNextConversation = document.getElementById("btn-next-conversation");
+
+if(btnNextConversation){
+    btnNextConversation.addEventListener("click", function(e){
+        e.stopPropagation();
+        showNextConversation();
+    });
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  var micBtn=document.getElementById('mic-btn');
+  if(micBtn)micBtn.addEventListener('click',function(){
+    if(appState.screen==='practice'){
+      if(!isRecording&&!isProcessing)startRecording();
+      else if(isRecording)stopRecording();
+    }
+  });
+
+  function finalizarActividadOS() {
+    // console.log("🏁 Procesando finalización de actividad...");
+
+    cambiarPantallaVR(''); 
+
+    if (appState.evaluacionHabilitada === true) {
+      // console.log("¡Viene de una práctica activa! Mostrando panel de evaluación estándar.");
+      
+      appState.evaluacionHabilitada = false; 
+
+      if (typeof cambiarPantallaVR === 'function') {
+        cambiarPantallaVR('screen-eval');
+      } else {
+        showScreen('eval');
+      }
+    } else {
+      // console.log("No es una práctica (Learn/Work o flujo alterno). Saltando evaluación e yendo a screen-welcome.");
+      cambiarPantallaVR('screen-welcome');
+    }
+  }
+
+
+
+
+  var btnInt=document.getElementById('btn-interventions');
+
+  if(btnInt)btnInt.addEventListener('click',function(e){
+
+    e.stopPropagation();
+// console.log("dio click al btnInt");
+showScreen('technique-list');
+
+  });
+
+  var btnTech=document.getElementById('btn-techniques');
+
+if(btnTech)
+  btnTech.addEventListener('click',function(e){
+
+    e.stopPropagation();
+
+    showScreen('technique-list');
+
+  });
+  var btnAL=document.getElementById('btn-active-listening');
+
+if(btnAL)
+  btnAL.addEventListener('click',function(e){
+
+    e.stopPropagation();
+
+    appState.selectedTechnique='active_listening';
+
+    goMode('techniques');
+
+  });
+  var btnTechBack=document.getElementById('btn-tech-list-back');
+
+if(btnTechBack)
+  btnTechBack.addEventListener('click',function(e){
+
+    e.stopPropagation();
+
+    goWelcome();
+
+  });
+  var btnLearn=document.getElementById('btn-learn');if(btnLearn)btnLearn.addEventListener('click',function(e){e.stopPropagation();goLearn();});
+  var btnWork=document.getElementById('btn-work');if(btnWork)btnWork.addEventListener('click',function(e){e.stopPropagation();goWork();});
+  
+  var btnPractice=document.getElementById('btn-practice');if(btnPractice)btnPractice.addEventListener('click',function(e){e.stopPropagation();goPractice();});
+  
+  var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
+var btnEnd = document.getElementById('btn-end-practice').addEventListener('click', function () {
+    // console.log("🏁 Botón Terminar presionado.");
+
+    var screenPractice = document.getElementById('screen-practice');
+    if (screenPractice) {
+        screenPractice.setAttribute('visible', 'false');
+        screenPractice.setAttribute('scale', '0 0 0');
+    }
+
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+    }
+
+    if (appState.evaluacionHabilitada === true) {
+        // console.log("Mostrando evaluación con IA.");
+        appState.evaluacionHabilitada = false;
+
+        if (typeof goEval === 'function') {
+            goEval();
+        } else {
+            console.warn("⚠️ No existe la función goEval().");
+        }
+    } else {
+        // console.log("Saltando evaluación. Redirigiendo a Welcome.");
+        cambiarPantallaVR('screen-welcome');
+    }
+});
+
+
+
+
+
+var btnNewSession = document.getElementById('btn-new-session');
+if (!btnNewSession) {
+  btnNewSession = document.getElementById('btn-welcome'); 
+}
+
+if (btnNewSession) {
+  btnNewSession.addEventListener('click', function(e) {
+    e.stopPropagation();
+    
+    if (typeof cambiarPantallaVR === 'function') {
+      cambiarPantallaVR('screen-welcome');
+    }
+    
+    if (typeof goWelcome === 'function') goWelcome();
+  });
+}
+
+var btnNewSession = document.getElementById('btn-new-session'); // Asegúrate de que el ID coincida con tu HTML
+if (!btnNewSession) {
+  btnNewSession = document.getElementById('btn-welcome'); 
+}
+
+if (btnNewSession) {
+  btnNewSession.addEventListener('click', function(e) {
+    e.stopPropagation();
+    
+    if (typeof cambiarPantallaVR === 'function') {
+      cambiarPantallaVR('screen-welcome');
+    }
+    
+    if (typeof goWelcome === 'function') goWelcome();
+  });
+}
+  var btnLogout=document.getElementById('btn-logout');
+  if(btnLogout)btnLogout.addEventListener('click',function(){
+    localStorage.removeItem('ldr_session_token');
+    localStorage.removeItem('ldr_refresh_token');
+    window.location.href='login-vr.html';
+  });
+  document.querySelector('a-scene').addEventListener('loaded',function(){
+    setupControllers();
+    setupMic().then(function(){
+      var gameId=localStorage.getItem('ldr_game_id')||'';
+      var name=gameId.split('.')[1]||'Manager';
+      var greet='Bienvenido'+(name?' '+name:'')+'. Soy Juanjolote. Elige un camino: Intervenciones para practicar conversaciones de retencion, o Tecnicas para desarrollar habilidades especificas.';
+      setTimeout(function(){setJuanMood('happy');speakVR(greet,'daniel');},800);
+    });
+    var stars=document.getElementById('stars-1');
+    if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
+  });
+});
+
+    document.querySelector('a-scene').addEventListener('loaded', () => {
+       console.log("🚀 Sistema de rastreo de clics activado.");
+      const botones = document.querySelectorAll('.clickable');
+      botones.forEach(boton => {
+        boton.addEventListener('click', (evento) => {
+          // console.log(`🎯 ¡Click detectado! Le...`);
+        });
+      });
+    });
+  
 </script>
 </body>
 </html>
