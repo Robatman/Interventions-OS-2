@@ -2190,14 +2190,18 @@ function selectAndPreviewVR(techniqueId) {
   document.querySelector('#btn-toggle-active-listening')
     .setAttribute('visible', false);
 
-  // Mostrar el botón Next y asegurar que su texto inicial sea el correcto
-  const nextBtn = document.querySelector('#btn-next-conversation');
+// Busca estas líneas en tu código (donde se prepara el botón para iniciar):
+const nextBtn = document.querySelector('#btn-next-conversation');
+if (nextBtn) {
   nextBtn.setAttribute('visible', true);
+  nextBtn.classList.add('clickable'); // 🌟 Le devolvemos la clase para que el raycaster lo detecte de nuevo
+  
   const nextBtnText = nextBtn.querySelector('a-text');
   if (nextBtnText) nextBtnText.setAttribute('value', '▶ Next');
+}
 
-  // Mostrar el primer mensaje
-  showNextConversation();
+// Mostrar el primer mensaje
+showNextConversation();
 }
 
 
@@ -2283,13 +2287,23 @@ function showNextConversation() {
     renderInsightText(stage, currentTechniqueData.good.insight);
 
     // Desaparecer botón Next e iluminar el botón definitivo "See the moves"
-    if (nextBtn) nextBtn.setAttribute("visible", false);
+    if (nextBtn) {
+      nextBtn.setAttribute("visible", false);
+      nextBtn.classList.remove("clickable"); // ❌ Quitamos la clase para que el raycaster lo ignore
+    }
     
     const toggleBtn = document.querySelector("#btn-toggle-active-listening");
     if (toggleBtn) {
       toggleBtn.setAttribute("visible", true);
+      toggleBtn.classList.add("clickable"); // 🌟 Aseguramos que el nuevo botón sí sea interactivo
       const toggleText = toggleBtn.querySelector('a-text');
       if (toggleText) toggleText.setAttribute('value', 'See the moves');
+    }
+
+    // 🔄 Forzar al raycaster de la escena a actualizarse inmediatamente
+    const raycasterEl = document.querySelector('[raycaster]');
+    if (raycasterEl && raycasterEl.components.raycaster) {
+      raycasterEl.components.raycaster.refreshObjects();
     }
     return;
   }
@@ -2320,6 +2334,8 @@ function showNextConversation() {
   stage.appendChild(entity);
   currentMessageIndex++;
 }
+
+
 
 // Función auxiliar para pintar los Insights de manera limpia y uniforme
 function renderInsightText(stage, textContent) {
