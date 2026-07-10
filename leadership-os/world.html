@@ -380,6 +380,24 @@ function funcionIntervTenureRenewal() {
     <a-text value="INTERVENCIONES" align="center" color="#00e5c0" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
     <a-text value="| Interview Anchoring" align="center" color="#c8d8ff" width="2" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
   </a-plane>
+  
+
+<!-- BOTÓN: REGRESAR A ACTIVIDAD (DIFERENCIADO EN COLOR VERDE NEÓN DE LA ACADEMIA) -->
+  <a-entity id="btn-resume-activity" position="0 0.12 -2.25" visible="false" scale="0 0 0">
+    <a-plane class="clickable" 
+             handler-botones-vr="mensaje: Reanudando última actividad guardada; tecnica: resume-last-activity"
+             width="1.4" height="0.24" 
+             color="#0d2a20" 
+             material="opacity:0.93;shader:flat;side:double"
+             animation__hover="property:position;to:0 0.04 0;startEvents:mouseenter;dur:180" 
+             animation__unhover="property:position;to:0 0 0;startEvents:mouseleave;dur:180">
+      
+      <a-plane width="1.44" height="0.28" color="#00e5c0" material="opacity:0.45;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="REGRESAR A ACTIVIDAD" align="center" color="#00e5c0" width="2.6" position="0 0.01 0.01" font="mozillavr"></a-text>
+    </a-plane>
+  </a-entity>
+
+  
 </a-entity>
 
 
@@ -1009,7 +1027,14 @@ function funcionIntervTenureRenewal() {
       <a-text id="eval-mood" value="--%"  position="1.1 0.65 0.01" align="right" color="#00e5c0" width="2" font="mozillavr"></a-text>
       <a-plane width="2.4" height="0.004" color="#2a3a7a" material="shader:flat" position="0 0.48 0.01"></a-plane>
       <a-text id="eval-feedback" value="Analizando conversacion..." position="0 0.1 0.01" align="center" color="#e8eeff" width="4.8" wrap-count="50" font="mozillavr"></a-text>
-      <a-plane id="btn-new-session" width="1.1" height="0.22" color="#0d2060" material="opacity:0.9;shader:flat;side:double" position="-0.65 -0.88 0.01" class="clickable">
+      <!-- <a-plane id="btn-new-session" width="1.1" height="0.22" color="#0d2060" material="opacity:0.9;shader:flat;side:double" position="-0.65 -0.88 0.01" class="clickable">
+        <a-plane width="1.12" height="0.24" color="#4466ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="Nueva sesion" color="#4466ff" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane> -->
+
+      <a-plane id="btn-new-session" 
+               handler-botones-vr="mensaje: Regresando al inicio y activando reanudación; tecnica: go-welcome-reset"
+               width="1.1" height="0.22" color="#0d2060" material="opacity:0.9;shader:flat;side:double" position="-0.65 -0.88 0.01" class="clickable">
         <a-plane width="1.12" height="0.24" color="#4466ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text value="Nueva sesion" color="#4466ff" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
       </a-plane>
@@ -1321,7 +1346,24 @@ function funcionIntervTenureRenewal() {
 const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
 const SUPA_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
 
-let appState = {screen:'welcome',activeMenu:null,origenActividad: null,tecnicaSeleccionada: null,currentArchetype:null,currentScenario:null,currentLevel:'novice',agentHistory:[],vrMood:30,boxState:'out',conversationClosed:false,hingesOpened:[]};
+let appState = {
+  screen: 'welcome',
+  activeMenu: null,
+  origenActividad: null,
+  tecnicaSeleccionada: null,
+  currentArchetype: null,
+  currentScenario: null,
+  currentLevel: 'novice',
+  agentHistory: [],
+  vrMood: 30,
+  boxState: 'out',
+  conversationClosed: false,
+  hingesOpened: [],
+  // 🌟 NUEVAS PROPIEDADES DE PERSISTENCIA
+  ultimaTecnicaGuardada: null,
+  ultimoModoGuardado: null
+};
+
 let isRecording=false,isProcessing=false,mediaRecorder=null,audioChunks=[],audioStream=null,audioContext=null,analyser=null,silenceTimer=null;
 const SILENCE_THRESHOLD=38,SILENCE_DURATION=1900;
 
