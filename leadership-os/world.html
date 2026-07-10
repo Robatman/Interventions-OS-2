@@ -210,29 +210,6 @@ function ejecutarFuncionPorTecnica(tecnica) {
       console.log("Aquí 2 pero no creo");
       cambiarPantallaVR('screen-learn-work-practice');
       break;
-
-
-
-      case 'practice-again':
-      if (appState.activeMenu === 'techniques') {
-        // Si viene de Técnicas, ejecuta tu función go14button
-        if (typeof go14button === 'function') {
-          go14button();
-        } else {
-          console.warn("La función go14button no está definida.");
-        }
-      } else if (appState.activeMenu === 'interventions') {
-        // Si viene de Intervenciones, muestra la pantalla de intervenciones
-        if (typeof cambiarPantallaVR === 'function') {
-          cambiarPantallaVR('screen-interventions');
-        } else if (typeof showScreen === 'function') {
-          showScreen('screen-interventions');
-        }
-      } else {
-        // Por si acaso no se ha definido el menú activo, regresar al inicio
-        cambiarPantallaVR('screen-welcome');
-      }
-      break;
     
     
     default: 
@@ -985,16 +962,10 @@ function funcionIntervTenureRenewal() {
         <a-plane width="1.12" height="0.24" color="#4466ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text value="Nueva sesion" color="#4466ff" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
       </a-plane>
-       <a-entity id="btn-practice-again" position="0 1 -2.5">
-  <a-plane class="clickable" 
-           handler-botones-vr="mensaje: Reiniciando práctica actual; tecnica: practice-again"
-           width="1.5" height="0.4" 
-           color="#101830" 
-           material="opacity: 0.9; shader: flat">
-    
-    <a-text value="PRACTICAR DE NUEVO" align="center" color="#00e5c0" width="3" font="mozillavr"></a-text>
-  </a-plane>
-</a-entity>
+       <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
+        <a-plane width="1.12" height="0.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="Practicar de nuevo" color="#00e5c0" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane> 
     </a-entity>
   </a-entity>
 
@@ -2427,15 +2398,25 @@ if (btnInterventionsBack) {
   });
 }
 
-// var btnPracticeAgain = document.getElementById('btn-practice-again');
-// if (btnPracticeAgain) {
-//   btnPracticeAgain.addEventListener('click', function(e) {
-//     e.stopPropagation();
-//     if (typeof go14button === 'function') {
-//       go14button();
-//     }
-//   });
-// }
+var btnPracticeAgain = document.getElementById('btn-practice-again');
+if (btnPracticeAgain) {
+  btnPracticeAgain.addEventListener('click', function(e) {
+    e.stopPropagation();
+
+    // Verificamos en qué menú se encuentra el usuario actualmente
+    if (appState.activeMenu === 'techniques') {
+      if (typeof go14button === 'function') {
+        go14button();
+      }
+    } else if (appState.activeMenu === 'interventions') {
+      if (typeof showScreen === 'function') {
+        showScreen('screen-interventions');
+      } else if (typeof cambiarPantallaVR === 'function') {
+        cambiarPantallaVR('screen-interventions');
+      }
+    }
+  });
+}
 
 var btnNextConversation = document.getElementById("btn-next-conversation");
 
