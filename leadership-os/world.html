@@ -166,23 +166,56 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interv-reclamaciones': funcionIntervReclamaciones(); break;
     case 'interv-tenure-renewal': funcionIntervTenureRenewal(); break;
 
-    case 'learn-intervention': goLearn(); break;
-    case 'work-together-intervention': goWork(); break;
-    
+   case 'learn-intervention': 
+      appState.ultimaActividad = { tipo: 'learn', tecnica: appState.tecnicaSeleccionada };
+      goLearn(); 
+      break;
+
+    case 'work-together-intervention': 
+      appState.ultimaActividad = { tipo: 'work', tecnica: appState.tecnicaSeleccionada };
+      goWork(); 
+      break;
+
+    case 'practice-intervention': 
+      appState.ultimaActividad = { tipo: 'practice', tecnica: appState.tecnicaSeleccionada };
+      cambiarPantallaVR('screen-level-selector'); 
+      break;
+
+
      case 'progress': 
       // console.log("📊 Abriendo historial de progreso..."); 
       goHistory(); 
       break;
 
-    case 'close-history':
-      // console.log("🔄 Regresando a la pantalla de bienvenida...");
+   case 'close-history':
       cambiarPantallaVR('screen-welcome');
+      // Si hay una actividad guardada, muestra el botón en el menú principal
+      if (appState.ultimaActividad) {
+        let btn = document.getElementById('btn-resume-activity');
+        if (btn) { btn.setAttribute('visible', 'true'); btn.setAttribute('scale', '1 1 1'); }
+      }
       break;
 
-      case 'practice-intervention': 
-      // console.log("🎚️ Abriendo selector de niveles para la práctica VR...");
-      cambiarPantallaVR('screen-level-selector'); 
+    case 'back-technicas':
+      cambiarPantallaVR('screen-welcome'); 
+      if (appState.ultimaActividad) {
+        let btn = document.getElementById('btn-resume-activity');
+        if (btn) { 
+          btn.setAttribute('visible', 'true'); 
+          btn.setAttribute('scale', '1 1 1'); 
+        }
+        // Refrescar el raycaster para que detecte el botón de inmediato
+        const raycasterEl = document.querySelector('[raycaster]');
+        if (raycasterEl && raycasterEl.components.raycaster) {
+          raycasterEl.components.raycaster.refreshObjects();
+        }
+      }
       break;
+
+      // case 'practice-intervention': 
+      // // console.log("🎚️ Abriendo selector de niveles para la práctica VR...");
+      // cambiarPantallaVR('screen-level-selector'); 
+      // break;
 
 
       case 'level-novice':
@@ -210,11 +243,24 @@ function ejecutarFuncionPorTecnica(tecnica) {
       console.log("Aquí 2 pero no creo");
       cambiarPantallaVR('screen-learn-work-practice');
       break;
- 
- 
-      case 'back-technicas':
-        cambiarPantallaVR('screen-welcome'); 
+
+
+      case 'resume-last-activity':
+      if (appState.ultimaActividad) {
+        // Recuperamos la técnica/intervención en la que estaba
+        appState.tecnicaSeleccionada = appState.ultimaActividad.tecnica;
+        
+        // Lo redirigimos al modo exacto
+        if (appState.ultimaActividad.tipo === 'learn') goLearn();
+        else if (appState.ultimaActividad.tipo === 'work') goWork();
+        else if (appState.ultimaActividad.tipo === 'practice') cambiarPantallaVR('screen-level-selector');
+      }
       break;
+ 
+ 
+      // case 'back-technicas':
+      //   cambiarPantallaVR('screen-welcome'); 
+      // break;
     
     
     default: 
@@ -440,6 +486,19 @@ function funcionIntervTenureRenewal() {
         <a-text value="SALIR" color="#ff5ca0" align="center" width="2.8" position="0 0 0.01" font="mozillavr"></a-text>
       </a-plane>
     </a-entity>
+
+    <a-entity id="btn-resume-activity" position="0 0.12 -2.25" visible="false" scale="0 0 0">
+  <a-plane class="clickable" 
+           handler-botones-vr="mensaje: Reanudando última actividad guardada; tecnica: resume-last-activity"
+           width="1.4" height="0.24" 
+           color="#0d2a20" 
+           material="opacity:0.93;shader:flat;side:double"
+           animation__hover="property:position;to:0 0.04 0;startEvents:mouseenter;dur:180" 
+           animation__unhover="property:position;to:0 0 0;startEvents:mouseleave;dur:180">
+    <a-plane width="1.44" height="0.28" color="#00e5c0" material="opacity:0.45;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+    <a-text value="REGRESAR A ACTIVIDAD" align="center" color="#00e5c0" width="2.6" position="0 0.01 0.01" font="mozillavr"></a-text>
+  </a-plane>
+</a-entity>
   </a-entity>
 
 
@@ -1216,6 +1275,12 @@ function funcionIntervTenureRenewal() {
         position="0 -1.35 0.02"
         visible="false"
         onclick="toggleListeningMoves()">
+
+        <a-plane id="btn-toggle-active-listening" width="1.4" height="0.3" 
+        color="#ff5ca0" position="0 -1.35 0.02></a-plane>
+
+        <a-plane id="btn-toggle-active-listening" width="1.4" height="0.3" 
+        color="#ff5ca0" position="0 -1.35 0.02"></a-plane>
 
         <a-text
             id="text-btn-toggle-listening"
