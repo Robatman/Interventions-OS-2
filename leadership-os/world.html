@@ -482,6 +482,27 @@ function funcionIntervTenureRenewal() {
       </a-plane>
     </a-entity>
 
+
+        <a-entity id="btn-back-technicas" position="0 0 -2.8">
+      <a-plane class="clickable sub-tecnica" 
+               handler-botones-vr="mensaje: Regresando a la pantalla de bienvenida; tecnica: back-technicas"
+               width="1.0" height="0.32" 
+               color="#111830" 
+               material="opacity: 0.9; shader: flat; transparent: true; side: double"
+               animation__mouseenter="property: position; to: 0 0 0.05; dur: 150; easing: easeOutQuad; startEvents: mouseenter"
+               animation__mouseleave="property: position; to: 0 0 0; dur: 200; easing: easeInQuad; startEvents: mouseleave"
+               animation__colorIn="property: material.color; to: #1c1530; dur: 150; startEvents: mouseenter"
+               animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave"
+               animation__click="property: scale; to: 0.9 0.9 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
+        
+        <!-- Borde trasero brillante -->
+        <a-plane width="1.04" height="0.36" color="#ff5ca0" material="opacity:0.4; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+        
+        <!-- Texto del botón -->
+        <a-text value="◀ BACK" align="center" color="#ff5ca0" width="3" position="0 0.01 0.02" font="mozillavr" shader="msdf"></a-text>
+      </a-plane>
+    </a-entity>
+
   </a-entity>
 </a-entity>
 
