@@ -1642,43 +1642,98 @@ function goMode(menuType){
 
 
 function goLearn() {
-  const tecnicaActual = appState.tecnicaCargada || 'active_listening';
+  appState.agentHistory = [];
   
-  // Diccionario con las introducciones de aprendizaje para cada una de las 14 técnicas
-  const lecciones = {
-    'active_listening': 'Hoy vamos a aprender sobre Active Listening (Escucha Activa): Conéctate plenamente sin planificar tu respuesta.',
-    'powerful_questions': 'Hoy vamos a aprender sobre Powerful Questions: Diseña preguntas abiertas que inviten a la reflexión profunda.',
-    'motivational_interviewing': 'Hoy vamos a aprender sobre Motivational Interviewing: Guía el cambio reforzando la motivación intrínseca.',
-    'nonviolent_communication': 'Hoy vamos a aprender sobre Nonviolent Communication: Expresa observaciones, sentimientos y necesidades sin juzgar.',
-    'radical_candor': 'Hoy vamos a aprender sobre Radical Candor: Desafía directamente mostrando que te importa la persona.',
-    'crucial_conversations': 'Hoy vamos a aprender sobre Crucial Conversations: Mantén la seguridad cuando los ánimos se calientan.',
-    'tactical_empathy': 'Hoy vamos a aprender sobre Tactical Empathy: Escucha y reconoce las emociones del otro para negociar mejor.',
-    'scarf_model': 'Hoy vamos a aprender sobre el SCARF Model: Gestiona las amenazas al estatus, certeza, autonomía, relación y justicia.',
-    'immunity_to_change': 'Hoy vamos a aprender sobre Immunity to Change: Descubre las creencias ocultas que bloquean tu progreso.',
-    'drama_triangle': 'Hoy vamos a aprender sobre el Drama Triangle: Evita caer en los roles de Víctima, Rescatador o Perseguidor.',
-    'grow_model': 'Hoy vamos a aprender sobre el GROW Model: Estructura tu sesión mediante Metas, Realidad, Opciones y Compromiso.',
-    'strengths_based_coaching': 'Hoy vamos a aprender sobre Strengths-Based Coaching: Potencia el desempeño enfocándote en los talentos naturales.',
-    'growth_mindset': 'Hoy vamos a aprender sobre Growth Mindset: Transforma los desafíos y errores en oportunidades de desarrollo.',
-    'solution_focused_coaching': 'Hoy vamos a aprender sobre Solution-Focused Coaching: Dirige la atención hacia los recursos futuros, no los problemas pasados.'
-  };
-
-  // Obtener el mensaje correspondiente
-  const mensajeLeccion = lecciones[tecnicaActual] || `Hoy vamos a aprender sobre una nueva técnica de comunicación empresarial.`;
-  
-  console.log(`📖 [GoLearn] Cargando lección activa: ${tecnicaActual}`);
-  console.log(`💬 Mensaje didáctico: "${mensajeLeccion}"`);
-
-  // Aquí puedes renderizar el texto en tu panel de UI de la actividad VR.
-  // Por ejemplo, si tienes un elemento de texto A-Frame para el título o descripción de la actividad:
-  const txtTituloActividad = document.querySelector('#screen-active-listening-activity a-text');
-  if (txtTituloActividad) {
-    txtTituloActividad.setAttribute('value', mensajeLeccion);
+  const opennessPanel = document.getElementById('openness-panel');
+  if (opennessPanel) {
+    opennessPanel.setAttribute('visible', 'false');
   }
 
-  // Cambiamos a la pantalla del entorno de aprendizaje
-  cambiarPantallaVR('screen-active-listening-activity');
-}
+  console.log("=== ENTRANDO A GOLEARN ===");
+  console.log("appState.tecnicaSeleccionada al entrar a goLearn:", appState.tecnicaSeleccionada);
 
+  var intro = '';
+  
+  // Si vienes desde el menú de intervenciones, mantiene su lógica original
+  if (appState.activeMenu === 'interventions') {
+    intro = 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?';
+  } else {
+    // Mapeo dinámico para las 14 técnicas de comunicación
+    switch(appState.tecnicaSeleccionada) {
+      // --- COLUMNA 1 ---
+      case 'active_listening':
+        console.log("Switch seleccionó: active_listening");
+        intro = 'Muy bien, vamos a aprender y practicar la Escucha Activa. Pon mucha atención a lo que te voy a decir.';
+        break;
+      case 'powerful_questions':
+        console.log("Switch seleccionó: powerful_questions");
+        intro = '¡Excelente elección! Vamos a profundizar en el arte de las Preguntas Poderosas para abrir nuevas perspectivas.';
+        break;
+      case 'motivational_interviewing':
+        console.log("Switch seleccionó: motivational_interviewing");
+        intro = 'Muy bien, exploremos la Entrevista Motivacional para guiar el cambio conectando con la motivación interna.';
+        break;
+      case 'nonviolent_communication':
+        console.log("Switch seleccionó: nonviolent_communication");
+        intro = 'Perfecto, iniciemos con Comunicación No Violenta. Nos enfocaremos en observaciones, sentimientos y necesidades.';
+        break;
+      case 'radical_candor':
+        console.log("Switch seleccionó: radical_candor");
+        intro = '¡Excelente! Vamos a trabajar en Franqueza Radical: desafiar directamente mostrando que realmente te importa.';
+        break;
+      case 'crucial_conversations':
+        console.log("Switch seleccionó: crucial_conversations");
+        intro = 'Muy bien, entremos a Conversaciones Cruciales. Aprendamos a mantener la seguridad cuando los ánimos se calientan.';
+        break;
+
+      // --- COLUMNA 2 ---
+      case 'tactical_empathy':
+        console.log("Switch seleccionó: tactical_empathy");
+        intro = '¡Excelente! Vamos a iniciar con Empatía Táctica. Aprenderemos a reconocer las emociones del otro para negociar mejor.';
+        break;
+      case 'scarf_model':
+        console.log("Switch seleccionó: scarf_model");
+        intro = 'Muy bien, analicemos el Modelo SCARF para entender las amenazas y recompensas sociales en la interacción.';
+        break;
+      case 'immunity_to_change':
+        console.log("Switch seleccionó: immunity_to_change");
+        intro = 'Perfecto, exploremos la Inmunidad al Cambio para descubrir las creencias ocultas que bloquean el progreso.';
+        break;
+      case 'drama_triangle':
+        console.log("Switch seleccionó: drama_triangle");
+        intro = '¡Excelente! Vamos a iniciar con la técnica del Triángulo de Drama. Comencemos a analizar el caso.';
+        break;
+
+      // --- COLUMNA 3 ---
+      case 'grow_model':
+        console.log("Switch seleccionó: grow_model");
+        intro = 'Muy bien, vamos a estructurar objetivos utilizando el Modelo GROW. Definamos metas y opciones claras.';
+        break;
+      case 'strengths_based_coaching':
+        console.log("Switch seleccionó: strengths_based_coaching");
+        intro = '¡Excelente elección! Trabajemos en Coaching Basado en Fortalezas para potenciar el talento natural.';
+        break;
+      case 'growth_mindset':
+        console.log("Switch seleccionó: growth_mindset");
+        intro = 'Perfecto, enfoquémonos en Mentalidad de Crecimiento para transformar los desafíos en oportunidades.';
+        break;
+      case 'solution_focused_coaching':
+        console.log("Switch seleccionó: solution_focused_coaching");
+        intro = 'Muy bien, iniciemos con Coaching Enfocado en Soluciones, dirigiendo la atención hacia los recursos y el futuro.';
+        break;
+
+      default:
+        console.warn("Switch cayó en default con el valor:", appState.tecnicaSeleccionada);
+        intro = 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
+    }
+  }
+    
+  showScreen('practice');
+  setJuanMood('happy');
+  setDialog('JUANJOLOTE', intro);
+  speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
+  appState.agentHistory.push({ role: 'assistant', content: intro });
+}
 
 function goWork() {
   appState.agentHistory = [];
