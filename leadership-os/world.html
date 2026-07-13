@@ -1971,6 +1971,29 @@ function goLearn() {
         intro = 'Muy bien, iniciemos con Coaching Enfocado en Soluciones, dirigiendo la atención hacia los recursos y el futuro.';
         break;
 
+
+        // ✨ ¡AQUÍ DEBES AGREGAR LAS INTERVENCIONES! ✨
+        case 'interv_pulse_check':
+            tituloPantalla = "Pulse Check Intervención";
+            promptEstudio = "Eres un asesor experto. Vamos a simular un Pulse Check con el cliente...";
+            break;
+
+        case 'interv_anchoring':
+            tituloPantalla = "Anchoring Intervención";
+            promptEstudio = "Eres un especialista en retención utilizando la técnica de Anchoring...";
+            break;
+
+        case 'interv_stay_interview':
+            tituloPantalla = "Stay Interview";
+            promptEstudio = "Simulación de una Stay Interview para identificar riesgos de salida...";
+            break;
+
+        case 'interv_tenure_renewal':
+            tituloPantalla = "Tenure Renewal";
+            promptEstudio = "Simulación de renovación de contrato por antigüedad (Tenure Renewal)...";
+            break;
+            
+
       default:
         console.warn("Switch cayó en default con el valor:", appState.tecnicaSeleccionada);
         intro = 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
