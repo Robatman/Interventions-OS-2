@@ -141,9 +141,18 @@ function ejecutarFuncionPorTecnica(tecnica) {
   switch(tecnica) {
     // Dentro del switch donde están tus cases, asegúrate de guardar la técnica en el estado global:
     case 'active-listening': 
-        appState.tecnicaSeleccionada = 'active_listening'; // <- Guardamos en el estado
-        selectAndPreviewVR('active_listening'); 
-        break;
+    appState.tecnicaSeleccionada = 'active_listening';
+    appState.tecnicaCargada = 'active_listening'; // <- AGREGA ESTE RESPALDO INDESTRUCTIBLE
+    selectAndPreviewVR('active_listening'); 
+    break;
+
+    case 'drama-triangle': 
+    appState.tecnicaSeleccionada = 'drama_triangle'; 
+    appState.tecnicaCargada = 'drama_triangle'; // <- AGREGA ESTE RESPALDO INDESTRUCTIBLE
+    selectAndPreviewVR('drama_triangle'); 
+    break;
+
+
     case 'powerful-questions': 
         appState.tecnicaSeleccionada = 'powerful_questions'; 
         selectAndPreviewVR('powerful_questions'); 
@@ -176,10 +185,9 @@ function ejecutarFuncionPorTecnica(tecnica) {
         appState.tecnicaSeleccionada = 'immunity_to_change'; 
         selectAndPreviewVR('immunity_to_change'); 
         break;
-    case 'drama-triangle': 
-        appState.tecnicaSeleccionada = 'drama_triangle'; 
-        selectAndPreviewVR('drama_triangle'); 
-        break;
+
+
+
     case 'grow-model': 
         appState.tecnicaSeleccionada = 'grow_model'; 
         selectAndPreviewVR('grow_model'); 
@@ -210,40 +218,25 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interv-tenure-renewal': funcionIntervTenureRenewal(); break;
 
 case 'learn-intervention': 
-      console.log("=== INICIO CASE LEARN-INTERVENTION ===");
-      
-      // Chequemos qué elementos existen en el HTML real en este segundo
-      const elDrama = document.querySelector('#btn-learn-intervention a-text[value*="Victima"]');
-      const elListening = document.querySelector('#btn-learn-intervention a-text[value*="Escucha"]');
-      
-      console.log("¿Existe texto de Víctima en el DOM?:", !!elDrama, elDrama ? elDrama.getAttribute('value') : '');
-      console.log("¿Existe texto de Escucha en el DOM?:", !!elListening, elListening ? elListening.getAttribute('value') : '');
+      console.log("=== INICIO CASE LEARN-INTERVENTION CORREGIDO ===");
+      console.log("Técnica respaldada originalmente:", appState.tecnicaCargada);
 
-      let tecnicaReal = 'drama_triangle'; 
+      // Usamos la técnica que se presionó en los 14 botones iniciales
+      // Si por alguna razón está vacía, usamos 'drama_triangle' como último recurso
+      let tecnicaReal = appState.tecnicaCargada || 'drama_triangle'; 
 
-      // Intentemos evaluar por contenido del texto
-      if (elDrama) {
-          tecnicaReal = 'drama_triangle';
-      }
-      
-      // Agrega aquí el string exacto que aparece en tu botón de LEARN cuando estás en Escucha Activa
-      // Por ejemplo, si abajo de "LEARN" dice otra cosa, pon una palabra clave de ese texto aquí:
-      if (elListening) {
-          tecnicaReal = 'active_listening';
-      }
+      console.log("Técnica real asignada para goLearn:", tecnicaReal);
 
-      console.log("Técnica real deducida en el Case:", tecnicaReal);
-
+      // Seteamos los estados globales correctamente con el valor real
       appState.tecnicaSeleccionada = tecnicaReal;
       appState.ultimaActividad = { tipo: 'learn', tecnica: tecnicaReal };
       
-      console.log("Valores asignados a appState antes de goLearn:", {
-        tecnicaSeleccionada: appState.tecnicaSeleccionada,
-        ultimaActividad: appState.ultimaActividad
-      });
-
       goLearn(); 
       break;
+
+
+
+
 
     case 'work-together-intervention': 
       appState.ultimaActividad = { tipo: 'work', tecnica: appState.tecnicaSeleccionada };
