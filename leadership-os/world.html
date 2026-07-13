@@ -1542,35 +1542,51 @@ function toggleListeningMoves() {
 
 function pickRandomScenario(archetype, level, tecnica) {
   console.log("--- 🕵️‍♂️ INSIDE pickRandomScenario ---");
-  console.log(`📥 Buscando en arquetipo: ${archetype.name} | Nivel: ${level} | Técnica: ${tecnica}`);
+  console.log("📥 Parámetros recibidos -> Nivel:", level, "| Técnica:", tecnica);
 
-  // 1. Obtener pool del nivel correspondiente ('novice', 'mid', 'adv')
+  // 1. Obtener pool inicial por nivel
   var pool = archetype.briefings[level] || archetype.briefings['novice'] || [];
-  console.log(`📦 Escenarios totales en este nivel:`, pool.length);
+  console.log(`📦 Tamaño del pool inicial para el nivel [${level}]:`, pool.length);
 
-  // 2. Filtrar por técnica si el escenario la tiene asignada
+  // Muestra qué técnicas tienen los escenarios de este arquetipo en la consola
+  if (pool.length > 0) {
+    console.log("📋 Técnicas disponibles en los escenarios de este nivel:");
+    pool.forEach((scen, idx) => {
+      console.log(`   [${idx}] Escenario: "${scen.title || 'Sin Título'}" -> Técnica asignada en objeto:`, scen.tecnica);
+    });
+  }
+
+  // 2. Filtrar por técnica
   if (tecnica) {
+    console.log(`🎯 Intentando filtrar escenarios para la técnica exacta: "${tecnica}"`);
+    
     var poolFiltrado = pool.filter(function(scenario) {
       return scenario.tecnica === tecnica;
     });
     
+    console.log("📊 Tamaño del pool tras aplicar el filtro de técnica:", poolFiltrado.length);
+    
     if (poolFiltrado.length > 0) {
       pool = poolFiltrado;
-      console.log("✅ Filtro aplicado: Se encontró un escenario diseñado para esta técnica.");
+      console.log("✅ Filtro exitoso. Se usará el pool específico de la técnica.");
     } else {
-      console.warn(`⚠️ Nota: El arquetipo no tiene un caso específico para "${tecnica}". Usando el escenario general del nivel.`);
+      console.warn(`⚠️ Ojo: No se encontró ningún escenario con la propiedad tecnica: "${tecnica}" en este arquetipo. Usando el pool general por defecto.`);
     }
+  } else {
+    console.log("ℹ️ No se pasó ninguna técnica a la función. Se elige del pool general de nivel.");
   }
 
-  if (!pool.length) return null;
+  if (!pool.length) {
+    console.error("❌ ERROR: El pool de escenarios está completamente vacío.");
+    return null;
+  }
 
-  // Elegir uno al azar del pool disponible
   var elegido = pool[Math.floor(Math.random() * pool.length)];
-  
-  // Imprimir el texto del briefing para verificarlo en consola
-  console.log("🏆 Escenario seleccionado:", elegido ? elegido.text : "Ninguno");
+  console.log("🏆 Escenario seleccionado:", elegido);
+  console.log("------------------------------------");
   return elegido;
 }
+
 
 
 function pickRandomOpener(archetype,scenario){
@@ -1814,59 +1830,6 @@ function goWork() {
 }
 
 function goPractice(){
-  // --- REPARACIÓN INMEDIATA DE LA TÉCNICA ---
-  // Si se ensució con 'practice-intervention', la rescatamos del objeto guardado en la última actividad
-  if (appState.tecnicaSeleccionada === 'practice-intervention' || !appState.tecnicaSeleccionada) {
-    if (appState.ultimaActividad && appState.ultimaActividad.tecnica) {
-      appState.tecnicaSeleccionada = appState.ultimaActividad.tecnica;
-    }
-  }
-
-  console.log("========================================");
-  console.log("🔍 [DEBUG] ENTRANDO A GOPRACTICE");
-  console.log("📌 Técnica seleccionada (REPARADA):", appState.tecnicaSeleccionada);
-  console.log("📌 Nivel actual asignado:", appState.currentLevel);
-  console.log("========================================");
-
-  appState.agentHistory = [];
-
-  setTimeout(() => {
-    const opennessPanel = document.getElementById('openness-panel');
-    if (opennessPanel) {
-      opennessPanel.setAttribute('visible', 'true');
-      opennessPanel.setAttribute('scale', '1 1 1');
-    }
-  }, 50);
-
-  var arch = pickRandomArchetype();
-  console.log("👤 Arquetipo elegido:", arch ? arch.name : "¡NINGUNO!");
-  
-  // Enviamos los datos correctos
-  var scenario = pickRandomScenario(arch, appState.currentLevel, appState.tecnicaSeleccionada);
-  console.log("🎬 Escenario final devuelto:", scenario);
-
-  appState.currentArchetype = arch;
-  appState.currentScenario = scenario;
-  appState.agentHistory = [];
-  appState.vrMood = (scenario && scenario.startMood) || 30;
-  appState.hingesOpened = [];
-  appState.conversationClosed = false;
-  
-  if(typeof currentArchetype !== 'undefined') currentArchetype = arch;
-  updateAgentAvatar(arch);
-  updateVRMood(appState.vrMood);
-  
-  var opener = pickRandomOpener(arch, scenario);
-
-  appState.agentHistory.push({role:'assistant', content:opener});
-  showScreen('practice');
-  setDialog(arch.name.toUpperCase(), opener);
-  speakVR(opener, getVoice('agent'), function(){ setHUD('ready','Listo para hablar'); });
-}
-
-
-
-
 
   if (!appState.tecnicaSeleccionada || appState.tecnicaSeleccionada.startsWith('level-')) {
     if (appState.ultimaActividad && appState.ultimaActividad.tecnica) {
