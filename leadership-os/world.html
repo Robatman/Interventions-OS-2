@@ -139,7 +139,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
   // cambiarPantallaVR(''); 
 
   switch(tecnica) {
-   case 'active-listening': selectAndPreviewVR('active_listening'); break;
+    case 'active-listening': selectAndPreviewVR('active_listening'); break;
     case 'powerful-questions': selectAndPreviewVR('powerful_questions'); break;
     case 'motivational-interviewing': selectAndPreviewVR('motivational_interviewing'); break;
     case 'nonviolent-communication': selectAndPreviewVR('nonviolent_communication'); break;
@@ -1643,7 +1643,7 @@ function goLearn() {
     opennessPanel.setAttribute('visible', 'false');
   }
 
-  // Recuperamos lo que haya en el estado
+  // 1. Recuperamos el valor inicial
   var tecnica = appState.tecnicaSeleccionada || 
                 (appState.ultimaActividad ? appState.ultimaActividad.tecnica : null);
 
@@ -1652,11 +1652,31 @@ function goLearn() {
   if (appState.activeMenu === 'interventions') {
     intro = 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?';
   } else {
-    // --- SOLUCIÓN: Si la técnica llega como 'learn-intervention', la redirigimos a la técnica que querías (Drama Triangle)
+    
+    // 2. --- DEDUCCIÓN INTELIGENTE ---
+    // Si el botón mandó el genérico 'learn-intervention', miramos qué pantalla o sub-menú está abierto
     if (tecnica === 'learn-intervention') {
-      tecnica = 'drama_triangle'; 
+      // Opción A: Si tu app guarda la técnica en appState.currentSubMenu o similar
+      if (appState.currentSubMenu) {
+        tecnica = appState.currentSubMenu;
+      } 
+      // Opción B: Si no tienes sub-menú guardado, revisamos qué panel visual está visible en tu HTML
+      else {
+        const dramaPanel = document.getElementById('menu-drama-triangle'); // Cambia estos IDs por los reales de tus páneles de técnicas
+        const listeningPanel = document.getElementById('menu-active-listening');
+        
+        if (dramaPanel && dramaPanel.getAttribute('visible') === 'true') {
+          tecnica = 'drama_triangle';
+        } else if (listeningPanel && listeningPanel.getAttribute('visible') === 'true') {
+          tecnica = 'active_listening';
+        } else {
+          // Si no encontramos paneles visibles, intentamos usar una propiedad que seguro cambia al dar click en el menú anterior
+          tecnica = appState.lastViewedTechnique || 'drama_triangle'; 
+        }
+      }
     }
 
+    // 3. El switch ahora recibirá la técnica correcta y no se mezclará
     switch(tecnica) {
       case 'drama_triangle':
       case 'drama-triangle':
