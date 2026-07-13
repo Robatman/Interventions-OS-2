@@ -249,17 +249,32 @@ function ejecutarFuncionPorTecnica(tecnica) {
       goWork(); 
       break;
 
-    case 'practice-intervention': 
-      appState.ultimaActividad = { tipo: 'practice', tecnica: appState.tecnicaSeleccionada };
-      cambiarPantallaVR('screen-level-selector'); 
-      break;
+   case 'practice-intervention': 
+  // Nos aseguramos de que guarde la técnica real en la última actividad antes de cambiar de pantalla
+  appState.ultimaActividad = { tipo: 'practice', tecnica: appState.tecnicaSeleccionada };
+  cambiarPantallaVR('screen-level-selector'); 
+  break;
 
     case 'progress': goHistory(); break;
     case 'close-history': cambiarPantallaVR('screen-welcome'); break;
     case 'back-technicas': cambiarPantallaVR('screen-welcome'); break;
-    case 'level-novice': appState.currentLevel = 'novice'; appState.evaluacionHabilitada = true; goPractice(); break;
-    case 'level-intermediate': appState.currentLevel = 'intermediate'; appState.evaluacionHabilitada = true; goPractice(); break;
-    case 'level-expert': appState.currentLevel = 'expert'; appState.evaluacionHabilitada = true; goPractice(); break;
+    case 'level-novice':        
+  appState.currentLevel = 'novice';       
+  appState.evaluacionHabilitada = true; 
+  goPractice(); 
+  break;
+
+case 'level-intermediate':  
+  appState.currentLevel = 'intermediate'; 
+  appState.evaluacionHabilitada = true; 
+  goPractice(); 
+  break;
+
+case 'level-expert':        
+  appState.currentLevel = 'expert';       
+  appState.evaluacionHabilitada = true; 
+  goPractice(); 
+  break;
     case 'back-to-learn-work': cambiarPantallaVR('screen-learn-work-practice'); break;
 
     case 'resume-last-activity':
@@ -1812,6 +1827,13 @@ function goWork() {
 }
 
 function goPractice(){
+
+  if (!appState.tecnicaSeleccionada || appState.tecnicaSeleccionada.startsWith('level-')) {
+    if (appState.ultimaActividad && appState.ultimaActividad.tecnica) {
+      appState.tecnicaSeleccionada = appState.ultimaActividad.tecnica;
+    }
+  }
+  
   console.log("========================================");
   console.log("🔍 [DEBUG] ENTRANDO A GOPRACTICE");
   console.log("📌 Técnica seleccionada en appState:", appState.tecnicaSeleccionada);
