@@ -1615,24 +1615,55 @@ function goMode(menuType){
   showScreen('mode');
 }
 
-function goLearn() {
-  appState.agentHistory = [];
+// function goLearn() {
+//   appState.agentHistory = [];
   
-  const opennessPanel = document.getElementById('openness-panel');
-  if (opennessPanel) {
-    opennessPanel.setAttribute('visible', 'false');
-  }
+//   const opennessPanel = document.getElementById('openness-panel');
+//   if (opennessPanel) {
+//     opennessPanel.setAttribute('visible', 'false');
+//   }
 
-  var intro = appState.activeMenu === 'interventions' 
-    ? 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?' 
-    : 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
+//   var intro = appState.activeMenu === 'interventions' 
+//     ? 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?' 
+//     : 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
     
-  showScreen('practice');
-  setJuanMood('happy');
-  setDialog('JUANJOLOTE', intro);
-  speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
-  appState.agentHistory.push({ role: 'assistant', content: intro });
+//   showScreen('practice');
+//   setJuanMood('happy');
+//   setDialog('JUANJOLOTE', intro);
+//   speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
+//   appState.agentHistory.push({ role: 'assistant', content: intro });
+// }
+
+
+function goLearn() {
+  // 1. Cambiamos a la pantalla del flujo de aprendizaje
+  cambiarPantallaVR('screen-active-listening-activity'); 
+
+  // 2. Detectamos automáticamente qué técnica está guardada en el estado
+  let tecnica = appState.tecnicaSeleccionada; 
+
+  // 3. En lugar de mandar el texto genérico fijo, usamos un validador
+  if (tecnica === 'drama-triangle') {
+    // Código para inicializar directamente el Drama Triangle
+    document.getElementById('speaker-name').setAttribute('value', 'AJOLIN');
+    
+    // Aquí mandas el texto inicial específico de esa técnica
+    inyectarTextoEnPantalla("¡Excelente elección! Vamos a iniciar con el Drama Triangle (Víctima, Rescatador y Perseguidor). Pon mucha atención...");
+    
+    // Aquí llamas a la función que cargue los diálogos del Drama Triangle
+    // Ejemplo: cargarContenidoDeTecnica('drama-triangle');
+  } 
+  else if (tecnica === 'active-listening') {
+    // Lo mismo para Escucha Activa, etc.
+  } 
+  else {
+    // Tu texto por defecto en caso de que ocurra un error o sea genérica
+    inyectarTextoEnPantalla("Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?");
+  }
 }
+
+
+
 
 function goWork() {
   appState.agentHistory = [];
