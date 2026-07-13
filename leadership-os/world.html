@@ -136,80 +136,99 @@ function cambiarPantallaVR(pantallaMostrarId) {
 function ejecutarFuncionPorTecnica(tecnica) {
   // console.log("⚡ Buscando técnica:", tecnica);
   appState.tecnicaSeleccionada = tecnica;
-  // cambiarPantallaVR(''); 
 
   switch(tecnica) {
-    // Dentro del switch donde están tus cases, asegúrate de guardar la técnica en el estado global:
+    // === COLUMNA 1: VERDE ===
     case 'active-listening': 
-    appState.tecnicaSeleccionada = 'active_listening';
-    appState.tecnicaCargada = 'active_listening'; // <- AGREGA ESTE RESPALDO INDESTRUCTIBLE
-    selectAndPreviewVR('active_listening'); 
-    break;
-
-    case 'drama-triangle': 
-    appState.tecnicaSeleccionada = 'drama_triangle'; 
-    appState.tecnicaCargada = 'drama_triangle'; // <- AGREGA ESTE RESPALDO INDESTRUCTIBLE
-    selectAndPreviewVR('drama_triangle'); 
-    break;
-
+      appState.tecnicaSeleccionada = 'active_listening';
+      appState.tecnicaCargada = 'active_listening'; 
+      selectAndPreviewVR('active_listening'); 
+      break;
 
     case 'powerful-questions': 
-        appState.tecnicaSeleccionada = 'powerful_questions'; 
-        selectAndPreviewVR('powerful_questions'); 
-        break;
+      appState.tecnicaSeleccionada = 'powerful_questions'; 
+      appState.tecnicaCargada = 'powerful_questions';
+      selectAndPreviewVR('powerful_questions'); 
+      break;
+
     case 'motivational-interviewing': 
-        appState.tecnicaSeleccionada = 'motivational_interviewing'; 
-        selectAndPreviewVR('motivational_interviewing'); 
-        break;
+      appState.tecnicaSeleccionada = 'motivational_interviewing'; 
+      appState.tecnicaCargada = 'motivational_interviewing';
+      selectAndPreviewVR('motivational_interviewing'); 
+      break;
+
     case 'nonviolent-communication': 
-        appState.tecnicaSeleccionada = 'nonviolent_communication'; 
-        selectAndPreviewVR('nonviolent_communication'); 
-        break;
+      appState.tecnicaSeleccionada = 'nonviolent_communication'; 
+      appState.tecnicaCargada = 'nonviolent_communication';
+      selectAndPreviewVR('nonviolent_communication'); 
+      break;
+
     case 'radical-candor': 
-        appState.tecnicaSeleccionada = 'radical_candor'; 
-        selectAndPreviewVR('radical_candor'); 
-        break;
+      appState.tecnicaSeleccionada = 'radical_candor'; 
+      appState.tecnicaCargada = 'radical_candor';
+      selectAndPreviewVR('radical_candor'); 
+      break;
+
     case 'crucial-conversations': 
-        appState.tecnicaSeleccionada = 'crucial_conversations'; 
-        selectAndPreviewVR('crucial_conversations'); 
-        break;
+      appState.tecnicaSeleccionada = 'crucial_conversations'; 
+      appState.tecnicaCargada = 'crucial_conversations';
+      selectAndPreviewVR('crucial_conversations'); 
+      break;
+
+    // === COLUMNA 2: MORADA ===
     case 'tactical-empathy': 
-        appState.tecnicaSeleccionada = 'tactical_empathy'; 
-        selectAndPreviewVR('tactical_empathy'); 
-        break;
+      appState.tecnicaSeleccionada = 'tactical_empathy'; 
+      appState.tecnicaCargada = 'tactical_empathy';
+      selectAndPreviewVR('tactical_empathy'); 
+      break;
+
     case 'scarf-model': 
-        appState.tecnicaSeleccionada = 'scarf_model'; 
-        selectAndPreviewVR('scarf_model'); 
-        break;
+      appState.tecnicaSeleccionada = 'scarf_model'; 
+      appState.tecnicaCargada = 'scarf_model';
+      selectAndPreviewVR('scarf_model'); 
+      break;
+
     case 'immunity-to-change': 
-        appState.tecnicaSeleccionada = 'immunity_to_change'; 
-        selectAndPreviewVR('immunity_to_change'); 
-        break;
+      appState.tecnicaSeleccionada = 'immunity_to_change'; 
+      appState.tecnicaCargada = 'immunity_to_change';
+      selectAndPreviewVR('immunity_to_change'); 
+      break;
 
+    case 'drama-triangle': 
+      appState.tecnicaSeleccionada = 'drama_triangle'; 
+      appState.tecnicaCargada = 'drama_triangle'; 
+      selectAndPreviewVR('drama_triangle'); 
+      break;
 
-
+    // === COLUMNA 3: NARANJA ===
     case 'grow-model': 
-        appState.tecnicaSeleccionada = 'grow_model'; 
-        selectAndPreviewVR('grow_model'); 
-        break;
-    case 'strengths-based-coaching': 
-        appState.tecnicaSeleccionada = 'strengths_based_coaching'; 
-        selectAndPreviewVR('strengths_based_coaching'); 
-        break;
-    case 'growth-mindset': 
-        appState.tecnicaSeleccionada = 'growth_mindset'; 
-        selectAndPreviewVR('growth_mindset'); 
-        break;
-    case 'solution-focused-coaching': 
-        appState.tecnicaSeleccionada = 'solution_focused_coaching'; 
-        selectAndPreviewVR('solution_focused_coaching'); 
-        break;
-    
+      appState.tecnicaSeleccionada = 'grow_model'; 
+      appState.tecnicaCargada = 'grow_model';
+      selectAndPreviewVR('grow_model'); 
+      break;
 
+    case 'strengths-based-coaching': 
+      appState.tecnicaSeleccionada = 'strengths_based_coaching'; 
+      appState.tecnicaCargada = 'strengths_based_coaching';
+      selectAndPreviewVR('strengths_based_coaching'); 
+      break;
+
+    case 'growth-mindset': 
+      appState.tecnicaSeleccionada = 'growth_mindset'; 
+      appState.tecnicaCargada = 'growth_mindset';
+      selectAndPreviewVR('growth_mindset'); 
+      break;
+
+    case 'solution-focused-coaching': 
+      appState.tecnicaSeleccionada = 'solution_focused_coaching'; 
+      appState.tecnicaCargada = 'solution_focused_coaching';
+      selectAndPreviewVR('solution_focused_coaching'); 
+      break;
+    
+    // === RESTO DE CASES DE TU SCRIPT ===
     case 'interv-pulse-check': funcionIntervPulseCheck(); break;
     case 'interventions': funcionShowInterventions(); break;
     case 'techniques': funcionShowtechniques(); break;
-
 
     case 'interv-retencion': funcionIntervRetencion(); break;
     case 'interv-fidelizacion': funcionIntervFidelizacion(); break;
@@ -217,26 +236,13 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interv-reclamaciones': funcionIntervReclamaciones(); break;
     case 'interv-tenure-renewal': funcionIntervTenureRenewal(); break;
 
-case 'learn-intervention': 
+    case 'learn-intervention': 
       console.log("=== INICIO CASE LEARN-INTERVENTION CORREGIDO ===");
-      console.log("Técnica respaldada originalmente:", appState.tecnicaCargada);
-
-      // Usamos la técnica que se presionó en los 14 botones iniciales
-      // Si por alguna razón está vacía, usamos 'drama_triangle' como último recurso
-      let tecnicaReal = appState.tecnicaCargada || 'drama_triangle'; 
-
-      console.log("Técnica real asignada para goLearn:", tecnicaReal);
-
-      // Seteamos los estados globales correctamente con el valor real
+      let tecnicaReal = appState.tecnicaCargada || 'active_listening'; 
       appState.tecnicaSeleccionada = tecnicaReal;
       appState.ultimaActividad = { tipo: 'learn', tecnica: tecnicaReal };
-      
       goLearn(); 
       break;
-
-
-
-
 
     case 'work-together-intervention': 
       appState.ultimaActividad = { tipo: 'work', tecnica: appState.tecnicaSeleccionada };
@@ -248,94 +254,27 @@ case 'learn-intervention':
       cambiarPantallaVR('screen-level-selector'); 
       break;
 
+    case 'progress': goHistory(); break;
+    case 'close-history': cambiarPantallaVR('screen-welcome'); break;
+    case 'back-technicas': cambiarPantallaVR('screen-welcome'); break;
+    case 'level-novice': appState.currentLevel = 'novice'; appState.evaluacionHabilitada = true; goPractice(); break;
+    case 'level-intermediate': appState.currentLevel = 'intermediate'; appState.evaluacionHabilitada = true; goPractice(); break;
+    case 'level-expert': appState.currentLevel = 'expert'; appState.evaluacionHabilitada = true; goPractice(); break;
+    case 'back-to-learn-work': cambiarPantallaVR('screen-learn-work-practice'); break;
 
-     case 'progress': 
-      // console.log("📊 Abriendo historial de progreso..."); 
-      goHistory(); 
-      break;
-
-   case 'close-history':
-      cambiarPantallaVR('screen-welcome');
-      // Si hay una actividad guardada, muestra el botón en el menú principal
+    case 'resume-last-activity':
       if (appState.ultimaActividad) {
-        let btn = document.getElementById('btn-resume-activity');
-        if (btn) { btn.setAttribute('visible', 'true'); btn.setAttribute('scale', '1 1 1'); }
-      }
-      break;
-
-    case 'back-technicas':
-      cambiarPantallaVR('screen-welcome'); 
-      if (appState.ultimaActividad) {
-        let btn = document.getElementById('btn-resume-activity');
-        if (btn) { 
-          btn.setAttribute('visible', 'true'); 
-          btn.setAttribute('scale', '1 1 1'); 
-        }
-        // Refrescar el raycaster para que detecte el botón de inmediato
-        const raycasterEl = document.querySelector('[raycaster]');
-        if (raycasterEl && raycasterEl.components.raycaster) {
-          raycasterEl.components.raycaster.refreshObjects();
-        }
-      }
-      break;
-
-      // case 'practice-intervention': 
-      // // console.log("🎚️ Abriendo selector de niveles para la práctica VR...");
-      // cambiarPantallaVR('screen-level-selector'); 
-      // break;
-
-
-      case 'level-novice':
-            appState.currentLevel = 'novice';
-            appState.evaluacionHabilitada = true;
-            // console.log("Dificultad fijada en: Novato. Evaluación Habilitada.");
-            goPractice(); 
-            break;
-
-          case 'level-intermediate':
-            appState.currentLevel = 'intermediate';
-            appState.evaluacionHabilitada = true;
-            // console.log("Dificultad fijada en: Intermedio. Evaluación Habilitada.");
-            goPractice(); 
-            break;
-
-          case 'level-expert':
-            appState.currentLevel = 'expert';
-            appState.evaluacionHabilitada = true;
-            // console.log("Dificultad fijada en: Experto. Evaluación Habilitada.");
-            goPractice(); 
-            break;
-
-    case 'back-to-learn-work':
-      console.log("Aquí 2 pero no creo");
-      cambiarPantallaVR('screen-learn-work-practice');
-      break;
-
-
-      case 'resume-last-activity':
-      if (appState.ultimaActividad) {
-        // Recuperamos la técnica/intervención en la que estaba
         appState.tecnicaSeleccionada = appState.ultimaActividad.tecnica;
-        
-        // Lo redirigimos al modo exacto
         if (appState.ultimaActividad.tipo === 'learn') goLearn();
         else if (appState.ultimaActividad.tipo === 'work') goWork();
         else if (appState.ultimaActividad.tipo === 'practice') cambiarPantallaVR('screen-level-selector');
       }
       break;
  
- 
-      // case 'back-technicas':
-      //   cambiarPantallaVR('screen-welcome'); 
-      // break;
-    
-    
     default: 
-      // console.log("⚡ Ejecutando función genérica de la academia.");
       break;
   }
 }
-
 
 function funcionShowInterventions(){
     // console.log("Cambiando a pantalla de intervenciones");
@@ -1703,43 +1642,42 @@ function goMode(menuType){
 
 
 function goLearn() {
-  appState.agentHistory = [];
+  const tecnicaActual = appState.tecnicaCargada || 'active_listening';
   
-  const opennessPanel = document.getElementById('openness-panel');
-  if (opennessPanel) {
-    opennessPanel.setAttribute('visible', 'false');
+  // Diccionario con las introducciones de aprendizaje para cada una de las 14 técnicas
+  const lecciones = {
+    'active_listening': 'Hoy vamos a aprender sobre Active Listening (Escucha Activa): Conéctate plenamente sin planificar tu respuesta.',
+    'powerful_questions': 'Hoy vamos a aprender sobre Powerful Questions: Diseña preguntas abiertas que inviten a la reflexión profunda.',
+    'motivational_interviewing': 'Hoy vamos a aprender sobre Motivational Interviewing: Guía el cambio reforzando la motivación intrínseca.',
+    'nonviolent_communication': 'Hoy vamos a aprender sobre Nonviolent Communication: Expresa observaciones, sentimientos y necesidades sin juzgar.',
+    'radical_candor': 'Hoy vamos a aprender sobre Radical Candor: Desafía directamente mostrando que te importa la persona.',
+    'crucial_conversations': 'Hoy vamos a aprender sobre Crucial Conversations: Mantén la seguridad cuando los ánimos se calientan.',
+    'tactical_empathy': 'Hoy vamos a aprender sobre Tactical Empathy: Escucha y reconoce las emociones del otro para negociar mejor.',
+    'scarf_model': 'Hoy vamos a aprender sobre el SCARF Model: Gestiona las amenazas al estatus, certeza, autonomía, relación y justicia.',
+    'immunity_to_change': 'Hoy vamos a aprender sobre Immunity to Change: Descubre las creencias ocultas que bloquean tu progreso.',
+    'drama_triangle': 'Hoy vamos a aprender sobre el Drama Triangle: Evita caer en los roles de Víctima, Rescatador o Perseguidor.',
+    'grow_model': 'Hoy vamos a aprender sobre el GROW Model: Estructura tu sesión mediante Metas, Realidad, Opciones y Compromiso.',
+    'strengths_based_coaching': 'Hoy vamos a aprender sobre Strengths-Based Coaching: Potencia el desempeño enfocándote en los talentos naturales.',
+    'growth_mindset': 'Hoy vamos a aprender sobre Growth Mindset: Transforma los desafíos y errores en oportunidades de desarrollo.',
+    'solution_focused_coaching': 'Hoy vamos a aprender sobre Solution-Focused Coaching: Dirige la atención hacia los recursos futuros, no los problemas pasados.'
+  };
+
+  // Obtener el mensaje correspondiente
+  const mensajeLeccion = lecciones[tecnicaActual] || `Hoy vamos a aprender sobre una nueva técnica de comunicación empresarial.`;
+  
+  console.log(`📖 [GoLearn] Cargando lección activa: ${tecnicaActual}`);
+  console.log(`💬 Mensaje didáctico: "${mensajeLeccion}"`);
+
+  // Aquí puedes renderizar el texto en tu panel de UI de la actividad VR.
+  // Por ejemplo, si tienes un elemento de texto A-Frame para el título o descripción de la actividad:
+  const txtTituloActividad = document.querySelector('#screen-active-listening-activity a-text');
+  if (txtTituloActividad) {
+    txtTituloActividad.setAttribute('value', mensajeLeccion);
   }
 
-  console.log("=== ENTRANDO A GOLEARN ===");
-  console.log("appState.tecnicaSeleccionada al entrar a goLearn:", appState.tecnicaSeleccionada);
-
-  var intro = '';
-  
-  if (appState.activeMenu === 'interventions') {
-    intro = 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?';
-  } else {
-    switch(appState.tecnicaSeleccionada) {
-      case 'drama_triangle':
-        console.log("Switch seleccionó: drama_triangle");
-        intro = '¡Excelente! Vamos a iniciar con la técnica del Triángulo de Drama. Comencemos a analizar el caso.';
-        break;
-      case 'active_listening':
-        console.log("Switch seleccionó: active_listening");
-        intro = 'Muy bien, vamos a practicar la Escucha Activa. Pon mucha atención a lo que te voy a decir.';
-        break;
-      default:
-        console.warn("Switch cayó en default con el valor:", appState.tecnicaSeleccionada);
-        intro = 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
-    }
-  }
-    
-  showScreen('practice');
-  setJuanMood('happy');
-  setDialog('JUANJOLOTE', intro);
-  speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
-  appState.agentHistory.push({ role: 'assistant', content: intro });
+  // Cambiamos a la pantalla del entorno de aprendizaje
+  cambiarPantallaVR('screen-active-listening-activity');
 }
-
 
 
 function goWork() {
