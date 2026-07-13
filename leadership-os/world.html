@@ -1643,30 +1643,35 @@ function goLearn() {
     opennessPanel.setAttribute('visible', 'false');
   }
 
-  // --- MODIFICACIÓN AQUÍ: Detectamos la técnica seleccionada ---
+  // 1. CONTROL DE DAÑOS: Vemos en la consola del navegador qué está pasando realmente
+  console.log("DEBUG goLearn - activeMenu:", appState.activeMenu);
+  console.log("DEBUG goLearn - tecnicaSeleccionada:", appState.tecnicaSeleccionada);
+  console.log("DEBUG goLearn - ultimaActividad:", appState.ultimaActividad);
+
+  // 2. RESPALDO: Si 'tecnicaSeleccionada' viene vacía, intentamos recuperarla de 'ultimaActividad'
+  var tecnica = appState.tecnicaSeleccionada || 
+                (appState.ultimaActividad ? appState.ultimaActividad.tecnica : null);
+
   var intro = '';
   
   if (appState.activeMenu === 'interventions') {
     intro = 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?';
   } else {
-    // Si estamos en técnicas de comunicación, evaluamos cuál se seleccionó
-    switch(appState.tecnicaSeleccionada) {
+    // Evaluamos la variable 'tecnica' que ya tiene el respaldo implementado
+    switch(tecnica) {
       case 'drama_triangle':
+      case 'drama-triangle': // Por si acaso está escrito con guion medio
         intro = '¡Excelente! Vamos a iniciar con la técnica del Triángulo de Drama. Comencemos a analizar el caso.';
         break;
       case 'active_listening':
+      case 'active-listening':
         intro = 'Muy bien, vamos a practicar la Escucha Activa. Pon mucha atención a lo que te voy a decir.';
         break;
-      // Puedes agregar más casos aquí abajo si tienes más técnicas:
-      // case 'otra_tecnica':
-      //   intro = 'Bienvenido a la otra técnica...';
-      //   break;
       default:
-        // Por si acaso no se guardó ninguna, dejamos tu pregunta original como respaldo
+        // Si de verdad todo falla y llega vacío, te dirá qué detectó en la consola
         intro = 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
     }
   }
-  // -------------------------------------------------------------
     
   showScreen('practice');
   setJuanMood('happy');
