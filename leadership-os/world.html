@@ -1870,24 +1870,6 @@ function goMode(menuType){
   showScreen('mode');
 }
 
-// function goLearn() {
-//   appState.agentHistory = [];
-  
-//   const opennessPanel = document.getElementById('openness-panel');
-//   if (opennessPanel) {
-//     opennessPanel.setAttribute('visible', 'false');
-//   }
-
-//   var intro = appState.activeMenu === 'interventions' 
-//     ? 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?' 
-//     : 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
-    
-//   showScreen('practice');
-//   setJuanMood('happy');
-//   setDialog('JUANJOLOTE', intro);
-//   speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
-//   appState.agentHistory.push({ role: 'assistant', content: intro });
-// }
 
 
 function goLearn() {
@@ -1903,11 +1885,12 @@ function goLearn() {
 
   var intro = '';
   
-  // Si vienes desde el menú de intervenciones, mantiene su lógica original
-  if (appState.activeMenu === 'interventions') {
+  // ✨ CORRECCIÓN: Si el menú activo es intervenciones pero NO has seleccionado ninguna en específico aún, te da la bienvenida general.
+  // Si ya seleccionaste una (como interv_anchoring), se salta al else para procesar su switch individual.
+  if (appState.activeMenu === 'interventions' && !appState.tecnicaSeleccionada) {
     intro = 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?';
   } else {
-    // Mapeo dinámico para las 14 técnicas de comunicación
+    // Mapeo dinámico para las técnicas e intervenciones
     switch(appState.tecnicaSeleccionada) {
       // --- COLUMNA 1 ---
       case 'active_listening':
@@ -1956,7 +1939,7 @@ function goLearn() {
       // --- COLUMNA 3 ---
       case 'grow_model':
         console.log("Switch seleccionó: grow_model");
-        intro = 'Muy bien, vamos a estructurar objetivos utilizando el Modelo GROW. Definamos metas y opciones claras.';
+        intro = 'Muy bien, vamos a avanzar utilizando el Modelo GROW. Definamos metas y opciones claras.';
         break;
       case 'strengths_based_coaching':
         console.log("Switch seleccionó: strengths_based_coaching");
@@ -1971,28 +1954,26 @@ function goLearn() {
         intro = 'Muy bien, iniciemos con Coaching Enfocado en Soluciones, dirigiendo la atención hacia los recursos y el futuro.';
         break;
 
+      // === 🚀 CASES DE INTERVENCIONES NUEVOS (Adaptados con tu variable 'intro') ===
+      case 'interv_pulse_check':
+        console.log("Switch seleccionó: interv_pulse_check");
+        intro = 'Muy bien, vamos a iniciar la simulación de Pulse Check. Analicemos el estado de retención del usuario.';
+        break;
 
-        // ✨ ¡AQUÍ DEBES AGREGAR LAS INTERVENCIONES! ✨
-        case 'interv_pulse_check':
-            tituloPantalla = "Pulse Check Intervención";
-            promptEstudio = "Eres un asesor experto. Vamos a simular un Pulse Check con el cliente...";
-            break;
+      case 'interv_anchoring':
+        console.log("Switch seleccionó: interv_anchoring");
+        intro = 'Excelente, daremos inicio al entrenamiento de la técnica de Anchoring. Nos enfocaremos en fijar las expectativas de retención.';
+        break;
 
-        case 'interv_anchoring':
-            tituloPantalla = "Anchoring Intervención";
-            promptEstudio = "Eres un especialista en retención utilizando la técnica de Anchoring...";
-            break;
+      case 'interv_stay_interview':
+        console.log("Switch seleccionó: interv_stay_interview");
+        intro = 'Perfecto, iniciaremos con la Stay Interview. Evaluemos los factores clave para prevenir la baja del cliente.';
+        break;
 
-        case 'interv_stay_interview':
-            tituloPantalla = "Stay Interview";
-            promptEstudio = "Simulación de una Stay Interview para identificar riesgos de salida...";
-            break;
-
-        case 'interv_tenure_renewal':
-            tituloPantalla = "Tenure Renewal";
-            promptEstudio = "Simulación de renovación de contrato por antigüedad (Tenure Renewal)...";
-            break;
-            
+      case 'interv_tenure_renewal':
+        console.log("Switch seleccionó: interv_tenure_renewal");
+        intro = 'Muy bien, entremos a Tenure Renewal. Revisemos la estrategia para gestionar las renovaciones por antigüedad de manera efectiva.';
+        break;
 
       default:
         console.warn("Switch cayó en default con el valor:", appState.tecnicaSeleccionada);
@@ -2006,6 +1987,9 @@ function goLearn() {
   speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
   appState.agentHistory.push({ role: 'assistant', content: intro });
 }
+
+
+
 
 function goWork() {
   appState.agentHistory = [];
