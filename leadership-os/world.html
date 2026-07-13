@@ -546,18 +546,27 @@ function regresarAlInicioActivandoReanudacion() {
   // 1. Cambiamos a la pantalla de bienvenida
   cambiarPantallaVR('screen-welcome');
   
-  // 2. Buscamos el componente del botón de reanudación en el DOM
+  // 2. Buscamos el botón de reanudación
   const btnResume = document.getElementById('btn-resume-activity');
   
   if (btnResume && appState.ultimaActividad) {
-    // Lo hacemos visible y escalable en el entorno de A-Frame
-    btnResume.setAttribute('visible', 'true');
-    btnResume.setAttribute('scale', '1 1 1');
+    // Forzamos la visibilidad y la escala directamente en el objeto 3D de A-Frame
+    btnResume.setAttribute('visible', true);
+    btnResume.setAttribute('scale', {x: 1, y: 1, z: 1}); 
     
-    // Nos aseguramos de que el raycaster lo detecte añadiendo la clase interactiva
+    // Buscamos el plano interactivo interno
     const planeClickable = btnResume.querySelector('a-plane');
     if (planeClickable) {
-      planeClickable.classList.add('clickable');
+      // Nos aseguramos de que tenga la clase para que el cursor lo detecte
+      if (!planeClickable.classList.contains('clickable')) {
+        planeClickable.classList.add('clickable');
+      }
+      
+      // TRUCO A-FRAME: Forzamos al componente raycaster a recalcular los objetos interactivos
+      const cursorEl = document.querySelector('[raycaster]') || document.querySelector('[cursor]');
+      if (cursorEl && cursorEl.components.raycaster) {
+        cursorEl.components.raycaster.refreshObjects();
+      }
     }
   }
 }
