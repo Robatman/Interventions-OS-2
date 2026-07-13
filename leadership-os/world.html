@@ -294,8 +294,184 @@ case 'level-expert':
   }
 }
 
+function ejecutarFuncionPorTecnica(tecnica) {
+  // console.log("⚡ Buscando técnica:", tecnica);
+  // appState.tecnicaSeleccionada = tecnica;
+
+  switch(tecnica) {
+    // === COLUMNA 1: VERDE ===
+    case 'active-listening': 
+      appState.tecnicaSeleccionada = 'active_listening';
+      appState.tecnicaCargada = 'active_listening'; 
+      selectAndPreviewVR('active_listening'); 
+      break;
+
+    case 'powerful-questions': 
+      appState.tecnicaSeleccionada = 'powerful_questions'; 
+      appState.tecnicaCargada = 'powerful_questions';
+      selectAndPreviewVR('powerful_questions'); 
+      break;
+
+    case 'motivational-interviewing': 
+      appState.tecnicaSeleccionada = 'motivational_interviewing'; 
+      appState.tecnicaCargada = 'motivational_interviewing';
+      selectAndPreviewVR('motivational_interviewing'); 
+      break;
+
+    case 'nonviolent-communication': 
+      appState.tecnicaSeleccionada = 'nonviolent_communication'; 
+      appState.tecnicaCargada = 'nonviolent_communication';
+      selectAndPreviewVR('nonviolent_communication'); 
+      break;
+
+    case 'radical-candor': 
+      appState.tecnicaSeleccionada = 'radical_candor'; 
+      appState.tecnicaCargada = 'radical_candor';
+      selectAndPreviewVR('radical_candor'); 
+      break;
+
+    case 'crucial-conversations': 
+      appState.tecnicaSeleccionada = 'crucial_conversations'; 
+      appState.tecnicaCargada = 'crucial_conversations';
+      selectAndPreviewVR('crucial_conversations'); 
+      break;
+
+    // === COLUMNA 2: MORADA ===
+    case 'tactical-empathy': 
+      appState.tecnicaSeleccionada = 'tactical_empathy'; 
+      appState.tecnicaCargada = 'tactical_empathy';
+      selectAndPreviewVR('tactical_empathy'); 
+      break;
+
+    case 'scarf-model': 
+      appState.tecnicaSeleccionada = 'scarf_model'; 
+      appState.tecnicaCargada = 'scarf_model';
+      selectAndPreviewVR('scarf_model'); 
+      break;
+
+    case 'immunity-to-change': 
+      appState.tecnicaSeleccionada = 'immunity_to_change'; 
+      appState.tecnicaCargada = 'immunity_to_change';
+      selectAndPreviewVR('immunity_to_change'); 
+      break;
+
+    case 'drama-triangle': 
+      appState.tecnicaSeleccionada = 'drama_triangle'; 
+      appState.tecnicaCargada = 'drama_triangle'; 
+      selectAndPreviewVR('drama_triangle'); 
+      break;
+
+    // === COLUMNA 3: NARANJA ===
+    case 'grow-model': 
+      appState.tecnicaSeleccionada = 'grow_model'; 
+      appState.tecnicaCargada = 'grow_model';
+      selectAndPreviewVR('grow_model'); 
+      break;
+
+    case 'strengths-based-coaching': 
+      appState.tecnicaSeleccionada = 'strengths_based_coaching'; 
+      appState.tecnicaCargada = 'strengths_based_coaching';
+      selectAndPreviewVR('strengths_based_coaching'); 
+      break;
+
+    case 'growth-mindset': 
+      appState.tecnicaSeleccionada = 'growth_mindset'; 
+      appState.tecnicaCargada = 'growth_mindset';
+      selectAndPreviewVR('growth_mindset'); 
+      break;
+
+    case 'solution-focused-coaching': 
+      appState.tecnicaSeleccionada = 'solution_focused_coaching'; 
+      appState.tecnicaCargada = 'solution_focused_coaching';
+      selectAndPreviewVR('solution_focused_coaching'); 
+      break;
+    
+    // === CASES DE INTERVENCIONES ===
+    case 'interv-pulse-check': funcionIntervPulseCheck(); break;
+    case 'interventions': funcionShowInterventions(); break;
+    case 'techniques': funcionShowtechniques(); break;
+
+    case 'interv-retencion': funcionIntervRetencion(); break;
+    case 'interv-fidelizacion': funcionIntervFidelizacion(); break;
+    case 'interv-soporte-critico': funcionIntervSoporteCritico(); break;
+    case 'interv-reclamaciones': funcionIntervReclamaciones(); break;
+    case 'interv-tenure-renewal': funcionIntervTenureRenewal(); break;
+
+    case 'learn-intervention': 
+      console.log("=== INICIO CASE LEARN-INTERVENTION CORREGIDO ===");
+      let tecnicaReal = appState.tecnicaCargada || 'active_listening'; 
+      appState.tecnicaSeleccionada = tecnicaReal;
+      appState.ultimaActividad = { tipo: 'learn', tecnica: tecnicaReal };
+      
+      // ✨ Mapeamos el ID técnico a un nombre legible y amigable para el HUD/IA
+      let nombresIntervenciones = {
+        'interv_pulse_check': 'Pulse Check',
+        'interv_anchoring': 'Anchoring',
+        'interv_stay_interview': 'Stay Interview',
+        'interv_tenure_renewal': 'Tenure Renewal'
+      };
+      
+      let nombreBonito = nombresIntervenciones[tecnicaReal] || tecnicaReal.replace(/_/g, ' ');
+      
+      // 💬 Si tienes un elemento HUD de texto para la IA o el usuario, lo actualizamos aquí.
+      // Por ejemplo, modificando el contenedor de voz o la etiqueta antes de entrar al flujo de aprendizaje:
+      const voiceLabel = document.getElementById('voice-label');
+      if (voiceLabel) {
+        voiceLabel.innerText = `Vamos a practicar la simulación de: ${nombreBonito}`;
+      }
+      
+      goLearn(); 
+      break;
+
+    case 'work-together-intervention': 
+      appState.ultimaActividad = { tipo: 'work', tecnica: appState.tecnicaSeleccionada };
+      goWork(); 
+      break;
+
+    case 'practice-intervention': 
+      appState.ultimaActividad = { tipo: 'practice', tecnica: appState.tecnicaSeleccionada };
+      cambiarPantallaVR('screen-level-selector'); 
+      break;
+
+    case 'progress': goHistory(); break;
+    case 'close-history': cambiarPantallaVR('screen-welcome'); break;
+    case 'back-technicas': cambiarPantallaVR('screen-welcome'); break;
+ 
+    case 'level-novice':
+      appState.currentLevel = 'novice';       
+      appState.evaluacionHabilitada = true; 
+      goPractice(); 
+      break;
+
+    case 'level-intermediate':  
+      appState.currentLevel = 'mid'; 
+      appState.evaluacionHabilitada = true; 
+      goPractice(); 
+      break;
+
+    case 'level-expert':        
+      appState.currentLevel = 'adv'; 
+      appState.evaluacionHabilitada = true; 
+      goPractice(); 
+      break;
+
+    case 'back-to-learn-work': cambiarPantallaVR('screen-learn-work-practice'); break;
+
+    case 'resume-last-activity':
+      if (appState.ultimaActividad) {
+        appState.tecnicaSeleccionada = appState.ultimaActividad.tecnica;
+        if (appState.ultimaActividad.tipo === 'learn') goLearn();
+        else if (appState.ultimaActividad.tipo === 'work') goWork();
+        else if (appState.ultimaActividad.tipo === 'practice') cambiarPantallaVR('screen-level-selector');
+      }
+      break;
+ 
+    default: 
+      break;
+  }
+}
+
 function funcionShowInterventions(){
-    // console.log("Cambiando a pantalla de intervenciones");
     appState.activeMenu = 'interventions';    
     if(typeof cambiarPantallaVR==='function'){
         cambiarPantallaVR('screen-interventions');
@@ -305,14 +481,41 @@ function funcionShowInterventions(){
 }
 
 function funcionShowtechniques(){
-    // console.log("Cambiando a pantalla de tecnicas");
     appState.activeMenu = 'techniques';
     cambiarPantallaVR('screen-technique-list'); 
 }
 
 // ==========================================
-// 🚀 NUEVAS FUNCIONES DE INTERVENCIONES
+// 🚀 FUNCIONES DE INTERVENCIONES ACTUALIZADAS
 // ==========================================
+// Nota: En tu HTML, el botón de "PULSE CHECK" ejecuta la técnica 'interv-retencion',
+// el de "Anchoring" ejecuta 'interv-soporte-critico', el de "Stay Interview" ejecuta 'interv-reclamaciones'
+// y el de "Tenure Renewal" ejecuta 'interv-tenure-renewal'.
+
+function funcionIntervRetencion() {
+  appState.tecnicaSeleccionada = 'interv_pulse_check';
+  appState.tecnicaCargada = 'interv_pulse_check';
+  cambiarPantallaVR('screen-learn-work-practice'); 
+}
+
+function funcionIntervSoporteCritico() {
+  appState.tecnicaSeleccionada = 'interv_anchoring';
+  appState.tecnicaCargada = 'interv_anchoring';
+  cambiarPantallaVR('screen-learn-work-practice'); 
+}
+
+function funcionIntervReclamaciones() {
+  appState.tecnicaSeleccionada = 'interv_stay_interview';
+  appState.tecnicaCargada = 'interv_stay_interview';
+  cambiarPantallaVR('screen-learn-work-practice'); 
+}
+
+function funcionIntervTenureRenewal() {
+  appState.tecnicaSeleccionada = 'interv_tenure_renewal';
+  appState.tecnicaCargada = 'interv_tenure_renewal';
+  cambiarPantallaVR('screen-learn-work-practice'); 
+}
+
 function funcionIntervRetencion() {
   // console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
@@ -320,21 +523,6 @@ function funcionIntervRetencion() {
 
 function funcionIntervFidelizacion() {
   // console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
-  showScreen('learn-work-practice'); // 👈 Cambiado aquí
-}
-
-function funcionIntervSoporteCritico() {
-  // console.log("🚨 [Intervención] Cargando simulación: Soporte Técnico Crítico / Clientes VIP...");
-  showScreen('learn-work-practice'); // 👈 Cambiado aquí
-}
-
-function funcionIntervReclamaciones() {
-  // console.log("🤬 [Intervención] Cargando simulación: Gestión de Reclamaciones y Crisis...");
-  showScreen('learn-work-practice'); // 👈 Cambiado aquí
-}
-
-function funcionIntervTenureRenewal() {
-  console.log("🤬 [Intervención] Cargando simulación:  Tenure Renewal...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
