@@ -1523,26 +1523,53 @@ function toggleListeningMoves() {
 
 
 function pickRandomScenario(archetype, level, tecnica) {
-  // 1. Obtenemos el pool del nivel (o el de respaldo)
+  console.log("--- 🕵️‍♂️ INSIDE pickRandomScenario ---");
+  console.log("📥 Parámetros recibidos -> Nivel:", level, "| Técnica:", tecnica);
+
+  // 1. Obtener pool inicial por nivel
   var pool = archetype.briefings[level] || archetype.briefings['novice'] || [];
-  
-  // 2. Si el usuario seleccionó una técnica, filtramos los escenarios que correspondan a ella
+  console.log(`📦 Tamaño del pool inicial para el nivel [${level}]:`, pool.length);
+
+  // Muestra qué técnicas tienen los escenarios de este arquetipo en la consola
+  if (pool.length > 0) {
+    console.log("📋 Técnicas disponibles en los escenarios de este nivel:");
+    pool.forEach((scen, idx) => {
+      console.log(`   [${idx}] Escenario: "${scen.title || 'Sin Título'}" -> Técnica asignada en objeto:`, scen.tecnica);
+    });
+  }
+
+  // 2. Filtrar por técnica
   if (tecnica) {
+    console.log(`🎯 Intentando filtrar escenarios para la técnica exacta: "${tecnica}"`);
+    
     var poolFiltrado = pool.filter(function(scenario) {
       return scenario.tecnica === tecnica;
     });
     
-    // Si encontramos escenarios para esa técnica, usamos ese pool
+    console.log("📊 Tamaño del pool tras aplicar el filtro de técnica:", poolFiltrado.length);
+    
     if (poolFiltrado.length > 0) {
       pool = poolFiltrado;
+      console.log("✅ Filtro exitoso. Se usará el pool específico de la técnica.");
     } else {
-      console.warn(`No se encontraron escenarios específicos para la técnica "${tecnica}" en el nivel "${level}". Usando pool general.`);
+      console.warn(`⚠️ Ojo: No se encontró ningún escenario con la propiedad tecnica: "${tecnica}" en este arquetipo. Usando el pool general por defecto.`);
     }
+  } else {
+    console.log("ℹ️ No se pasó ninguna técnica a la función. Se elige del pool general de nivel.");
   }
 
-  if (!pool.length) return null;
-  return pool[Math.floor(Math.random() * pool.length)];
+  if (!pool.length) {
+    console.error("❌ ERROR: El pool de escenarios está completamente vacío.");
+    return null;
+  }
+
+  var elegido = pool[Math.floor(Math.random() * pool.length)];
+  console.log("🏆 Escenario seleccionado:", elegido);
+  console.log("------------------------------------");
+  return elegido;
 }
+
+
 
 function pickRandomOpener(archetype,scenario){
   var state=(scenario&&(scenario.carlosState||scenario.agentState))||'guarded-tired';
@@ -1785,6 +1812,13 @@ function goWork() {
 }
 
 function goPractice(){
+  console.log("========================================");
+  console.log("🔍 [DEBUG] ENTRANDO A GOPRACTICE");
+  console.log("📌 Técnica seleccionada en appState:", appState.tecnicaSeleccionada);
+  console.log("📌 Nivel actual en appState:", appState.currentLevel);
+  console.log("📌 Última actividad guardada:", appState.ultimaActividad);
+  console.log("========================================");
+
   appState.agentHistory = [];
 
   setTimeout(() => {
@@ -1793,17 +1827,17 @@ function goPractice(){
       opennessPanel.setAttribute('visible', 'true');
       opennessPanel.setAttribute('scale', '1 1 1');
     } else {
-      console.error("¡El elemento #openness-panel no existe en el DOM en este momento!");
+      console.error("❌ ¡El elemento #openness-panel no existe en el DOM!");
     }
   }, 50);
 
-  // 1. Elegimos el arquetipo
   var arch = pickRandomArchetype();
+  console.log("👤 Arquetipo elegido al azar:", arch ? arch.name : "¡NINGUNO!");
   
-  // 2. MODIFICACIÓN AQUÍ: Le pasamos también la técnica seleccionada a tu buscador de escenarios
-  // De esta forma, el simulador filtrará un escenario que obligue a usar esa herramienta.
+  // Enviamos la técnica como tercer parámetro
   var scenario = pickRandomScenario(arch, appState.currentLevel, appState.tecnicaSeleccionada);
-  
+  console.log("🎬 Escenario final devuelto por pickRandomScenario:", scenario ? scenario.title || "Tiene datos pero no propiedad title" : "❌ ¡NULL/VACÍO!");
+
   appState.currentArchetype = arch;
   appState.currentScenario = scenario;
   appState.agentHistory = [];
@@ -1815,23 +1849,17 @@ function goPractice(){
   updateAgentAvatar(arch);
   updateVRMood(appState.vrMood);
   
-  // 3. Modificación del Opener (Opcional pero recomendado)
-  // Si es modo "practica", quizás el bot deba dar una pequeña instrucción inicial antes del opener del cliente.
   var opener = pickRandomOpener(arch, scenario);
-  
-  // Si quieres que Juanjolote o el sistema te dé una intro contextual de la técnica antes de que hable el cliente:
-  if (appState.ultimaActividad && appState.ultimaActividad.tipo === 'practice') {
-     console.log(`🎯 Iniciando PRÁCTICA real para la técnica: ${appState.tecnicaSeleccionada} en nivel ${appState.currentLevel}`);
-     // Aquí podrías alterar el 'opener' o mandar un log al backend de Groq para que el prompt del sistema 
-     // sepa que se va a evaluar estrictamente el uso de 'appState.tecnicaSeleccionada'.
-  }
+  console.log("💬 Opener generado para el inicio:", opener);
 
   appState.agentHistory.push({role:'assistant', content:opener});
   showScreen('practice');
   setDialog(arch.name.toUpperCase(), opener);
   speakVR(opener, getVoice('agent'), function(){ setHUD('ready','Listo para hablar'); });
+  
+  console.log("🚀 [DEBUG] Fin de goPractice. Transición de pantalla ejecutada.");
+  console.log("========================================");
 }
-
 
   function go14button(){
     showScreen('technique-list');
