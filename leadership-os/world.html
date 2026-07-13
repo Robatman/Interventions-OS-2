@@ -209,8 +209,23 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interv-reclamaciones': funcionIntervReclamaciones(); break;
     case 'interv-tenure-renewal': funcionIntervTenureRenewal(); break;
 
-   case 'learn-intervention': 
-      appState.ultimaActividad = { tipo: 'learn', tecnica: appState.tecnicaSeleccionada };
+  case 'learn-intervention': 
+      let tecnicaReal = 'drama_triangle';
+
+      const btnText = document.querySelector('#btn-learn-intervention a-text[value*="Victima"]');
+      
+      if (btnText) {
+          tecnicaReal = 'drama_triangle';
+      } else {
+          const listeningText = document.querySelector('#btn-learn-intervention a-text[value*="Escucha"]');
+          if (listeningText) {
+              tecnicaReal = 'active_listening';
+          }
+      }
+
+      appState.tecnicaSeleccionada = tecnicaReal;
+      appState.ultimaActividad = { tipo: 'learn', tecnica: tecnicaReal };
+      
       goLearn(); 
       break;
 
@@ -1686,22 +1701,12 @@ function goLearn() {
     opennessPanel.setAttribute('visible', 'false');
   }
 
-  // === RASTREO DE DATOS ===
-  console.log("=== DIAGNÓSTICO GOLEARN ===");
-  console.log("1. activeMenu actual:", appState.activeMenu);
-  console.log("2. tecnicaSeleccionada actual:", appState.tecnicaSeleccionada);
-  if (appState.ultimaActividad) {
-    console.log("3. tecnica en ultimaActividad:", appState.ultimaActividad.tecnica);
-  } else {
-    console.log("3. ultimaActividad no existe");
-  }
-
   var intro = '';
   
   if (appState.activeMenu === 'interventions') {
     intro = 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?';
   } else {
-    // Evaluamos directamente lo que tiene la variable global
+    // Gracias al ajuste en el 'case', aquí ya llegará 'drama_triangle' o la técnica correcta
     switch(appState.tecnicaSeleccionada) {
       case 'drama_triangle':
         intro = '¡Excelente! Vamos a iniciar con la técnica del Triángulo de Drama. Comencemos a analizar el caso.';
@@ -1709,15 +1714,7 @@ function goLearn() {
       case 'active_listening':
         intro = 'Muy bien, vamos a practicar la Escucha Activa. Pon mucha atención a lo que te voy a decir.';
         break;
-      case 'powerful_questions':
-        intro = 'Perfecto, vamos a explorar las Preguntas Poderosas. Comencemos.';
-        break;
-      case 'motivational_interviewing':
-        intro = 'Bienvenido a la Entrevista Motivacional. Iniciemos la práctica.';
-        break;
       default:
-        // Si entra aquí, imprimimos en consola qué valor causó que fallara el switch
-        console.warn("4. El switch cayó en 'default' porque el valor no coincidió. Valor evaluado:", appState.tecnicaSeleccionada);
         intro = 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
     }
   }
@@ -1728,7 +1725,6 @@ function goLearn() {
   speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
   appState.agentHistory.push({ role: 'assistant', content: intro });
 }
-
 
 
 
