@@ -1686,12 +1686,22 @@ function goLearn() {
     opennessPanel.setAttribute('visible', 'false');
   }
 
+  // === RASTREO DE DATOS ===
+  console.log("=== DIAGNÓSTICO GOLEARN ===");
+  console.log("1. activeMenu actual:", appState.activeMenu);
+  console.log("2. tecnicaSeleccionada actual:", appState.tecnicaSeleccionada);
+  if (appState.ultimaActividad) {
+    console.log("3. tecnica en ultimaActividad:", appState.ultimaActividad.tecnica);
+  } else {
+    console.log("3. ultimaActividad no existe");
+  }
+
   var intro = '';
   
   if (appState.activeMenu === 'interventions') {
     intro = 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?';
   } else {
-    // Como ya guardamos el valor real en el Paso 1, este switch funcionará a la perfección
+    // Evaluamos directamente lo que tiene la variable global
     switch(appState.tecnicaSeleccionada) {
       case 'drama_triangle':
         intro = '¡Excelente! Vamos a iniciar con la técnica del Triángulo de Drama. Comencemos a analizar el caso.';
@@ -1705,9 +1715,9 @@ function goLearn() {
       case 'motivational_interviewing':
         intro = 'Bienvenido a la Entrevista Motivacional. Iniciemos la práctica.';
         break;
-      // Puedes ir agregando aquí abajo los intros para los demás cases si quieres personalizarlos
       default:
-        // Respaldo por si el usuario entra directo sin seleccionar
+        // Si entra aquí, imprimimos en consola qué valor causó que fallara el switch
+        console.warn("4. El switch cayó en 'default' porque el valor no coincidió. Valor evaluado:", appState.tecnicaSeleccionada);
         intro = 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
     }
   }
@@ -1718,6 +1728,7 @@ function goLearn() {
   speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
   appState.agentHistory.push({ role: 'assistant', content: intro });
 }
+
 
 
 
