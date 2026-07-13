@@ -139,20 +139,63 @@ function ejecutarFuncionPorTecnica(tecnica) {
   // cambiarPantallaVR(''); 
 
   switch(tecnica) {
-    case 'active-listening': selectAndPreviewVR('active_listening'); break;
-    case 'powerful-questions': selectAndPreviewVR('powerful_questions'); break;
-    case 'motivational-interviewing': selectAndPreviewVR('motivational_interviewing'); break;
-    case 'nonviolent-communication': selectAndPreviewVR('nonviolent_communication'); break;
-    case 'radical-candor': selectAndPreviewVR('radical_candor'); break;
-    case 'crucial-conversations': selectAndPreviewVR('crucial_conversations'); break;
-    case 'tactical-empathy': selectAndPreviewVR('tactical_empathy'); break;
-    case 'scarf-model': selectAndPreviewVR('scarf_model'); break;
-    case 'immunity-to-change': selectAndPreviewVR('immunity_to_change'); break;
-    case 'drama-triangle': selectAndPreviewVR('drama_triangle'); break;
-    case 'grow-model': selectAndPreviewVR('grow_model'); break;
-    case 'strengths-based-coaching': selectAndPreviewVR('strengths_based_coaching'); break;
-    case 'growth-mindset': selectAndPreviewVR('growth_mindset'); break;
-    case 'solution-focused-coaching': selectAndPreviewVR('solution_focused_coaching'); break;
+    // Dentro del switch donde están tus cases, asegúrate de guardar la técnica en el estado global:
+    case 'active-listening': 
+        appState.tecnicaSeleccionada = 'active_listening'; // <- Guardamos en el estado
+        selectAndPreviewVR('active_listening'); 
+        break;
+    case 'powerful-questions': 
+        appState.tecnicaSeleccionada = 'powerful_questions'; 
+        selectAndPreviewVR('powerful_questions'); 
+        break;
+    case 'motivational-interviewing': 
+        appState.tecnicaSeleccionada = 'motivational_interviewing'; 
+        selectAndPreviewVR('motivational_interviewing'); 
+        break;
+    case 'nonviolent-communication': 
+        appState.tecnicaSeleccionada = 'nonviolent_communication'; 
+        selectAndPreviewVR('nonviolent_communication'); 
+        break;
+    case 'radical-candor': 
+        appState.tecnicaSeleccionada = 'radical_candor'; 
+        selectAndPreviewVR('radical_candor'); 
+        break;
+    case 'crucial-conversations': 
+        appState.tecnicaSeleccionada = 'crucial_conversations'; 
+        selectAndPreviewVR('crucial_conversations'); 
+        break;
+    case 'tactical-empathy': 
+        appState.tecnicaSeleccionada = 'tactical_empathy'; 
+        selectAndPreviewVR('tactical_empathy'); 
+        break;
+    case 'scarf-model': 
+        appState.tecnicaSeleccionada = 'scarf_model'; 
+        selectAndPreviewVR('scarf_model'); 
+        break;
+    case 'immunity-to-change': 
+        appState.tecnicaSeleccionada = 'immunity_to_change'; 
+        selectAndPreviewVR('immunity_to_change'); 
+        break;
+    case 'drama-triangle': 
+        appState.tecnicaSeleccionada = 'drama_triangle'; 
+        selectAndPreviewVR('drama_triangle'); 
+        break;
+    case 'grow-model': 
+        appState.tecnicaSeleccionada = 'grow_model'; 
+        selectAndPreviewVR('grow_model'); 
+        break;
+    case 'strengths-based-coaching': 
+        appState.tecnicaSeleccionada = 'strengths_based_coaching'; 
+        selectAndPreviewVR('strengths_based_coaching'); 
+        break;
+    case 'growth-mindset': 
+        appState.tecnicaSeleccionada = 'growth_mindset'; 
+        selectAndPreviewVR('growth_mindset'); 
+        break;
+    case 'solution-focused-coaching': 
+        appState.tecnicaSeleccionada = 'solution_focused_coaching'; 
+        selectAndPreviewVR('solution_focused_coaching'); 
+        break;
     
 
     case 'interv-pulse-check': funcionIntervPulseCheck(); break;
@@ -1643,50 +1686,28 @@ function goLearn() {
     opennessPanel.setAttribute('visible', 'false');
   }
 
-  // 1. Recuperamos el valor inicial
-  var tecnica = appState.tecnicaSeleccionada || 
-                (appState.ultimaActividad ? appState.ultimaActividad.tecnica : null);
-
   var intro = '';
   
   if (appState.activeMenu === 'interventions') {
     intro = 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?';
   } else {
-    
-    // 2. --- DEDUCCIÓN INTELIGENTE ---
-    // Si el botón mandó el genérico 'learn-intervention', miramos qué pantalla o sub-menú está abierto
-    if (tecnica === 'learn-intervention') {
-      // Opción A: Si tu app guarda la técnica en appState.currentSubMenu o similar
-      if (appState.currentSubMenu) {
-        tecnica = appState.currentSubMenu;
-      } 
-      // Opción B: Si no tienes sub-menú guardado, revisamos qué panel visual está visible en tu HTML
-      else {
-        const dramaPanel = document.getElementById('menu-drama-triangle'); // Cambia estos IDs por los reales de tus páneles de técnicas
-        const listeningPanel = document.getElementById('menu-active-listening');
-        
-        if (dramaPanel && dramaPanel.getAttribute('visible') === 'true') {
-          tecnica = 'drama_triangle';
-        } else if (listeningPanel && listeningPanel.getAttribute('visible') === 'true') {
-          tecnica = 'active_listening';
-        } else {
-          // Si no encontramos paneles visibles, intentamos usar una propiedad que seguro cambia al dar click en el menú anterior
-          tecnica = appState.lastViewedTechnique || 'drama_triangle'; 
-        }
-      }
-    }
-
-    // 3. El switch ahora recibirá la técnica correcta y no se mezclará
-    switch(tecnica) {
+    // Como ya guardamos el valor real en el Paso 1, este switch funcionará a la perfección
+    switch(appState.tecnicaSeleccionada) {
       case 'drama_triangle':
-      case 'drama-triangle':
         intro = '¡Excelente! Vamos a iniciar con la técnica del Triángulo de Drama. Comencemos a analizar el caso.';
         break;
       case 'active_listening':
-      case 'active-listening':
         intro = 'Muy bien, vamos a practicar la Escucha Activa. Pon mucha atención a lo que te voy a decir.';
         break;
+      case 'powerful_questions':
+        intro = 'Perfecto, vamos a explorar las Preguntas Poderosas. Comencemos.';
+        break;
+      case 'motivational_interviewing':
+        intro = 'Bienvenido a la Entrevista Motivacional. Iniciemos la práctica.';
+        break;
+      // Puedes ir agregando aquí abajo los intros para los demás cases si quieres personalizarlos
       default:
+        // Respaldo por si el usuario entra directo sin seleccionar
         intro = 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
     }
   }
@@ -1697,6 +1718,8 @@ function goLearn() {
   speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
   appState.agentHistory.push({ role: 'assistant', content: intro });
 }
+
+
 
 function goWork() {
   appState.agentHistory = [];
