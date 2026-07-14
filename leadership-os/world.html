@@ -2878,27 +2878,24 @@ document.addEventListener('DOMContentLoaded',function(){
     }
   });
 
-  function finalizarActividadOS() {
-    // console.log("🏁 Procesando finalización de actividad...");
+ function finalizarActividadOS() {
+  console.log("🏁 [Finalizar Actividad] Procesando cierre de actividad. Estado de evaluacionHabilitada:", appState.evaluacionHabilitada);
 
-    cambiarPantallaVR(''); 
+  if (appState.evaluacionHabilitada === true) {
+    console.log("📊 [Finalizar Actividad] ¡Viene de una práctica activa! Saltando directo a screen-eval.");
+    
+    appState.evaluacionHabilitada = false; 
 
-    if (appState.evaluacionHabilitada === true) {
-      // console.log("¡Viene de una práctica activa! Mostrando panel de evaluación estándar.");
-      
-      appState.evaluacionHabilitada = false; 
-
-      if (typeof cambiarPantallaVR === 'function') {
-        cambiarPantallaVR('screen-eval');
-      } else {
-        showScreen('eval');
-      }
+    if (typeof cambiarPantallaVR === 'function') {
+      cambiarPantallaVR('screen-eval');
     } else {
-      // console.log("No es una práctica (Learn/Work o flujo alterno). Saltando evaluación e yendo a screen-welcome.");
-      cambiarPantallaVR('screen-welcome');
+      showScreen('eval');
     }
+  } else {
+    console.log("🏠 [Finalizar Actividad] No requiere evaluación. Redirigiendo a screen-welcome.");
+    cambiarPantallaVR('screen-welcome');
   }
-
+}
 
 
 
