@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -75,8 +75,6 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 
 function cambiarPantallaVR(pantallaMostrarId) {
-  console.log(`🎬 [Navegación VR] Solicitando cambiar a pantalla: "${pantallaMostrarId}"`);
-
   const pantallas = [
     'screen-welcome', 
     'screen-mode', 
@@ -95,32 +93,33 @@ function cambiarPantallaVR(pantallaMostrarId) {
     const elPantalla = document.getElementById(id);
     if (!elPantalla) return;
 
-    if (id === pantallaMostrarId) {
-      elPantalla.setAttribute('visible', 'true');
-      elPantalla.setAttribute('scale', '1 1 1');
-      console.log(`✅ Pantalla activada: #${id} (visible: true, scale: 1 1 1)`);
-      
-      // 🔍 LOG ULTRA-DIAGNÓSTICO CUANDO ENTRAMOS A EVALUACIÓN
-      if (id === 'screen-eval') {
-        const btnAgain = document.getElementById('btn-practice-again');
-        const padreEval = document.getElementById('screen-eval');
-        console.log("📊 [Diagnóstico Screen Eval] Verificando entorno del botón repetir:");
-        console.log("   -> ¿Padre screen-eval en DOM?:", !!padreEval);
-        console.log("   -> scale del Padre:", padreEval ? padreEval.getAttribute('scale') : 'N/A');
-        console.log("   -> ¿Existe btn-practice-again en DOM?:", !!btnAgain);
-        if (btnAgain) {
-          console.log("   -> Atributo visible del botón:", btnAgain.getAttribute('visible'));
-          console.log("   -> Clases CSS del botón:", btnAgain.classList.toString());
-          console.log("   -> ¿El botón tiene su escala correcta?:", btnAgain.getAttribute('scale') || '1 1 1');
-        }
-      }
+ // Busca esta sección dentro de tu función cambiarPantallaVR(pantallaMostrarId)
+if (id === pantallaMostrarId) {
+  elPantalla.setAttribute('visible', 'true');
+  elPantalla.setAttribute('scale', '1 1 1');
+  
+  // 🔍 LOG DE DIAGNÓSTICO PARA EL BOTÓN DE PRÁCTICA
+  if (id === 'screen-eval') {
+    const btnAgain = document.getElementById('btn-practice-again');
+    console.log("📊 [Diagnóstico Screen Eval] ¿Existe btn-practice-again en DOM?:", !!btnAgain);
+    if (btnAgain) {
+      console.log("   -> Atributo visible:", btnAgain.getAttribute('visible'));
+      console.log("   -> Componentes activos:", Object.keys(btnAgain.components || {}));
+      console.log("   -> Clases CSS:", btnAgain.classList.toString());
+    }
+  }
 
+  // (Aquí continúa tu lógica especial de 'screen-active-listening-activity'...)
+      // 🌟 REGLA ESPECIAL PARA TU BOTÓN Y PERSONAJES:
       if (id === 'screen-active-listening-activity') {
         const btnToggle = document.getElementById('btn-toggle-active-listening');
         if (btnToggle) {
           btnToggle.setAttribute('visible', 'true');
+          // Añadimos la clase a la fuerza cuando la pantalla está activa
           btnToggle.classList.add('clickable'); 
         }
+        
+        // Inicializa el estado para que Juanjolote siempre empiece del lado izquierdo
         if (typeof initActiveListeningConversation === 'function') {
           initActiveListeningConversation();
         }
@@ -129,6 +128,7 @@ function cambiarPantallaVR(pantallaMostrarId) {
       elPantalla.setAttribute('visible', 'false');
       elPantalla.setAttribute('scale', '0 0 0');
       
+      // 🔒 Si nos estamos saliendo de la pantalla o cargando otra, le quitamos la clase clickable
       if (pantallaMostrarId !== 'screen-active-listening-activity') {
         const btnToggle = document.getElementById('btn-toggle-active-listening');
         if (btnToggle) {
@@ -138,13 +138,12 @@ function cambiarPantallaVR(pantallaMostrarId) {
     }
   });
 
+  // Forzamos al raycaster de la escena a recalcular los botones activos inmediatamente
   const raycasterEl = document.querySelector('[raycaster]');
   if (raycasterEl && raycasterEl.components.raycaster) {
     raycasterEl.components.raycaster.refreshObjects();
-    console.log("📡 Raycaster de la escena refrescado.");
   }
 }
-
 
 
 function ejecutarFuncionPorTecnica(tecnica) {
@@ -319,15 +318,13 @@ function ejecutarFuncionPorTecnica(tecnica) {
       }
       break;
 
-    case 'practice-again-flow':
-      console.log("🔄 [Flujo Práctica] Intentando repetir. Estado actual de appState:", JSON.stringify(appState.ultimaActividad));
-      
+      case 'practice-again-flow':
+      console.log("🔄 [Flujo Práctica] Reanudando flujo guardado. Estado actual de appState:", appState);
       if (appState && appState.ultimaActividad) {
-        console.log(`🚀 [Flujo Práctica] Redirigiendo con éxito a Técnica: ${appState.ultimaActividad.tecnica} | Tipo: ${appState.ultimaActividad.tipo}`);
+        console.log(`   -> Redirigiendo a Técnica: ${appState.ultimaActividad.tecnica} | Tipo: ${appState.ultimaActividad.tipo}`);
         
-        // Forzamos al appState a recuperar y amarrar el contexto
+        // Forzamos al appState a mantener la técnica seleccionada por si se limpió
         appState.tecnicaSeleccionada = appState.ultimaActividad.tecnica;
-        appState.tecnicaCargada = appState.ultimaActividad.tecnica;
         
         if (appState.ultimaActividad.tipo === 'learn') {
           goLearn();
@@ -337,13 +334,13 @@ function ejecutarFuncionPorTecnica(tecnica) {
           cambiarPantallaVR('screen-level-selector');
         }
       } else {
-        console.warn("⚠️ [Flujo Práctica] ¡Alerta! appState.ultimaActividad se borró al regresar al inicio. Forzando fallback a active_listening.");
-        // Respaldo de seguridad para que nunca rompa el flujo de tu Interventions OS
+        console.warn("⚠️ [Flujo Práctica] appState.ultimaActividad no está definido. Mandando a active_listening por defecto.");
+        // Respaldo por si el estado se borró al terminar la actividad
         appState.tecnicaSeleccionada = 'active_listening';
-        appState.ultimaActividad = { tipo: 'work', tecnica: 'active_listening' };
-        goWork();
+        goWork(); // O el flujo por defecto que prefieras
       }
       break;
+ 
     default: 
       break;
   }
@@ -2881,46 +2878,28 @@ document.addEventListener('DOMContentLoaded',function(){
     }
   });
 
-function finalizarActividadOS() {
-  console.log("🏁 [Finalizar Actividad] Iniciando cierre... Valor de evaluacionHabilitada:", appState.evaluacionHabilitada);
+  function finalizarActividadOS() {
+    // console.log("🏁 Procesando finalización de actividad...");
 
-  // 🚨 FORZADO MANUAL: Si viene de la intervención, obligamos a que sea true para testear la pantalla de evaluación
-  // Puedes quitar esta línea si después controlas bien el appState, pero déjala ahora para asegurar el tiro.
-  appState.evaluacionHabilitada = true; 
+    cambiarPantallaVR(''); 
 
-  if (appState.evaluacionHabilitada === true) {
-    console.log("📊 [Finalizar Actividad] Cambiando a pantalla de evaluación...");
-    appState.evaluacionHabilitada = false; 
-
-    // 1. Ejecutamos tu función normal de cambio de pantalla
-    if (typeof cambiarPantallaVR === 'function') {
-      cambiarPantallaVR('screen-eval');
-    } else {
-      showScreen('eval');
-    }
-
-    // 2. 🛠️ BYPASS DE EMERGENCIA: Forzamos el encendido en el DOM por si la función falló
-    const elPadre = document.getElementById('screen-eval');
-    if (elPadre) {
-      console.log("🔥 [Bypass] Forzando visibilidad y escala en 'screen-eval'");
-      elPadre.setAttribute('visible', 'true');
-      elPadre.setAttribute('scale', '1 1 1');
+    if (appState.evaluacionHabilitada === true) {
+      // console.log("¡Viene de una práctica activa! Mostrando panel de evaluación estándar.");
       
-      // Si tus botones están dentro de otro contenedor hijo de screen-eval, lo encendemos también
-      const contenedorBotones = elPadre.querySelector('a-entity');
-      if (contenedorBotones) {
-        contenedorBotones.setAttribute('visible', 'true');
-        contenedorBotones.setAttribute('scale', '1 1 1');
+      appState.evaluacionHabilitada = false; 
+
+      if (typeof cambiarPantallaVR === 'function') {
+        cambiarPantallaVR('screen-eval');
+      } else {
+        showScreen('eval');
       }
     } else {
-      console.error("❌ [Error] No se encontró ningún elemento con ID 'screen-eval' en el HTML.");
+      // console.log("No es una práctica (Learn/Work o flujo alterno). Saltando evaluación e yendo a screen-welcome.");
+      cambiarPantallaVR('screen-welcome');
     }
-
-  } else {
-    console.log("🏠 [Finalizar Actividad] Redirigiendo a screen-welcome.");
-    cambiarPantallaVR('screen-welcome');
   }
-}
+
+
 
 
   var btnInt=document.getElementById('btn-interventions');
