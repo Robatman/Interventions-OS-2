@@ -402,50 +402,38 @@ function funcionIntervFidelizacion() {
 }
 
 function regresarAlInicioActivandoReanudacion() {
+  // 1. Cambiamos a la pantalla de bienvenida
   cambiarPantallaVR('screen-welcome');
   
-  // ... lógica del btn-resume-activity ...
+  // 2. Buscamos el botón de reanudación
+  const btnResume = document.getElementById('btn-resume-activity');
+  if (btnResume && appState.ultimaActividad) {
+    btnResume.setAttribute('visible', true);
+    btnResume.setAttribute('scale', {x: 1, y: 1, z: 1}); 
+    
+    const planeClickable = btnResume.querySelector('a-plane');
+    if (planeClickable && !planeClickable.classList.contains('clickable')) {
+      planeClickable.classList.add('clickable');
+    }
+  }
 
-  // MOSTRAR el botón "Practicar de nuevo"
+  // 🌟 3. ACTIVAMOS TU BOTÓN DE PRÁCTICA DE NUEVO
   const btnAgain = document.getElementById('btn-practice-again');
-  if (btnAgain) {
+  if (btnAgain && appState.ultimaActividad) {
+    // Forzamos visibilidad y escala en el espacio 3D de su nuevo padre visible
     btnAgain.setAttribute('visible', true);
     btnAgain.setAttribute('scale', {x: 1, y: 1, z: 1});
     
-    // Le agregamos la clase interactiva para el raycaster en VR
-    const planeAgain = document.getElementById('btn-practice-again-plane') || btnAgain.querySelector('a-plane');
-    if (planeAgain) {
-      planeAgain.classList.add('clickable');
+    const planeAgainClickable = btnAgain.querySelector('a-plane') || btnAgain;
+    if (planeAgainClickable && !planeAgainClickable.classList.contains('clickable')) {
+      planeAgainClickable.classList.add('clickable');
     }
   }
 
-  // Refrescar el Raycaster
+  // TRUCO A-FRAME: Forzamos al componente raycaster a recalcular los objetos interactivos inmediatamente
   const cursorEl = document.querySelector('[raycaster]') || document.querySelector('[cursor]');
   if (cursorEl && cursorEl.components.raycaster) {
     cursorEl.components.raycaster.refreshObjects();
-  }
-}
-
-// Dentro de tu lógica cuando se inicia un flujo nuevo o se repite:
-function ocultarBotonesDeRetorno() {
-  const btnAgain = document.getElementById('btn-practice-again');
-  if (btnAgain) {
-    btnAgain.setAttribute('visible', false);
-    btnAgain.setAttribute('scale', {x: 0, y: 0, z: 0});
-    
-    const planeAgain = document.getElementById('btn-practice-again-plane') || btnAgain.querySelector('a-plane');
-    if (planeAgain) {
-      planeAgain.classList.remove('clickable'); // Deja de ser interactivo
-    }
-  }
-  
-  // (Opcional) Haz lo mismo para el botón de reanudar si también quieres limpiarlo
-  const btnResume = document.getElementById('btn-resume-activity');
-  if (btnResume) {
-    btnResume.setAttribute('visible', false);
-    btnResume.setAttribute('scale', {x: 0, y: 0, z: 0});
-    const planeResume = btnResume.querySelector('a-plane');
-    if (planeResume) { planeResume.classList.remove('clickable'); }
   }
 }
 </script>
@@ -577,18 +565,12 @@ function ocultarBotonesDeRetorno() {
   </a-plane>
 </a-entity>
 
-        <!-- BOTÓN: PRACTICAR DE NUEVO (Oculto e inactivo al arrancar) -->
-<a-entity id="btn-practice-again" position="0 -0.25 -2.25" visible="false" scale="0 0 0">
-  <!-- Quitamos "clickable" temporalmente del HTML inicial -->
-  <a-plane id="btn-practice-again-plane"
-           handler-botones-vr="mensaje: Repitiendo último flujo completado; tecnica: practice-again-flow"
-           width="1.6" height="0.3" 
-           color="#0d2a20" 
-           material="opacity:0.9; shader:flat; side:double">
-    <a-plane width="1.64" height="0.34" color="#00e5c0" material="opacity:0.4; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
-    <a-text value="PRACTICAR DE NUEVO" color="#00e5c0" align="center" width="3.5" position="0 0.01 0.01" font="mozillavr"></a-text>
-  </a-plane>
-</a-entity>
+         <a-plane id="btn-practice-again" 
+         handler-botones-vr="mensaje: Repitiendo último flujo completado; tecnica: practice-again-flow"
+         width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
+        <a-plane width="1.12" height="0.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="Practicar de nuevo" color="#00e5c0" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
 
 
 
