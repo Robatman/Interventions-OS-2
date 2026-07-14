@@ -75,6 +75,8 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 
 function cambiarPantallaVR(pantallaMostrarId) {
+  console.log(`🎬 [Navegación VR] Solicitando cambiar a pantalla: "${pantallaMostrarId}"`);
+
   const pantallas = [
     'screen-welcome', 
     'screen-mode', 
@@ -93,33 +95,32 @@ function cambiarPantallaVR(pantallaMostrarId) {
     const elPantalla = document.getElementById(id);
     if (!elPantalla) return;
 
- // Busca esta sección dentro de tu función cambiarPantallaVR(pantallaMostrarId)
-if (id === pantallaMostrarId) {
-  elPantalla.setAttribute('visible', 'true');
-  elPantalla.setAttribute('scale', '1 1 1');
-  
-  // 🔍 LOG DE DIAGNÓSTICO PARA EL BOTÓN DE PRÁCTICA
-  if (id === 'screen-eval') {
-    const btnAgain = document.getElementById('btn-practice-again');
-    console.log("📊 [Diagnóstico Screen Eval] ¿Existe btn-practice-again en DOM?:", !!btnAgain);
-    if (btnAgain) {
-      console.log("   -> Atributo visible:", btnAgain.getAttribute('visible'));
-      console.log("   -> Componentes activos:", Object.keys(btnAgain.components || {}));
-      console.log("   -> Clases CSS:", btnAgain.classList.toString());
-    }
-  }
+    if (id === pantallaMostrarId) {
+      elPantalla.setAttribute('visible', 'true');
+      elPantalla.setAttribute('scale', '1 1 1');
+      console.log(`✅ Pantalla activada: #${id} (visible: true, scale: 1 1 1)`);
+      
+      // 🔍 LOG ULTRA-DIAGNÓSTICO CUANDO ENTRAMOS A EVALUACIÓN
+      if (id === 'screen-eval') {
+        const btnAgain = document.getElementById('btn-practice-again');
+        const padreEval = document.getElementById('screen-eval');
+        console.log("📊 [Diagnóstico Screen Eval] Verificando entorno del botón repetir:");
+        console.log("   -> ¿Padre screen-eval en DOM?:", !!padreEval);
+        console.log("   -> scale del Padre:", padreEval ? padreEval.getAttribute('scale') : 'N/A');
+        console.log("   -> ¿Existe btn-practice-again en DOM?:", !!btnAgain);
+        if (btnAgain) {
+          console.log("   -> Atributo visible del botón:", btnAgain.getAttribute('visible'));
+          console.log("   -> Clases CSS del botón:", btnAgain.classList.toString());
+          console.log("   -> ¿El botón tiene su escala correcta?:", btnAgain.getAttribute('scale') || '1 1 1');
+        }
+      }
 
-  // (Aquí continúa tu lógica especial de 'screen-active-listening-activity'...)
-      // 🌟 REGLA ESPECIAL PARA TU BOTÓN Y PERSONAJES:
       if (id === 'screen-active-listening-activity') {
         const btnToggle = document.getElementById('btn-toggle-active-listening');
         if (btnToggle) {
           btnToggle.setAttribute('visible', 'true');
-          // Añadimos la clase a la fuerza cuando la pantalla está activa
           btnToggle.classList.add('clickable'); 
         }
-        
-        // Inicializa el estado para que Juanjolote siempre empiece del lado izquierdo
         if (typeof initActiveListeningConversation === 'function') {
           initActiveListeningConversation();
         }
@@ -128,7 +129,6 @@ if (id === pantallaMostrarId) {
       elPantalla.setAttribute('visible', 'false');
       elPantalla.setAttribute('scale', '0 0 0');
       
-      // 🔒 Si nos estamos saliendo de la pantalla o cargando otra, le quitamos la clase clickable
       if (pantallaMostrarId !== 'screen-active-listening-activity') {
         const btnToggle = document.getElementById('btn-toggle-active-listening');
         if (btnToggle) {
@@ -138,12 +138,13 @@ if (id === pantallaMostrarId) {
     }
   });
 
-  // Forzamos al raycaster de la escena a recalcular los botones activos inmediatamente
   const raycasterEl = document.querySelector('[raycaster]');
   if (raycasterEl && raycasterEl.components.raycaster) {
     raycasterEl.components.raycaster.refreshObjects();
+    console.log("📡 Raycaster de la escena refrescado.");
   }
 }
+
 
 
 function ejecutarFuncionPorTecnica(tecnica) {
@@ -318,13 +319,15 @@ function ejecutarFuncionPorTecnica(tecnica) {
       }
       break;
 
-      case 'practice-again-flow':
-      console.log("🔄 [Flujo Práctica] Reanudando flujo guardado. Estado actual de appState:", appState);
+    case 'practice-again-flow':
+      console.log("🔄 [Flujo Práctica] Intentando repetir. Estado actual de appState:", JSON.stringify(appState.ultimaActividad));
+      
       if (appState && appState.ultimaActividad) {
-        console.log(`   -> Redirigiendo a Técnica: ${appState.ultimaActividad.tecnica} | Tipo: ${appState.ultimaActividad.tipo}`);
+        console.log(`🚀 [Flujo Práctica] Redirigiendo con éxito a Técnica: ${appState.ultimaActividad.tecnica} | Tipo: ${appState.ultimaActividad.tipo}`);
         
-        // Forzamos al appState a mantener la técnica seleccionada por si se limpió
+        // Forzamos al appState a recuperar y amarrar el contexto
         appState.tecnicaSeleccionada = appState.ultimaActividad.tecnica;
+        appState.tecnicaCargada = appState.ultimaActividad.tecnica;
         
         if (appState.ultimaActividad.tipo === 'learn') {
           goLearn();
@@ -334,13 +337,13 @@ function ejecutarFuncionPorTecnica(tecnica) {
           cambiarPantallaVR('screen-level-selector');
         }
       } else {
-        console.warn("⚠️ [Flujo Práctica] appState.ultimaActividad no está definido. Mandando a active_listening por defecto.");
-        // Respaldo por si el estado se borró al terminar la actividad
+        console.warn("⚠️ [Flujo Práctica] ¡Alerta! appState.ultimaActividad se borró al regresar al inicio. Forzando fallback a active_listening.");
+        // Respaldo de seguridad para que nunca rompa el flujo de tu Interventions OS
         appState.tecnicaSeleccionada = 'active_listening';
-        goWork(); // O el flujo por defecto que prefieras
+        appState.ultimaActividad = { tipo: 'work', tecnica: 'active_listening' };
+        goWork();
       }
       break;
- 
     default: 
       break;
   }
