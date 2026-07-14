@@ -2878,25 +2878,46 @@ document.addEventListener('DOMContentLoaded',function(){
     }
   });
 
- function finalizarActividadOS() {
-  console.log("🏁 [Finalizar Actividad] Procesando cierre de actividad. Estado de evaluacionHabilitada:", appState.evaluacionHabilitada);
+function finalizarActividadOS() {
+  console.log("🏁 [Finalizar Actividad] Iniciando cierre... Valor de evaluacionHabilitada:", appState.evaluacionHabilitada);
+
+  // 🚨 FORZADO MANUAL: Si viene de la intervención, obligamos a que sea true para testear la pantalla de evaluación
+  // Puedes quitar esta línea si después controlas bien el appState, pero déjala ahora para asegurar el tiro.
+  appState.evaluacionHabilitada = true; 
 
   if (appState.evaluacionHabilitada === true) {
-    console.log("📊 [Finalizar Actividad] ¡Viene de una práctica activa! Saltando directo a screen-eval.");
-    
+    console.log("📊 [Finalizar Actividad] Cambiando a pantalla de evaluación...");
     appState.evaluacionHabilitada = false; 
 
+    // 1. Ejecutamos tu función normal de cambio de pantalla
     if (typeof cambiarPantallaVR === 'function') {
       cambiarPantallaVR('screen-eval');
     } else {
       showScreen('eval');
     }
+
+    // 2. 🛠️ BYPASS DE EMERGENCIA: Forzamos el encendido en el DOM por si la función falló
+    const elPadre = document.getElementById('screen-eval');
+    if (elPadre) {
+      console.log("🔥 [Bypass] Forzando visibilidad y escala en 'screen-eval'");
+      elPadre.setAttribute('visible', 'true');
+      elPadre.setAttribute('scale', '1 1 1');
+      
+      // Si tus botones están dentro de otro contenedor hijo de screen-eval, lo encendemos también
+      const contenedorBotones = elPadre.querySelector('a-entity');
+      if (contenedorBotones) {
+        contenedorBotones.setAttribute('visible', 'true');
+        contenedorBotones.setAttribute('scale', '1 1 1');
+      }
+    } else {
+      console.error("❌ [Error] No se encontró ningún elemento con ID 'screen-eval' en el HTML.");
+    }
+
   } else {
-    console.log("🏠 [Finalizar Actividad] No requiere evaluación. Redirigiendo a screen-welcome.");
+    console.log("🏠 [Finalizar Actividad] Redirigiendo a screen-welcome.");
     cambiarPantallaVR('screen-welcome');
   }
 }
-
 
 
   var btnInt=document.getElementById('btn-interventions');
