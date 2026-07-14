@@ -317,6 +317,29 @@ function ejecutarFuncionPorTecnica(tecnica) {
         else if (appState.ultimaActividad.tipo === 'practice') cambiarPantallaVR('screen-level-selector');
       }
       break;
+
+      case 'practice-again-flow':
+      console.log("🔄 [Flujo Práctica] Reanudando flujo guardado. Estado actual de appState:", appState);
+      if (appState && appState.ultimaActividad) {
+        console.log(`   -> Redirigiendo a Técnica: ${appState.ultimaActividad.tecnica} | Tipo: ${appState.ultimaActividad.tipo}`);
+        
+        // Forzamos al appState a mantener la técnica seleccionada por si se limpió
+        appState.tecnicaSeleccionada = appState.ultimaActividad.tecnica;
+        
+        if (appState.ultimaActividad.tipo === 'learn') {
+          goLearn();
+        } else if (appState.ultimaActividad.tipo === 'work') {
+          goWork();
+        } else if (appState.ultimaActividad.tipo === 'practice') {
+          cambiarPantallaVR('screen-level-selector');
+        }
+      } else {
+        console.warn("⚠️ [Flujo Práctica] appState.ultimaActividad no está definido. Mandando a active_listening por defecto.");
+        // Respaldo por si el estado se borró al terminar la actividad
+        appState.tecnicaSeleccionada = 'active_listening';
+        goWork(); // O el flujo por defecto que prefieras
+      }
+      break;
  
     default: 
       break;
@@ -1193,10 +1216,12 @@ function regresarAlInicioActivandoReanudacion() {
       </a-plane>
 
 
-       <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
+       <a-plane id="btn-practice-again" 
+         handler-botones-vr="mensaje: Repitiendo último flujo completado; tecnica: practice-again-flow"
+         width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
         <a-plane width="1.12" height="0.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text value="Practicar de nuevo" color="#00e5c0" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
-      </a-plane> 
+      </a-plane>
     </a-entity>
   </a-entity>
 
