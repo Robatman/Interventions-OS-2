@@ -417,7 +417,7 @@ function regresarAlInicioActivandoReanudacion() {
     }
   }
 
-  // 🌟 3. ACTIVAMOS TU BOTÓN DE PRÁCTICA DE NUEVO
+// 🌟 3. ACTIVAMOS TU BOTÓN DE PRÁCTICA DE NUEVO
   const btnAgain = document.getElementById('btn-practice-again');
   if (btnAgain && appState.ultimaActividad) {
     // Forzamos visibilidad y escala en el espacio 3D de su nuevo padre visible
@@ -565,12 +565,18 @@ function regresarAlInicioActivandoReanudacion() {
   </a-plane>
 </a-entity>
 
-         <a-plane id="btn-practice-again" 
+
+<a-plane id="btn-practice-again" 
          handler-botones-vr="mensaje: Repitiendo último flujo completado; tecnica: practice-again-flow"
-         width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
-        <a-plane width="1.12" height="0.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="Practicar de nuevo" color="#00e5c0" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
-      </a-plane>
+         width="1.1" height="0.22" 
+         color="#0d2a20" 
+         material="opacity:0.9;shader:flat;side:double" 
+         position="0.65 -0.88 0.01" 
+         visible="false" 
+         scale="0 0 0"> <!-- 👈 Lo inicializamos oculto y sin escala -->
+  <a-plane width="1.12" height="0.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+  <a-text value="Practicar de nuevo" color="#00e5c0" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
+</a-plane>
 
 
 
