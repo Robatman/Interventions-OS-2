@@ -3043,6 +3043,33 @@ if (btnNewSession) {
         });
       });
     });
+
+
+    // Inspector en tiempo real para el botón fantasma
+setInterval(() => {
+  const btn = document.getElementById('btn-practice-again');
+  if (!btn) {
+    console.log("🕵️‍♂️ [Rastreador] Alerta: El botón 'btn-practice-again' ni siquiera existe en el HTML en este momento.");
+    return;
+  }
+  
+  // Averiguar si es visible para el motor 3D
+  const visibleAttr = btn.getAttribute('visible');
+  const classList = btn.classList.toString();
+  const tieneComponente = btn.hasAttribute('handler-botones-vr');
+  
+  // Solo interactúa si sus ancestros son visibles
+  let parentVisible = true;
+  let current = btn.parentElement;
+  while (current && current.tagName !== 'A-SCENE') {
+    if (current.getAttribute('visible') === 'false' || current.getAttribute('visible') === false) {
+      parentVisible = false;
+    }
+    current = current.parentElement;
+  }
+
+  console.log(`📡 [Estado Botón Repetir] -> Visible: ${visibleAttr} | ¿Padre visible?: ${parentVisible} | Clases: "${classList}" | ¿Tiene Handler?: ${tieneComponente}`);
+}, 3000); // Revisa cada 3 segundos
   
 </script>
 </body>
