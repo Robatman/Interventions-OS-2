@@ -40,6 +40,8 @@ AFRAME.registerComponent('handler-botones-vr', {
     var data = this.data;
 
     el.addEventListener('click', function (evt) {
+      console.log(`🎯 [VR Click Detectado] ID: ${el.id || el.parentElement.id} | Técnica configurada: ${data.tecnica}`);
+
       // 🔒 Validamos que el botón pertenezca a una jerarquía completamente visible y con escala real
       if (el.object3D) {
         let current = el.object3D;
@@ -47,6 +49,7 @@ AFRAME.registerComponent('handler-botones-vr', {
         
         while (current) {
           if (current.visible === false || current.scale.x === 0) {
+            console.warn(`🚫 [VR Click Bloqueado] El ancestro ${current.el ? current.el.id : 'oculto'} tiene visible:false o scale.x:0`);
             isHierarchyActive = false;
             break;
           }
@@ -64,12 +67,11 @@ AFRAME.registerComponent('handler-botones-vr', {
       }
       evt.stopPropagation(); 
       
-      // console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id ||i8 el.parentElement.id})`);
+      console.log(`🚀 [VR Click Ejecutando] Pasando al switch de técnicas: ${data.tecnica}`);
       ejecutarFuncionPorTecnica(data.tecnica);
     });
   }
 });
-
 
 
 function cambiarPantallaVR(pantallaMostrarId) {
@@ -91,10 +93,23 @@ function cambiarPantallaVR(pantallaMostrarId) {
     const elPantalla = document.getElementById(id);
     if (!elPantalla) return;
 
-    if (id === pantallaMostrarId) {
-      elPantalla.setAttribute('visible', 'true');
-      elPantalla.setAttribute('scale', '1 1 1');
-      
+ // Busca esta sección dentro de tu función cambiarPantallaVR(pantallaMostrarId)
+if (id === pantallaMostrarId) {
+  elPantalla.setAttribute('visible', 'true');
+  elPantalla.setAttribute('scale', '1 1 1');
+  
+  // 🔍 LOG DE DIAGNÓSTICO PARA EL BOTÓN DE PRÁCTICA
+  if (id === 'screen-eval') {
+    const btnAgain = document.getElementById('btn-practice-again');
+    console.log("📊 [Diagnóstico Screen Eval] ¿Existe btn-practice-again en DOM?:", !!btnAgain);
+    if (btnAgain) {
+      console.log("   -> Atributo visible:", btnAgain.getAttribute('visible'));
+      console.log("   -> Componentes activos:", Object.keys(btnAgain.components || {}));
+      console.log("   -> Clases CSS:", btnAgain.classList.toString());
+    }
+  }
+
+  // (Aquí continúa tu lógica especial de 'screen-active-listening-activity'...)
       // 🌟 REGLA ESPECIAL PARA TU BOTÓN Y PERSONAJES:
       if (id === 'screen-active-listening-activity') {
         const btnToggle = document.getElementById('btn-toggle-active-listening');
@@ -130,185 +145,6 @@ function cambiarPantallaVR(pantallaMostrarId) {
   }
 }
 
-
-
-
-function ejecutarFuncionPorTecnica(tecnica) {
-  // console.log("⚡ Buscando técnica:", tecnica);
-  // appState.tecnicaSeleccionada = tecnica;
-
-  switch(tecnica) {
-    // === COLUMNA 1: VERDE ===
-    case 'active-listening': 
-      appState.tecnicaSeleccionada = 'active_listening';
-      appState.tecnicaCargada = 'active_listening'; 
-      selectAndPreviewVR('active_listening'); 
-      break;
-
-    case 'powerful-questions': 
-      appState.tecnicaSeleccionada = 'powerful_questions'; 
-      appState.tecnicaCargada = 'powerful_questions';
-      selectAndPreviewVR('powerful_questions'); 
-      break;
-
-    case 'motivational-interviewing': 
-      appState.tecnicaSeleccionada = 'motivational_interviewing'; 
-      appState.tecnicaCargada = 'motivational_interviewing';
-      selectAndPreviewVR('motivational_interviewing'); 
-      break;
-
-    case 'nonviolent-communication': 
-      appState.tecnicaSeleccionada = 'nonviolent_communication'; 
-      appState.tecnicaCargada = 'nonviolent_communication';
-      selectAndPreviewVR('nonviolent_communication'); 
-      break;
-
-    case 'radical-candor': 
-      appState.tecnicaSeleccionada = 'radical_candor'; 
-      appState.tecnicaCargada = 'radical_candor';
-      selectAndPreviewVR('radical_candor'); 
-      break;
-
-    case 'crucial-conversations': 
-      appState.tecnicaSeleccionada = 'crucial_conversations'; 
-      appState.tecnicaCargada = 'crucial_conversations';
-      selectAndPreviewVR('crucial_conversations'); 
-      break;
-
-    // === COLUMNA 2: MORADA ===
-    case 'tactical-empathy': 
-      appState.tecnicaSeleccionada = 'tactical_empathy'; 
-      appState.tecnicaCargada = 'tactical_empathy';
-      selectAndPreviewVR('tactical_empathy'); 
-      break;
-
-    case 'scarf-model': 
-      appState.tecnicaSeleccionada = 'scarf_model'; 
-      appState.tecnicaCargada = 'scarf_model';
-      selectAndPreviewVR('scarf_model'); 
-      break;
-
-    case 'immunity-to-change': 
-      appState.tecnicaSeleccionada = 'immunity_to_change'; 
-      appState.tecnicaCargada = 'immunity_to_change';
-      selectAndPreviewVR('immunity_to_change'); 
-      break;
-
-    case 'drama-triangle': 
-      appState.tecnicaSeleccionada = 'drama_triangle'; 
-      appState.tecnicaCargada = 'drama_triangle'; 
-      selectAndPreviewVR('drama_triangle'); 
-      break;
-
-    // === COLUMNA 3: NARANJA ===
-    case 'grow-model': 
-      appState.tecnicaSeleccionada = 'grow_model'; 
-      appState.tecnicaCargada = 'grow_model';
-      selectAndPreviewVR('grow_model'); 
-      break;
-
-    case 'strengths-based-coaching': 
-      appState.tecnicaSeleccionada = 'strengths_based_coaching'; 
-      appState.tecnicaCargada = 'strengths_based_coaching';
-      selectAndPreviewVR('strengths_based_coaching'); 
-      break;
-
-    case 'growth-mindset': 
-      appState.tecnicaSeleccionada = 'growth_mindset'; 
-      appState.tecnicaCargada = 'growth_mindset';
-      selectAndPreviewVR('growth_mindset'); 
-      break;
-
-    case 'solution-focused-coaching': 
-      appState.tecnicaSeleccionada = 'solution_focused_coaching'; 
-      appState.tecnicaCargada = 'solution_focused_coaching';
-      selectAndPreviewVR('solution_focused_coaching'); 
-      break;
-    
-    // === RESTO DE CASES DE TU SCRIPT ===
-    case 'interv-pulse-check': funcionIntervPulseCheck(); break;
-    case 'interventions': funcionShowInterventions(); break;
-    case 'techniques': funcionShowtechniques(); break;
-
-    case 'interv-retencion': funcionIntervRetencion(); break;
-    case 'interv-fidelizacion': funcionIntervFidelizacion(); break;
-    case 'interv-soporte-critico': funcionIntervSoporteCritico(); break;
-    case 'interv-reclamaciones': funcionIntervReclamaciones(); break;
-    case 'interv-tenure-renewal': funcionIntervTenureRenewal(); break;
-
-    case 'learn-intervention': 
-      console.log("=== INICIO CASE LEARN-INTERVENTION CORREGIDO ===");
-      let tecnicaReal = appState.tecnicaCargada || 'active_listening'; 
-      appState.tecnicaSeleccionada = tecnicaReal;
-      appState.ultimaActividad = { tipo: 'learn', tecnica: tecnicaReal };
-      goLearn(); 
-      break;
-
-    case 'work-together-intervention': 
-      appState.ultimaActividad = { tipo: 'work', tecnica: appState.tecnicaSeleccionada };
-      goWork(); 
-      break;
-
-      case 'go-welcome-reset':
-      regresarAlInicioActivandoReanudacion();
-      break;
-
-   case 'practice-intervention': 
-  // Nos aseguramos de que guarde la técnica real en la última actividad antes de cambiar de pantalla
-  appState.ultimaActividad = { tipo: 'practice', tecnica: appState.tecnicaSeleccionada };
-  cambiarPantallaVR('screen-level-selector'); 
-  break;
-
-    case 'progress': goHistory(); break;
-    case 'close-history': cambiarPantallaVR('screen-welcome'); break;
-    case 'back-technicas': cambiarPantallaVR('screen-welcome'); break;
- 
-    case 'level-novice':
-  appState.currentLevel = 'novice';       
-  appState.evaluacionHabilitada = true; 
-  goPractice(); 
-  break;
-
-case 'level-intermediate':  
-  appState.currentLevel = 'mid'; // <-- Cambiado de 'intermediate' a 'mid' para que coincida con tus arquetipos
-  appState.evaluacionHabilitada = true; 
-  goPractice(); 
-  break;
-
-case 'level-expert':        
-  appState.currentLevel = 'adv'; // <-- Cambiado de 'expert' a 'adv' para que coincida con tus arquetipos
-  appState.evaluacionHabilitada = true; 
-  goPractice(); 
-  break;
-
-
-    case 'back-to-learn-work': cambiarPantallaVR('screen-learn-work-practice'); break;
-
-  case 'resume-last-activity':
-  if (appState.ultimaActividad) {
-    // 1. Restauramos los datos en el estado global
-    appState.tecnicaSeleccionada = appState.ultimaActividad.tecnica;
-    appState.tecnicaCargada = appState.ultimaActividad.tecnica;
-    
-    // 2. Redirección directa según el modo en el que se quedó
-    if (appState.ultimaActividad.tipo === 'work') {
-      goWork(); // Te manda directo a la actividad Work Together
-    } else if (appState.ultimaActividad.tipo === 'learn') {
-      goLearn(); // Te manda directo a la actividad Learn
-    } else if (appState.ultimaActividad.tipo === 'practice') {
-      cambiarPantallaVR('screen-level-selector');
-    }
-    
-    // 3. Opcional: Ocultamos el botón de reanudación ya que se consumió la acción
-    const btnResume = document.getElementById('btn-resume-activity');
-    if (btnResume) {
-      btnResume.setAttribute('visible', 'false');
-      btnResume.setAttribute('scale', '0 0 0');
-    }
-  }
-  break;
-  }
-}
 
 function ejecutarFuncionPorTecnica(tecnica) {
   // console.log("⚡ Buscando técnica:", tecnica);
@@ -1355,6 +1191,8 @@ function regresarAlInicioActivandoReanudacion() {
         <a-plane width="1.12" height="0.24" color="#4466ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text value="Nueva sesion" color="#4466ff" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
       </a-plane>
+
+
        <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
         <a-plane width="1.12" height="0.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text value="Practicar de nuevo" color="#00e5c0" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
