@@ -100,11 +100,9 @@ function cambiarPantallaVR(pantallaMostrarId) {
         const btnToggle = document.getElementById('btn-toggle-active-listening');
         if (btnToggle) {
           btnToggle.setAttribute('visible', 'true');
-          // Añadimos la clase a la fuerza cuando la pantalla está activa
           btnToggle.classList.add('clickable'); 
         }
         
-        // Inicializa el estado para que Juanjolote siempre empiece del lado izquierdo
         if (typeof initActiveListeningConversation === 'function') {
           initActiveListeningConversation();
         }
@@ -113,7 +111,6 @@ function cambiarPantallaVR(pantallaMostrarId) {
       elPantalla.setAttribute('visible', 'false');
       elPantalla.setAttribute('scale', '0 0 0');
       
-      // 🔒 Si nos estamos saliendo de la pantalla o cargando otra, le quitamos la clase clickable
       if (pantallaMostrarId !== 'screen-active-listening-activity') {
         const btnToggle = document.getElementById('btn-toggle-active-listening');
         if (btnToggle) {
@@ -123,6 +120,22 @@ function cambiarPantallaVR(pantallaMostrarId) {
     }
   });
 
+  // 🔄 CONTROL DINÁMICO DEL BOTÓN DE REPETIR FLUJO ANTERIOR EN EL WELCOME
+  const btnBackPrev = document.getElementById('btn-back-activity-previous');
+  if (btnBackPrev) {
+    if (pantallaMostrarId === 'screen-welcome' && appState.flujoReciente && appState.flujoReciente.activo) {
+      // Habilitamos y mostramos el botón
+      btnBackPrev.setAttribute('visible', 'true');
+      btnBackPrev.setAttribute('scale', '1 1 1');
+      btnBackPrev.classList.add('clickable');
+    } else {
+      // Ocultamos y removemos interacción interactiva para que el raycaster no lo cliquee sin querer
+      btnBackPrev.setAttribute('visible', 'false');
+      btnBackPrev.setAttribute('scale', '0 0 0');
+      btnBackPrev.classList.remove('clickable');
+    }
+  }
+
   // Forzamos al raycaster de la escena a recalcular los botones activos inmediatamente
   const raycasterEl = document.querySelector('[raycaster]');
   if (raycasterEl && raycasterEl.components.raycaster) {
@@ -131,45 +144,81 @@ function cambiarPantallaVR(pantallaMostrarId) {
 }
 
 
-function ejecutarFuncionPorTecnica(tecnica) {
-  // console.log("⚡ Buscando técnica:", tecnica);
-  // appState.tecnicaSeleccionada = tecnica;
 
+
+function ejecutarFuncionPorTecnica(tecnica) {
+  // === INTERCEPTOR PARA GRABAR EL FLUJO EN TIEMPO REAL ===
+  // Si el usuario empieza un nuevo flujo, reseteamos el previo activo hasta que termine
+  if (tecnica === 'active-listening' || tecnica === 'powerful-questions' || 
+      tecnica === 'motivational-interviewing' || tecnica === 'nonviolent-communication' || 
+      tecnica === 'radical-candor' || tecnica === 'crucial-conversations' ||
+      tecnica === 'tactical-empathy' || tecnica === 'scarf-model' || 
+      tecnica === 'immunity-to-change' || tecnica === 'drama-triangle' ||
+      tecnica === 'grow-model' || tecnica === 'strengths-based-coaching' || 
+      tecnica === 'growth-mindset' || tecnica === 'solution-focused-coaching') {
+    
+    appState.flujoReciente.pantallaOrigen = 'screen-technique-list';
+    appState.flujoReciente.activo = false; // Aún no ha terminado la actividad
+  }
+
+  if (tecnica.startsWith('interv-')) {
+    appState.flujoReciente.pantallaOrigen = 'screen-interventions';
+    appState.flujoReciente.activo = false; 
+  }
+
+  // Guardar el modo seleccionado
+  if (tecnica === 'learn-intervention') appState.flujoReciente.modoSeleccionado = 'learn';
+  if (tecnica === 'work-together-intervention') appState.flujoReciente.modoSeleccionado = 'work';
+  if (tecnica === 'practice-intervention') appState.flujoReciente.modoSeleccionado = 'practice';
+
+  // Guardar dificultad
+  if (tecnica === 'level-novice') appState.flujoReciente.nivelSeleccionado = 'novice';
+  if (tecnica === 'level-intermediate') appState.flujoReciente.nivelSeleccionado = 'mid';
+  if (tecnica === 'level-expert') appState.flujoReciente.nivelSeleccionado = 'adv';
+
+
+  // === SWITCH PRINCIPAL DE TU SISTEMA ===
   switch(tecnica) {
     // === COLUMNA 1: VERDE ===
     case 'active-listening': 
       appState.tecnicaSeleccionada = 'active_listening';
       appState.tecnicaCargada = 'active_listening'; 
+      appState.flujoReciente.tecnicaSeleccionada = 'active_listening'; // Registrar
       selectAndPreviewVR('active_listening'); 
       break;
 
     case 'powerful-questions': 
       appState.tecnicaSeleccionada = 'powerful_questions'; 
       appState.tecnicaCargada = 'powerful_questions';
+      appState.flujoReciente.tecnicaSeleccionada = 'powerful_questions'; // Registrar
       selectAndPreviewVR('powerful_questions'); 
       break;
 
     case 'motivational-interviewing': 
       appState.tecnicaSeleccionada = 'motivational_interviewing'; 
       appState.tecnicaCargada = 'motivational_interviewing';
+      appState.flujoReciente.tecnicaSeleccionada = 'motivational_interviewing'; // Registrar
       selectAndPreviewVR('motivational_interviewing'); 
       break;
 
     case 'nonviolent-communication': 
       appState.tecnicaSeleccionada = 'nonviolent_communication'; 
       appState.tecnicaCargada = 'nonviolent_communication';
+      appState.flujoReciente.tecnicaSeleccionada = 'nonviolent_communication'; // Registrar
       selectAndPreviewVR('nonviolent_communication'); 
       break;
 
     case 'radical-candor': 
       appState.tecnicaSeleccionada = 'radical_candor'; 
       appState.tecnicaCargada = 'radical_candor';
+      appState.flujoReciente.tecnicaSeleccionada = 'radical_candor'; // Registrar
       selectAndPreviewVR('radical_candor'); 
       break;
 
     case 'crucial-conversations': 
       appState.tecnicaSeleccionada = 'crucial_conversations'; 
       appState.tecnicaCargada = 'crucial_conversations';
+      appState.flujoReciente.tecnicaSeleccionada = 'crucial_conversations'; // Registrar
       selectAndPreviewVR('crucial_conversations'); 
       break;
 
@@ -177,24 +226,28 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'tactical-empathy': 
       appState.tecnicaSeleccionada = 'tactical_empathy'; 
       appState.tecnicaCargada = 'tactical_empathy';
+      appState.flujoReciente.tecnicaSeleccionada = 'tactical_empathy'; // Registrar
       selectAndPreviewVR('tactical_empathy'); 
       break;
 
     case 'scarf-model': 
       appState.tecnicaSeleccionada = 'scarf_model'; 
       appState.tecnicaCargada = 'scarf_model';
+      appState.flujoReciente.tecnicaSeleccionada = 'scarf_model'; // Registrar
       selectAndPreviewVR('scarf_model'); 
       break;
 
     case 'immunity-to-change': 
       appState.tecnicaSeleccionada = 'immunity_to_change'; 
       appState.tecnicaCargada = 'immunity_to_change';
+      appState.flujoReciente.tecnicaSeleccionada = 'immunity_to_change'; // Registrar
       selectAndPreviewVR('immunity_to_change'); 
       break;
 
     case 'drama-triangle': 
       appState.tecnicaSeleccionada = 'drama_triangle'; 
       appState.tecnicaCargada = 'drama_triangle'; 
+      appState.flujoReciente.tecnicaSeleccionada = 'drama_triangle'; // Registrar
       selectAndPreviewVR('drama_triangle'); 
       break;
 
@@ -202,24 +255,28 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'grow-model': 
       appState.tecnicaSeleccionada = 'grow_model'; 
       appState.tecnicaCargada = 'grow_model';
+      appState.flujoReciente.tecnicaSeleccionada = 'grow_model'; // Registrar
       selectAndPreviewVR('grow_model'); 
       break;
 
     case 'strengths-based-coaching': 
       appState.tecnicaSeleccionada = 'strengths_based_coaching'; 
       appState.tecnicaCargada = 'strengths_based_coaching';
+      appState.flujoReciente.tecnicaSeleccionada = 'strengths_based_coaching'; // Registrar
       selectAndPreviewVR('strengths_based_coaching'); 
       break;
 
     case 'growth-mindset': 
       appState.tecnicaSeleccionada = 'growth_mindset'; 
       appState.tecnicaCargada = 'growth_mindset';
+      appState.flujoReciente.tecnicaSeleccionada = 'growth_mindset'; // Registrar
       selectAndPreviewVR('growth_mindset'); 
       break;
 
     case 'solution-focused-coaching': 
       appState.tecnicaSeleccionada = 'solution_focused_coaching'; 
       appState.tecnicaCargada = 'solution_focused_coaching';
+      appState.flujoReciente.tecnicaSeleccionada = 'solution_focused_coaching'; // Registrar
       selectAndPreviewVR('solution_focused_coaching'); 
       break;
     
@@ -235,12 +292,10 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interv-tenure-renewal': funcionIntervTenureRenewal(); break;
 
     case 'learn-intervention': 
-      console.log("=== INICIO CASE LEARN-INTERVENTION CORREGIDO ===");
       let tecnicaReal = appState.tecnicaCargada || 'active_listening'; 
       appState.tecnicaSeleccionada = tecnicaReal;
       appState.ultimaActividad = { tipo: 'learn', tecnica: tecnicaReal };
       
-      // ✨ Mapeamos el ID técnico a un nombre legible y amigable para el HUD/IA
       let nombresIntervenciones = {
         'interv_pulse_check': 'Pulse Check',
         'interv_anchoring': 'Anchoring',
@@ -250,8 +305,6 @@ function ejecutarFuncionPorTecnica(tecnica) {
       
       let nombreBonito = nombresIntervenciones[tecnicaReal] || tecnicaReal.replace(/_/g, ' ');
       
-      // 💬 Si tienes un elemento HUD de texto para la IA o el usuario, lo actualizamos aquí.
-      // Por ejemplo, modificando el contenedor de voz o la etiqueta antes de entrar al flujo de aprendizaje:
       const voiceLabel = document.getElementById('voice-label');
       if (voiceLabel) {
         voiceLabel.innerText = `Vamos a practicar la simulación de: ${nombreBonito}`;
@@ -302,11 +355,29 @@ function ejecutarFuncionPorTecnica(tecnica) {
         else if (appState.ultimaActividad.tipo === 'practice') cambiarPantallaVR('screen-level-selector');
       }
       break;
+
+    // === 🔄 NUEVO CASO: REPLICAR EL FLUJO GUARDADO ===
+    case 'replay-previous-flow':
+      ejecutarFlujoGuardado();
+      break;
+
+    // === CASO AL REINICIAR (TERMINAR / NUEVA SESION) ===
+    case 'go-welcome-reset':
+      // 🏁 Este es el disparador! El usuario terminó la actividad y vuelve a la pantalla inicial.
+      // Validamos si hay suficientes datos en el flujo para darlo como "activo"
+      if (appState.flujoReciente.tecnicaSeleccionada && appState.flujoReciente.modoSeleccionado) {
+        appState.flujoReciente.activo = true;
+      }
+      cambiarPantallaVR('screen-welcome');
+      break;
  
     default: 
       break;
   }
 }
+
+
+
 
 function funcionShowInterventions(){
     appState.activeMenu = 'interventions';    
@@ -363,7 +434,46 @@ function funcionIntervFidelizacion() {
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
+function ejecutarFlujoGuardado() {
+  const flujo = appState.flujoReciente;
+  if (!flujo || !flujo.activo) return;
 
+  console.log("🔄 Replicando flujo guardado:", flujo);
+
+  // 1. Restauramos variables de control
+  appState.tecnicaSeleccionada = flujo.tecnicaSeleccionada;
+  appState.tecnicaCargada = flujo.tecnicaSeleccionada;
+
+  // 2. Si venía de una intervención (Pulse Check, Anchoring, etc.), llamamos a su función de carga directa
+  if (flujo.pantallaOrigen === 'screen-interventions') {
+    if (flujo.tecnicaSeleccionada === 'interv_pulse_check') funcionIntervRetencion();
+    else if (flujo.tecnicaSeleccionada === 'interv_anchoring') funcionIntervSoporteCritico();
+    else if (flujo.tecnicaSeleccionada === 'interv_stay_interview') funcionIntervReclamaciones();
+    else if (flujo.tecnicaSeleccionada === 'interv_tenure_renewal') funcionIntervTenureRenewal();
+  } 
+  // Si venía de las técnicas tradicionales de comunicación
+  else {
+    cambiarPantallaVR('screen-learn-work-practice');
+  }
+
+  // 3. Ejecutamos el Modo (Learn / Work / Practice)
+  setTimeout(() => {
+    if (flujo.modoSeleccionado === 'learn') {
+      ejecutarFuncionPorTecnica('learn-intervention');
+    } else if (flujo.modoSeleccionado === 'work') {
+      ejecutarFuncionPorTecnica('work-together-intervention');
+    } else if (flujo.modoSeleccionado === 'practice') {
+      // Si eligió práctica, vamos a saltarnos directamente al nivel que había elegido
+      if (flujo.nivelSeleccionado) {
+        if (flujo.nivelSeleccionado === 'novice') ejecutarFuncionPorTecnica('level-novice');
+        else if (flujo.nivelSeleccionado === 'mid') ejecutarFuncionPorTecnica('level-intermediate');
+        else if (flujo.nivelSeleccionado === 'adv') ejecutarFuncionPorTecnica('level-expert');
+      } else {
+        ejecutarFuncionPorTecnica('practice-intervention');
+      }
+    }
+  }, 150); // Un pequeño retardo en milisegundos para permitir que carguen los estados de pantalla de A-Frame
+}
 </script>
 
 
@@ -522,12 +632,19 @@ function funcionIntervFidelizacion() {
     </a-entity>
 
 
+      <!-- BOTÓN REPLICAR FLUJO ANTERIOR (Dinámico) -->
       <a-entity position="2.9 2.25 -2.5" rotation="0 -30 0">
-      <a-plane id="btn-back-activity" width="0.82" height="0.24" color="#1a0a30" material="opacity:0.84;shader:flat;side:double" class="clickable">
-        <a-plane width="0.84" height="0.26" color="#ff5ca0" material="opacity:0.35;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="Back to the previous activity" color="#ff5ca0" align="center" width="2.8" position="0 0 0.01" font="mozillavr"></a-text>
-      </a-plane>
-    </a-entity>
+        <a-plane id="btn-back-activity-previous" 
+                 handler-botones-vr="mensaje: Replicando actividad anterior; tecnica: replay-previous-flow"
+                 width="0.82" height="0.24" 
+                 color="#1a0a30" 
+                 material="opacity:0.84;shader:flat;side:double" 
+                 visible="false"
+                 scale="0 0 0"> <!-- Inicia oculto y sin escala -->
+          <a-plane width="0.84" height="0.26" color="#00e5c0" material="opacity:0.35;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+          <a-text value="Back to previous activity" color="#00e5c0" align="center" width="2.8" position="0 0 0.01" font="mozillavr"></a-text>
+        </a-plane>
+      </a-entity>
 
 
   </a-entity>
@@ -1120,10 +1237,16 @@ function funcionIntervFidelizacion() {
 
       <a-plane id="btn-new-session" 
                handler-botones-vr="mensaje: Regresando al inicio y activando reanudación; tecnica: go-welcome-reset"
-               width="1.1" height="0.22" color="#0d2060" material="opacity:0.9;shader:flat;side:double" position="-0.65 -0.88 0.01" class="clickable">
+               width="1.1" height="0.22" 
+               color="#0d2060" 
+               material="opacity:0.9;shader:flat;side:double" 
+               position="-0.65 -0.88 0.01" 
+               class="clickable">
         <a-plane width="1.12" height="0.24" color="#4466ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text value="Nueva sesion" color="#4466ff" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
       </a-plane>
+
+
        <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
         <a-plane width="1.12" height="0.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text value="Practicar de nuevo" color="#00e5c0" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
@@ -2126,6 +2249,22 @@ if (typeof window.endActivity === 'function') {
   };
 }
 
+
+// Asegúrate de que appState esté definido. Si ya lo tienes, solo agrégale estas propiedades.
+if (typeof appState === 'undefined') {
+  window.appState = {};
+}
+
+// Estructura para registrar el flujo dinámico de la sesión actual
+appState.flujoReciente = {
+  pantallaOrigen: null,      // Ej. 'screen-technique-list' o 'screen-interventions'
+  tecnicaSeleccionada: null, // Ej. 'active_listening' o 'interv_pulse_check'
+  modoSeleccionado: null,    // Ej. 'learn', 'work' o 'practice'
+  nivelSeleccionado: null,   // Ej. 'novice', 'mid' or 'adv' (si aplica)
+  activo: false              // Indica si hay un flujo válido listo para replicar
+};
+
+sessionStorage.removeItem("flujo_vr_guardado");
 
 window.goHistory = function() {
   // console.log("🗣️ Mostrando panel de historial en el espacio VR...");
