@@ -1170,10 +1170,6 @@ function regresarAlInicioActivandoReanudacion() {
       <a-text id="eval-mood" value="--%"  position="1.1 0.65 0.01" align="right" color="#00e5c0" width="2" font="mozillavr"></a-text>
       <a-plane width="2.4" height="0.004" color="#2a3a7a" material="shader:flat" position="0 0.48 0.01"></a-plane>
       <a-text id="eval-feedback" value="Analizando conversacion..." position="0 0.1 0.01" align="center" color="#e8eeff" width="4.8" wrap-count="50" font="mozillavr"></a-text>
-      <!-- <a-plane id="btn-new-session" width="1.1" height="0.22" color="#0d2060" material="opacity:0.9;shader:flat;side:double" position="-0.65 -0.88 0.01" class="clickable">
-        <a-plane width="1.12" height="0.24" color="#4466ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-        <a-text value="Nueva sesion" color="#4466ff" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
-      </a-plane> -->
 
       <a-plane id="btn-new-session" 
                handler-botones-vr="mensaje: Regresando al inicio y activando reanudación; tecnica: go-welcome-reset"
@@ -1181,9 +1177,13 @@ function regresarAlInicioActivandoReanudacion() {
         <a-plane width="1.12" height="0.24" color="#4466ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text value="Nueva sesion" color="#4466ff" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
       </a-plane>
- 
+       <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
+        <a-plane width="1.12" height="0.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+        <a-text value="Practicar de nuevo" color="#00e5c0" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane> 
     </a-entity>
   </a-entity>
+
 
 
 
