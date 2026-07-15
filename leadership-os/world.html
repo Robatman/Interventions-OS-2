@@ -180,7 +180,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
   console.log("📊 [DEBUG-CLICK] Estado del flujo JUSTO ANTES del clic:", JSON.parse(JSON.stringify(appState.flujoReciente)));
 
   // === INTERCEPTOR PARA GRABAR EL FLUJO EN TIEMPO REAL ===
-  // Si el usuario empieza un nuevo flujo de técnica, reseteamos el previo activo hasta que termine
+  // Si el usuario empieza un nuevo flujo de técnica tradicional de los 14 botones:
   if (tecnica === 'active-listening' || tecnica === 'powerful-questions' || 
       tecnica === 'motivational-interviewing' || tecnica === 'nonviolent-communication' || 
       tecnica === 'radical-candor' || tecnica === 'crucial-conversations' ||
@@ -194,10 +194,17 @@ function ejecutarFuncionPorTecnica(tecnica) {
     console.log(`📝 [DEBUG-FLUJO] Origen de flujo detectado y guardado como: "screen-technique-list". Flujo activo = false.`);
   }
 
+  // Si el usuario selecciona una intervención de la otra lista:
   if (tecnica.startsWith('interv-')) {
-    appState.flujoReciente.pantarmaOrigen = 'screen-interventions';
+    appState.flujoReciente.pantallaOrigen = 'screen-interventions';
     appState.flujoReciente.activo = false; 
-    console.log(`📝 [DEBUG-FLUJO] Origen de flujo detectado y guardado como: "screen-interventions". Flujo activo = false.`);
+    
+    // Normalizamos el id a guiones bajos (ej: "interv-pulse-check" -> "interv_pulse_check")
+    let idFormateado = tecnica.replace(/-/g, '_');
+    appState.flujoReciente.tecnicaSeleccionada = idFormateado;
+    
+    console.log(`📝 [DEBUG-FLUJO] Origen de flujo detectado y guardado como: "screen-interventions".`);
+    console.log(`🎯 [DEBUG-FLUJO] Auto-registrada intervención seleccionada: "${idFormateado}"`);
   }
 
   // Guardar el modo seleccionado
@@ -450,7 +457,6 @@ function ejecutarFuncionPorTecnica(tecnica) {
   console.log("📊 [DEBUG-CLICK] Estado final del flujo TRAS terminar la ejecución de la técnica:", JSON.parse(JSON.stringify(appState.flujoReciente)));
   console.log("========================================\n");
 }
-
 
 
 function funcionShowInterventions(){
