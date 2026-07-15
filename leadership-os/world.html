@@ -73,7 +73,7 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 
 function cambiarPantallaVR(pantallaMostrarId) {
-  console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
+  // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
 
   const pantallas = [
     'screen-welcome', 
@@ -1897,8 +1897,8 @@ function goLearn() {
     opennessPanel.setAttribute('visible', 'false');
   } 
 
-  console.log("=== ENTRANDO A GOLEARN ===");
-  console.log("appState.tecnicaSeleccionada al entrar a goLearn:", appState.tecnicaSeleccionada);
+  // console.log("=== ENTRANDO A GOLEARN ===");
+  // console.log("appState.tecnicaSeleccionada al entrar a goLearn:", appState.tecnicaSeleccionada);
 
   var intro = '';
   
@@ -2303,11 +2303,11 @@ appState.flujoReciente = {
   activo: false              
 };
 
-console.log("⚙️ [DEBUG-FLUJO] Estado inicial del flujo creado:", JSON.parse(JSON.stringify(appState.flujoReciente)));
+// console.log("⚙️ [DEBUG-FLUJO] Estado inicial del flujo creado:", JSON.parse(JSON.stringify(appState.flujoReciente)));
 
 // Limpieza de storage con log
 sessionStorage.removeItem("flujo_vr_guardado");
-console.log("🧹 [DEBUG-FLUJO] sessionStorage limpiado al cargar la página.");
+// console.log("🧹 [DEBUG-FLUJO] sessionStorage limpiado al cargar la página.");
 
 
 window.goHistory = function() {
@@ -3043,7 +3043,7 @@ if(btnTechBack)
 
 
 var btnEnd = document.getElementById('btn-end-practice').addEventListener('click', function () {
-    console.log("🛑 [DEBUG-CLICK] Botón físico 'Terminar' presionado (btn-end-practice).");
+    // console.log("🛑 [DEBUG-CLICK] Botón físico 'Terminar' presionado (btn-end-practice).");
 
     var screenPractice = document.getElementById('screen-practice');
     if (screenPractice) {
@@ -3058,11 +3058,11 @@ var btnEnd = document.getElementById('btn-end-practice').addEventListener('click
     // 🚀 [NUEVO] Marcamos el flujo como activo de una vez porque la actividad ya se está dando por terminada
     if (appState.flujoReciente && appState.flujoReciente.tecnicaSeleccionada && appState.flujoReciente.modoSeleccionado) {
         appState.flujoReciente.activo = true;
-        console.log("📝 [DEBUG-FLUJO] Seteando .activo = true desde el botón Terminar.");
+        // console.log("📝 [DEBUG-FLUJO] Seteando .activo = true desde el botón Terminar.");
     }
 
     if (appState.evaluacionHabilitada === true) {
-        console.log("📊 Mostrando evaluación con IA (goEval).");
+        // console.log("📊 Mostrando evaluación con IA (goEval).");
         appState.evaluacionHabilitada = false;
 
         if (typeof goEval === 'function') {
@@ -3071,7 +3071,7 @@ var btnEnd = document.getElementById('btn-end-practice').addEventListener('click
             console.warn("⚠️ No existe la función goEval().");
         }
     } else {
-        console.log("🚪 Saltando evaluación. Redirigiendo directo a Welcome.");
+        // console.log("🚪 Saltando evaluación. Redirigiendo directo a Welcome.");
         cambiarPantallaVR('screen-welcome');
     }
 });
