@@ -3078,7 +3078,7 @@ if(btnTechBack)
   var btnPractice=document.getElementById('btn-practice');if(btnPractice)btnPractice.addEventListener('click',function(e){e.stopPropagation();goPractice();});
   
   var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
-var btnEnd = document.getElementById('btn-end-practice').addEventListener('click', function () {
+  var btnEnd = document.getElementById('btn-end-practice').addEventListener('click', function () {
     // console.log("🏁 Botón Terminar presionado.");
 
     var screenPractice = document.getElementById('screen-practice');
@@ -3106,7 +3106,21 @@ var btnEnd = document.getElementById('btn-end-practice').addEventListener('click
     }
 });
 
-
+const btnEndPractice = document.getElementById('btn-end-practice');
+if (btnEndPractice) {
+  btnEndPractice.addEventListener('click', () => {
+    console.log("🛑 [DEBUG-CLICK] Se hizo clic en el botón físico de Terminar (btn-end-practice)");
+    
+    // Forzamos a que pase por nuestro gestor de flujo
+    if (typeof ejecutarFuncionPorTecnica === 'function') {
+      ejecutarFuncionPorTecnica('go-welcome-reset');
+    } else {
+      // Alternativa directa si por algo no encontrara la función
+      appState.flujoReciente.activo = true;
+      cambiarPantallaVR('screen-welcome');
+    }
+  });
+}
 
 
 
