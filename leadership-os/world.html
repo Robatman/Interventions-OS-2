@@ -2577,43 +2577,44 @@ function startSilenceDetection(){
 }
 
 async function onRecordingStop(){
-  // console.log('[Grabación] MediaRecorder se ha detenido. Armando el Blob...');
-  var blob=new Blob(audioChunks,{type:'audio/webm'});
-  // console.log('[Grabación] Archivo de audio generado -> Tamaño total:', blob.size, 'bytes');
+  // console.log('[Recording] MediaRecorder has stopped. Assembling Blob...');
+  var blob = new Blob(audioChunks, { type: 'audio/webm' });
+  // console.log('[Recording] Generated audio file -> Total size:', blob.size, 'bytes');
   
-  if(blob.size<800){
-    // console.error('[Grabación] El archivo de audio es DEMASIADO PEQUEÑO (menor a 800 bytes). Se cancela el envío.');
-    setHUD('ready','No te escuche, intenta de nuevo');
+  if (blob.size < 800) {
+    // console.error('[Recording] The audio file is TOO SMALL (under 800 bytes). Canceling upload.');
+    setHUD('ready', "I didn't hear you, please try again");
     return;
   }
   
-  isProcessing=true;
-  try{
-    // console.log('[Whisper] Enviando audio a transcribir...');
-    var text=await transcribeAudio(blob);
-    // console.log('[Whisper] Respuesta cruda recibida de la función transcribir:', text);
+  isProcessing = true;
+  try {
+    // console.log('[Whisper] Sending audio to transcribe...');
+    var text = await transcribeAudio(blob);
+    // console.log('[Whisper] Raw response received from transcription function:', text);
     
-    if(!text||text.trim().length<2){
-      console.warn('[Whisper] La transcripción regresó vacía o demasiado corta.');
-      setHUD('ready','No entendi, intenta de nuevo');
-      isProcessing=false;
+    if (!text || text.trim().length < 2) {
+      console.warn('[Whisper] Transcription returned empty or too short.');
+      setHUD('ready', "I didn't understand, please try again");
+      isProcessing = false;
       return;
     }
     
-    console.log('[Whisper] Transcripción exitosa:', text);
-    if(appState.screen==='practice') setDialog('TU',text);
-    setHUD('thinking','Pensando...');
+    console.log('[Whisper] Transcription successful:', text);
+    if (appState.screen === 'practice') setDialog('YOU', text);
+    setHUD('thinking', 'Thinking...');
     
-    // console.log('[VR] Ejecutando handleVRSpeech con el texto...');
+    // console.log('[VR] Executing handleVRSpeech with the text...');
     await handleVRSpeech(text);
-  } catch(e){
-    console.error('[Voice] Error crítico en el flujo de parada/transcripción:', e);
-    setHUD('ready','Error, intenta de nuevo');
+  } catch(e) {
+    console.error('[Voice] Critical error in the stop/transcription flow:', e);
+    setHUD('ready', 'Error, please try again');
   } finally {
-    isProcessing=false;
-    // console.log('[Grabación] Ciclo finalizado. Listo para la siguiente instrucción.');
+    isProcessing = false;
+    // console.log('[Recording] Cycle finished. Ready for the next instruction.');
   }
 }
+
 
 async function transcribeAudio(blob) {
   var form = new FormData();
