@@ -362,6 +362,36 @@ function funcionIntervFidelizacion() {
   // console.log("🤝 [Intervención] Cargando simulación: Estrategia de Fidelización activa...");
   showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
+
+function regresarAlInicioActivandoReanudacion() {
+  // 1. Cambiamos a la pantalla de bienvenida
+  cambiarPantallaVR('screen-welcome');
+  
+  // 2. Buscamos el botón de reanudación
+  const btnResume = document.getElementById('btn-resume-activity');
+  
+  if (btnResume && appState.ultimaActividad) {
+    // Forzamos la visibilidad y la escala directamente en el objeto 3D de A-Frame
+    btnResume.setAttribute('visible', true);
+    btnResume.setAttribute('scale', {x: 1, y: 1, z: 1}); 
+    
+    // Buscamos el plano interactivo interno
+    const planeClickable = btnResume.querySelector('a-plane');
+    if (planeClickable) {
+      // Nos aseguramos de que tenga la clase para que el cursor lo detecte
+      if (!planeClickable.classList.contains('clickable')) {
+        planeClickable.classList.add('clickable');
+      }
+      
+      // TRUCO A-FRAME: Forzamos al componente raycaster a recalcular los objetos interactivos
+      const cursorEl = document.querySelector('[raycaster]') || document.querySelector('[cursor]');
+      if (cursorEl && cursorEl.components.raycaster) {
+        cursorEl.components.raycaster.refreshObjects();
+      }
+    }
+  }
+}
+
 </script>
 
 
@@ -460,8 +490,6 @@ function funcionIntervFidelizacion() {
       <a-text value="Choose your training path" align="center" color="#e8eeff" width="4.5" position="0 0 0.01" font="mozillavr"></a-text>
     </a-entity>
 
-
-
    <a-entity id="btn-interventions" position="-1.2 1.02 -2.4">
   <a-plane class="clickable" 
            handler-botones-vr="mensaje: Iniciando módulo de Intervenciones; tecnica: interventions"
@@ -477,6 +505,7 @@ function funcionIntervFidelizacion() {
     <a-text value="| Interview Anchoring" align="center" color="#c8d8ff" width="2" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
   </a-plane>
   
+
 
   
 </a-entity>
