@@ -121,9 +121,19 @@ function cambiarPantallaVR(pantallaMostrarId) {
   });
 
   // 🔍 LOGS PARA EL BOTÓN DE REPETIR FLUJO
+// 🔍 LOGS PARA EL BOTÓN DE REPETIR FLUJO
   const btnBackPrev = document.getElementById('btn-back-activity-previous');
   if (btnBackPrev) {
     console.log("🎯 [DEBUG-FLUJO] Evaluando botón 'Back to previous activity'...");
+    
+    // AUTO-ACTIVACIÓN: Si entramos a screen-welcome y tenemos los datos listos, lo activamos automáticamente aquí
+    if (pantallaMostrarId === 'screen-welcome' && appState.flujoReciente) {
+      if (appState.flujoReciente.tecnicaSeleccionada && appState.flujoReciente.modoSeleccionado) {
+        appState.flujoReciente.activo = true;
+        console.log("🚀 [DEBUG-FLUJO] ¡Auto-activación exitosa! Se detectó regreso a welcome con datos listos. (.activo = true)");
+      }
+    }
+
     console.log(`   - ¿Pantalla es screen-welcome?: ${pantallaMostrarId === 'screen-welcome'}`);
     console.log(`   - ¿Existe appState.flujoReciente?: ${!!appState.flujoReciente}`);
     if (appState.flujoReciente) {
