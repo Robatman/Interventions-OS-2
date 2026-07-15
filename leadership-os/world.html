@@ -73,6 +73,8 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 
 function cambiarPantallaVR(pantallaMostrarId) {
+  console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
+
   const pantallas = [
     'screen-welcome', 
     'screen-mode', 
@@ -95,14 +97,12 @@ function cambiarPantallaVR(pantallaMostrarId) {
       elPantalla.setAttribute('visible', 'true');
       elPantalla.setAttribute('scale', '1 1 1');
       
-      // 🌟 REGLA ESPECIAL PARA TU BOTÓN Y PERSONAJES:
       if (id === 'screen-active-listening-activity') {
         const btnToggle = document.getElementById('btn-toggle-active-listening');
         if (btnToggle) {
           btnToggle.setAttribute('visible', 'true');
           btnToggle.classList.add('clickable'); 
         }
-        
         if (typeof initActiveListeningConversation === 'function') {
           initActiveListeningConversation();
         }
@@ -120,23 +120,32 @@ function cambiarPantallaVR(pantallaMostrarId) {
     }
   });
 
-  // 🔄 CONTROL DINÁMICO DEL BOTÓN DE REPETIR FLUJO ANTERIOR EN EL WELCOME
+  // 🔍 LOGS PARA EL BOTÓN DE REPETIR FLUJO
   const btnBackPrev = document.getElementById('btn-back-activity-previous');
   if (btnBackPrev) {
+    console.log("🎯 [DEBUG-FLUJO] Evaluando botón 'Back to previous activity'...");
+    console.log(`   - ¿Pantalla es screen-welcome?: ${pantallaMostrarId === 'screen-welcome'}`);
+    console.log(`   - ¿Existe appState.flujoReciente?: ${!!appState.flujoReciente}`);
+    if (appState.flujoReciente) {
+      console.log(`   - ¿Flujo está activo?: ${appState.flujoReciente.activo}`);
+      console.log("   - Datos del flujo actual:", JSON.parse(JSON.stringify(appState.flujoReciente)));
+    }
+
     if (pantallaMostrarId === 'screen-welcome' && appState.flujoReciente && appState.flujoReciente.activo) {
-      // Habilitamos y mostramos el botón
+      console.log("✅ [DEBUG-FLUJO] Mostrando y habilitando el botón de repetir actividad!");
       btnBackPrev.setAttribute('visible', 'true');
       btnBackPrev.setAttribute('scale', '1 1 1');
       btnBackPrev.classList.add('clickable');
     } else {
-      // Ocultamos y removemos interacción interactiva para que el raycaster no lo cliquee sin querer
+      console.log("❌ [DEBUG-FLUJO] Ocultando el botón de repetir actividad (No cumple condiciones).");
       btnBackPrev.setAttribute('visible', 'false');
       btnBackPrev.setAttribute('scale', '0 0 0');
       btnBackPrev.classList.remove('clickable');
     }
+  } else {
+    console.warn("⚠️ [DEBUG-FLUJO] ERROR: ¡No se encontró el elemento HTML #btn-back-activity-previous!");
   }
 
-  // Forzamos al raycaster de la escena a recalcular los botones activos inmediatamente
   const raycasterEl = document.querySelector('[raycaster]');
   if (raycasterEl && raycasterEl.components.raycaster) {
     raycasterEl.components.raycaster.refreshObjects();
@@ -145,10 +154,23 @@ function cambiarPantallaVR(pantallaMostrarId) {
 
 
 
-
 function ejecutarFuncionPorTecnica(tecnica) {
+  // Aseguramos que el objeto de flujo exista para evitar errores "Cannot set property of undefined"
+  if (!appState.flujoReciente) {
+    appState.flujoReciente = {
+      pantallaOrigen: null,      
+      tecnicaSeleccionada: null, 
+      modoSeleccionado: null,    
+      nivelSeleccionado: null,   
+      activo: false              
+    };
+  }
+
+  console.log(`\n🖱️ [DEBUG-CLICK] Se ejecutó ejecutarFuncionPorTecnica con parámetro: "${tecnica}"`);
+  console.log("📊 [DEBUG-CLICK] Estado del flujo JUSTO ANTES del clic:", JSON.parse(JSON.stringify(appState.flujoReciente)));
+
   // === INTERCEPTOR PARA GRABAR EL FLUJO EN TIEMPO REAL ===
-  // Si el usuario empieza un nuevo flujo, reseteamos el previo activo hasta que termine
+  // Si el usuario empieza un nuevo flujo de técnica, reseteamos el previo activo hasta que termine
   if (tecnica === 'active-listening' || tecnica === 'powerful-questions' || 
       tecnica === 'motivational-interviewing' || tecnica === 'nonviolent-communication' || 
       tecnica === 'radical-candor' || tecnica === 'crucial-conversations' ||
@@ -159,22 +181,42 @@ function ejecutarFuncionPorTecnica(tecnica) {
     
     appState.flujoReciente.pantallaOrigen = 'screen-technique-list';
     appState.flujoReciente.activo = false; // Aún no ha terminado la actividad
+    console.log(`📝 [DEBUG-FLUJO] Origen de flujo detectado y guardado como: "screen-technique-list". Flujo activo = false.`);
   }
 
   if (tecnica.startsWith('interv-')) {
-    appState.flujoReciente.pantallaOrigen = 'screen-interventions';
+    appState.flujoReciente.pantarmaOrigen = 'screen-interventions';
     appState.flujoReciente.activo = false; 
+    console.log(`📝 [DEBUG-FLUJO] Origen de flujo detectado y guardado como: "screen-interventions". Flujo activo = false.`);
   }
 
   // Guardar el modo seleccionado
-  if (tecnica === 'learn-intervention') appState.flujoReciente.modoSeleccionado = 'learn';
-  if (tecnica === 'work-together-intervention') appState.flujoReciente.modoSeleccionado = 'work';
-  if (tecnica === 'practice-intervention') appState.flujoReciente.modoSeleccionado = 'practice';
+  if (tecnica === 'learn-intervention') {
+    appState.flujoReciente.modoSeleccionado = 'learn';
+    console.log("📝 [DEBUG-FLUJO] Modo guardado en flujo: 'learn'");
+  }
+  if (tecnica === 'work-together-intervention') {
+    appState.flujoReciente.modoSeleccionado = 'work';
+    console.log("📝 [DEBUG-FLUJO] Modo guardado en flujo: 'work'");
+  }
+  if (tecnica === 'practice-intervention') {
+    appState.flujoReciente.modoSeleccionado = 'practice';
+    console.log("📝 [DEBUG-FLUJO] Modo guardado en flujo: 'practice'");
+  }
 
   // Guardar dificultad
-  if (tecnica === 'level-novice') appState.flujoReciente.nivelSeleccionado = 'novice';
-  if (tecnica === 'level-intermediate') appState.flujoReciente.nivelSeleccionado = 'mid';
-  if (tecnica === 'level-expert') appState.flujoReciente.nivelSeleccionado = 'adv';
+  if (tecnica === 'level-novice') {
+    appState.flujoReciente.nivelSeleccionado = 'novice';
+    console.log("📝 [DEBUG-FLUJO] Nivel guardado en flujo: 'novice'");
+  }
+  if (tecnica === 'level-intermediate') {
+    appState.flujoReciente.nivelSeleccionado = 'mid';
+    console.log("📝 [DEBUG-FLUJO] Nivel guardado en flujo: 'mid'");
+  }
+  if (tecnica === 'level-expert') {
+    appState.flujoReciente.nivelSeleccionado = 'adv';
+    console.log("📝 [DEBUG-FLUJO] Nivel guardado en flujo: 'adv'");
+  }
 
 
   // === SWITCH PRINCIPAL DE TU SISTEMA ===
@@ -184,6 +226,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'active_listening';
       appState.tecnicaCargada = 'active_listening'; 
       appState.flujoReciente.tecnicaSeleccionada = 'active_listening'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'active_listening'");
       selectAndPreviewVR('active_listening'); 
       break;
 
@@ -191,6 +234,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'powerful_questions'; 
       appState.tecnicaCargada = 'powerful_questions';
       appState.flujoReciente.tecnicaSeleccionada = 'powerful_questions'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'powerful_questions'");
       selectAndPreviewVR('powerful_questions'); 
       break;
 
@@ -198,6 +242,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'motivational_interviewing'; 
       appState.tecnicaCargada = 'motivational_interviewing';
       appState.flujoReciente.tecnicaSeleccionada = 'motivational_interviewing'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'motivational_interviewing'");
       selectAndPreviewVR('motivational_interviewing'); 
       break;
 
@@ -205,6 +250,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'nonviolent_communication'; 
       appState.tecnicaCargada = 'nonviolent_communication';
       appState.flujoReciente.tecnicaSeleccionada = 'nonviolent_communication'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'nonviolent_communication'");
       selectAndPreviewVR('nonviolent_communication'); 
       break;
 
@@ -212,6 +258,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'radical_candor'; 
       appState.tecnicaCargada = 'radical_candor';
       appState.flujoReciente.tecnicaSeleccionada = 'radical_candor'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'radical_candor'");
       selectAndPreviewVR('radical_candor'); 
       break;
 
@@ -219,6 +266,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'crucial_conversations'; 
       appState.tecnicaCargada = 'crucial_conversations';
       appState.flujoReciente.tecnicaSeleccionada = 'crucial_conversations'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'crucial_conversations'");
       selectAndPreviewVR('crucial_conversations'); 
       break;
 
@@ -227,6 +275,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'tactical_empathy'; 
       appState.tecnicaCargada = 'tactical_empathy';
       appState.flujoReciente.tecnicaSeleccionada = 'tactical_empathy'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'tactical_empathy'");
       selectAndPreviewVR('tactical_empathy'); 
       break;
 
@@ -234,6 +283,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'scarf_model'; 
       appState.tecnicaCargada = 'scarf_model';
       appState.flujoReciente.tecnicaSeleccionada = 'scarf_model'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'scarf_model'");
       selectAndPreviewVR('scarf_model'); 
       break;
 
@@ -241,6 +291,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'immunity_to_change'; 
       appState.tecnicaCargada = 'immunity_to_change';
       appState.flujoReciente.tecnicaSeleccionada = 'immunity_to_change'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'immunity_to_change'");
       selectAndPreviewVR('immunity_to_change'); 
       break;
 
@@ -248,6 +299,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'drama_triangle'; 
       appState.tecnicaCargada = 'drama_triangle'; 
       appState.flujoReciente.tecnicaSeleccionada = 'drama_triangle'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'drama_triangle'");
       selectAndPreviewVR('drama_triangle'); 
       break;
 
@@ -256,6 +308,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'grow_model'; 
       appState.tecnicaCargada = 'grow_model';
       appState.flujoReciente.tecnicaSeleccionada = 'grow_model'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'grow_model'");
       selectAndPreviewVR('grow_model'); 
       break;
 
@@ -263,6 +316,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'strengths_based_coaching'; 
       appState.tecnicaCargada = 'strengths_based_coaching';
       appState.flujoReciente.tecnicaSeleccionada = 'strengths_based_coaching'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'strengths_based_coaching'");
       selectAndPreviewVR('strengths_based_coaching'); 
       break;
 
@@ -270,6 +324,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'growth_mindset'; 
       appState.tecnicaCargada = 'growth_mindset';
       appState.flujoReciente.tecnicaSeleccionada = 'growth_mindset'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'growth_mindset'");
       selectAndPreviewVR('growth_mindset'); 
       break;
 
@@ -277,6 +332,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       appState.tecnicaSeleccionada = 'solution_focused_coaching'; 
       appState.tecnicaCargada = 'solution_focused_coaching';
       appState.flujoReciente.tecnicaSeleccionada = 'solution_focused_coaching'; // Registrar
+      console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'solution_focused_coaching'");
       selectAndPreviewVR('solution_focused_coaching'); 
       break;
     
@@ -358,15 +414,21 @@ function ejecutarFuncionPorTecnica(tecnica) {
 
     // === 🔄 NUEVO CASO: REPLICAR EL FLUJO GUARDADO ===
     case 'replay-previous-flow':
+      console.log("🔄 [DEBUG-FLUJO] Ejecutando replay-previous-flow de manera interactiva...");
       ejecutarFlujoGuardado();
       break;
 
     // === CASO AL REINICIAR (TERMINAR / NUEVA SESION) ===
     case 'go-welcome-reset':
-      // 🏁 Este es el disparador! El usuario terminó la actividad y vuelve a la pantalla inicial.
-      // Validamos si hay suficientes datos en el flujo para darlo como "activo"
+      console.log("🏁 [DEBUG-FLUJO] Procesando 'go-welcome-reset' para regresar al lobby.");
+      console.log("📊 [DEBUG-FLUJO] Datos previos de flujo acumulados en sesión:", JSON.parse(JSON.stringify(appState.flujoReciente)));
+      
+      // Validamos si hay suficientes datos en el flujo para darlo como "activo" antes de volver al lobby
       if (appState.flujoReciente.tecnicaSeleccionada && appState.flujoReciente.modoSeleccionado) {
         appState.flujoReciente.activo = true;
+        console.log("🚀 [DEBUG-FLUJO] ¡Felicidades! Flujo marcado como .activo = true. El botón de reanudar debería aparecer.");
+      } else {
+        console.warn("⚠️ [DEBUG-FLUJO] Cuidado: No se pudo marcar como activo porque faltan datos clave.");
       }
       cambiarPantallaVR('screen-welcome');
       break;
@@ -374,8 +436,10 @@ function ejecutarFuncionPorTecnica(tecnica) {
     default: 
       break;
   }
+  
+  console.log("📊 [DEBUG-CLICK] Estado final del flujo TRAS terminar la ejecución de la técnica:", JSON.parse(JSON.stringify(appState.flujoReciente)));
+  console.log("========================================\n");
 }
-
 
 
 
@@ -2255,16 +2319,21 @@ if (typeof appState === 'undefined') {
   window.appState = {};
 }
 
-// Estructura para registrar el flujo dinámico de la sesión actual
+// Inicialización con logs
 appState.flujoReciente = {
-  pantallaOrigen: null,      // Ej. 'screen-technique-list' o 'screen-interventions'
-  tecnicaSeleccionada: null, // Ej. 'active_listening' o 'interv_pulse_check'
-  modoSeleccionado: null,    // Ej. 'learn', 'work' o 'practice'
-  nivelSeleccionado: null,   // Ej. 'novice', 'mid' or 'adv' (si aplica)
-  activo: false              // Indica si hay un flujo válido listo para replicar
+  pantallaOrigen: null,      
+  tecnicaSeleccionada: null, 
+  modoSeleccionado: null,    
+  nivelSeleccionado: null,   
+  activo: false              
 };
 
+console.log("⚙️ [DEBUG-FLUJO] Estado inicial del flujo creado:", JSON.parse(JSON.stringify(appState.flujoReciente)));
+
+// Limpieza de storage con log
 sessionStorage.removeItem("flujo_vr_guardado");
+console.log("🧹 [DEBUG-FLUJO] sessionStorage limpiado al cargar la página.");
+
 
 window.goHistory = function() {
   // console.log("🗣️ Mostrando panel de historial en el espacio VR...");
