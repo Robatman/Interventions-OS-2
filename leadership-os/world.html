@@ -3078,8 +3078,10 @@ if(btnTechBack)
   var btnPractice=document.getElementById('btn-practice');if(btnPractice)btnPractice.addEventListener('click',function(e){e.stopPropagation();goPractice();});
   
   var btnModeBack=document.getElementById('btn-mode-back');if(btnModeBack)btnModeBack.addEventListener('click',function(e){e.stopPropagation();goWelcome();});
-  var btnEnd = document.getElementById('btn-end-practice').addEventListener('click', function () {
-    // console.log("🏁 Botón Terminar presionado.");
+
+
+var btnEnd = document.getElementById('btn-end-practice').addEventListener('click', function () {
+    console.log("🛑 [DEBUG-CLICK] Botón físico 'Terminar' presionado (btn-end-practice).");
 
     var screenPractice = document.getElementById('screen-practice');
     if (screenPractice) {
@@ -3091,8 +3093,14 @@ if(btnTechBack)
         window.speechSynthesis.cancel();
     }
 
+    // 🚀 [NUEVO] Marcamos el flujo como activo de una vez porque la actividad ya se está dando por terminada
+    if (appState.flujoReciente && appState.flujoReciente.tecnicaSeleccionada && appState.flujoReciente.modoSeleccionado) {
+        appState.flujoReciente.activo = true;
+        console.log("📝 [DEBUG-FLUJO] Seteando .activo = true desde el botón Terminar.");
+    }
+
     if (appState.evaluacionHabilitada === true) {
-        // console.log("Mostrando evaluación con IA.");
+        console.log("📊 Mostrando evaluación con IA (goEval).");
         appState.evaluacionHabilitada = false;
 
         if (typeof goEval === 'function') {
@@ -3101,26 +3109,11 @@ if(btnTechBack)
             console.warn("⚠️ No existe la función goEval().");
         }
     } else {
-        // console.log("Saltando evaluación. Redirigiendo a Welcome.");
+        console.log("🚪 Saltando evaluación. Redirigiendo directo a Welcome.");
         cambiarPantallaVR('screen-welcome');
     }
 });
 
-const btnEndPractice = document.getElementById('btn-end-practice');
-if (btnEndPractice) {
-  btnEndPractice.addEventListener('click', () => {
-    console.log("🛑 [DEBUG-CLICK] Se hizo clic en el botón físico de Terminar (btn-end-practice)");
-    
-    // Forzamos a que pase por nuestro gestor de flujo
-    if (typeof ejecutarFuncionPorTecnica === 'function') {
-      ejecutarFuncionPorTecnica('go-welcome-reset');
-    } else {
-      // Alternativa directa si por algo no encontrara la función
-      appState.flujoReciente.activo = true;
-      cambiarPantallaVR('screen-welcome');
-    }
-  });
-}
 
 
 
