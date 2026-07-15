@@ -1737,7 +1737,7 @@ function toggleListeningMoves() {
       showScreen('learn-work-practice');
     } else if (typeof cambiarPantallaVR === 'function') {
       // Por si usas la otra función en este script
-      console.log("Aquí 1");
+      // console.log("Aquí 1");
       cambiarPantallaVR('screen-learn-work-practice');
     }
   }
@@ -1746,39 +1746,39 @@ function toggleListeningMoves() {
 
 
 function pickRandomScenario(archetype, level, tecnica) {
-  console.log("--- 🕵️‍♂️ INSIDE pickRandomScenario ---");
-  console.log("📥 Parámetros recibidos -> Nivel:", level, "| Técnica:", tecnica);
+  // console.log("--- 🕵️‍♂️ INSIDE pickRandomScenario ---");
+  // console.log("📥 Parámetros recibidos -> Nivel:", level, "| Técnica:", tecnica);
 
   // 1. Obtener pool inicial por nivel
   var pool = archetype.briefings[level] || archetype.briefings['novice'] || [];
-  console.log(`📦 Tamaño del pool inicial para el nivel [${level}]:`, pool.length);
+  // console.log(`📦 Tamaño del pool inicial para el nivel [${level}]:`, pool.length);
 
   // Muestra qué técnicas tienen los escenarios de este arquetipo en la consola
   if (pool.length > 0) {
-    console.log("📋 Técnicas disponibles en los escenarios de este nivel:");
+    // console.log("📋 Técnicas disponibles en los escenarios de este nivel:");
     pool.forEach((scen, idx) => {
-      console.log(`   [${idx}] Escenario: "${scen.title || 'Sin Título'}" -> Técnica asignada en objeto:`, scen.tecnica);
+      // console.log(`   [${idx}] Escenario: "${scen.title || 'Sin Título'}" -> Técnica asignada en objeto:`, scen.tecnica);
     });
   }
 
   // 2. Filtrar por técnica
   if (tecnica) {
-    console.log(`🎯 Intentando filtrar escenarios para la técnica exacta: "${tecnica}"`);
+    // console.log(`🎯 Intentando filtrar escenarios para la técnica exacta: "${tecnica}"`);
     
     var poolFiltrado = pool.filter(function(scenario) {
       return scenario.tecnica === tecnica;
     });
     
-    console.log("📊 Tamaño del pool tras aplicar el filtro de técnica:", poolFiltrado.length);
+    // console.log("📊 Tamaño del pool tras aplicar el filtro de técnica:", poolFiltrado.length);
     
     if (poolFiltrado.length > 0) {
       pool = poolFiltrado;
-      console.log("✅ Filtro exitoso. Se usará el pool específico de la técnica.");
+      // console.log("✅ Filtro exitoso. Se usará el pool específico de la técnica.");
     } else {
       console.warn(`⚠️ Ojo: No se encontró ningún escenario con la propiedad tecnica: "${tecnica}" en este arquetipo. Usando el pool general por defecto.`);
     }
   } else {
-    console.log("ℹ️ No se pasó ninguna técnica a la función. Se elige del pool general de nivel.");
+    // console.log("ℹ️ No se pasó ninguna técnica a la función. Se elige del pool general de nivel.");
   }
 
   if (!pool.length) {
@@ -1787,8 +1787,8 @@ function pickRandomScenario(archetype, level, tecnica) {
   }
 
   var elegido = pool[Math.floor(Math.random() * pool.length)];
-  console.log("🏆 Escenario seleccionado:", elegido);
-  console.log("------------------------------------");
+  // console.log("🏆 Escenario seleccionado:", elegido);
+  // console.log("------------------------------------");
   return elegido;
 }
 
@@ -2010,12 +2010,12 @@ function goPractice(){
     }
   }
 
-  console.log("========================================");
-  console.log("🔍 [DEBUG] ENTRANDO A GOPRACTICE");
-  console.log("📌 Técnica seleccionada en appState:", appState.tecnicaSeleccionada);
-  console.log("📌 Nivel actual en appState:", appState.currentLevel);
-  console.log("📌 Última actividad guardada:", appState.ultimaActividad);
-  console.log("========================================");
+  // console.log("========================================");
+  // console.log("🔍 [DEBUG] ENTRANDO A GOPRACTICE");
+  // console.log("📌 Técnica seleccionada en appState:", appState.tecnicaSeleccionada);
+  // console.log("📌 Nivel actual en appState:", appState.currentLevel);
+  // console.log("📌 Última actividad guardada:", appState.ultimaActividad);
+  // console.log("========================================");
 
   appState.agentHistory = [];
 
@@ -2030,11 +2030,11 @@ function goPractice(){
   }, 50);
 
   var arch = pickRandomArchetype();
-  console.log("👤 Arquetipo elegido al azar:", arch ? arch.name : "¡NINGUNO!");
+  // console.log("👤 Arquetipo elegido al azar:", arch ? arch.name : "¡NINGUNO!");
   
   // Enviamos la técnica como tercer parámetro
   var scenario = pickRandomScenario(arch, appState.currentLevel, appState.tecnicaSeleccionada);
-  console.log("🎬 Escenario final devuelto por pickRandomScenario:", scenario ? scenario.title || "Tiene datos pero no propiedad title" : "❌ ¡NULL/VACÍO!");
+  // console.log("🎬 Escenario final devuelto por pickRandomScenario:", scenario ? scenario.title || "Tiene datos pero no propiedad title" : "❌ ¡NULL/VACÍO!");
 
   appState.currentArchetype = arch;
   appState.currentScenario = scenario;
@@ -2048,15 +2048,15 @@ function goPractice(){
   updateVRMood(appState.vrMood);
   
   var opener = pickRandomOpener(arch, scenario);
-  console.log("💬 Opener generado para el inicio:", opener);
+  // console.log("💬 Opener generado para el inicio:", opener);
 
   appState.agentHistory.push({role:'assistant', content:opener});
   showScreen('practice');
   setDialog(arch.name.toUpperCase(), opener);
   speakVR(opener, getVoice('agent'), function(){ setHUD('ready','Listo para hablar'); });
   
-  console.log("🚀 [DEBUG] Fin de goPractice. Transición de pantalla ejecutada.");
-  console.log("========================================");
+  // console.log("🚀 [DEBUG] Fin de goPractice. Transición de pantalla ejecutada.");
+  // console.log("========================================");
 }
 
   function go14button(){
@@ -2471,11 +2471,11 @@ async function setupMic(){
 }
 
 function startRecording(){
-   console.log('[Grabación] Intento de iniciar grabación. Estado actual -> isRecording:', isRecording, 'isProcessing:', isProcessing, 'hasAudioStream:', !!audioStream);
+  //  console.log('[Grabación] Intento de iniciar grabación. Estado actual -> isRecording:', isRecording, 'isProcessing:', isProcessing, 'hasAudioStream:', !!audioStream);
   if(isRecording||isProcessing||!audioStream) return;
   
   if (audioContext && audioContext.state === 'suspended') {
-    console.log('[Mic] AudioContext suspendido. Intentando reactivar...');
+    // console.log('[Mic] AudioContext suspendido. Intentando reactivar...');
     audioContext.resume();
   }
 
@@ -2488,9 +2488,9 @@ function startRecording(){
   mediaRecorder.ondataavailable=function(e){
     if(e.data.size>0){
       audioChunks.push(e.data);
-      console.log('[Grabación] Chunk recibido. Tamaño:', e.data.size, 'bytes. Total chunks:', audioChunks.length);
+      // console.log('[Grabación] Chunk recibido. Tamaño:', e.data.size, 'bytes. Total chunks:', audioChunks.length);
     } else {
-      console.warn('[Grabación] Chunk recibido pero está VACÍO (0 bytes)');
+      // console.warn('[Grabación] Chunk recibido pero está VACÍO (0 bytes)');
     }
   };
   
@@ -2501,18 +2501,18 @@ function startRecording(){
   
   setTimeout(function(){
     if(isRecording){
-      console.log('[Grabación] Límite de 25 segundos alcanzado. Forzando parada.');
+      // console.log('[Grabación] Límite de 25 segundos alcanzado. Forzando parada.');
       stopRecording();
     }
   },25000);
 }
 
 function stopRecording(){
-   console.log('[Grabación] stopRecording invocado. ¿Registrando?:', isRecording);
+   // console.log('[Grabación] stopRecording invocado. ¿Registrando?:', isRecording);
   if(!isRecording||!mediaRecorder)return;
   isRecording=false;
   if(silenceTimer){
-    console.log('[Grabación] Limpiando temporizador de silencio.');
+    // console.log('[Grabación] Limpiando temporizador de silencio.');
     cancelAnimationFrame(silenceTimer);
     silenceTimer=null;
   }
@@ -2523,7 +2523,7 @@ function stopRecording(){
 
 function startSilenceDetection(){
   var data=new Uint8Array(analyser.frequencyBinCount),silenceMs=0,lastTime=performance.now();
-  console.log('[Silencio] Detección iniciada. Umbral (SILENCE_THRESHOLD):', typeof SILENCE_THRESHOLD !== 'undefined' ? SILENCE_THRESHOLD : 'No definido');
+  // console.log('[Silencio] Detección iniciada. Umbral (SILENCE_THRESHOLD):', typeof SILENCE_THRESHOLD !== 'undefined' ? SILENCE_THRESHOLD : 'No definido');
   
   function check(){
     if(!isRecording) return;
@@ -2550,12 +2550,12 @@ function startSilenceDetection(){
 }
 
 async function onRecordingStop(){
-  console.log('[Grabación] MediaRecorder se ha detenido. Armando el Blob...');
+  // console.log('[Grabación] MediaRecorder se ha detenido. Armando el Blob...');
   var blob=new Blob(audioChunks,{type:'audio/webm'});
   // console.log('[Grabación] Archivo de audio generado -> Tamaño total:', blob.size, 'bytes');
   
   if(blob.size<800){
-    console.error('[Grabación] El archivo de audio es DEMASIADO PEQUEÑO (menor a 800 bytes). Se cancela el envío.');
+    // console.error('[Grabación] El archivo de audio es DEMASIADO PEQUEÑO (menor a 800 bytes). Se cancela el envío.');
     setHUD('ready','No te escuche, intenta de nuevo');
     return;
   }
@@ -3132,7 +3132,7 @@ if (btnNewSession) {
 });
 
     document.querySelector('a-scene').addEventListener('loaded', () => {
-       console.log("🚀 Sistema de rastreo de clics activado.");
+      //  console.log("🚀 Sistema de rastreo de clics activado.");
       const botones = document.querySelectorAll('.clickable');
       botones.forEach(boton => {
         boton.addEventListener('click', (evento) => {
