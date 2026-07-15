@@ -509,45 +509,48 @@ function funcionIntervFidelizacion() {
 }
 
 function ejecutarFlujoGuardado() {
-  const flujo = appState.flujoReciente;
-  if (!flujo || !flujo.activo) return;
-
-  console.log("🔄 Replicando flujo guardado:", flujo);
-
-  // 1. Restauramos variables de control
-  appState.tecnicaSeleccionada = flujo.tecnicaSeleccionada;
-  appState.tecnicaCargada = flujo.tecnicaSeleccionada;
-
-  // 2. Si venía de una intervención (Pulse Check, Anchoring, etc.), llamamos a su función de carga directa
-  if (flujo.pantallaOrigen === 'screen-interventions') {
-    if (flujo.tecnicaSeleccionada === 'interv_pulse_check') funcionIntervRetencion();
-    else if (flujo.tecnicaSeleccionada === 'interv_anchoring') funcionIntervSoporteCritico();
-    else if (flujo.tecnicaSeleccionada === 'interv_stay_interview') funcionIntervReclamaciones();
-    else if (flujo.tecnicaSeleccionada === 'interv_tenure_renewal') funcionIntervTenureRenewal();
-  } 
-  // Si venía de las técnicas tradicionales de comunicación
-  else {
-    cambiarPantallaVR('screen-learn-work-practice');
+  console.log("========================================");
+  console.log("🔄 [REPLAY] INICIANDO REPETICIÓN DE FLUJO");
+  
+  if (!appState.flujoReciente) {
+    console.error("❌ [REPLAY] Error: No existe el objeto appState.flujoReciente");
+    return;
   }
 
-  // 3. Ejecutamos el Modo (Learn / Work / Practice)
-  setTimeout(() => {
-    if (flujo.modoSeleccionado === 'learn') {
-      ejecutarFuncionPorTecnica('learn-intervention');
-    } else if (flujo.modoSeleccionado === 'work') {
-      ejecutarFuncionPorTecnica('work-together-intervention');
-    } else if (flujo.modoSeleccionado === 'practice') {
-      // Si eligió práctica, vamos a saltarnos directamente al nivel que había elegido
-      if (flujo.nivelSeleccionado) {
-        if (flujo.nivelSeleccionado === 'novice') ejecutarFuncionPorTecnica('level-novice');
-        else if (flujo.nivelSeleccionado === 'mid') ejecutarFuncionPorTecnica('level-intermediate');
-        else if (flujo.nivelSeleccionado === 'adv') ejecutarFuncionPorTecnica('level-expert');
-      } else {
-        ejecutarFuncionPorTecnica('practice-intervention');
-      }
+  const { tecnicaSeleccionada, modoSeleccionado, nivelSeleccionado, pantallaOrigen } = appState.flujoReciente;
+
+  console.log(`📌 [REPLAY] Datos recuperados de la última sesión:`);
+  console.log(`   - 🛠️ Técnica:  ${tecnicaSeleccionada}`);
+  console.log(`   - 🎮 Modo:     ${modoSeleccionado}`);
+  console.log(`   - 📊 Nivel:    ${nivelSeleccionado || 'No aplica'}`);
+  console.log(`   - 📍 Origen:   ${pantallaOrigen}`);
+  console.log("========================================");
+
+  // Aquí va tu lógica para redirigir al usuario...
+  // Por ejemplo, si el modo es 'practice', debería activar la técnica y saltar directo a goPractice()
+  if (tecnicaSeleccionada) {
+    appState.tecnicaSeleccionada = tecnicaSeleccionada;
+    appState.tecnicaCargada = tecnicaSeleccionada;
+    
+    if (modoSeleccionado === 'practice') {
+      appState.currentLevel = nivelSeleccionado || 'novice';
+      console.log(`🚀 [REPLAY] Redirigiendo directo a goPractice con ${tecnicaSeleccionada} en nivel ${appState.currentLevel}`);
+      goPractice();
+    } else if (modoSeleccionado === 'learn') {
+      console.log(`🚀 [REPLAY] Redirigiendo directo a goLearn con ${tecnicaSeleccionada}`);
+      goLearn();
+    } else if (modoSeleccionado === 'work') {
+      console.log(`🚀 [REPLAY] Redirigiendo directo a goWork con ${tecnicaSeleccionada}`);
+      goWork();
     }
-  }, 150); // Un pequeño retardo en milisegundos para permitir que carguen los estados de pantalla de A-Frame
+  } else {
+    console.warn("⚠️ [REPLAY] No se pudo ejecutar porque falta la técnica seleccionada.");
+  }
 }
+
+
+
+
 </script>
 
 
