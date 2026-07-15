@@ -2110,18 +2110,45 @@ function updateVRMood(val){
 }
 
 async function callGroqLLM(mode){
-  var systemPrompt='';
-  if(mode==='practice'){
-    systemPrompt=PROMPTS.avatar(appState.currentLevel);
-  } else if(mode==='learn'){
-    systemPrompt='Eres Juanjolote, coach de liderazgo calido y directo en Centris Neural Academy. Estas ensenando sobre '+(appState.activeMenu==='interventions'?'intervenciones de retencion':'tecnicas de comunicacion')+'. Habla en espanol. Conversacional, maximo 3 oraciones. Haz preguntas. Nunca des conferencias. Conecta todo a situaciones reales de call center.';
-  } else if(mode==='work'){
-    systemPrompt='Eres Juanjolote, coach socratico en Centris Neural Academy. Tu rol es hacer preguntas que ayuden al manager a descubrir sus propios insights. NUNCA des consejos directos. Haz UNA pregunta a la vez. Maximo 2 oraciones. Habla en espanol. Se calido pero directo.';
+  var systemPrompt = '';
+  
+  if (mode === 'practice') {
+    systemPrompt = PROMPTS.avatar(appState.currentLevel) + 
+      "\n\nCRITICAL: You must respond strictly and exclusively in natural English. Even if the user speaks or replies in Spanish, you must ONLY reply in English.";
+      
+  } else if (mode === 'learn') {
+    systemPrompt = 'You are Juanjolote, a warm and direct leadership coach at Centris Neural Academy. ' +
+                   'You are teaching about ' + (appState.activeMenu === 'interventions' ? 'retention interventions' : 'communication techniques') + '. ' +
+                   'Speak strictly in English. Be conversational, maximum 3 sentences. Ask questions. Never lecture. ' +
+                   'Connect everything to real-world call center situations. ' +
+                   'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
+                   
+  } else if (mode === 'work') {
+    systemPrompt = 'You are Juanjolote, a Socratic coach at Centris Neural Academy. ' +
+                   'Your role is to ask questions that help the manager discover their own insights. ' +
+                   'NEVER give direct advice. Ask ONLY ONE question at a time. Maximum 2 sentences. ' +
+                   'Speak strictly in English. Be warm but direct. ' +
+                   'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
   }
-  var res=await fetch('/api/groq',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemPrompt},...appState.agentHistory.slice(-12)],max_tokens:150,temperature:0.88})});
-  var data=await res.json();
-  return (data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'...';
+
+  var res = await fetch('/api/groq', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...appState.agentHistory.slice(-12)
+      ],
+      max_tokens: 150,
+      temperature: 0.88
+    })
+  });
+
+  var data = await res.json();
+  return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '...';
 }
+
 
 function parseAgentReply(raw){
   var moodMatch=raw.match(/\[MOOD:(\d+)\]/),boxMatch=raw.match(/\[BOX:(in|out)\]/);
