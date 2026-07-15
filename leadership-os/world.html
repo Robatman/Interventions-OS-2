@@ -1994,13 +1994,17 @@ function goWork() {
     opennessPanel.setAttribute('visible', 'false');
   }
 
-  var intro = 'Cuentame, que situacion tienes con un agente ahora mismo?';
+  // Se traduce directamente a inglés natural para el simulador
+  var intro = 'Tell me, what situation are you dealing with with an agent right now?';
+  
   showScreen('practice');
   setJuanMood('talking');
   setDialog('JUANJOLOTE', intro);
-  speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
+  
+  // Cambiamos el HUD al estado "Ready to respond" para mantener la consistencia del idioma
+  speakVR(intro, 'daniel', function() { setHUD('ready', 'Ready to respond'); });
+  
   appState.agentHistory.push({ role: 'assistant', content: intro });
-  // console.log("dio click al gowork");
 }
 
 function goPractice(){
