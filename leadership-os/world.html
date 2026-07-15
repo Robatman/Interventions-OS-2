@@ -1900,134 +1900,91 @@ function goLearn() {
   const opennessPanel = document.getElementById('openness-panel');
   if (opennessPanel) {
     opennessPanel.setAttribute('visible', 'false');
-  }
+  } 
 
   console.log("=== ENTRANDO A GOLEARN ===");
   console.log("appState.tecnicaSeleccionada al entrar a goLearn:", appState.tecnicaSeleccionada);
 
   var intro = '';
   
-  // ✨ CORRECCIÓN: Si el menú activo es intervenciones pero NO has seleccionado ninguna en específico aún, te da la bienvenida general.
-  // Si ya seleccionaste una (como interv_anchoring), se salta al else para procesar su switch individual.
   if (appState.activeMenu === 'interventions' && !appState.tecnicaSeleccionada) {
-    intro = 'Vamos a explorar las intervenciones de retencion. Con cual quieres empezar: Pulse Check, Anchoring, Stay Interview, o Tenure Renewal?';
+    intro = 'Let\'s explore retention interventions. Which one would you like to start with: Pulse Check, Anchoring, Stay Interview, or Tenure Renewal?';
   } else {
-    // Mapeo dinámico para las técnicas e intervenciones
     switch(appState.tecnicaSeleccionada) {
       // --- COLUMNA 1 ---
       case 'active_listening':
-        console.log("Switch seleccionó: active_listening");
-        intro = 'Muy bien, vamos a aprender y practicar la Escucha Activa. Pon mucha atención a lo que te voy a decir.';
+        intro = 'Very well, let\'s learn and practice Active Listening. Pay close attention to what I am about to tell you.';
         break;
       case 'powerful_questions':
-        console.log("Switch seleccionó: powerful_questions");
-        intro = '¡Excelente elección! Vamos a profundizar en el arte de las Preguntas Poderosas para abrir nuevas perspectivas.';
+        intro = 'Excellent choice! Let\'s dive deeper into the art of Powerful Questions to open up new perspectives.';
         break;
       case 'motivational_interviewing':
-        console.log("Switch seleccionó: motivational_interviewing");
-        intro = 'Muy bien, exploremos la Entrevista Motivacional para guiar el cambio conectando con la motivación interna.';
+        intro = 'Great, let\'s explore Motivational Interviewing to guide change by connecting with internal motivation.';
         break;
       case 'nonviolent_communication':
-        console.log("Switch seleccionó: nonviolent_communication");
-        intro = 'Perfecto, iniciemos con Comunicación No Violenta. Nos enfocaremos en observaciones, sentimientos y necesidades.';
+        intro = 'Perfect, let\'s start with Nonviolent Communication. We will focus on observations, feelings, and needs.';
         break;
       case 'radical_candor':
-        console.log("Switch seleccionó: radical_candor");
-        intro = '¡Excelente! Vamos a trabajar en Franqueza Radical: desafiar directamente mostrando que realmente te importa.';
+        intro = 'Excellent! Let\'s work on Radical Candor: challenging directly while showing that you truly care.';
         break;
       case 'crucial_conversations':
-        console.log("Switch seleccionó: crucial_conversations");
-        intro = 'Muy bien, entremos a Conversaciones Cruciales. Aprendamos a mantener la seguridad cuando los ánimos se calientan.';
+        intro = 'Very well, let\'s enter Crucial Conversations. We will learn how to maintain safety when emotions run high.';
         break;
 
       // --- COLUMNA 2 ---
       case 'tactical_empathy':
-        console.log("Switch seleccionó: tactical_empathy");
-        intro = '¡Excelente! Vamos a iniciar con Empatía Táctica. Aprenderemos a reconocer las emociones del otro para negociar mejor.';
+        intro = 'Excellent! Let\'s begin with Tactical Empathy. We will learn to recognize the other person\'s emotions to negotiate better.';
         break;
       case 'scarf_model':
-        console.log("Switch seleccionó: scarf_model");
-        intro = 'Muy bien, analicemos el Modelo SCARF para entender las amenazas y recompensas sociales en la interacción.';
+        intro = 'Very well, let\'s analyze the SCARF Model to understand social threats and rewards during interactions.';
         break;
       case 'immunity_to_change':
-        console.log("Switch seleccionó: immunity_to_change");
-        intro = 'Perfecto, exploremos la Inmunidad al Cambio para descubrir las creencias ocultas que bloquean el progreso.';
+        intro = 'Perfect, let\'s explore Immunity to Change to uncover the hidden beliefs that block progress.';
         break;
       case 'drama_triangle':
-        console.log("Switch seleccionó: drama_triangle");
-        intro = '¡Excelente! Vamos a iniciar con la técnica del Triángulo de Drama. Comencemos a analizar el caso.';
+        intro = 'Excellent! Let\'s start with the Drama Triangle technique. Let\'s begin analyzing the case.';
         break;
 
       // --- COLUMNA 3 ---
       case 'grow_model':
-        console.log("Switch seleccionó: grow_model");
-        intro = 'Muy bien, vamos a avanzar utilizando el Modelo GROW. Definamos metas y opciones claras.';
+        intro = 'Very well, let\'s move forward using the GROW Model. Let\'s define clear goals and options.';
         break;
       case 'strengths_based_coaching':
-        console.log("Switch seleccionó: strengths_based_coaching");
-        intro = '¡Excelente elección! Trabajemos en Coaching Basado en Fortalezas para potenciar el talento natural.';
+        intro = 'Excellent choice! Let\'s work on Strengths-Based Coaching to enhance natural talent.';
         break;
       case 'growth_mindset':
-        console.log("Switch seleccionó: growth_mindset");
-        intro = 'Perfecto, enfoquémonos en Mentalidad de Crecimiento para transformar los desafíos en oportunidades.';
+        intro = 'Perfect, let\'s focus on a Growth Mindset to transform challenges into opportunities.';
         break;
       case 'solution_focused_coaching':
-        console.log("Switch seleccionó: solution_focused_coaching");
-        intro = 'Muy bien, iniciemos con Coaching Enfocado en Soluciones, dirigiendo la atención hacia los recursos y el futuro.';
+        intro = 'Very well, let\'s start with Solution-Focused Coaching, directing attention toward resources and the future.';
         break;
 
-      // === 🚀 CASES DE INTERVENCIONES NUEVOS (Adaptados con tu variable 'intro') ===
+      // === CASES DE INTERVENCIONES ===
       case 'interv_pulse_check':
-        console.log("Switch seleccionó: interv_pulse_check");
-        intro = 'Muy bien, vamos a iniciar la simulación de Pulse Check. Analicemos el estado de retención del usuario.';
+        intro = 'Very well, let\'s start the Pulse Check simulation. Let\'s analyze the user\'s retention status.';
         break;
-
       case 'interv_anchoring':
-        console.log("Switch seleccionó: interv_anchoring");
-        intro = 'Excelente, daremos inicio al entrenamiento de la técnica de Anchoring. Nos enfocaremos en fijar las expectativas de retención.';
+        intro = 'Excellent, we will begin the Anchoring technique training. We will focus on setting retention expectations.';
         break;
-
       case 'interv_stay_interview':
-        console.log("Switch seleccionó: interv_stay_interview");
-        intro = 'Perfecto, iniciaremos con la Stay Interview. Evaluemos los factores clave para prevenir la baja del cliente.';
+        intro = 'Perfect, we will start with the Stay Interview. Let\'s evaluate key factors to prevent customer churn.';
         break;
-
       case 'interv_tenure_renewal':
-        console.log("Switch seleccionó: interv_tenure_renewal");
-        intro = 'Muy bien, entremos a Tenure Renewal. Revisemos la estrategia para gestionar las renovaciones por antigüedad de manera efectiva.';
+        intro = 'Very well, let\'s dive into Tenure Renewal. We will review the strategy to manage seniority-based renewals effectively.';
         break;
 
       default:
-        console.warn("Switch cayó en default con el valor:", appState.tecnicaSeleccionada);
-        intro = 'Vamos a explorar las tecnicas de comunicacion. Cual te interesa practicar hoy?';
+        intro = 'Let\'s explore communication techniques. Which one are you interested in practicing today?';
     }
   }
     
   showScreen('practice');
   setJuanMood('happy');
   setDialog('JUANJOLOTE', intro);
-  speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
+  speakVR(intro, 'daniel', function() { setHUD('ready', 'Ready to respond'); });
   appState.agentHistory.push({ role: 'assistant', content: intro });
 }
 
-
-
-
-function goWork() {
-  appState.agentHistory = [];
-  
-  const opennessPanel = document.getElementById('openness-panel');
-  if (opennessPanel) {
-    opennessPanel.setAttribute('visible', 'false');
-  }
-
-  var intro = 'Cuentame, que situacion tienes con un agente ahora mismo?';
-  showScreen('practice');
-  setJuanMood('talking');
-  setDialog('JUANJOLOTE', intro);
-  speakVR(intro, 'daniel', function() { setHUD('ready', 'Listo para responder'); });
-  appState.agentHistory.push({ role: 'assistant', content: intro });
-}
 
 function goWork() {
   appState.agentHistory = [];
