@@ -365,26 +365,20 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interv-tenure-renewal': funcionIntervTenureRenewal(); break;
 
     case 'learn-intervention': 
-      let tecnicaReal = appState.tecnicaCargada || 'active_listening'; 
-      appState.tecnicaSeleccionada = tecnicaReal;
-      appState.ultimaActividad = { tipo: 'learn', tecnica: tecnicaReal };
-      
-      let nombresIntervenciones = {
-        'interv_pulse_check': 'Pulse Check',
-        'interv_anchoring': 'Anchoring',
-        'interv_stay_interview': 'Stay Interview',
-        'interv_tenure_renewal': 'Tenure Renewal'
-      };
-      
-      let nombreBonito = nombresIntervenciones[tecnicaReal] || tecnicaReal.replace(/_/g, ' ');
-      
-      const voiceLabel = document.getElementById('voice-label');
-      if (voiceLabel) {
-        voiceLabel.innerText = `Vamos a practicar la simulación de: ${nombreBonito}`;
-      }
-      
-      goLearn(); 
-      break;
+    let tecnicaReal = appState.tecnicaCargada || 'active_listening'; 
+    appState.tecnicaSeleccionada = tecnicaReal;
+    appState.ultimaActividad = { tipo: 'learn', tecnica: tecnicaReal };
+    
+    // Borramos el objeto nombresIntervenciones y la variable nombreBonito de aquí 🧹
+
+    const voiceLabel = document.getElementById('voice-label');
+    if (voiceLabel) {
+      // Un texto directo, genérico y enfocado en el aprendizaje (Learn)
+      voiceLabel.innerText = "Starting learning module..."; 
+    }
+    
+    goLearn(); 
+    break;
 
     case 'work-together-intervention': 
       appState.ultimaActividad = { tipo: 'work', tecnica: appState.tecnicaSeleccionada };
@@ -562,7 +556,7 @@ function ejecutarFlujoGuardado() {
 <script src="js/techniques.js"></script>
 <script src="js/prompts.js"></script>
 <script src="js/preview.js"></script>
-<div id="voice-hud"><div id="voice-dot" class="idle"></div><span id="voice-label">Iniciando Neural Academy...</span></div>
+<div id="voice-hud"><div id="voice-dot" class="idle"></div><span id="voice-label">Starting Neural Academy...</span></div>
 <button id="mic-btn" title="Hablar">&#127908;</button>
 <a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018">
   <a-assets>
@@ -728,9 +722,10 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
 
-  <a-entity id="screen-learn-work-practice" visible="false">
+<a-entity id="screen-learn-work-practice" visible="false">
   <a-entity id="practice-buttons-container">
     
+    <!-- 1. BOTÓN PRACTICE (Simulación Interactiva de Rol) -->
     <a-entity id="btn-practice-intervention" position="-1.65 1.4 -2.6" rotation="0 12 0">
       <a-plane class="sub-tecnica" 
                handler-botones-vr="mensaje: Abriendo Practice Intervention; tecnica: practice-intervention"
@@ -744,11 +739,13 @@ function ejecutarFlujoGuardado() {
                animation__click="property: scale; to: 0.95 0.95 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
         
         <a-text value="PRACTICE" align="center" color="#ffffff" width="3.2" position="0 0.18 0.02" font="mozillavr" shader="msdf"></a-text>
-        <a-text value="Hidden Commitments That Hold You Back" align="center" color="#ffedd5" width="1.3" position="0 -0.10 0.02" opacity="0.75" wrap-count="22" font="mozillavr" shader="msdf"></a-text>
+        <!-- CAMBIO AQUÍ: Descripción de simulación interactiva con feedback de voz -->
+        <a-text value="Interactive roleplay simulation with AI voice feedback." align="center" color="#ffedd5" width="1.3" position="0 -0.10 0.02" opacity="0.75" wrap-count="22" font="mozillavr" shader="msdf"></a-text>
         <a-plane width="1.35" height="0.02" color="#f59e0b" position="0 -0.32 0.03" material="opacity: 0.8"></a-plane>
       </a-plane>
     </a-entity>
 
+    <!-- 2. BOTÓN LEARN (Base Conceptual y Teoría) -->
     <a-entity id="btn-learn-intervention" position="0 1.4 -2.8" rotation="0 0 0">
       <a-plane class="sub-tecnica" 
                handler-botones-vr="mensaje: Abriendo Learn Intervention; tecnica: learn-intervention"
@@ -762,11 +759,13 @@ function ejecutarFlujoGuardado() {
                animation__click="property: scale; to: 0.95 0.95 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
         
         <a-text value="LEARN" align="center" color="#ffffff" width="3.2" position="0 0.18 0.02" font="mozillavr" shader="msdf"></a-text>
-        <a-text value="Alex introduces the goal and approach." align="center" color="#ffedd5" width="1.3" position="0 -0.10 0.02" opacity="0.75" wrap-count="22" font="mozillavr" shader="msdf"></a-text>
+        <!-- CAMBIO AQUÍ: Descripción de base teórica y guías principales -->
+        <a-text value="Conceptual basis, theory, and core guidelines of the technique." align="center" color="#ffedd5" width="1.3" position="0 -0.10 0.02" opacity="0.75" wrap-count="22" font="mozillavr" shader="msdf"></a-text>
         <a-plane width="1.35" height="0.02" color="#f59e0b" position="0 -0.32 0.03" material="opacity: 0.8"></a-plane>
       </a-plane>
     </a-entity>
 
+    <!-- 3. BOTÓN WORK TOGETHER (Método Empírico: Hipótesis, Experimento y Análisis) -->
     <a-entity id="btn-work-together-intervention" position="1.65 1.4 -2.6" rotation="0 -12 0">
       <a-plane class="sub-tecnica" 
                handler-botones-vr="mensaje: Abriendo Work Together Intervention; tecnica: work-together-intervention"
@@ -780,13 +779,15 @@ function ejecutarFlujoGuardado() {
                animation__click="property: scale; to: 0.95 0.95 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
         
         <a-text value="WORK TOGETHER" align="center" color="#ffffff" width="3" position="0 0.18 0.02" font="mozillavr" shader="msdf"></a-text>
-        <a-text value="Collaboration Communication Problem-Solving" align="center" color="#ffedd5" width="1.3" position="0 -0.10 0.02" opacity="0.75" wrap-count="22" font="mozillavr" shader="msdf"></a-text>
+        <!-- CAMBIO AQUÍ: Añadimos explícitamente los pasos del método empírico -->
+        <a-text value="Empirical Method: Hypothesize, experiment, and analyze team dynamics." align="center" color="#ffedd5" width="1.3" position="0 -0.10 0.02" opacity="0.75" wrap-count="22" font="mozillavr" shader="msdf"></a-text>
         <a-plane width="1.35" height="0.02" color="#f59e0b" position="0 -0.32 0.03" material="opacity: 0.8"></a-plane>
       </a-plane>
     </a-entity>
 
 
-        <a-entity id="btn-back-technicas" position="0 .5 -2.8">
+    <!-- BOTÓN REGRESAR -->
+    <a-entity id="btn-back-technicas" position="0 .5 -2.8">
       <a-plane class="clickable sub-tecnica" 
                handler-botones-vr="mensaje: Regresando a la pantalla de bienvenida; tecnica: back-technicas"
                width="1.0" height="0.32" 
@@ -1268,7 +1269,7 @@ function ejecutarFlujoGuardado() {
       <a-circle position="0 0.06 0" radius="1.0" rotation="-90 0 0" id="agent-halo" color="#9d5cff" material="opacity:0.06;transparent:true;shader:flat"></a-circle>
       <a-torus position="0 0.06 0" id="agent-ring" radius="1.05" radius-tubular="0.015" rotation="-90 0 0" color="#9d5cff" material="opacity:0.3;transparent:true;shader:flat" animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:7000;easing:linear"></a-torus>
       <a-text id="agent-name" value="Carlos Mendoza" position="0 1.65 0" align="center" color="#c8d8ff" width="3.5" font="mozillavr"></a-text>
-      <a-text id="agent-role" value="Agente 2 anos" position="0 1.45 0" align="center" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr"></a-text>
+      <a-text id="agent-role" value="Agent 2 years" position="0 1.45 0" align="center" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr"></a-text>
     </a-entity>
     <a-entity id="dialog-panel" position="0 2.35 -2.5" visible="false">
       <a-plane width="3.2" height="0.85" color="#080e2a" material="opacity:0.95;shader:flat;side:double"></a-plane>
@@ -3146,12 +3147,14 @@ if (btnNewSession) {
     localStorage.removeItem('ldr_refresh_token');
     window.location.href='login-vr.html';
   });
+
+  
   document.querySelector('a-scene').addEventListener('loaded',function(){
     setupControllers();
     setupMic().then(function(){
       var gameId=localStorage.getItem('ldr_game_id')||'';
       var name=gameId.split('.')[1]||'Manager';
-var greet='Welcome'+(name?' '+name:'')+'. I am Juanjolote. Choose a path: Interventions to practice retention conversations, or Techniques to develop specific communication skills.';      setTimeout(function(){setJuanMood('happy');speakVR(greet,'daniel');},800);
+      var greet='Welcome'+(name?' '+name:'')+'. I am Juanjolote. Choose a path: Interventions to practice retention conversations, or Techniques to develop specific communication skills.';      setTimeout(function(){setJuanMood('happy');speakVR(greet,'daniel');},800);
     });
     var stars=document.getElementById('stars-1');
     if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
