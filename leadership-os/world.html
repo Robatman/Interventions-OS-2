@@ -2011,13 +2011,6 @@ function goPractice(){
     }
   }
 
-  // console.log("========================================");
-  // console.log("🔍 [DEBUG] ENTRANDO A GOPRACTICE");
-  // console.log("📌 Técnica seleccionada en appState:", appState.tecnicaSeleccionada);
-  // console.log("📌 Nivel actual en appState:", appState.currentLevel);
-  // console.log("📌 Última actividad guardada:", appState.ultimaActividad);
-  // console.log("========================================");
-
   appState.agentHistory = [];
 
   setTimeout(() => {
@@ -2030,35 +2023,52 @@ function goPractice(){
     }
   }, 50);
 
+  // 1. Selecciona el Arquetipo y Escenario aleatorio
   var arch = pickRandomArchetype();
-  // console.log("👤 Arquetipo elegido al azar:", arch ? arch.name : "¡NINGUNO!");
-  
-  // Enviamos la técnica como tercer parámetro
   var scenario = pickRandomScenario(arch, appState.currentLevel, appState.tecnicaSeleccionada);
-  // console.log("🎬 Escenario final devuelto por pickRandomScenario:", scenario ? scenario.title || "Tiene datos pero no propiedad title" : "❌ ¡NULL/VACÍO!");
 
   appState.currentArchetype = arch;
   appState.currentScenario = scenario;
   appState.agentHistory = [];
-  appState.vrMood = (scenario && scenario.startMood) || 30;
   appState.hingesOpened = [];
   appState.conversationClosed = false;
   
   if(typeof currentArchetype !== 'undefined') currentArchetype = arch;
+
+  // 2. 🎲 CUMPLIR PUNTO 5: Añadir un factor impredecible al humor (Mood) inicial
+  // Tomamos el mood base del escenario y le sumamos/restamos un valor aleatorio (ej. entre -10 y +10)
+  var baseMood = (scenario && scenario.startMood) || 30;
+  var moodVariation = Math.floor(Math.random() * 21) - 10; // Genera un número entre -10 y 10
+  appState.vrMood = Math.max(10, Math.min(90, baseMood + moodVariation)); // Asegura que quede entre 10% y 90%
+
+  // 3. Renderizar el avatar y actualizar la barra de humor
   updateAgentAvatar(arch);
   updateVRMood(appState.vrMood);
   
+  // 4. 🖼️ Actualizar dinámicamente el HUD de A-Frame con el nuevo personaje
+  // Cambiamos el texto de la pantalla de práctica para mostrar el nombre y rol del arquetipo elegido
+  const agentNameEl = document.getElementById('agent-name');
+  const agentRoleEl = document.getElementById('agent-role');
+  
+  if (agentNameEl) {
+    agentNameEl.setAttribute('value', arch.name || "Agent");
+  }
+  if (agentRoleEl) {
+    // Si tu arquetipo tiene un rol (ej. "Junior Dev"), lo muestra. Si no, ponemos uno genérico.
+    agentRoleEl.setAttribute('value', arch.role || "Team Member");
+  }
+
+  // 5. Generar la frase de apertura inicial e iniciar la simulación
   var opener = pickRandomOpener(arch, scenario);
-  // console.log("💬 Opener generado para el inicio:", opener);
 
   appState.agentHistory.push({role:'assistant', content:opener});
   showScreen('practice');
   setDialog(arch.name.toUpperCase(), opener);
   speakVR(opener, getVoice('agent'), function(){ setHUD('ready','Ready to speak'); });
-  
-  // console.log("🚀 [DEBUG] Fin de goPractice. Transición de pantalla ejecutada.");
-  // console.log("========================================");
+
 }
+
+
 
   function go14button(){
     showScreen('technique-list');
