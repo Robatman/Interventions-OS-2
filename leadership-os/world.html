@@ -1898,9 +1898,34 @@ function goLearn() {
     opennessPanel.setAttribute('visible', 'false');
   } 
 
-  // console.log("=== ENTRANDO A GOLEARN ===");
-  // console.log("appState.tecnicaSeleccionada al entrar a goLearn:", appState.tecnicaSeleccionada);
+  // ========================================================
+  // 1. INYECTAR REGLAS DE DIFICULTAD EN EL SYSTEM PROMPT
+  // ========================================================
+  let instruccionesDificultad = "";
+  const nivel = appState.currentLevel; // 'novice', 'mid', 'adv'
 
+  if (nivel === 'novice') {
+    instruccionesDificultad = "Dificultad: FÁCIL (Novato). Sé sumamente cooperativo, expresa tus emociones de forma muy evidente, no interrumpas al usuario y responde con oraciones claras y directas.";
+  } else if (nivel === 'mid' || nivel === 'intermediate') {
+    instruccionesDificultad = "Dificultad: INTERMEDIA. Muestra resistencia moderada ante las preguntas, usa evasivas corporativas realistas y exige que el usuario aplique la técnica correctamente para abrirte.";
+  } else if (nivel === 'adv' || nivel === 'expert') {
+    instruccionesDificultad = "Dificultad: DIFÍCIL (Experto). Estás muy cerrado, a la defensiva o frustrado. Si el usuario no aplica de manera impecable la técnica, responde de forma cortante o con monosílabos.";
+  } else {
+    instruccionesDificultad = "Dificultad: ESTÁNDAR. Mantén una actitud neutra y realista.";
+  }
+
+  // Guardamos el System Prompt con las reglas de dificultad en el historial para que Groq lo lea siempre
+  appState.agentHistory.push({
+    role: 'system',
+    content: `Eres un agente de simulación para entrenamiento de liderazgo llamado JUANJOLOTE.
+Técnica actual de comunicación: "${appState.tecnicaSeleccionada || 'General'}".
+Reglas de comportamiento del cliente: ${instruccionesDificultad}
+Mantén el rol y el nivel de dificultad asignado en cada respuesta.`
+  });
+
+  // ========================================================
+  // 2. DETERMINAR INTRODUCCIÓN (Tu lógica original)
+  // ========================================================
   var intro = '';
   
   if (appState.activeMenu === 'interventions' && !appState.tecnicaSeleccionada) {
@@ -1978,8 +2003,13 @@ function goLearn() {
   setJuanMood('happy');
   setDialog('JUANJOLOTE', intro);
   speakVR(intro, 'daniel', function() { setHUD('ready', 'Ready to respond'); });
+  
+  // Guardamos la introducción en el historial
   appState.agentHistory.push({ role: 'assistant', content: intro });
 }
+
+
+
 
 
 function goWork() {
