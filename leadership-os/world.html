@@ -353,7 +353,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       selectAndPreviewVR('solution_focused_coaching'); 
       break;
     
-    // === CASES DE INTERVENCIONES ===
+    // === CASES DE INTERVENTIONS ===
     case 'interv-pulse-check': funcionIntervPulseCheck(); break;
     case 'interventions': funcionShowInterventions(); break;
     case 'techniques': funcionShowtechniques(); break;
@@ -661,7 +661,7 @@ function ejecutarFlujoGuardado() {
     
     <a-plane width="1.84" height="0.76" color="#00e5c0" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
     
-    <a-text value="INTERVENCIONES" align="center" color="#00e5c0" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
+    <a-text value="INTERVENTIONS" align="center" color="#00e5c0" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
     <a-text value="| Interview Anchoring" align="center" color="#c8d8ff" width="2" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
   </a-plane>
   
@@ -681,7 +681,7 @@ function ejecutarFlujoGuardado() {
     
     <a-plane width="1.84" height="0.76" color="#9d5cff" material="opacity:0.45;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
     
-    <a-text value="TECNICAS" align="center" color="#9d5cff" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
+    <a-text value="TECHNIQUES" align="center" color="#9d5cff" width="4" position="0 0.10 0.01" font="mozillavr"></a-text>
     <a-text value="14 Communication Tools" align="center" color="#c8d8ff" width="2" position="0 -0.16 0.01" opacity="0.72" wrap-count="34" font="mozillavr"></a-text>
   </a-plane>
 </a-entity>
@@ -1174,7 +1174,7 @@ function ejecutarFlujoGuardado() {
 
 
 <a-entity id="screen-interventions" visible="false">
-  <a-text value="INTERVENCIONES" position="0 2.6 -2.8" align="center" color="#ffffff" width="6.5" font="exo2bold" shader="msdf"></a-text>
+  <a-text value="INTERVENTIONS" position="0 2.6 -2.8" align="center" color="#ffffff" width="6.5" font="exo2bold" shader="msdf"></a-text>
   <a-text value="Which intervention do you want to work on?\nEach has its own moment, owner, and objective." position="0 2.2 -2.8" align="center" color="#c8d8ff" width="4" opacity="0.8" font="mozillavr" shader="msdf"></a-text>
 
   <a-entity id="buttons-container">
@@ -1954,7 +1954,7 @@ function goLearn() {
         intro = 'Very well, let\'s start with Solution-Focused Coaching, directing attention toward resources and the future.';
         break;
 
-      // === CASES DE INTERVENCIONES ===
+      // === CASES DE INTERVENTIONS ===
       case 'interv_pulse_check':
         intro = 'Very well, let\'s start the Pulse Check simulation. Let\'s analyze the user\'s retention status.';
         break;
