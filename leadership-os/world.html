@@ -64,7 +64,7 @@ AFRAME.registerComponent('handler-botones-vr', {
       }
       evt.stopPropagation(); 
       
-      // console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id ||i8 el.parentElement.id})`);
+      //console.log(`🎯 [VR Click] ${data.mensaje} (ID: ${el.id el.parentElement.id})`);
       ejecutarFuncionPorTecnica(data.tecnica);
     });
   }
@@ -491,11 +491,6 @@ function funcionIntervTenureRenewal() {
   appState.tecnicaSeleccionada = 'interv_tenure_renewal';
   appState.tecnicaCargada = 'interv_tenure_renewal';
   cambiarPantallaVR('screen-learn-work-practice'); 
-}
-
-function funcionIntervRetencion() {
-  // console.log("📊 [Intervención] Cargando simulación: Conversación de Retención de Clientes...");
-  showScreen('learn-work-practice'); // 👈 Cambiado aquí
 }
 
 function funcionIntervFidelizacion() {
@@ -1898,34 +1893,9 @@ function goLearn() {
     opennessPanel.setAttribute('visible', 'false');
   } 
 
-  // ========================================================
-  // 1. INYECTAR REGLAS DE DIFICULTAD EN EL SYSTEM PROMPT
-  // ========================================================
-  let instruccionesDificultad = "";
-  const nivel = appState.currentLevel; // 'novice', 'mid', 'adv'
+  // console.log("=== ENTRANDO A GOLEARN ===");
+  // console.log("appState.tecnicaSeleccionada al entrar a goLearn:", appState.tecnicaSeleccionada);
 
-  if (nivel === 'novice') {
-    instruccionesDificultad = "Dificultad: FÁCIL (Novato). Sé sumamente cooperativo, expresa tus emociones de forma muy evidente, no interrumpas al usuario y responde con oraciones claras y directas.";
-  } else if (nivel === 'mid' || nivel === 'intermediate') {
-    instruccionesDificultad = "Dificultad: INTERMEDIA. Muestra resistencia moderada ante las preguntas, usa evasivas corporativas realistas y exige que el usuario aplique la técnica correctamente para abrirte.";
-  } else if (nivel === 'adv' || nivel === 'expert') {
-    instruccionesDificultad = "Dificultad: DIFÍCIL (Experto). Estás muy cerrado, a la defensiva o frustrado. Si el usuario no aplica de manera impecable la técnica, responde de forma cortante o con monosílabos.";
-  } else {
-    instruccionesDificultad = "Dificultad: ESTÁNDAR. Mantén una actitud neutra y realista.";
-  }
-
-  // Guardamos el System Prompt con las reglas de dificultad en el historial para que Groq lo lea siempre
-  appState.agentHistory.push({
-    role: 'system',
-    content: `Eres un agente de simulación para entrenamiento de liderazgo llamado JUANJOLOTE.
-Técnica actual de comunicación: "${appState.tecnicaSeleccionada || 'General'}".
-Reglas de comportamiento del cliente: ${instruccionesDificultad}
-Mantén el rol y el nivel de dificultad asignado en cada respuesta.`
-  });
-
-  // ========================================================
-  // 2. DETERMINAR INTRODUCCIÓN (Tu lógica original)
-  // ========================================================
   var intro = '';
   
   if (appState.activeMenu === 'interventions' && !appState.tecnicaSeleccionada) {
@@ -2003,13 +1973,8 @@ Mantén el rol y el nivel de dificultad asignado en cada respuesta.`
   setJuanMood('happy');
   setDialog('JUANJOLOTE', intro);
   speakVR(intro, 'daniel', function() { setHUD('ready', 'Ready to respond'); });
-  
-  // Guardamos la introducción en el historial
   appState.agentHistory.push({ role: 'assistant', content: intro });
 }
-
-
-
 
 
 function goWork() {
@@ -2053,52 +2018,35 @@ function goPractice(){
     }
   }, 50);
 
-  // 1. Selecciona el Arquetipo y Escenario aleatorio
   var arch = pickRandomArchetype();
+  // console.log("👤 Arquetipo elegido al azar:", arch ? arch.name : "¡NINGUNO!");
+  
+  // Enviamos la técnica como tercer parámetro
   var scenario = pickRandomScenario(arch, appState.currentLevel, appState.tecnicaSeleccionada);
+  // console.log("🎬 Escenario final devuelto por pickRandomScenario:", scenario ? scenario.title || "Tiene datos pero no propiedad title" : "❌ ¡NULL/VACÍO!");
 
   appState.currentArchetype = arch;
   appState.currentScenario = scenario;
   appState.agentHistory = [];
+  appState.vrMood = (scenario && scenario.startMood) || 30;
   appState.hingesOpened = [];
   appState.conversationClosed = false;
   
   if(typeof currentArchetype !== 'undefined') currentArchetype = arch;
-
-  // 2. 🎲 CUMPLIR PUNTO 5: Añadir un factor impredecible al humor (Mood) inicial
-  // Tomamos el mood base del escenario y le sumamos/restamos un valor aleatorio (ej. entre -10 y +10)
-  var baseMood = (scenario && scenario.startMood) || 30;
-  var moodVariation = Math.floor(Math.random() * 21) - 10; // Genera un número entre -10 y 10
-  appState.vrMood = Math.max(10, Math.min(90, baseMood + moodVariation)); // Asegura que quede entre 10% y 90%
-
-  // 3. Renderizar el avatar y actualizar la barra de humor
   updateAgentAvatar(arch);
   updateVRMood(appState.vrMood);
   
-  // 4. 🖼️ Actualizar dinámicamente el HUD de A-Frame con el nuevo personaje
-  // Cambiamos el texto de la pantalla de práctica para mostrar el nombre y rol del arquetipo elegido
-  const agentNameEl = document.getElementById('agent-name');
-  const agentRoleEl = document.getElementById('agent-role');
-  
-  if (agentNameEl) {
-    agentNameEl.setAttribute('value', arch.name || "Agent");
-  }
-  if (agentRoleEl) {
-    // Si tu arquetipo tiene un rol (ej. "Junior Dev"), lo muestra. Si no, ponemos uno genérico.
-    agentRoleEl.setAttribute('value', arch.role || "Team Member");
-  }
-
-  // 5. Generar la frase de apertura inicial e iniciar la simulación
   var opener = pickRandomOpener(arch, scenario);
+  // console.log("💬 Opener generado para el inicio:", opener);
 
   appState.agentHistory.push({role:'assistant', content:opener});
   showScreen('practice');
   setDialog(arch.name.toUpperCase(), opener);
   speakVR(opener, getVoice('agent'), function(){ setHUD('ready','Ready to speak'); });
-
+  
+  // console.log("🚀 [DEBUG] Fin de goPractice. Transición de pantalla ejecutada.");
+  // console.log("========================================");
 }
-
-
 
   function go14button(){
     showScreen('technique-list');
