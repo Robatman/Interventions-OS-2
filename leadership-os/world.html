@@ -555,9 +555,10 @@ function ejecutarFlujoGuardado() {
 <button id="mic-btn" title="Hablar">&#127908;</button>
 <!-- <a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018"> -->
 <a-scene vr-mode-ui="enabled:true" 
-         background="color:#05020a" 
+         background="color:#f1edfa" 
          renderer="antialias:true;colorManagement:true;alpha:true" 
-         fog="type:exponential;color:#0a0514;density:0.045">
+         fog="type:exponential;color:#e8e3f5;density:0.015">
+           <a-assets>
     <img id="juan-neutral"    src="assets/juanjolote_neutral.png">
     <img id="juan-happy"      src="assets/juanjolote_happy.png">
     <img id="juan-talking"    src="assets/juanjolote_talking.png">
@@ -617,66 +618,72 @@ function ejecutarFlujoGuardado() {
 
   
 <!-- ========================================================= -->
-<!-- ENTORNO: SALA DE CONTROL SYNTHWAVE / BÚNKER FUTURISTA     -->
+<!-- ENTORNO: HUB CORPORATIVO BASADO EN EL LOGO "C"            -->
 <!-- ========================================================= -->
 
-<!-- 1. Iluminación Estilizada Neón -->
-<a-light type="ambient" color="#0a0518" intensity="0.6"></a-light>
-<!-- Luz direccional superior tenue -->
-<a-light type="directional" position="0 10 -2" color="#ff007f" intensity="0.5"></a-light>
-<!-- Focalización Magenta y Cian para las paredes -->
-<a-light type="point" position="-6 3 -4" color="#00f0ff" intensity="1.2" distance="15"></a-light>
-<a-light type="point" position="6 3 -4" color="#ff007f" intensity="1.2" distance="15"></a-light>
-<!-- Luz de piso ambiental cálida -->
-<a-light type="point" position="0 0.5 0" color="#7b2cbf" intensity="0.8" distance="8"></a-light>
+<!-- 1. Iluminación Limpia y Profesional -->
+<a-light type="ambient" color="#e2e8f0" intensity="0.8"></a-light>
+<!-- Luz principal superior (Luz de estudio moderna) -->
+<a-light type="directional" position="0 12 5" color="#ffffff" intensity="0.9"></a-light>
+<!-- Acentos de luz azul y rojo según la paleta del logo -->
+<a-light type="point" position="-5 3 -5" color="#0022fa" intensity="1.2" distance="15"></a-light>
+<a-light type="point" position="5 3 -5" color="#ff3b4e" intensity="1.2" distance="15"></a-light>
 
-<!-- 2. Paredes y Estructura del Búnker (Techo y límites) -->
-<!-- Techo bajo e industrial -->
-<a-plane position="0 5 0" rotation="90 0 0" width="24" height="24" color="#0d0914" material="metalness:0.8;roughness:0.2"></a-plane>
+<!-- 2. Cúpula / Fondo con Degradado Suave (Matching Background) -->
+<a-sphere radius="35" color="#f1edfa" material="shader:flat;side:back"></a-sphere>
 
-<!-- Pared Trasera -->
-<a-plane position="0 2.5 -10" width="20" height="5" color="#120c1f" material="metalness:0.5;roughness:0.5"></a-plane>
-<!-- Paredes Laterales -->
-<a-plane position="-10 2.5 0" rotation="0 90 0" width="20" height="5" color="#0e0a17" material="metalness:0.5;roughness:0.5"></a-plane>
-<a-plane position="10 2.5 0" rotation="0 -90 0" width="20" height="5" color="#0e0a17" material="metalness:0.5;roughness:0.5"></a-plane>
+<!-- 3. Plataforma Central (El Suelo) -->
+<!-- Anillo exterior azul (La C principal) -->
+<a-cylinder position="0 0 0" radius="10" height="0.1" color="#0022fa" material="roughness:0.3;metalness:0.2"></a-cylinder>
+<!-- Disco interior blanco pulido -->
+<a-cylinder position="0 0.05 0" radius="8.5" height="0.1" color="#ffffff" material="roughness:0.1;metalness:0.5"></a-cylinder>
 
-<!-- 3. Suelo de Neón Reflectante con Rejilla Cyan -->
-<a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#05020a" material="roughness:0.1;metalness:0.9"></a-plane>
-<a-entity position="0 0.01 0">
-  <a-plane rotation="-90 0 0" width="20" height="20" material="color:#00f0ff;opacity:0.3;transparent:true;shader:flat;wireframe:true"></a-plane>
+<!-- 4. LOGO 3D GIGANTE EN EL FONDO (Escultura Central) -->
+<a-entity id="logo-3d-escultura" position="0 3.8 -8">
+  <!-- Cuerpo principal de la 'C' (Arco Azul) -->
+  <a-torus radius="2.5" radius-tubular="0.4" arc="270" rotation="0 0 45" color="#0022fa" material="roughness:0.2;metalness:0.3"></a-torus>
+  
+  <!-- Detalle biselado azul claro en los bordes de la C -->
+  <a-torus radius="2.5" radius-tubular="0.42" arc="60" rotation="0 0 240" color="#536bfe" material="shader:flat;opacity:0.8;transparent:true"></a-torus>
+  
+  <!-- La Cuña / Flecha Roja del Logo (Flotando hacia el centro de la C) -->
+  <a-cone position="1.1 0 0" rotation="0 0 -90" radius-bottom="1.4" height="2.2" segments-radial="3" color="#ff3b4e" material="roughness:0.2;metalness:0.1"
+          animation="property:position;to:1.3 0 0;dir:alternate;loop:true;dur:2500;easing:easeInOutSine"></a-cone>
 </a-entity>
 
-<!-- 4. Marcos Luminosos Neón en las Paredes (Paneles de Control) -->
-<!-- Marco Neón Magenta (Izquierda) -->
-<a-torus position="-9.8 2.5 -2" rotation="0 90 0" radius="1.8" radius-tubular="0.02" color="#ff007f" material="shader:flat"></a-torus>
-<a-plane position="-9.7 2.5 -2" rotation="0 90 0" width="2" height="2" color="#ff007f" material="shader:flat;opacity:0.15;transparent:true"></a-plane>
+<!-- 5. Marcos / Enmarcado del Espacio (Arcos Gigantes de la 'C') -->
+<!-- Arco gigante azul rodeando la escena -->
+<a-torus position="0 4 -2" radius="9" radius-tubular="0.15" arc="220" rotation="30 0 -45" color="#0022fa" material="metalness:0.6;roughness:0.2"></a-torus>
+<!-- Anillo flotante rojo dinámico -->
+<a-torus position="0 4.5 -2" radius="9.3" radius-tubular="0.05" arc="120" rotation="30 0 165" color="#ff3b4e" material="shader:flat"
+         animation="property:rotation;to:30 360 165;loop:true;dur:30000;easing:linear"></a-torus>
 
-<!-- Marco Neón Cian (Derecha) -->
-<a-torus position="9.8 2.5 -2" rotation="0 -90 0" radius="1.8" radius-tubular="0.02" color="#00f0ff" material="shader:flat"></a-torus>
-<a-plane position="9.7 2.5 -2" rotation="0 -90 0" width="2" height="2" color="#00f0ff" material="shader:flat;opacity:0.15;transparent:true"></a-plane>
+<!-- 6. Podios / Consolas de Interacción (Inspirados en la geometría) -->
+<!-- Podio Central (Rojo) -->
+<a-cylinder position="0 0.6 -3.5" radius="0.8" height="1.2" color="#ff3b4e" material="roughness:0.2"></a-cylinder>
+<a-cylinder position="0 1.25 -3.5" radius="0.85" height="0.1" color="#ffffff" material="roughness:0.1"></a-cylinder>
 
-<!-- 5. Columnas Industriales Mágicas con Anillos Flotantes -->
-<!-- Columna Izquierda -->
-<a-cylinder position="-5 2.5 -6" radius="0.3" height="5" color="#1a1126" material="metalness:0.8"></a-cylinder>
-<a-torus position="-5 1.5 -6" rotation="90 0 0" radius="0.5" radius-tubular="0.025" color="#00f0ff" material="shader:flat"
-         animation="property:rotation;to:90 360 0;loop:true;dur:6000;easing:linear"></a-torus>
-<a-torus position="-5 3.5 -6" rotation="90 0 0" radius="0.5" radius-tubular="0.025" color="#ff007f" material="shader:flat"
-         animation="property:rotation;to:90 -360 0;loop:true;dur:8000;easing:linear"></a-torus>
+<!-- Podio Izquierdo (Azul Oscuro) -->
+<a-cylinder position="-3.5 0.5 -2.5" radius="0.6" height="1" color="#0022fa" material="roughness:0.3"></a-cylinder>
+<a-cylinder position="-3.5 1.05 -2.5" radius="0.65" height="0.08" color="#ffffff"></a-cylinder>
 
-<!-- Columna Derecha -->
-<a-cylinder position="5 2.5 -6" radius="0.3" height="5" color="#1a1126" material="metalness:0.8"></a-cylinder>
-<a-torus position="5 1.5 -6" rotation="90 0 0" radius="0.5" radius-tubular="0.025" color="#ff007f" material="shader:flat"
-         animation="property:rotation;to:90 -360 0;loop:true;dur:7000;easing:linear"></a-torus>
-<a-torus position="5 3.5 -6" rotation="90 0 0" radius="0.5" radius-tubular="0.025" color="#00f0ff" material="shader:flat"
-         animation="property:rotation;to:90 360 0;loop:true;dur:9000;easing:linear"></a-torus>
+<!-- Podio Derecho (Azul Claro) -->
+<a-cylinder position="3.5 0.5 -2.5" radius="0.6" height="1" color="#536bfe" material="roughness:0.3"></a-cylinder>
+<a-cylinder position="3.5 1.05 -2.5" radius="0.65" height="0.08" color="#ffffff"></a-cylinder>
 
-<!-- 6. Núcleo Holográfico Central (Detrás del área principal de interacción) -->
-<a-octahedron position="0 2.2 -8" radius="0.8" color="#00f0ff" material="shader:flat;wireframe:true"
-              animation="property:rotation;to:0 360 360;loop:true;dur:12000;easing:linear"></a-octahedron>
-<a-octahedron position="0 2.2 -8" radius="0.4" color="#ff007f" material="shader:flat"
-              animation="property:scale;to:1.3 1.3 1.3;dir:alternate;loop:true;dur:2000;easing:easeInOutQuad"></a-octahedron>
+<!-- 7. Partículas / Triángulos Rojos Flotantes (Basados en la cuña del logo) -->
+<a-entity id="triangulos-flotantes">
+  <a-cone position="-4 2.5 -4" rotation="45 20 0" radius-bottom="0.2" height="0.3" segments-radial="3" color="#ff3b4e" material="shader:flat;opacity:0.85"
+          animation="property:position;to:-4 3.1 -4;dir:alternate;loop:true;dur:3200;easing:easeInOutSine"></a-cone>
+          
+  <a-cone position="4.5 2 -3" rotation="-20 40 30" radius-bottom="0.18" height="0.28" segments-radial="3" color="#ff3b4e" material="shader:flat;opacity:0.85"
+          animation="property:position;to:4.5 2.6 -3;dir:alternate;loop:true;dur:2700;easing:easeInOutSine"></a-cone>
+          
+  <a-cone position="-2 3.8 -6" rotation="10 -30 15" radius-bottom="0.25" height="0.4" segments-radial="3" color="#536bfe" material="shader:flat;opacity:0.7"
+          animation="property:position;to:-2 4.3 -6;dir:alternate;loop:true;dur:4000;easing:easeInOutSine"></a-cone>
+</a-entity>
 
-
+  
   <!-- SCREEN: WELCOME -->
   <a-entity id="screen-welcome">
     <a-entity id="juanjolote-entity" position="-3.3 0 -2.9">
