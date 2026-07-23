@@ -5,7 +5,7 @@
 <title>Centris · Neural Academy</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-<!-- <style>
+<style>
   html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#060818;}
   a-scene{width:100%;height:100%;}
   #voice-hud{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:10px;background:rgba(15,20,50,0.85);border:1px solid #2a3a7a;border-radius:40px;padding:9px 22px;font-family:monospace;font-size:0.8rem;color:#c8d8ff;pointer-events:none;backdrop-filter:blur(8px);}
@@ -19,7 +19,7 @@
   #mic-btn.recording{background:linear-gradient(135deg,#ff5ca0,#ff3c6b);box-shadow:0 0 24px #ff5ca0;}
   
   
-</style> -->
+</style>
 </head>
 <body>
 <script>
@@ -553,7 +553,7 @@ function ejecutarFlujoGuardado() {
 <script src="js/preview.js"></script>
 <div id="voice-hud"><div id="voice-dot" class="idle"></div><span id="voice-label">Starting Neural Academy...</span></div>
 <button id="mic-btn" title="Hablar">&#127908;</button>
-<a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018">
+<!-- <a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018">
   <a-assets>
     <img id="juan-neutral"    src="assets/juanjolote_neutral.png">
     <img id="juan-happy"      src="assets/juanjolote_happy.png">
@@ -1639,7 +1639,7 @@ function ejecutarFlujoGuardado() {
     <a-entity geometry="primitive:ring;radiusInner:0.007;radiusOuter:0.012" material="color:#00e5c0;shader:flat;opacity:0.85" position="0 0 -1.0"></a-entity>
     <a-cursor id="vr-cursor" raycaster="objects: .clickable, .sub-tecnica; far:6" fuse="false" color="#00e5c0" opacity="0" position="0 0 -1.0" geometry="primitive:ring;radiusInner:0.009;radiusOuter:0.014" material="color:#00e5c0;shader:flat;opacity:0"></a-cursor>    
   </a-camera>
-</a-scene>
+</a-scene> -->
 
 <script>
 const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
