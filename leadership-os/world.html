@@ -617,7 +617,7 @@ function ejecutarFlujoGuardado() {
   <a-sphere position="0 3.5 -5" radius="0.14" color="#00e5c0" material="opacity:0.7;shader:flat" animation="property:position;to:0 4.2 -5;loop:true;dur:4200;dir:alternate;easing:easeInOutSine"></a-sphere> -->
 
   <!-- ========================================================= -->
-<!-- ENTORNO: HUB TECH MODO OSCURO (INSPIRADO EN EL LOGO)      -->
+<!-- ENTORNO: HUB TECH MODO OSCURO (SIN CONTENEDORES EN PISO)  -->
 <!-- ========================================================= -->
 
 <!-- 1. Iluminación Oscura y Enfocada (Cero deslumbre) -->
@@ -631,14 +631,11 @@ function ejecutarFlujoGuardado() {
 <!-- 2. Cúpula del Fondo (Azul Noche Profundo / Espacio Controlado) -->
 <a-sphere radius="35" color="#04060d" material="shader:flat;side:back"></a-sphere>
 
-<!-- 3. Plataforma Central (Suelo Oscuro y Elegante) -->
-<!-- Anillo exterior gris oscuro metálico -->
-<a-cylinder position="0 0 0" radius="10" height="0.1" color="#0f1420" material="roughness:0.4;metalness:0.8"></a-cylinder>
-<!-- Disco interior negro carbón con baja reflexividad -->
-<a-cylinder position="0 0.05 0" radius="8.5" height="0.1" color="#080a12" material="roughness:0.2;metalness:0.9"></a-cylinder>
+<!-- 3. Suelo Diáfano y Elegante (Sin plataformas elevadas) -->
+<a-plane position="0 0 0" rotation="-90 0 0" width="40" height="40" color="#080a12" material="roughness:0.2;metalness:0.9"></a-plane>
 
-<!-- Detalle en el suelo: Anillo Neón fino alrededor del usuario -->
-<a-torus position="0 0.11 0" rotation="90 0 0" radius="3" radius-tubular="0.015" color="#0022fa" material="shader:flat;opacity:0.8;transparent:true"></a-torus>
+<!-- Anillo Neón fino en el suelo para referencia espacial del usuario -->
+<a-torus position="0 0.01 0" rotation="90 0 0" radius="3" radius-tubular="0.015" color="#0022fa" material="shader:flat;opacity:0.8;transparent:true"></a-torus>
 
 <!-- 4. LOGO 3D EN EL FONDO (Escultura Central) -->
 <a-entity id="logo-3d-escultura" position="0 3.8 -8">
@@ -660,20 +657,7 @@ function ejecutarFlujoGuardado() {
 <a-torus position="0 4.5 -2" radius="9.3" radius-tubular="0.03" arc="120" rotation="30 0 165" color="#ff3b4e" material="shader:flat;opacity:0.75;transparent:true"
          animation="property:rotation;to:30 360 165;loop:true;dur:30000;easing:linear"></a-torus>
 
-<!-- 6. Podios / Consolas de Interacción Oscuras -->
-<!-- Podio Central (Acento Rojo) -->
-<a-cylinder position="0 0.6 -3.5" radius="0.8" height="1.2" color="#18121e" material="metalness:0.7;roughness:0.3"></a-cylinder>
-<a-cylinder position="0 1.22 -3.5" radius="0.82" height="0.04" color="#ff3b4e" material="shader:flat"></a-cylinder>
-
-<!-- Podio Izquierdo (Acento Azul Oscuro) -->
-<a-cylinder position="-3.5 0.5 -2.5" radius="0.6" height="1" color="#0e1326" material="metalness:0.7;roughness:0.3"></a-cylinder>
-<a-cylinder position="-3.5 1.02 -2.5" radius="0.62" height="0.04" color="#0022fa" material="shader:flat"></a-cylinder>
-
-<!-- Podio Derecho (Acento Azul Claro) -->
-<a-cylinder position="3.5 0.5 -2.5" radius="0.6" height="1" color="#0e1326" material="metalness:0.7;roughness:0.3"></a-cylinder>
-<a-cylinder position="3.5 1.02 -2.5" radius="0.62" height="0.04" color="#536bfe" material="shader:flat"></a-cylinder>
-
-<!-- 7. Partículas / Triángulos Flotantes Neón (Sutiles en la oscuridad) -->
+<!-- 6. Partículas / Triángulos Flotantes Neón (Sutiles en la oscuridad) -->
 <a-entity id="triangulos-flotantes">
   <a-cone position="-4 2.5 -4" rotation="45 20 0" radius-bottom="0.2" height="0.3" segments-radial="3" color="#ff3b4e" material="shader:flat;opacity:0.8"
           animation="property:position;to:-4 3.1 -4;dir:alternate;loop:true;dur:3200;easing:easeInOutSine"></a-cone>
