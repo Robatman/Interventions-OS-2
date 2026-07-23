@@ -553,7 +553,8 @@ function ejecutarFlujoGuardado() {
 <script src="js/preview.js"></script>
 <div id="voice-hud"><div id="voice-dot" class="idle"></div><span id="voice-label">Starting Neural Academy...</span></div>
 <button id="mic-btn" title="Hablar">&#127908;</button>
-<!-- <a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018">
+<!-- <a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018"> -->
+  <a-scene>
   <a-assets>
     <img id="juan-neutral"    src="assets/juanjolote_neutral.png">
     <img id="juan-happy"      src="assets/juanjolote_happy.png">
@@ -570,9 +571,9 @@ function ejecutarFlujoGuardado() {
   <a-light type="point" position="-4 2 -4" color="#00e5c0" intensity="0.7" distance="12"></a-light>
   <a-light type="point" position="4 2 -4" color="#9d5cff" intensity="0.6" distance="12"></a-light>
   <a-light type="point" position="0 1 3" color="#ff5ca0" intensity="0.3" distance="8"></a-light>
-  <a-plane position="0 0 0" rotation="-90 0 0" width="40" height="40" color="#080c1f" material="shader:flat;opacity:1"></a-plane>
-  <a-entity position="0 0.01 0"><a-plane rotation="-90 0 0" width="40" height="40" material="color:#1a2a6a;opacity:0.25;transparent:true;shader:flat;wireframe:true"></a-plane></a-entity>
-  <a-sphere radius="30" color="#0a0a2a" material="opacity:1;shader:flat;side:back"></a-sphere>
+  <!-- <a-plane position="0 0 0" rotation="-90 0 0" width="40" height="40" color="#080c1f" material="shader:flat;opacity:1"></a-plane> -->
+  <!-- <a-entity position="0 0.01 0"><a-plane rotation="-90 0 0" width="40" height="40" material="color:#1a2a6a;opacity:0.25;transparent:true;shader:flat;wireframe:true"></a-plane></a-entity> -->
+  <!-- <a-sphere radius="30" color="#0a0a2a" material="opacity:1;shader:flat;side:back"></a-sphere> -->
   <a-sphere position="-8 4 -18" radius="5" color="#1a0a4a" material="opacity:0.6;transparent:true;shader:flat"></a-sphere>
   <a-sphere position="10 3 -20" radius="6" color="#0a1a3a" material="opacity:0.5;transparent:true;shader:flat"></a-sphere>
   <a-sphere position="0 8 -22" radius="7" color="#0a2a2a" material="opacity:0.4;transparent:true;shader:flat"></a-sphere>
@@ -1639,7 +1640,7 @@ function ejecutarFlujoGuardado() {
     <a-entity geometry="primitive:ring;radiusInner:0.007;radiusOuter:0.012" material="color:#00e5c0;shader:flat;opacity:0.85" position="0 0 -1.0"></a-entity>
     <a-cursor id="vr-cursor" raycaster="objects: .clickable, .sub-tecnica; far:6" fuse="false" color="#00e5c0" opacity="0" position="0 0 -1.0" geometry="primitive:ring;radiusInner:0.009;radiusOuter:0.014" material="color:#00e5c0;shader:flat;opacity:0"></a-cursor>    
   </a-camera>
-</a-scene> -->
+</a-scene>
 
 <script>
 const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
