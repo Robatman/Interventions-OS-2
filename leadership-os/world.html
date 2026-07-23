@@ -74,7 +74,14 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 function cambiarPantallaVR(pantallaMostrarId) {
   // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
-
+const entornoUniversal = document.getElementById('entorno-universal');
+  if (entornoUniversal) {
+    if (pantallaMostrarId === 'screen-intro') {
+      entornoUniversal.setAttribute('visible', 'false');
+    } else {
+      entornoUniversal.setAttribute('visible', 'true');
+    }
+  }
   const pantallas = [
     'screen-intro',
     'screen-welcome', 
@@ -576,44 +583,46 @@ function ejecutarFlujoGuardado() {
     <img id="ajolin-sad"      src="assets/ajolin_sad.png">
     <img id="ajolin-surprised" src="assets/ajolin_surprised.png">
   </a-assets>s
+ 
+  
+
+
   <!-- ========================================================= -->
-<!-- ENTORNO: HUB TECH MODO OSCURO (SIN CONTENEDORES EN PISO)  -->
+<!-- ENTORNO UNIVERSAL / HUB TECH (Agrupado en un contenedor)   -->
 <!-- ========================================================= -->
+<a-entity id="entorno-universal" visible="true">
+  <a-light type="ambient" color="#0a0d18" intensity="0.5"></a-light>
+  <a-light type="directional" position="0 10 -2" color="#1a2542" intensity="0.6"></a-light>
+  <a-light type="point" position="-5 3 -5" color="#0022fa" intensity="1.5" distance="15"></a-light>
+  <a-light type="point" position="5 3 -5" color="#ff3b4e" intensity="1.2" distance="15"></a-light>
 
-<a-light type="ambient" color="#0a0d18" intensity="0.5"></a-light>
-<a-light type="directional" position="0 10 -2" color="#1a2542" intensity="0.6"></a-light>
-<a-light type="point" position="-5 3 -5" color="#0022fa" intensity="1.5" distance="15"></a-light>
-<a-light type="point" position="5 3 -5" color="#ff3b4e" intensity="1.2" distance="15"></a-light>
+  <a-sphere radius="35" color="#04060d" material="shader:flat;side:back"></a-sphere>
 
-<a-sphere radius="35" color="#04060d" material="shader:flat;side:back"></a-sphere>
+  <a-plane position="0 0 0" rotation="-90 0 0" width="40" height="40" color="#080a12" material="roughness:0.2;metalness:0.9"></a-plane>
 
-<a-plane position="0 0 0" rotation="-90 0 0" width="40" height="40" color="#080a12" material="roughness:0.2;metalness:0.9"></a-plane>
+  <a-torus position="0 0.01 0" rotation="90 0 0" radius="3" radius-tubular="0.015" color="#0022fa" material="shader:flat;opacity:0.8;transparent:true"></a-torus>
 
-<a-torus position="0 0.01 0" rotation="90 0 0" radius="3" radius-tubular="0.015" color="#0022fa" material="shader:flat;opacity:0.8;transparent:true"></a-torus>
+  <a-entity id="logo-3d-escultura" position="0 3.8 -8">
+    <a-torus radius="2.5" radius-tubular="0.4" arc="270" rotation="0 0 45" color="#0022fa" material="roughness:0.2;metalness:0.5"></a-torus>
+    <a-torus radius="2.5" radius-tubular="0.42" arc="60" rotation="0 0 240" color="#536bfe" material="shader:flat;opacity:0.9;transparent:true"></a-torus>
+    <a-cone position="1.1 0 0" rotation="0 0 90" radius-bottom="1.4" height="2.2" segments-radial="3" color="#ff3b4e" material="shader:flat"
+            animation="property:position;to:1.3 0 0;dir:alternate;loop:true;dur:2500;easing:easeInOutSine"></a-cone>
+  </a-entity>
 
-<a-entity id="logo-3d-escultura" position="0 3.8 -8">
-  <a-torus radius="2.5" radius-tubular="0.4" arc="270" rotation="0 0 45" color="#0022fa" material="roughness:0.2;metalness:0.5"></a-torus>
-  
-  <a-torus radius="2.5" radius-tubular="0.42" arc="60" rotation="0 0 240" color="#536bfe" material="shader:flat;opacity:0.9;transparent:true"></a-torus>
-  
-  <a-cone position="1.1 0 0" rotation="0 0 90" radius-bottom="1.4" height="2.2" segments-radial="3" color="#ff3b4e" material="shader:flat"
-          animation="property:position;to:1.3 0 0;dir:alternate;loop:true;dur:2500;easing:easeInOutSine"></a-cone>
+  <a-torus position="0 4 -2" radius="9" radius-tubular="0.12" arc="220" rotation="30 0 -45" color="#0d1f5e" material="metalness:0.8;roughness:0.2"></a-torus>
+  <a-torus position="0 4.5 -2" radius="9.3" radius-tubular="0.03" arc="120" rotation="30 0 165" color="#ff3b4e" material="shader:flat;opacity:0.75;transparent:true"
+           animation="property:rotation;to:30 360 165;loop:true;dur:30000;easing:linear"></a-torus>
 
-</a-entity>
-
-<a-torus position="0 4 -2" radius="9" radius-tubular="0.12" arc="220" rotation="30 0 -45" color="#0d1f5e" material="metalness:0.8;roughness:0.2"></a-torus>
-<a-torus position="0 4.5 -2" radius="9.3" radius-tubular="0.03" arc="120" rotation="30 0 165" color="#ff3b4e" material="shader:flat;opacity:0.75;transparent:true"
-         animation="property:rotation;to:30 360 165;loop:true;dur:30000;easing:linear"></a-torus>
-
-<a-entity id="triangulos-flotantes">
-  <a-cone position="-4 2.5 -4" rotation="45 20 0" radius-bottom="0.2" height="0.3" segments-radial="3" color="#ff3b4e" material="shader:flat;opacity:0.8"
-          animation="property:position;to:-4 3.1 -4;dir:alternate;loop:true;dur:3200;easing:easeInOutSine"></a-cone>
-          
-  <a-cone position="4.5 2 -3" rotation="-20 40 30" radius-bottom="0.18" height="0.28" segments-radial="3" color="#ff3b4e" material="shader:flat;opacity:0.8"
-          animation="property:position;to:4.5 2.6 -3;dir:alternate;loop:true;dur:2700;easing:easeInOutSine"></a-cone>
-          
-  <a-cone position="-2 3.8 -6" rotation="10 -30 15" radius-bottom="0.25" height="0.4" segments-radial="3" color="#536bfe" material="shader:flat;opacity:0.6"
-          animation="property:position;to:-2 4.3 -6;dir:alternate;loop:true;dur:4000;easing:easeInOutSine"></a-cone>
+  <a-entity id="triangulos-flotantes">
+    <a-cone position="-4 2.5 -4" rotation="45 20 0" radius-bottom="0.2" height="0.3" segments-radial="3" color="#ff3b4e" material="shader:flat;opacity:0.8"
+            animation="property:position;to:-4 3.1 -4;dir:alternate;loop:true;dur:3200;easing:easeInOutSine"></a-cone>
+            
+    <a-cone position="4.5 2 -3" rotation="-20 40 30" radius-bottom="0.18" height="0.28" segments-radial="3" color="#ff3b4e" material="shader:flat;opacity:0.8"
+            animation="property:position;to:4.5 2.6 -3;dir:alternate;loop:true;dur:2700;easing:easeInOutSine"></a-cone>
+            
+    <a-cone position="-2 3.8 -6" rotation="10 -30 15" radius-bottom="0.25" height="0.4" segments-radial="3" color="#536bfe" material="shader:flat;opacity:0.6"
+            animation="property:position;to:-2 4.3 -6;dir:alternate;loop:true;dur:4000;easing:easeInOutSine"></a-cone>
+  </a-entity>
 </a-entity>
 
 
