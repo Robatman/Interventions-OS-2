@@ -555,9 +555,9 @@ function ejecutarFlujoGuardado() {
 <button id="mic-btn" title="Hablar">&#127908;</button>
 <!-- <a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018"> -->
 <a-scene vr-mode-ui="enabled:true" 
-         background="color:#f1edfa" 
+         background="color:#04060d" 
          renderer="antialias:true;colorManagement:true;alpha:true" 
-         fog="type:exponential;color:#e8e3f5;density:0.015">
+         fog="type:exponential;color:#070a14;density:0.025">
            <a-assets>
     <img id="juan-neutral"    src="assets/juanjolote_neutral.png">
     <img id="juan-happy"      src="assets/juanjolote_happy.png">
@@ -616,70 +616,72 @@ function ejecutarFlujoGuardado() {
   <a-sphere position="-3 1.2 2.5" radius="0.09" color="#ff5ca0" material="opacity:0.8;shader:flat" animation="property:position;to:-3 1.8 2.5;loop:true;dur:2900;dir:alternate;easing:easeInOutSine"></a-sphere>
   <a-sphere position="0 3.5 -5" radius="0.14" color="#00e5c0" material="opacity:0.7;shader:flat" animation="property:position;to:0 4.2 -5;loop:true;dur:4200;dir:alternate;easing:easeInOutSine"></a-sphere> -->
 
-  
-<!-- ========================================================= -->
-<!-- ENTORNO: HUB CORPORATIVO BASADO EN EL LOGO "C"            -->
+  <!-- ========================================================= -->
+<!-- ENTORNO: HUB TECH MODO OSCURO (INSPIRADO EN EL LOGO)      -->
 <!-- ========================================================= -->
 
-<!-- 1. Iluminación Limpia y Profesional -->
-<a-light type="ambient" color="#e2e8f0" intensity="0.8"></a-light>
-<!-- Luz principal superior (Luz de estudio moderna) -->
-<a-light type="directional" position="0 12 5" color="#ffffff" intensity="0.9"></a-light>
-<!-- Acentos de luz azul y rojo según la paleta del logo -->
-<a-light type="point" position="-5 3 -5" color="#0022fa" intensity="1.2" distance="15"></a-light>
+<!-- 1. Iluminación Oscura y Enfocada (Cero deslumbre) -->
+<a-light type="ambient" color="#0a0d18" intensity="0.5"></a-light>
+<!-- Luz direccional de luna/estudio muy suave -->
+<a-light type="directional" position="0 10 -2" color="#1a2542" intensity="0.6"></a-light>
+<!-- Luces puntuales de acento neón suave basadas en el logo -->
+<a-light type="point" position="-5 3 -5" color="#0022fa" intensity="1.5" distance="15"></a-light>
 <a-light type="point" position="5 3 -5" color="#ff3b4e" intensity="1.2" distance="15"></a-light>
 
-<!-- 2. Cúpula / Fondo con Degradado Suave (Matching Background) -->
-<a-sphere radius="35" color="#f1edfa" material="shader:flat;side:back"></a-sphere>
+<!-- 2. Cúpula del Fondo (Azul Noche Profundo / Espacio Controlado) -->
+<a-sphere radius="35" color="#04060d" material="shader:flat;side:back"></a-sphere>
 
-<!-- 3. Plataforma Central (El Suelo) -->
-<!-- Anillo exterior azul (La C principal) -->
-<a-cylinder position="0 0 0" radius="10" height="0.1" color="#0022fa" material="roughness:0.3;metalness:0.2"></a-cylinder>
-<!-- Disco interior blanco pulido -->
-<a-cylinder position="0 0.05 0" radius="8.5" height="0.1" color="#ffffff" material="roughness:0.1;metalness:0.5"></a-cylinder>
+<!-- 3. Plataforma Central (Suelo Oscuro y Elegante) -->
+<!-- Anillo exterior gris oscuro metálico -->
+<a-cylinder position="0 0 0" radius="10" height="0.1" color="#0f1420" material="roughness:0.4;metalness:0.8"></a-cylinder>
+<!-- Disco interior negro carbón con baja reflexividad -->
+<a-cylinder position="0 0.05 0" radius="8.5" height="0.1" color="#080a12" material="roughness:0.2;metalness:0.9"></a-cylinder>
 
-<!-- 4. LOGO 3D GIGANTE EN EL FONDO (Escultura Central) -->
+<!-- Detalle en el suelo: Anillo Neón fino alrededor del usuario -->
+<a-torus position="0 0.11 0" rotation="90 0 0" radius="3" radius-tubular="0.015" color="#0022fa" material="shader:flat;opacity:0.8;transparent:true"></a-torus>
+
+<!-- 4. LOGO 3D EN EL FONDO (Escultura Central) -->
 <a-entity id="logo-3d-escultura" position="0 3.8 -8">
   <!-- Cuerpo principal de la 'C' (Arco Azul) -->
-  <a-torus radius="2.5" radius-tubular="0.4" arc="270" rotation="0 0 45" color="#0022fa" material="roughness:0.2;metalness:0.3"></a-torus>
+  <a-torus radius="2.5" radius-tubular="0.4" arc="270" rotation="0 0 45" color="#0022fa" material="roughness:0.2;metalness:0.5"></a-torus>
   
   <!-- Detalle biselado azul claro en los bordes de la C -->
-  <a-torus radius="2.5" radius-tubular="0.42" arc="60" rotation="0 0 240" color="#536bfe" material="shader:flat;opacity:0.8;transparent:true"></a-torus>
+  <a-torus radius="2.5" radius-tubular="0.42" arc="60" rotation="0 0 240" color="#536bfe" material="shader:flat;opacity:0.9;transparent:true"></a-torus>
   
   <!-- La Cuña / Flecha Roja del Logo (Flotando hacia el centro de la C) -->
-  <a-cone position="1.1 0 0" rotation="0 0 -90" radius-bottom="1.4" height="2.2" segments-radial="3" color="#ff3b4e" material="roughness:0.2;metalness:0.1"
+  <a-cone position="1.1 0 0" rotation="0 0 -90" radius-bottom="1.4" height="2.2" segments-radial="3" color="#ff3b4e" material="roughness:0.2;metalness:0.3"
           animation="property:position;to:1.3 0 0;dir:alternate;loop:true;dur:2500;easing:easeInOutSine"></a-cone>
 </a-entity>
 
-<!-- 5. Marcos / Enmarcado del Espacio (Arcos Gigantes de la 'C') -->
+<!-- 5. Marcos / Enmarcado del Espacio (Arcos Industriales) -->
 <!-- Arco gigante azul rodeando la escena -->
-<a-torus position="0 4 -2" radius="9" radius-tubular="0.15" arc="220" rotation="30 0 -45" color="#0022fa" material="metalness:0.6;roughness:0.2"></a-torus>
+<a-torus position="0 4 -2" radius="9" radius-tubular="0.12" arc="220" rotation="30 0 -45" color="#0d1f5e" material="metalness:0.8;roughness:0.2"></a-torus>
 <!-- Anillo flotante rojo dinámico -->
-<a-torus position="0 4.5 -2" radius="9.3" radius-tubular="0.05" arc="120" rotation="30 0 165" color="#ff3b4e" material="shader:flat"
+<a-torus position="0 4.5 -2" radius="9.3" radius-tubular="0.03" arc="120" rotation="30 0 165" color="#ff3b4e" material="shader:flat;opacity:0.75;transparent:true"
          animation="property:rotation;to:30 360 165;loop:true;dur:30000;easing:linear"></a-torus>
 
-<!-- 6. Podios / Consolas de Interacción (Inspirados en la geometría) -->
-<!-- Podio Central (Rojo) -->
-<a-cylinder position="0 0.6 -3.5" radius="0.8" height="1.2" color="#ff3b4e" material="roughness:0.2"></a-cylinder>
-<a-cylinder position="0 1.25 -3.5" radius="0.85" height="0.1" color="#ffffff" material="roughness:0.1"></a-cylinder>
+<!-- 6. Podios / Consolas de Interacción Oscuras -->
+<!-- Podio Central (Acento Rojo) -->
+<a-cylinder position="0 0.6 -3.5" radius="0.8" height="1.2" color="#18121e" material="metalness:0.7;roughness:0.3"></a-cylinder>
+<a-cylinder position="0 1.22 -3.5" radius="0.82" height="0.04" color="#ff3b4e" material="shader:flat"></a-cylinder>
 
-<!-- Podio Izquierdo (Azul Oscuro) -->
-<a-cylinder position="-3.5 0.5 -2.5" radius="0.6" height="1" color="#0022fa" material="roughness:0.3"></a-cylinder>
-<a-cylinder position="-3.5 1.05 -2.5" radius="0.65" height="0.08" color="#ffffff"></a-cylinder>
+<!-- Podio Izquierdo (Acento Azul Oscuro) -->
+<a-cylinder position="-3.5 0.5 -2.5" radius="0.6" height="1" color="#0e1326" material="metalness:0.7;roughness:0.3"></a-cylinder>
+<a-cylinder position="-3.5 1.02 -2.5" radius="0.62" height="0.04" color="#0022fa" material="shader:flat"></a-cylinder>
 
-<!-- Podio Derecho (Azul Claro) -->
-<a-cylinder position="3.5 0.5 -2.5" radius="0.6" height="1" color="#536bfe" material="roughness:0.3"></a-cylinder>
-<a-cylinder position="3.5 1.05 -2.5" radius="0.65" height="0.08" color="#ffffff"></a-cylinder>
+<!-- Podio Derecho (Acento Azul Claro) -->
+<a-cylinder position="3.5 0.5 -2.5" radius="0.6" height="1" color="#0e1326" material="metalness:0.7;roughness:0.3"></a-cylinder>
+<a-cylinder position="3.5 1.02 -2.5" radius="0.62" height="0.04" color="#536bfe" material="shader:flat"></a-cylinder>
 
-<!-- 7. Partículas / Triángulos Rojos Flotantes (Basados en la cuña del logo) -->
+<!-- 7. Partículas / Triángulos Flotantes Neón (Sutiles en la oscuridad) -->
 <a-entity id="triangulos-flotantes">
-  <a-cone position="-4 2.5 -4" rotation="45 20 0" radius-bottom="0.2" height="0.3" segments-radial="3" color="#ff3b4e" material="shader:flat;opacity:0.85"
+  <a-cone position="-4 2.5 -4" rotation="45 20 0" radius-bottom="0.2" height="0.3" segments-radial="3" color="#ff3b4e" material="shader:flat;opacity:0.8"
           animation="property:position;to:-4 3.1 -4;dir:alternate;loop:true;dur:3200;easing:easeInOutSine"></a-cone>
           
-  <a-cone position="4.5 2 -3" rotation="-20 40 30" radius-bottom="0.18" height="0.28" segments-radial="3" color="#ff3b4e" material="shader:flat;opacity:0.85"
+  <a-cone position="4.5 2 -3" rotation="-20 40 30" radius-bottom="0.18" height="0.28" segments-radial="3" color="#ff3b4e" material="shader:flat;opacity:0.8"
           animation="property:position;to:4.5 2.6 -3;dir:alternate;loop:true;dur:2700;easing:easeInOutSine"></a-cone>
           
-  <a-cone position="-2 3.8 -6" rotation="10 -30 15" radius-bottom="0.25" height="0.4" segments-radial="3" color="#536bfe" material="shader:flat;opacity:0.7"
+  <a-cone position="-2 3.8 -6" rotation="10 -30 15" radius-bottom="0.25" height="0.4" segments-radial="3" color="#536bfe" material="shader:flat;opacity:0.6"
           animation="property:position;to:-2 4.3 -6;dir:alternate;loop:true;dur:4000;easing:easeInOutSine"></a-cone>
 </a-entity>
 
