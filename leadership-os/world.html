@@ -244,7 +244,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       cambiarPantallaVR('screen-welcome');
       break;
 
-
+      
     // === COLUMNA 1: VERDE ===
     case 'active-listening': 
       appState.tecnicaSeleccionada = 'active_listening';
@@ -617,60 +617,24 @@ function ejecutarFlujoGuardado() {
 </a-entity>
 
 
-¡Sí, totalmente! En A-Frame es muy sencillo lograr que una pantalla tenga su propia iluminación, ambiente, fondos u objetos decorativos independientes del resto de la aplicación.
-
-Como cada pantalla en tu código es una entidad contenedora (<a-entity id="screen-intro">), todo lo que pongas dentro de esa entidad (luces, fondo, cielo, geometrías) se ocultará automáticamente cuando cambies de pantalla, gracias a que la función cambiarPantallaVR oculta la entidad completa con visible="false" y scale="0 0 0".
-
-Aquí tienes un ejemplo de cómo estructurar tu screen-intro para que tenga un ambiente único (por ejemplo, un ambiente más oscuro o de estilo "ciberpunk / neón" con sus propias luces y elementos decorativos):
-
-Código HTML para screen-intro con diseño independiente
-HTML
-<!-- SCREEN: INTRO / PANTALLA PREVIA CON DISEÑO ÚNICO -->
 <a-entity id="screen-intro" visible="true">
-
-  <!-- ======================================================== -->
-  <!-- 1. ILUMINACIÓN EXCLUSIVA DE ESTA PANTALLA                 -->
-  <!-- (Se ocultará/desactivará cuando pases a screen-welcome)  -->
-  <!-- ======================================================== -->
-  <a-light type="ambient" color="#050814" intensity="0.3"></a-light>
-  <a-light type="point" position="0 3 -2" color="#00e5c0" intensity="1.5" distance="10"></a-light>
-  <a-light type="point" position="-3 1 -2" color="#ff007f" intensity="1" distance="8"></a-light>
-
-  <!-- ======================================================== -->
-  <!-- 2. FONDO / ENTORNO PROPIO (Opcional)                      -->
-  <!-- Puedes poner un fondo/panel gigante detrás o un portal   -->
-  <!-- ======================================================== -->
-  <a-plane position="0 2 -5" width="12" height="8" color="#03050d" material="shader:flat; opacity:0.95"></a-plane>
-
-  <!-- ======================================================== -->
-  <!-- 3. GEOMETRÍAS Y DECORACIÓN EXCLUSIVAS                    -->
-  <!-- ======================================================== -->
-  <!-- Anillos/Luz decorativa en 3D detras del texto -->
-  <a-ring position="0 2 -3" radius-inner="1.8" radius-outer="1.85" color="#00e5c0" material="shader:flat; opacity:0.8"
-          animation="property: rotation; to: 0 0 360; loop: true; dur: 12000; easing: linear"></a-ring>
-  <a-ring position="0 2 -3" radius-inner="2.1" radius-outer="2.13" color="#ff007f" material="shader:flat; opacity:0.5"
-          animation="property: rotation; to: 0 0 -360; loop: true; dur: 18000; easing: linear"></a-ring>
-
-  <!-- ======================================================== -->
-  <!-- 4. CONTENIDO Y BOTÓN DE LA PANTALLA                      -->
-  <!-- ======================================================== -->
-  <a-entity position="0 2.2 -2.8">
-    <a-text value="NEURAL ACADEMY" align="center" color="#ffffff" font="exo2bold" width="8"></a-text>
-    <a-text value="Plataforma de Entrenamiento Virtual" position="0 -0.5 0" align="center" color="#00e5c0" width="4" font="mozillavr"></a-text>
+  <!-- Fondo o decoración de la pantalla inicial -->
+  <a-entity position="0 2.2 -3">
+    <a-text value="BIENVENIDO A NEURAL ACADEMY" align="center" color="#00e5c0" font="exo2bold" width="7"></a-text>
+    <a-text value="Presiona el botón para comenzar la experiencia" position="0 -0.4 0" align="center" color="#c8d8ff" width="4" font="mozillavr"></a-text>
   </a-entity>
 
-  <!-- Botón para entrar a la app -->
-  <a-entity position="0 1.1 -2.5">
+  <!-- Botón para continuar a la pantalla principal (screen-welcome) -->
+  <a-entity position="0 1.2 -2.5">
     <a-plane class="clickable" 
-             handler-botones-vr="mensaje: Entrando a la academia; tecnica: start-app"
-             width="1.8" height="0.45" 
-             color="#0a1128" 
+             handler-botones-vr="mensaje: Iniciando sistema; tecnica: start-app"
+             width="1.6" height="0.4" 
+             color="#0d2060" 
              material="opacity:0.9; shader:flat; side:double">
-      <a-plane width="1.84" height="0.49" color="#00e5c0" material="opacity:0.6; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="INGRESAR / ENTER" align="center" color="#00e5c0" width="3.8" position="0 0 0.01" font="mozillavr"></a-text>
+      <a-plane width="1.64" height="0.44" color="#00e5c0" material="opacity:0.4; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="INICIAR / START" align="center" color="#00e5c0" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
     </a-plane>
   </a-entity>
-
 </a-entity>
 
   
