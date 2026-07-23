@@ -554,8 +554,11 @@ function ejecutarFlujoGuardado() {
 <div id="voice-hud"><div id="voice-dot" class="idle"></div><span id="voice-label">Starting Neural Academy...</span></div>
 <button id="mic-btn" title="Hablar">&#127908;</button>
 <!-- <a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018"> -->
-  <a-scene>
-  <a-assets>
+<a-scene vr-mode-ui="enabled:true" 
+         background="color:#030810" 
+         renderer="antialias:true;colorManagement:true;alpha:true" 
+         fog="type:exponential;color:#07121a;density:0.035">
+         
     <img id="juan-neutral"    src="assets/juanjolote_neutral.png">
     <img id="juan-happy"      src="assets/juanjolote_happy.png">
     <img id="juan-talking"    src="assets/juanjolote_talking.png">
@@ -612,6 +615,76 @@ function ejecutarFlujoGuardado() {
   <a-sphere position="3.5 2.2 3.5" radius="0.10" color="#9d5cff" material="opacity:0.85;shader:flat" animation="property:position;to:3.5 2.8 3.5;loop:true;dur:3800;dir:alternate;easing:easeInOutSine"></a-sphere>
   <a-sphere position="-3 1.2 2.5" radius="0.09" color="#ff5ca0" material="opacity:0.8;shader:flat" animation="property:position;to:-3 1.8 2.5;loop:true;dur:2900;dir:alternate;easing:easeInOutSine"></a-sphere>
   <a-sphere position="0 3.5 -5" radius="0.14" color="#00e5c0" material="opacity:0.7;shader:flat" animation="property:position;to:0 4.2 -5;loop:true;dur:4200;dir:alternate;easing:easeInOutSine"></a-sphere> -->
+
+  <!-- ========================================================= -->
+<!-- ENTORNO: BOSQUE MÍSTICO / SELVA NOCTURNA                 -->
+<!-- ========================================================= -->
+
+<!-- 1. Iluminación Natural de Bosque Nocturno -->
+<a-light type="ambient" color="#112233" intensity="0.8"></a-light>
+<!-- Luz de luna cenital -->
+<a-light type="directional" position="-5 15 -5" color="#77aaff" intensity="0.9"></a-light>
+<!-- Luz cálida tenue de linterna/fuego central -->
+<a-light type="point" position="0 1.5 0" color="#ffaa44" intensity="0.6" distance="10"></a-light>
+
+<!-- 2. Cúpula del Cielo (Noche en el bosque) -->
+<a-sphere radius="30" color="#030810" material="shader:flat;side:back"></a-sphere>
+
+<!-- 3. Suelo de Hierba / Tierra Musgosa -->
+<a-plane position="0 0 0" rotation="-90 0 0" width="40" height="40" color="#0f2115" material="roughness:0.9;metalness:0.1"></a-plane>
+
+<!-- 4. Troncos de Árboles Alrededor (Límite visual del bosque) -->
+<a-entity id="bosque-arboles">
+  <!-- Troncos traseros -->
+  <a-cylinder position="-6 3 -8" radius="0.4" height="8" color="#1a110a"></a-cylinder>
+  <a-cone position="-6 6 -8" radius-bottom="2.5" radius-top="0.1" height="5" color="#082b13"></a-cone>
+
+  <a-cylinder position="6 3 -8" radius="0.5" height="8" color="#1c120c"></a-cylinder>
+  <a-cone position="6 6.5 -8" radius-bottom="3" radius-top="0.1" height="6" color="#06240f"></a-cone>
+
+  <a-cylinder position="0 3.5 -10" radius="0.6" height="9" color="#180e08"></a-cylinder>
+  <a-cone position="0 7.5 -10" radius-bottom="3.5" radius-top="0.1" height="7" color="#041f0c"></a-cone>
+
+  <!-- Troncos laterales -->
+  <a-cylinder position="-8 3 -2" radius="0.45" height="8" color="#1c120c"></a-cylinder>
+  <a-cone position="-8 6 -2" radius-bottom="2.5" radius-top="0.1" height="5" color="#082b13"></a-cone>
+
+  <a-cylinder position="8 3 -2" radius="0.5" height="8" color="#1a110a"></a-cylinder>
+  <a-cone position="8 6.5 -2" radius-bottom="2.8" radius-top="0.1" height="5.5" color="#06240f"></a-cone>
+
+  <!-- Troncos frontales (detrás del usuario) -->
+  <a-cylinder position="-5 3 6" radius="0.4" height="8" color="#180e08"></a-cylinder>
+  <a-cone position="-5 6 6" radius-bottom="2.3" radius-top="0.1" height="5" color="#041f0c"></a-cone>
+
+  <a-cylinder position="5 3 6" radius="0.45" height="8" color="#1c120c"></a-cylinder>
+  <a-cone position="5 6 6" radius-bottom="2.5" radius-top="0.1" height="5" color="#082b13"></a-cone>
+</a-entity>
+
+<!-- 5. Rocas Esparcidas en el Suelo -->
+<a-dodecahedron position="-2 0.3 -3" radius="0.6" color="#2b3336" rotation="10 45 20"></a-dodecahedron>
+<a-dodecahedron position="3 0.2 -2.5" radius="0.4" color="#1e2426" rotation="30 12 50"></a-dodecahedron>
+<a-dodecahedron position="-3.5 0.25 2" radius="0.5" color="#222b2e" rotation="5 80 15"></a-dodecahedron>
+
+<!-- 6. Luciérnagas Mágicas Flotantes (Luces flotantes animadas) -->
+<a-entity id="luciernagas">
+  <a-sphere position="-2 1.5 -3" radius="0.04" color="#88ff44" material="shader:flat;opacity:0.9"
+            animation="property:position;to:-2 2.2 -3;loop:true;dur:3000;dir:alternate;easing:easeInOutSine"></a-sphere>
+
+  <a-sphere position="2.5 1.2 -2" radius="0.03" color="#aaff55" material="shader:flat;opacity:0.85"
+            animation="property:position;to:2.5 1.8 -2;loop:true;dur:2400;dir:alternate;easing:easeInOutSine"></a-sphere>
+
+  <a-sphere position="-1 2 -5" radius="0.05" color="#00ffaa" material="shader:flat;opacity:0.9"
+            animation="property:position;to:-1 1.4 -5;loop:true;dur:3500;dir:alternate;easing:easeInOutSine"></a-sphere>
+
+  <a-sphere position="1.8 2.2 -4" radius="0.035" color="#88ff44" material="shader:flat;opacity:0.8"
+            animation="property:position;to:1.8 2.7 -4;loop:true;dur:2800;dir:alternate;easing:easeInOutSine"></a-sphere>
+
+  <a-sphere position="-3 1.8 1" radius="0.04" color="#aaff55" material="shader:flat;opacity:0.9"
+            animation="property:position;to:-3 2.3 1;loop:true;dur:3100;dir:alternate;easing:easeInOutSine"></a-sphere>
+
+  <a-sphere position="3 1.6 2" radius="0.03" color="#00ffaa" material="shader:flat;opacity:0.8"
+            animation="property:position;to:3 1.1 2;loop:true;dur:2600;dir:alternate;easing:easeInOutSine"></a-sphere>
+</a-entity>
 
   <!-- SCREEN: WELCOME -->
   <a-entity id="screen-welcome">
