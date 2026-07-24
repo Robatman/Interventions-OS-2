@@ -74,19 +74,21 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 function cambiarPantallaVR(pantallaMostrarId) {
   // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
-const audioIntro = document.getElementById('audio-intro-bg');
+function cambiarPantallaVR(pantallaMostrarId) {
+  const audioIntro = document.getElementById('audio-intro-bg');
+  
   if (audioIntro) {
-    if (pantallaMostrarId === 'screen-intro') {
-      // Reproduce el audio si estamos en la pantalla Intro
-      audioIntro.currentTime = 0; // Reinicia desde el principio
-      audioIntro.play().catch(err => {
-        console.warn("El navegador bloqueó el autoplay del audio hasta la primera interacción del usuario.", err);
-      });
+    // Si queremos que el audio solo suene en 'screen-intro' o 'screen-welcome'
+    if (pantallaMostrarId === 'screen-intro' || pantallaMostrarId === 'screen-welcome') {
+      if (audioIntro.paused) {
+        audioIntro.play().catch(err => console.warn("Esperando interacción de usuario...", err));
+      }
     } else {
-      // Pausa y detiene el audio en cualquier otra pantalla (como screen-welcome)
+      // Se pausa y reinicia en cualquier otra pantalla de trabajo/actividad
       audioIntro.pause();
       audioIntro.currentTime = 0;
     }
+  }
   }
 
   // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
@@ -98,7 +100,7 @@ const audioIntro = document.getElementById('audio-intro-bg');
       entornoUniversal.setAttribute('visible', 'true');
     }
   }
-  
+
   const pantallas = [
     'screen-intro',
     'screen-welcome', 
@@ -264,9 +266,15 @@ function ejecutarFuncionPorTecnica(tecnica) {
   // === SWITCH PRINCIPAL DE TU SISTEMA ===
   switch(tecnica) {
 
-    case 'start-app':
-      cambiarPantallaVR('screen-welcome');
-      break;
+   case 'start-app':
+  // Al hacer clic en START, el navegador ya considera que hubo interacción de usuario
+  const audioIntro = document.getElementById('audio-intro-bg');
+  if (audioIntro) {
+    audioIntro.currentTime = 0;
+    audioIntro.play().catch(err => console.error("Error al reproducir audio:", err));
+  }
+  cambiarPantallaVR('screen-welcome');
+  break;
 
       
     // === COLUMNA 1: VERDE ===
