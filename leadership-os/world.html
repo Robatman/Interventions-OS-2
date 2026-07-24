@@ -73,24 +73,8 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 
 function cambiarPantallaVR(pantallaMostrarId) {
-  const audioIntro = document.getElementById('audio-intro-bg');
-  
-  if (audioIntro) {
-    // Si queremos que el audio solo suene en 'screen-intro' o 'screen-welcome'
-    if (pantallaMostrarId === 'screen-intro' || pantallaMostrarId === 'screen-welcome') {
-      
-      if (audioIntro.paused) {
-        audioIntro.play().catch(err => console.warn("Esperando interacción de usuario...", err));
-      }
-    } else {
-      // Se pausa y reinicia en cualquier otra pantalla de trabajo/actividad
-      audioIntro.pause();
-      audioIntro.currentTime = 0;
-    }
-  }
-
   // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
-  const entornoUniversal = document.getElementById('entorno-universal');
+const entornoUniversal = document.getElementById('entorno-universal');
   if (entornoUniversal) {
     if (pantallaMostrarId === 'screen-intro') {
       entornoUniversal.setAttribute('visible', 'false');
@@ -98,7 +82,6 @@ function cambiarPantallaVR(pantallaMostrarId) {
       entornoUniversal.setAttribute('visible', 'true');
     }
   }
-
   const pantallas = [
     'screen-intro',
     'screen-welcome', 
@@ -264,15 +247,9 @@ function ejecutarFuncionPorTecnica(tecnica) {
   // === SWITCH PRINCIPAL DE TU SISTEMA ===
   switch(tecnica) {
 
-   case 'start-app':
-  // Al hacer clic en START, el navegador ya considera que hubo interacción de usuario
-  const audioIntro = document.getElementById('audio-intro-bg');
-  if (audioIntro) {
-    audioIntro.currentTime = 0;
-    audioIntro.play().catch(err => console.error("Error al reproducir audio:", err));
-  }
-  cambiarPantallaVR('screen-welcome');
-  break;
+    case 'start-app':
+      cambiarPantallaVR('screen-welcome');
+      break;
 
       
     // === COLUMNA 1: VERDE ===
@@ -653,9 +630,7 @@ function ejecutarFlujoGuardado() {
 <!-- ========================================================= -->
 <!-- ENTORNO: BOSQUE MÍSTICO / SELVA NOCTURNA                 -->
 <!-- ========================================================= -->
-
 <audio id="audio-intro-bg" src="assets/audio/bosque-intro.mp3" loop preload="auto"></audio>
-
 <!-- 1. Iluminación Natural de Bosque Nocturno -->
 <a-light type="ambient" color="#112233" intensity="0.8"></a-light>
 <!-- Luz de luna cenital -->
