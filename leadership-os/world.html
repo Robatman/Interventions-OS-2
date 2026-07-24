@@ -74,7 +74,23 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 function cambiarPantallaVR(pantallaMostrarId) {
   // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
-const entornoUniversal = document.getElementById('entorno-universal');
+const audioIntro = document.getElementById('audio-intro-bg');
+  if (audioIntro) {
+    if (pantallaMostrarId === 'screen-intro') {
+      // Reproduce el audio si estamos en la pantalla Intro
+      audioIntro.currentTime = 0; // Reinicia desde el principio
+      audioIntro.play().catch(err => {
+        console.warn("El navegador bloqueó el autoplay del audio hasta la primera interacción del usuario.", err);
+      });
+    } else {
+      // Pausa y detiene el audio en cualquier otra pantalla (como screen-welcome)
+      audioIntro.pause();
+      audioIntro.currentTime = 0;
+    }
+  }
+
+  // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
+  const entornoUniversal = document.getElementById('entorno-universal');
   if (entornoUniversal) {
     if (pantallaMostrarId === 'screen-intro') {
       entornoUniversal.setAttribute('visible', 'false');
@@ -82,6 +98,7 @@ const entornoUniversal = document.getElementById('entorno-universal');
       entornoUniversal.setAttribute('visible', 'true');
     }
   }
+  
   const pantallas = [
     'screen-intro',
     'screen-welcome', 
@@ -630,6 +647,8 @@ function ejecutarFlujoGuardado() {
 <!-- ========================================================= -->
 <!-- ENTORNO: BOSQUE MÍSTICO / SELVA NOCTURNA                 -->
 <!-- ========================================================= -->
+
+<audio id="audio-intro-bg" src="assets/audio/bosque-intro.mp3" loop preload="auto"></audio>
 
 <!-- 1. Iluminación Natural de Bosque Nocturno -->
 <a-light type="ambient" color="#112233" intensity="0.8"></a-light>
