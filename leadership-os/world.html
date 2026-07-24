@@ -71,23 +71,22 @@ AFRAME.registerComponent('handler-botones-vr', {
 });
 
 
-const introAudio = document.getElementById('audio-intro-bg');
-
-// Si tienes un botón de inicio en la intro o al hacer clic en la pantalla intro:
-document.getElementById('screen-intro').addEventListener('click', () => {
-  // Solo reproduce si está pausado
-  if (introAudio.paused) {
-    introAudio.play().catch(error => console.log("Autoplay bloqueado hasta interacción:", error));
-  }
-});
 
 function cambiarPantallaVR(pantallaMostrarId) {
-
-if (siguientePantalla !== 'screen-intro') {
-    introAudio.pause();
-    introAudio.currentTime = 0; // Reinicia la canción al principio
-  } else {
-    introAudio.play();
+  const audioIntro = document.getElementById('audio-intro-bg');
+  
+  if (audioIntro) {
+    // Si queremos que el audio solo suene en 'screen-intro' o 'screen-welcome'
+    if (pantallaMostrarId === 'screen-intro' || pantallaMostrarId === 'screen-welcome') {
+      
+      if (audioIntro.paused) {
+        audioIntro.play().catch(err => console.warn("Esperando interacción de usuario...", err));
+      }
+    } else {
+      // Se pausa y reinicia en cualquier otra pantalla de trabajo/actividad
+      audioIntro.pause();
+      audioIntro.currentTime = 0;
+    }
   }
 
   // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
