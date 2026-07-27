@@ -671,6 +671,16 @@ function ejecutarFlujoGuardado() {
 
 
 <script src="js/interventions.js"></script>
+
+<!-- Puente para vincularlo a window -->
+<script>
+  if (typeof INTERVENTIONS !== 'undefined') {
+    window.INTERVENTIONS = INTERVENTIONS;
+    console.log("🔗 INTERVENTIONS vinculado con éxito a window.");
+  }
+</script>
+
+
 <script src="js/archetypes.js"></script>
 <script src="js/techniques.js"></script>
 <script src="js/prompts.js"></script>
