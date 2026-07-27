@@ -240,8 +240,11 @@ function mostrarBriefingIntervencion() {
     if (scenarioData) {
       scriptTexto = scenarioData.text || scenarioData.script || scenarioData.context || scenarioData.description;
       if (scenarioData.tags) {
-        tagsTexto = Array.isArray(scenarioData.tags) ? scenarioData.tags.join(' | ') : scenarioData.tags;
-      }
+    // Resultado:  [Promovida sin ajuste salarial]  [No ha dicho nada]  [Bomba de tiempo potencial]
+    tagsTexto = Array.isArray(scenarioData.tags) 
+    ? scenarioData.tags.map(t => `[${t}]`).join('  ') 
+    : scenarioData.tags;
+}
     } else {
       // Fallback final: context u objective raíz de la intervención
       scriptTexto = dataIntervencion.agentContext || dataIntervencion.objective || dataIntervencion.description;
