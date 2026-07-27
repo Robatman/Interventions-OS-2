@@ -186,12 +186,11 @@ function mostrarBriefingIntervencion() {
 
   let dataIntervencion = null;
   if (window.INTERVENTIONS) {
-    // Normalizar la clave de búsqueda quitando el prefijo 'interv_'
     const claveLimpia = tecnica ? tecnica.replace('interv_', '') : '';
     dataIntervencion = window.INTERVENTIONS[tecnica] || 
                        window.INTERVENTIONS[claveLimpia] || 
-                       window.INTERVENTIONS['anchoring'] ||
-                       window.INTERVENTIONS['pulse_check'];
+                       window.INTERVENTIONS['pulse_check'] ||
+                       window.INTERVENTIONS['anchoring'];
   }
 
   console.log("2. Objeto de intervención encontrado:", dataIntervencion);
@@ -204,7 +203,7 @@ function mostrarBriefingIntervencion() {
   if (dataIntervencion) {
     // 3. Título y Trap
     if (titleEl) {
-      const titulo = (dataIntervencion.title || dataIntervencion.name || tecnica || 'BRIEFING').toUpperCase();
+      const titulo = (dataIntervencion.label || dataIntervencion.title || dataIntervencion.name || tecnica || 'BRIEFING').toUpperCase();
       titleEl.setAttribute('value', `${titulo} BRIEFING`);
     }
 
@@ -213,43 +212,46 @@ function mostrarBriefingIntervencion() {
       trapEl.setAttribute('value', `TRAP: ${trapText}`);
     }
 
-    // 4. Búsqueda exhaustiva del Nivel/Script
-    const baseKey = tecnica ? tecnica.replace('interv_', '') : 'anch';
-    const scriptKey = `${baseKey}_${nivel}`;
-    const scriptKeyWithOne = `${scriptKey}_1`;
+    // 4. Buscar dentro de 'scenarios' según el nivel
+    let scenarioData = null;
 
-    // Intentar ubicar los datos del nivel en múltiples estructuras posibles
-    let nivelData = dataIntervencion.levels?.[nivel] || 
-                    dataIntervencion.levels?.[nivel === 'mid' ? 'intermediate' : nivel] ||
-                    dataIntervencion.scripts?.[nivel] ||
-                    dataIntervencion[scriptKey] || 
-                    dataIntervencion[scriptKeyWithOne];
+    if (dataIntervencion.scenarios) {
+      const arrayNivel = dataIntervencion.scenarios[nivel] || 
+                         dataIntervencion.scenarios[nivel === 'mid' ? 'intermediate' : nivel];
 
-    // Si nivelData es una cadena directa de texto
-    let scriptTexto = typeof nivelData === 'string' ? nivelData : null;
-    let tagsTexto = '';
-
-    // Si nivelData es un objeto
-    if (nivelData && typeof nivelData === 'object') {
-      scriptTexto = nivelData.text || nivelData.script || nivelData.context || nivelData.description;
-      if (nivelData.tags) {
-        tagsTexto = Array.isArray(nivelData.tags) ? nivelData.tags.join(' | ') : nivelData.tags;
+      if (Array.isArray(arrayNivel) && arrayNivel.length > 0) {
+        // Tomamos el primer escenario del arreglo para ese nivel (ej. pc_mid_1)
+        scenarioData = arrayNivel[0]; 
+      } else if (typeof arrayNivel === 'object') {
+        scenarioData = arrayNivel;
       }
     }
 
-    // Fallback general si no se encontró en nivelData
-    if (!scriptTexto) {
-      scriptTexto = dataIntervencion.script || 
-                    dataIntervencion.text || 
-                    dataIntervencion.description || 
-                    dataIntervencion.context;
+    // Respaldo (fallback) por si en otras intervenciones usa 'levels' o 'scripts'
+    if (!scenarioData) {
+      const fallbackLevel = dataIntervencion.levels?.[nivel] || dataIntervencion.scripts?.[nivel];
+      scenarioData = Array.isArray(fallbackLevel) ? fallbackLevel[0] : fallbackLevel;
     }
 
-    // 5. Renderizar en la pantalla VR
+    // 5. Extraer texto y tags
+    let scriptTexto = null;
+    let tagsTexto = '';
+
+    if (scenarioData) {
+      scriptTexto = scenarioData.text || scenarioData.script || scenarioData.context || scenarioData.description;
+      if (scenarioData.tags) {
+        tagsTexto = Array.isArray(scenarioData.tags) ? scenarioData.tags.join(' | ') : scenarioData.tags;
+      }
+    } else {
+      // Fallback final: context u objective raíz de la intervención
+      scriptTexto = dataIntervencion.agentContext || dataIntervencion.objective || dataIntervencion.description;
+    }
+
+    // 6. Renderizar en la pantalla VR
     if (tagsEl) {
       if (scriptTexto) {
         let textoRenderizado = `NIVEL: ${nivel.toUpperCase()}\n\n`;
-        textoRenderizado += `• Script: "${scriptTexto}"\n\n`;
+        textoRenderizado += `• Escenario: "${scriptTexto}"\n\n`;
         if (tagsTexto) {
           textoRenderizado += `• Tags: ${tagsTexto}`;
         }
@@ -270,7 +272,6 @@ function mostrarBriefingIntervencion() {
   // Transición a la pantalla de VR briefing
   cambiarPantallaVR('screen-intervention-briefing');
 }
-
 
 
 
