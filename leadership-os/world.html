@@ -280,55 +280,52 @@ function mostrarBriefingIntervencion() {
 
 
 function mostrarBriefingTecnica() {
-  console.log("=== 🔍 INICIO DEPURACIÓN BRIEFING ARQUETIPO ===");
+  console.log("=== 🔍 BRIEFING DEBUG START ===");
 
-  // 1. Obtener nivel ('novice', 'mid', 'adv')
+  // 1. Get current level ('novice', 'mid', 'adv')
   const nivel = appState.flujoReciente?.nivelSeleccionado || appState.currentLevel || 'novice';
 
-  // 2. Obtener lista de todos los arquetipos disponibles en el objeto ARCHETYPES
+  // 2. Get list of available archetypes
   const objetoArquetipos = typeof ARCHETYPES !== 'undefined' ? ARCHETYPES : (window.ARCHETYPES || {});
   const listaIdsArquetipos = Object.keys(objetoArquetipos).filter(id => objetoArquetipos[id].available !== false);
 
   if (listaIdsArquetipos.length === 0) {
-    console.error("❌ ERROR: No se encontraron arquetipos disponibles en ARCHETYPES.");
+    console.error("❌ ERROR: No available archetypes found.");
     return;
   }
 
-  // 3. Selección del arquetipo:
-  // Si el usuario ya seleccionó uno explícitamente en el estado, usamos ese.
-  // Si NO hay uno seleccionado (o tras recargar la página), elegimos uno COMPLETAMENTE ALEATORIO.
+  // 3. Archetype Selection
   let arquetipoId = appState.arquetipoSeleccionado || appState.agenteSeleccionado;
 
   if (!arquetipoId || !objetoArquetipos[arquetipoId]) {
     const indiceArquetipoAzar = Math.floor(Math.random() * listaIdsArquetipos.length);
     arquetipoId = listaIdsArquetipos[indiceArquetipoAzar];
-    console.log(`🎲 Arquetipo elegido al azar tras recarga/inicio: ${arquetipoId.toUpperCase()}`);
+    console.log(`🎲 Random archetype selected: ${arquetipoId.toUpperCase()}`);
   }
 
   const dataArquetipo = objetoArquetipos[arquetipoId];
-  console.log("1. Datos del arquetipo activo:", dataArquetipo);
 
-  // Referencias DOM en A-Frame
+  // DOM / A-Frame References
   const titleEl = document.getElementById('briefing-title');
   const trapEl = document.getElementById('briefing-trap');
   const tagsEl = document.getElementById('briefing-tags');
 
   if (dataArquetipo) {
-    // A. Título con nombre del personaje y su rol
+    // A. Title
     if (titleEl) {
       const nombre = (dataArquetipo.name || arquetipoId).toUpperCase();
       titleEl.setAttribute('value', `${nombre} - BRIEFING`);
     }
 
-    // B. Panel superior de Rasgo / Personalidad
+    // B. Trait Banner (TRAP) in English
     if (trapEl) {
       const traitInfo = dataArquetipo.trait 
-        ? `RASGO: ${dataArquetipo.trait.toUpperCase()} - ${dataArquetipo.traitDesc || ''}`
-        : 'Cuidado con tus sesgos al abordar a este colaborador.';
+        ? `TRAIT: ${dataArquetipo.trait.toUpperCase()} - ${dataArquetipo.traitDesc || ''}`
+        : 'Be mindful of biases during the conversation.';
       trapEl.setAttribute('value', traitInfo);
     }
 
-    // C. Buscar los briefings disponibles para el nivel seleccionado
+    // C. Get briefings per level
     let listaBriefings = [];
     if (dataArquetipo.briefings && dataArquetipo.briefings[nivel]) {
       listaBriefings = dataArquetipo.briefings[nivel];
@@ -337,13 +334,11 @@ function mostrarBriefingTecnica() {
     let briefingSeleccionado = null;
 
     if (listaBriefings.length > 0) {
-      // 🎲 Elegir también una situación ALEATORIA dentro de las opciones de ese nivel
       const indiceBriefingAzar = Math.floor(Math.random() * listaBriefings.length);
       briefingSeleccionado = listaBriefings[indiceBriefingAzar];
-      console.log(`🎲 Escenario elegido al azar: #${indiceBriefingAzar + 1} de ${listaBriefings.length} para nivel ${nivel}`);
     }
 
-    // D. Extraer Texto y Tags
+    // D. Text & Tags extraction
     let scriptTexto = null;
     let tagsTexto = '';
 
@@ -356,25 +351,25 @@ function mostrarBriefingTecnica() {
           : briefingSeleccionado.tags;
       }
     } else {
-      scriptTexto = dataArquetipo.backstory || dataArquetipo.personality || "Sin briefing disponible para este nivel.";
+      scriptTexto = dataArquetipo.backstory || dataArquetipo.personality || "No scenario available for this level.";
     }
 
-    // E. Renderizar en A-Frame
+    // E. Render to A-Frame in English (100% ASCII-safe for fonts)
     if (tagsEl) {
       if (scriptTexto) {
-        let textoRenderizado = `NIVEL: ${nivel.toUpperCase()}\n\n`;
-        textoRenderizado += `Situación: "${scriptTexto}"\n\n`;
+        let textoRenderizado = `LEVEL: ${nivel.toUpperCase()}\n\n`;
+        textoRenderizado += `Scenario: "${scriptTexto}"\n\n`;
         if (tagsTexto) {
           textoRenderizado += `Tags: ${tagsTexto}`;
         }
         
-        console.log("✅ Renderizando en VR:", textoRenderizado);
+        console.log("✅ Rendered in VR:", textoRenderizado);
         tagsEl.setAttribute('value', textoRenderizado);
       }
     }
   }
 
-  console.log("=== 🔚 FIN DEPURACIÓN BRIEFING ARQUETIPO ===");
+  console.log("=== 🔚 BRIEFING DEBUG END ===");
 
   cambiarPantallaVR('screen-intervention-briefing');
 }
@@ -383,9 +378,8 @@ function mostrarBriefingTecnica() {
 
 
 
-
 function ejecutarFuncionPorTecnica(tecnica) {
-  // Aseguramos que el objeto de flujo exista para evitar errores "Cannot set property of undefined"
+  // Ensure the flow state object exists to avoid "Cannot set property of undefined" errors
   if (!appState.flujoReciente) {
     appState.flujoReciente = {
       pantallaOrigen: null,      
@@ -396,11 +390,11 @@ function ejecutarFuncionPorTecnica(tecnica) {
     };
   }
 
-  // console.log(`\n🖱️ [DEBUG-CLICK] Se ejecutó ejecutarFuncionPorTecnica con parámetro: "${tecnica}"`);
-  // console.log("📊 [DEBUG-CLICK] Estado del flujo JUSTO ANTES del clic:", JSON.parse(JSON.stringify(appState.flujoReciente)));
+  // console.log(`\n🖱️ [DEBUG-CLICK] Executed ejecutarFuncionPorTecnica with parameter: "${tecnica}"`);
+  // console.log("📊 [DEBUG-CLICK] Flow state JUST BEFORE click:", JSON.parse(JSON.stringify(appState.flujoReciente)));
 
-  // === INTERCEPTOR PARA GRABAR EL FLUJO EN TIEMPO REAL ===
-  // Si el usuario empieza un nuevo flujo de técnica tradicional de los 14 botones:
+  // === INTERCEPTOR TO RECORD REAL-TIME FLOW ===
+  // If the user starts a new flow from the traditional 14-button technique list:
   if (tecnica === 'active-listening' || tecnica === 'powerful-questions' || 
       tecnica === 'motivational-interviewing' || tecnica === 'nonviolent-communication' || 
       tecnica === 'radical-candor' || tecnica === 'crucial-conversations' ||
@@ -410,53 +404,53 @@ function ejecutarFuncionPorTecnica(tecnica) {
       tecnica === 'growth-mindset' || tecnica === 'solution-focused-coaching') {
     
     appState.flujoReciente.pantallaOrigen = 'screen-technique-list';
-    appState.flujoReciente.activo = false; // Aún no ha terminado la actividad
-    // console.log(`📝 [DEBUG-FLUJO] Origen de flujo detectado y guardado como: "screen-technique-list". Flujo activo = false.`);
+    appState.flujoReciente.activo = false; // Activity has not finished yet
+    // console.log(`📝 [DEBUG-FLOW] Flow origin detected and saved as: "screen-technique-list". Active flow = false.`);
   }
 
-  // Si el usuario selecciona una intervención de la otra lista:
+  // If the user selects an intervention from the other list:
   if (tecnica.startsWith('interv-')) {
     appState.flujoReciente.pantallaOrigen = 'screen-interventions';
     appState.flujoReciente.activo = false; 
     
-    // Normalizamos el id a guiones bajos (ej: "interv-pulse-check" -> "interv_pulse_check")
+    // Normalize ID with underscores (e.g., "interv-pulse-check" -> "interv_pulse_check")
     let idFormateado = tecnica.replace(/-/g, '_');
     appState.flujoReciente.tecnicaSeleccionada = idFormateado;
     
-    // console.log(`📝 [DEBUG-FLUJO] Origen de flujo detectado y guardado como: "screen-interventions".`);
-    // console.log(`🎯 [DEBUG-FLUJO] Auto-registrada intervención seleccionada: "${idFormateado}"`);
+    // console.log(`📝 [DEBUG-FLOW] Flow origin detected and saved as: "screen-interventions".`);
+    // console.log(`🎯 [DEBUG-FLOW] Auto-registered selected intervention: "${idFormateado}"`);
   }
 
-  // Guardar el modo seleccionado
+  // Save selected mode
   if (tecnica === 'learn-intervention') {
     appState.flujoReciente.modoSeleccionado = 'learn';
-    console.log("📝 [DEBUG-FLUJO] Modo guardado en flujo: 'learn'");
+    console.log("📝 [DEBUG-FLOW] Mode saved in flow: 'learn'");
   }
   if (tecnica === 'work-together-intervention') {
     appState.flujoReciente.modoSeleccionado = 'work';
-    // console.log("📝 [DEBUG-FLUJO] Modo guardado en flujo: 'work'");
+    // console.log("📝 [DEBUG-FLOW] Mode saved in flow: 'work'");
   }
   if (tecnica === 'practice-intervention') {
     appState.flujoReciente.modoSeleccionado = 'practice';
-    // console.log("📝 [DEBUG-FLUJO] Modo guardado en flujo: 'practice'");
+    // console.log("📝 [DEBUG-FLOW] Mode saved in flow: 'practice'");
   }
 
-  // Guardar dificultad
+  // Save difficulty level
   if (tecnica === 'level-novice') {
     appState.flujoReciente.nivelSeleccionado = 'novice';
-    // console.log("📝 [DEBUG-FLUJO] Nivel guardado en flujo: 'novice'");
+    // console.log("📝 [DEBUG-FLOW] Level saved in flow: 'novice'");
   }
   if (tecnica === 'level-intermediate') {
     appState.flujoReciente.nivelSeleccionado = 'mid';
-    // console.log("📝 [DEBUG-FLUJO] Nivel guardado en flujo: 'mid'");
+    // console.log("📝 [DEBUG-FLOW] Level saved in flow: 'mid'");
   }
   if (tecnica === 'level-expert') {
     appState.flujoReciente.nivelSeleccionado = 'adv';
-    // console.log("📝 [DEBUG-FLUJO] Nivel guardado en flujo: 'adv'");
+    // console.log("📝 [DEBUG-FLOW] Level saved in flow: 'adv'");
   }
 
 
-  // === SWITCH PRINCIPAL DE TU SISTEMA ===
+  // === MAIN ROUTER / SWITCH SYSTEM ===
   switch(tecnica) {
 
     case 'start-app':
@@ -464,122 +458,122 @@ function ejecutarFuncionPorTecnica(tecnica) {
       break;
 
       
-    // === COLUMNA 1: VERDE ===
+    // === COLUMN 1: GREEN ===
     case 'active-listening': 
       appState.tecnicaSeleccionada = 'active_listening';
       appState.tecnicaCargada = 'active_listening'; 
-      appState.flujoReciente.tecnicaSeleccionada = 'active_listening'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'active_listening'");
+      appState.flujoReciente.tecnicaSeleccionada = 'active_listening'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'active_listening'");
       selectAndPreviewVR('active_listening'); 
       break;
 
     case 'powerful-questions': 
       appState.tecnicaSeleccionada = 'powerful_questions'; 
       appState.tecnicaCargada = 'powerful_questions';
-      appState.flujoReciente.tecnicaSeleccionada = 'powerful_questions'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'powerful_questions'");
+      appState.flujoReciente.tecnicaSeleccionada = 'powerful_questions'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'powerful_questions'");
       selectAndPreviewVR('powerful_questions'); 
       break;
 
     case 'motivational-interviewing': 
       appState.tecnicaSeleccionada = 'motivational_interviewing'; 
       appState.tecnicaCargada = 'motivational_interviewing';
-      appState.flujoReciente.tecnicaSeleccionada = 'motivational_interviewing'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'motivational_interviewing'");
+      appState.flujoReciente.tecnicaSeleccionada = 'motivational_interviewing'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'motivational_interviewing'");
       selectAndPreviewVR('motivational_interviewing'); 
       break;
 
     case 'nonviolent-communication': 
       appState.tecnicaSeleccionada = 'nonviolent_communication'; 
       appState.tecnicaCargada = 'nonviolent_communication';
-      appState.flujoReciente.tecnicaSeleccionada = 'nonviolent_communication'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'nonviolent_communication'");
+      appState.flujoReciente.tecnicaSeleccionada = 'nonviolent_communication'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'nonviolent_communication'");
       selectAndPreviewVR('nonviolent_communication'); 
       break;
 
     case 'radical-candor': 
       appState.tecnicaSeleccionada = 'radical_candor'; 
       appState.tecnicaCargada = 'radical_candor';
-      appState.flujoReciente.tecnicaSeleccionada = 'radical_candor'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'radical_candor'");
+      appState.flujoReciente.tecnicaSeleccionada = 'radical_candor'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'radical_candor'");
       selectAndPreviewVR('radical_candor'); 
       break;
 
     case 'crucial-conversations': 
       appState.tecnicaSeleccionada = 'crucial_conversations'; 
       appState.tecnicaCargada = 'crucial_conversations';
-      appState.flujoReciente.tecnicaSeleccionada = 'crucial_conversations'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'crucial_conversations'");
+      appState.flujoReciente.tecnicaSeleccionada = 'crucial_conversations'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'crucial_conversations'");
       selectAndPreviewVR('crucial_conversations'); 
       break;
 
-    // === COLUMNA 2: MORADA ===
+    // === COLUMN 2: PURPLE ===
     case 'tactical-empathy': 
       appState.tecnicaSeleccionada = 'tactical_empathy'; 
       appState.tecnicaCargada = 'tactical_empathy';
-      appState.flujoReciente.tecnicaSeleccionada = 'tactical_empathy'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'tactical_empathy'");
+      appState.flujoReciente.tecnicaSeleccionada = 'tactical_empathy'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'tactical_empathy'");
       selectAndPreviewVR('tactical_empathy'); 
       break;
 
     case 'scarf-model': 
       appState.tecnicaSeleccionada = 'scarf_model'; 
       appState.tecnicaCargada = 'scarf_model';
-      appState.flujoReciente.tecnicaSeleccionada = 'scarf_model'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'scarf_model'");
+      appState.flujoReciente.tecnicaSeleccionada = 'scarf_model'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'scarf_model'");
       selectAndPreviewVR('scarf_model'); 
       break;
 
     case 'immunity-to-change': 
       appState.tecnicaSeleccionada = 'immunity_to_change'; 
       appState.tecnicaCargada = 'immunity_to_change';
-      appState.flujoReciente.tecnicaSeleccionada = 'immunity_to_change'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'immunity_to_change'");
+      appState.flujoReciente.tecnicaSeleccionada = 'immunity_to_change'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'immunity_to_change'");
       selectAndPreviewVR('immunity_to_change'); 
       break;
 
     case 'drama-triangle': 
       appState.tecnicaSeleccionada = 'drama_triangle'; 
       appState.tecnicaCargada = 'drama_triangle'; 
-      appState.flujoReciente.tecnicaSeleccionada = 'drama_triangle'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'drama_triangle'");
+      appState.flujoReciente.tecnicaSeleccionada = 'drama_triangle'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'drama_triangle'");
       selectAndPreviewVR('drama_triangle'); 
       break;
 
-    // === COLUMNA 3: NARANJA ===
+    // === COLUMN 3: ORANGE ===
     case 'grow-model': 
       appState.tecnicaSeleccionada = 'grow_model'; 
       appState.tecnicaCargada = 'grow_model';
-      appState.flujoReciente.tecnicaSeleccionada = 'grow_model'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'grow_model'");
+      appState.flujoReciente.tecnicaSeleccionada = 'grow_model'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'grow_model'");
       selectAndPreviewVR('grow_model'); 
       break;
 
     case 'strengths-based-coaching': 
       appState.tecnicaSeleccionada = 'strengths_based_coaching'; 
       appState.tecnicaCargada = 'strengths_based_coaching';
-      appState.flujoReciente.tecnicaSeleccionada = 'strengths_based_coaching'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'strengths_based_coaching'");
+      appState.flujoReciente.tecnicaSeleccionada = 'strengths_based_coaching'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'strengths_based_coaching'");
       selectAndPreviewVR('strengths_based_coaching'); 
       break;
 
     case 'growth-mindset': 
       appState.tecnicaSeleccionada = 'growth_mindset'; 
       appState.tecnicaCargada = 'growth_mindset';
-      appState.flujoReciente.tecnicaSeleccionada = 'growth_mindset'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'growth_mindset'");
+      appState.flujoReciente.tecnicaSeleccionada = 'growth_mindset'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'growth_mindset'");
       selectAndPreviewVR('growth_mindset'); 
       break;
 
     case 'solution-focused-coaching': 
       appState.tecnicaSeleccionada = 'solution_focused_coaching'; 
       appState.tecnicaCargada = 'solution_focused_coaching';
-      appState.flujoReciente.tecnicaSeleccionada = 'solution_focused_coaching'; // Registrar
-      // console.log("🎯 [DEBUG-FLUJO] Registrada técnica: 'solution_focused_coaching'");
+      appState.flujoReciente.tecnicaSeleccionada = 'solution_focused_coaching'; // Register
+      // console.log("🎯 [DEBUG-FLOW] Registered technique: 'solution_focused_coaching'");
       selectAndPreviewVR('solution_focused_coaching'); 
       break;
     
-    // === CASES DE INTERVENTIONS ===
+    // === INTERVENTIONS CASES ===
     case 'interv-pulse-check': funcionIntervPulseCheck(); break;
     case 'interventions': funcionShowInterventions(); break;
     case 'techniques': funcionShowtechniques(); break;
@@ -591,19 +585,19 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'interv-tenure-renewal': funcionIntervTenureRenewal(); break;
 
     case 'learn-intervention': 
-    let tecnicaReal = appState.tecnicaCargada || 'active_listening'; 
-    appState.tecnicaSeleccionada = tecnicaReal;
-    appState.ultimaActividad = { tipo: 'learn', tecnica: tecnicaReal };
-    
+      let tecnicaReal = appState.tecnicaCargada || 'active_listening'; 
+      appState.tecnicaSeleccionada = tecnicaReal;
+      appState.ultimaActividad = { tipo: 'learn', tecnica: tecnicaReal };
+      
 
-    const voiceLabel = document.getElementById('voice-label');
-    if (voiceLabel) {
-      // Un texto directo, genérico y enfocado en el aprendizaje (Learn)
-      voiceLabel.innerText = "Starting learning module..."; 
-    }
-    
-    goLearn(); 
-    break;
+      const voiceLabel = document.getElementById('voice-label');
+      if (voiceLabel) {
+        // Direct, clean, English label for learning mode
+        voiceLabel.innerText = "Starting learning module..."; 
+      }
+      
+      goLearn(); 
+      break;
 
     case 'work-together-intervention': 
       appState.ultimaActividad = { tipo: 'work', tecnica: appState.tecnicaSeleccionada };
@@ -618,11 +612,11 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'progress': goHistory(); break;
     case 'close-history': cambiarPantallaVR('screen-welcome'); break;
     case 'back-technicas': cambiarPantallaVR('screen-welcome'); break;
- 
+
     case 'level-novice':
       appState.currentLevel = 'novice';       
       appState.evaluacionHabilitada = true; 
-      // Si la técnica es una intervención, mostramos el briefing primero
+      // If the technique is an intervention, display intervention briefing
       if (appState.tecnicaSeleccionada.startsWith('interv_')) {
         mostrarBriefingIntervencion();
       } else {
@@ -650,7 +644,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       }
       break;
 
-      case 'start-briefed-practice':
+    case 'start-briefed-practice':
       goPractice();
       break;
 
@@ -665,34 +659,37 @@ function ejecutarFuncionPorTecnica(tecnica) {
       }
       break;
 
-    // === 🔄 NUEVO CASO: REPLICAR EL FLUJO GUARDADO ===
+    // === REPLICATE SAVED FLOW ===
     case 'replay-previous-flow':
-      // console.log("🔄 [DEBUG-FLUJO] Ejecutando replay-previous-flow de manera interactiva...");
+      // console.log("🔄 [DEBUG-FLOW] Executing replay-previous-flow interactively...");
       ejecutarFlujoGuardado();
       break;
 
-    // === CASO AL REINICIAR (TERMINAR / NUEVA SESION) ===
+    // === RESET SESSION / RETURN LOBBY ===
     case 'go-welcome-reset':
-      // console.log("🏁 [DEBUG-FLUJO] Procesando 'go-welcome-reset' para regresar al lobby.");
-      // console.log("📊 [DEBUG-FLUJO] Datos previos de flujo acumulados en sesión:", JSON.parse(JSON.stringify(appState.flujoReciente)));
+      // console.log("🏁 [DEBUG-FLOW] Processing 'go-welcome-reset' to return to lobby.");
+      // console.log("📊 [DEBUG-FLOW] Previous flow data accumulated in session:", JSON.parse(JSON.stringify(appState.flujoReciente)));
       
-      // Validamos si hay suficientes datos en el flujo para darlo como "activo" antes de volver al lobby
+      // Validate if enough data exists in the flow to consider it "active" before returning to lobby
       if (appState.flujoReciente.tecnicaSeleccionada && appState.flujoReciente.modoSeleccionado) {
         appState.flujoReciente.activo = true;
-        // console.log("🚀 [DEBUG-FLUJO] ¡Felicidades! Flujo marcado como .activo = true. El botón de reanudar debería aparecer.");
+        // console.log("🚀 [DEBUG-FLOW] Flow marked as .activo = true. Resume button should appear.");
       } else {
-        // console.warn("⚠️ [DEBUG-FLUJO] Cuidado: No se pudo marcar como activo porque faltan datos clave.");
+        // console.warn("⚠️ [DEBUG-FLOW] Warning: Could not set active state due to missing key data.");
       }
       cambiarPantallaVR('screen-welcome');
       break;
- 
+
     default: 
       break;
   }
   
-  // console.log("📊 [DEBUG-CLICK] Estado final del flujo TRAS terminar la ejecución de la técnica:", JSON.parse(JSON.stringify(appState.flujoReciente)));
+  // console.log("📊 [DEBUG-CLICK] Final flow state AFTER executing technique:", JSON.parse(JSON.stringify(appState.flujoReciente)));
   // console.log("========================================\n");
 }
+
+
+
 
 
 function funcionShowInterventions(){
