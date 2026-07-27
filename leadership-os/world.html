@@ -279,38 +279,45 @@ function mostrarBriefingIntervencion() {
 function mostrarBriefingTecnica() {
   console.log("=== 🔍 INICIO DEPURACIÓN BRIEFING ARQUETIPO ===");
 
-  // 1. Obtener arquetipo/agente seleccionado (ej: 'carlos', 'valeria', 'miguel', 'sandra')
-  // Usamos appState o caemos en 'carlos' por defecto
-  const arquetipoId = appState.arquetipoSeleccionado || appState.agenteSeleccionado || 'carlos';
-  
-  // 2. Obtener nivel ('novice', 'mid', 'adv')
-  const nivel = appState.flujoReciente?.nivelSeleccionado || appState.currentLevel || 'mid';
+  // 1. Obtener nivel ('novice', 'mid', 'adv')
+  const nivel = appState.flujoReciente?.nivelSeleccionado || appState.currentLevel || 'novice';
 
-  console.log("1. Buscando briefing para:", { arquetipoId, nivel });
+  // 2. Obtener lista de todos los arquetipos disponibles en el objeto ARCHETYPES
+  const objetoArquetipos = typeof ARCHETYPES !== 'undefined' ? ARCHETYPES : (window.ARCHETYPES || {});
+  const listaIdsArquetipos = Object.keys(objetoArquetipos).filter(id => objetoArquetipos[id].available !== false);
 
-  // 3. Buscar el objeto del arquetipo
-  let dataArquetipo = null;
-  if (typeof ARCHETYPES !== 'undefined') {
-    dataArquetipo = ARCHETYPES[arquetipoId] || ARCHETYPES['carlos'];
-  } else if (window.ARCHETYPES) {
-    dataArquetipo = window.ARCHETYPES[arquetipoId] || window.ARCHETYPES['carlos'];
+  if (listaIdsArquetipos.length === 0) {
+    console.error("❌ ERROR: No se encontraron arquetipos disponibles en ARCHETYPES.");
+    return;
   }
 
-  console.log("2. Datos de arquetipo encontrados:", dataArquetipo);
+  // 3. Selección del arquetipo:
+  // Si el usuario ya seleccionó uno explícitamente en el estado, usamos ese.
+  // Si NO hay uno seleccionado (o tras recargar la página), elegimos uno COMPLETAMENTE ALEATORIO.
+  let arquetipoId = appState.arquetipoSeleccionado || appState.agenteSeleccionado;
+
+  if (!arquetipoId || !objetoArquetipos[arquetipoId]) {
+    const indiceArquetipoAzar = Math.floor(Math.random() * listaIdsArquetipos.length);
+    arquetipoId = listaIdsArquetipos[indiceArquetipoAzar];
+    console.log(`🎲 Arquetipo elegido al azar tras recarga/inicio: ${arquetipoId.toUpperCase()}`);
+  }
+
+  const dataArquetipo = objetoArquetipos[arquetipoId];
+  console.log("1. Datos del arquetipo activo:", dataArquetipo);
 
   // Referencias DOM en A-Frame
   const titleEl = document.getElementById('briefing-title');
-  const trapEl = document.getElementById('briefing-trap'); // En arquetipos podemos mostrar el Trait/Rasgo o Backstory
+  const trapEl = document.getElementById('briefing-trap');
   const tagsEl = document.getElementById('briefing-tags');
 
   if (dataArquetipo) {
-    // A. Título con nombre del agente y su rol
+    // A. Título con nombre del personaje y su rol
     if (titleEl) {
       const nombre = (dataArquetipo.name || arquetipoId).toUpperCase();
       titleEl.setAttribute('value', `${nombre} - BRIEFING`);
     }
 
-    // B. Panel de "Trap" o Contexto del Trait
+    // B. Panel superior de Rasgo / Personalidad
     if (trapEl) {
       const traitInfo = dataArquetipo.trait 
         ? `RASGO: ${dataArquetipo.trait.toUpperCase()} - ${dataArquetipo.traitDesc || ''}`
@@ -318,7 +325,7 @@ function mostrarBriefingTecnica() {
       trapEl.setAttribute('value', traitInfo);
     }
 
-    // C. Buscar la lista de briefings según el nivel ('novice', 'mid', 'adv')
+    // C. Buscar los briefings disponibles para el nivel seleccionado
     let listaBriefings = [];
     if (dataArquetipo.briefings && dataArquetipo.briefings[nivel]) {
       listaBriefings = dataArquetipo.briefings[nivel];
@@ -327,10 +334,10 @@ function mostrarBriefingTecnica() {
     let briefingSeleccionado = null;
 
     if (listaBriefings.length > 0) {
-      // 🎲 Seleccionamos uno ALEATORIO dentro de las opciones disponibles para ese nivel
-      const indiceAleatorio = Math.floor(Math.random() * listaBriefings.length);
-      briefingSeleccionado = listaBriefings[indiceAleatorio];
-      console.log(`🎲 Seleccionado escenario aleatorio #${indiceAleatorio + 1} de ${listaBriefings.length}`);
+      // 🎲 Elegir también una situación ALEATORIA dentro de las opciones de ese nivel
+      const indiceBriefingAzar = Math.floor(Math.random() * listaBriefings.length);
+      briefingSeleccionado = listaBriefings[indiceBriefingAzar];
+      console.log(`🎲 Escenario elegido al azar: #${indiceBriefingAzar + 1} de ${listaBriefings.length} para nivel ${nivel}`);
     }
 
     // D. Extraer Texto y Tags
@@ -341,17 +348,15 @@ function mostrarBriefingTecnica() {
       scriptTexto = briefingSeleccionado.text;
       
       if (briefingSeleccionado.tags) {
-        // Formateamos los tags con viñetas elegantes separadas
         tagsTexto = Array.isArray(briefingSeleccionado.tags)
           ? briefingSeleccionado.tags.map(t => `• ${t}`).join('   ')
           : briefingSeleccionado.tags;
       }
     } else {
-      // Fallback por si no encuentra el nivel especificado
       scriptTexto = dataArquetipo.backstory || dataArquetipo.personality || "Sin briefing disponible para este nivel.";
     }
 
-    // E. Renderizar en la pantalla VR
+    // E. Renderizar en A-Frame
     if (tagsEl) {
       if (scriptTexto) {
         let textoRenderizado = `NIVEL: ${nivel.toUpperCase()}\n\n`;
@@ -360,21 +365,16 @@ function mostrarBriefingTecnica() {
           textoRenderizado += `Tags: ${tagsTexto}`;
         }
         
-        console.log("✅ Renderizando en pantalla VR:", textoRenderizado);
+        console.log("✅ Renderizando en VR:", textoRenderizado);
         tagsEl.setAttribute('value', textoRenderizado);
       }
     }
-
-  } else {
-    console.error("❌ ERROR: No se encontró la constante ARCHETYPES.");
   }
 
   console.log("=== 🔚 FIN DEPURACIÓN BRIEFING ARQUETIPO ===");
 
-  // Transición a la pantalla VR
   cambiarPantallaVR('screen-intervention-briefing');
 }
-
 
 
 
