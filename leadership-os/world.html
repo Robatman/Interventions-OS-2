@@ -94,7 +94,8 @@ const entornoUniversal = document.getElementById('entorno-universal');
     'screen-practice',              
     'screen-eval',                   
     'screen-active-listening-activity',
-    'screen-level-selector'
+    'screen-level-selector',
+    'screen-intervention-briefing'
   ];
   
   pantallas.forEach(id => {
@@ -170,7 +171,42 @@ const entornoUniversal = document.getElementById('entorno-universal');
   }
 }
 
+function mostrarBriefingIntervencion() {
+  const tecnica = appState.tecnicaSeleccionada; // Ej: 'interv_anchoring'
+  const nivel = appState.flujoReciente.nivelSeleccionado || 'novice'; // 'novice', 'mid', 'adv'
+  
+  // Obtenemos los datos de la intervención cargada (ajusta la referencia según tu data real en js/interventions.js)
+  const dataIntervencion = window.INTERVENTIONS ? window.INTERVENTIONS[tecnica] : null;
 
+  // Título y Trap
+  const titleEl = document.getElementById('briefing-title');
+  const trapEl = document.getElementById('briefing-trap');
+  const tagsEl = document.getElementById('briefing-tags');
+
+  if (dataIntervencion) {
+    if (titleEl) titleEl.setAttribute('value', dataIntervencion.title || tecnica.toUpperCase());
+    
+    // TRAP UNIVERSAL (se muestra sin importar el nivel seleccionado)
+    if (trapEl) trapEl.setAttribute('value', `TRAP: ${dataIntervencion.trap || 'Evita caer en sesgos durante la sesión.'}`);
+
+    // Extraemos los datos/etiquetas del nivel actual
+    const nivelData = dataIntervencion.levels ? dataIntervencion.levels[nivel] : null;
+    if (nivelData) {
+      // Ejemplo: "Sandra lleva...", "Año difícil", "Demostró resiliencia"
+      let tagsTexto = `NIVEL: ${nivel.toUpperCase()}\n\n`;
+      if (nivelData.context) tagsTexto += `• Contexto: ${nivelData.context}\n`;
+      if (nivelData.tags && Array.isArray(nivelData.tags)) {
+        tagsTexto += `• Etiquetas: ${nivelData.tags.join(' | ')}`;
+      }
+      if (tagsEl) tagsEl.setAttribute('value', tagsTexto);
+    } else {
+      if (tagsEl) tagsEl.setAttribute('value', `Nivel seleccionado: ${nivel.toUpperCase()}`);
+    }
+  }
+
+  // Cambiamos a la nueva pantalla VR
+  cambiarPantallaVR('screen-intervention-briefing');
+}
 
 function ejecutarFuncionPorTecnica(tecnica) {
   // Aseguramos que el objeto de flujo exista para evitar errores "Cannot set property of undefined"
@@ -411,19 +447,36 @@ function ejecutarFuncionPorTecnica(tecnica) {
     case 'level-novice':
       appState.currentLevel = 'novice';       
       appState.evaluacionHabilitada = true; 
-      goPractice(); 
+      // Si la técnica es una intervención, mostramos el briefing primero
+      if (appState.tecnicaSeleccionada.startsWith('interv_')) {
+        mostrarBriefingIntervencion();
+      } else {
+        goPractice(); 
+      }
       break;
 
     case 'level-intermediate':  
       appState.currentLevel = 'mid'; 
       appState.evaluacionHabilitada = true; 
-      goPractice(); 
+      if (appState.tecnicaSeleccionada.startsWith('interv_')) {
+        mostrarBriefingIntervencion();
+      } else {
+        goPractice(); 
+      }
       break;
 
     case 'level-expert':        
       appState.currentLevel = 'adv'; 
       appState.evaluacionHabilitada = true; 
-      goPractice(); 
+      if (appState.tecnicaSeleccionada.startsWith('interv_')) {
+        mostrarBriefingIntervencion();
+      } else {
+        goPractice(); 
+      }
+      break;
+
+      case 'start-briefed-practice':
+      goPractice();
       break;
 
     case 'back-to-learn-work': cambiarPantallaVR('screen-learn-work-practice'); break;
@@ -1343,6 +1396,39 @@ function ejecutarFlujoGuardado() {
   <a-plane width="0.86" height="0.30" color="#4466ff" material="opacity:0.4; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
 </a-entity>
 </a-entity>
+
+
+
+<a-entity id="screen-intervention-briefing" position="0 1.6 -2.5" visible="false">
+  <!-- Fondo del Panel -->
+  <a-plane width="3.2" height="2.2" color="#080e2a" material="opacity:0.95;shader:flat;side:double"></a-plane>
+  <a-plane width="3.24" height="2.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat;side:double" position="0 0 -0.005"></a-plane>
+
+  <!-- Título de la Intervención -->
+  <a-text id="briefing-title" value="ANCHORING BRIEFING" position="0 0.85 0.01" align="center" color="#00e5c0" width="4.5" font="mozillavr"></a-text>
+  
+  <!-- Trap Universal -->
+  <a-plane width="2.9" height="0.3" color="#300a18" material="opacity:0.9;shader:flat" position="0 0.5 0.01"></a-plane>
+  <a-text id="briefing-trap" value="TRAP: Cuidado con asumir intenciones previas..." position="0 0.5 0.02" align="center" color="#ff5ca0" width="3.2" wrap-count="45" font="mozillavr"></a-text>
+
+  <!-- Detalles, Contexto y Etiquetas del Nivel -->
+  <a-text id="briefing-tags" value="Cargando detalles de la actividad..." position="-1.3 0.1 0.01" align="left" color="#e8eeff" width="3.0" wrap-count="45" font="mozillavr"></a-text>
+
+  <!-- Botón de Continuar a la Práctica -->
+  <a-entity position="0 -0.75 0.02">
+    <a-plane class="clickable" 
+             handler-botones-vr="mensaje: Iniciando simulador tras briefing; tecnica: start-briefed-practice"
+             width="1.6" height="0.32" 
+             color="#0d2060" 
+             material="opacity:0.9;shader:flat;side:double">
+      <a-plane width="1.64" height="0.36" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text value="START PRACTICE ➔" align="center" color="#00e5c0" width="3.2" position="0 0 0.01" font="mozillavr"></a-text>
+    </a-plane>
+  </a-entity>
+</a-entity>
+
+
+
 
 <a-entity id="screen-practice" visible="false">
   <a-entity id="agent-entity" position="0 0 -2.5">
