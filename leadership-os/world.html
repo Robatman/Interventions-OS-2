@@ -204,7 +204,7 @@ function mostrarBriefingIntervencion() {
     // 3. Título y Trap
     if (titleEl) {
       const titulo = (dataIntervencion.label || dataIntervencion.title || dataIntervencion.name || tecnica || 'BRIEFING').toUpperCase();
-      titleEl.setAttribute('value', `${titulo} BRIEFING`);
+      titleEl.setAttribute('value', `${titulo}`);
     }
 
     if (trapEl) {
@@ -253,8 +253,8 @@ function mostrarBriefingIntervencion() {
     // 6. Renderizar en la pantalla VR
     if (tagsEl) {
       if (scriptTexto) {
-        let textoRenderizado = `NIVEL: ${nivel.toUpperCase()}\n\n`;
-        textoRenderizado += `• Escenario: "${scriptTexto}"\n\n`;
+        let textoRenderizado = `Level: ${nivel.toUpperCase()}\n\n`;
+        textoRenderizado += `• Scenery: "${scriptTexto}"\n\n`;
         if (tagsTexto) {
           textoRenderizado += `• Tags: ${tagsTexto}`;
         }
@@ -275,6 +275,9 @@ function mostrarBriefingIntervencion() {
   // Transición a la pantalla de VR briefing
   cambiarPantallaVR('screen-intervention-briefing');
 }
+
+
+
 
 function mostrarBriefingTecnica() {
   console.log("=== 🔍 INICIO DEPURACIÓN BRIEFING ARQUETIPO ===");
