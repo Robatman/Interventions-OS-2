@@ -172,41 +172,80 @@ const entornoUniversal = document.getElementById('entorno-universal');
 }
 
 function mostrarBriefingIntervencion() {
-  const tecnica = appState.tecnicaSeleccionada; // Ej: 'interv_anchoring'
-  const nivel = appState.flujoReciente.nivelSeleccionado || 'novice'; // 'novice', 'mid', 'adv'
+  const tecnica = appState.tecnicaSeleccionada; // Ej: 'interv_anchoring' o 'anchoring'
+  const nivel = appState.flujoReciente.nivelSeleccionado || appState.currentLevel || 'mid'; // 'novice', 'mid', 'adv'
   
-  // Obtenemos los datos de la intervención cargada (ajusta la referencia según tu data real en js/interventions.js)
-  const dataIntervencion = window.INTERVENTIONS ? window.INTERVENTIONS[tecnica] : null;
+  // 1. Buscamos el objeto de la intervención en window.INTERVENTIONS
+  let dataIntervencion = null;
+  if (window.INTERVENTIONS) {
+    dataIntervencion = window.INTERVENTIONS[tecnica] || 
+                        window.INTERVENTIONS[tecnica.replace('interv_', '')] || 
+                        window.INTERVENTIONS['anchoring']; // Fallback a la intervención activa
+  }
 
-  // Título y Trap
+  // Elementos HTML de A-Frame
   const titleEl = document.getElementById('briefing-title');
   const trapEl = document.getElementById('briefing-trap');
   const tagsEl = document.getElementById('briefing-tags');
 
   if (dataIntervencion) {
-    if (titleEl) titleEl.setAttribute('value', dataIntervencion.title || tecnica.toUpperCase());
+    // 2. Extraer Título Principal
+    if (titleEl) {
+      titleEl.setAttribute('value', (dataIntervencion.title || dataIntervencion.name || tecnica).toUpperCase() + ' BRIEFING');
+    }
     
-    // TRAP UNIVERSAL (se muestra sin importar el nivel seleccionado)
-    if (trapEl) trapEl.setAttribute('value', `TRAP: ${dataIntervencion.trap || 'Evita caer en sesgos durante la sesión.'}`);
+    // 3. Extraer TRAP (o Warning/Precaución del script)
+    if (trapEl) {
+      const trapText = dataIntervencion.trap || dataIntervencion.warning || 'Evita caer en sesgos durante la sesión.';
+      trapEl.setAttribute('value', `TRAP: ${trapText}`);
+    }
 
-    // Extraemos los datos/etiquetas del nivel actual
-    const nivelData = dataIntervencion.levels ? dataIntervencion.levels[nivel] : null;
-    if (nivelData) {
-      // Ejemplo: "Sandra lleva...", "Año difícil", "Demostró resiliencia"
-      let tagsTexto = `NIVEL: ${nivel.toUpperCase()}\n\n`;
-      if (nivelData.context) tagsTexto += `• Contexto: ${nivelData.context}\n`;
-      if (nivelData.tags && Array.isArray(nivelData.tags)) {
-        tagsTexto += `• Etiquetas: ${nivelData.tags.join(' | ')}`;
-      }
-      if (tagsEl) tagsEl.setAttribute('value', tagsTexto);
+    // 4. Mapear dinámicamente según la estructura del script (ejemplo: anch_mid_1)
+    let nivelData = null;
+
+    if (dataIntervencion.levels && dataIntervencion.levels[nivel]) {
+      nivelData = dataIntervencion.levels[nivel];
     } else {
-      if (tagsEl) tagsEl.setAttribute('value', `Nivel seleccionado: ${nivel.toUpperCase()}`);
+      // Buscar por coincidencia de ID (por ejemplo: "anch_mid_1")
+      const scriptKey = `${tecnica.replace('interv_', '')}_${nivel}`; // "anch_mid"
+      if (dataIntervencion[scriptKey]) {
+        nivelData = dataIntervencion[scriptKey];
+      } else if (dataIntervencion[`${scriptKey}_1`]) { // Maneja el sufijo _1 ("anch_mid_1")
+        nivelData = dataIntervencion[`${scriptKey}_1`];
+      }
+    }
+
+    // 5. Renderizar Texto del Script y Tags en Pantalla
+    if (nivelData) {
+      let textoRenderizado = `NIVEL: ${nivel.toUpperCase()}\n\n`;
+
+      // Texto / Contexto del script
+      const scriptTexto = nivelData.text || nivelData.script || nivelData.context || nivelData.description;
+      if (scriptTexto) {
+        textoRenderizado += `• Script: "${scriptTexto}"\n\n`;
+      }
+
+      // Etiquetas / Tags
+      if (nivelData.tags && Array.isArray(nivelData.tags)) {
+        textoRenderizado += `• Tags: ${nivelData.tags.join(' | ')}`;
+      } else if (nivelData.tags) {
+        textoRenderizado += `• Tags: ${nivelData.tags}`;
+      }
+
+      if (tagsEl) tagsEl.setAttribute('value', textoRenderizado);
+    } else {
+      // Si no encuentra la variante específica del nivel, muestra el resumen general
+      if (tagsEl) {
+        const descGeneral = dataIntervencion.description || `Configuración cargada para nivel ${nivel.toUpperCase()}`;
+        tagsEl.setAttribute('value', descGeneral);
+      }
     }
   }
 
-  // Cambiamos a la nueva pantalla VR
+  // Cambiar a la pantalla de VR briefing
   cambiarPantallaVR('screen-intervention-briefing');
 }
+
 
 function ejecutarFuncionPorTecnica(tecnica) {
   // Aseguramos que el objeto de flujo exista para evitar errores "Cannot set property of undefined"
