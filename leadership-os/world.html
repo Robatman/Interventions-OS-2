@@ -1855,32 +1855,38 @@ function ejecutarFlujoGuardado() {
     </a-entity>
 
     <!-- Botón See the Moves -->
-    <a-plane
-        id="btn-toggle-active-listening"
-        
-        width="1.4"
-        height="0.3"
-        color="#ff5ca0"
-        position="0 -1.35 0.02"
-        visible="false"
-        onclick="toggleListeningMoves()">
+   <a-plane
+    id="btn-toggle-active-listening"
+    class="raycastable"
+    width="1.4"
+    height="0.3"
+    color="#253570"
+    material="opacity: 0.95; shader: flat; transparent: true"
+    position="0 -1.35 0.02"
+    visible="false"
+    onclick="toggleListeningMoves()">
 
-        <a-plane id="btn-toggle-active-listening" width="1.4" height="0.3" 
-        color="#ff5ca0" position="0 -1.35 0.02></a-plane>
-
-        <a-plane id="btn-toggle-active-listening" width="1.4" height="0.3" 
-        color="#ff5ca0" position="0 -1.35 0.02"></a-plane>
-
-        <a-text
-            id="text-btn-toggle-listening"
-            value="See the moves"
-            align="center"
-            color="#fff"
-            width="3.2"
-            font="mozillavr">
-        </a-text>
-
+    <!-- Borde/Glow opcional para que resalte mucho más sobre el negro -->
+    <a-plane 
+        width="1.44" 
+        height="0.34" 
+        color="#ff5ca0" 
+        material="opacity: 0.8; shader: flat; transparent: true" 
+        position="0 0 -0.005">
     </a-plane>
+
+    <!-- Texto centrado dentro del botón -->
+    <a-text
+        id="text-btn-toggle-listening"
+        value="See the moves"
+        align="center"
+        color="#ffffff"
+        width="3.2"
+        position="0 0 0.01"
+        font="mozillavr">
+    </a-text>
+
+</a-plane>
 
 </a-entity>
 
