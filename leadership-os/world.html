@@ -592,7 +592,6 @@ function ejecutarFuncionPorTecnica(tecnica) {
     appState.tecnicaSeleccionada = tecnicaReal;
     appState.ultimaActividad = { tipo: 'learn', tecnica: tecnicaReal };
     
-    // Borramos el objeto nombresIntervenciones y la variable nombreBonito de aquí 🧹
 
     const voiceLabel = document.getElementById('voice-label');
     if (voiceLabel) {
@@ -624,7 +623,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       if (appState.tecnicaSeleccionada.startsWith('interv_')) {
         mostrarBriefingIntervencion();
       } else {
-        goPractice(); 
+        mostrarBriefingIntervencion(); 
       }
       break;
 
@@ -634,7 +633,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       if (appState.tecnicaSeleccionada.startsWith('interv_')) {
         mostrarBriefingIntervencion();
       } else {
-        goPractice(); 
+        mostrarBriefingIntervencion(); 
       }
       break;
 
@@ -644,7 +643,7 @@ function ejecutarFuncionPorTecnica(tecnica) {
       if (appState.tecnicaSeleccionada.startsWith('interv_')) {
         mostrarBriefingIntervencion();
       } else {
-        goPractice(); 
+        mostrarBriefingIntervencion(); 
       }
       break;
 
