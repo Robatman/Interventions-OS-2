@@ -174,7 +174,7 @@ const entornoUniversal = document.getElementById('entorno-universal');
 function mostrarBriefingIntervencion() {
   console.log("=== 🔍 INICIO DEPURACIÓN BRIEFING ===");
   
-  // 1. Verificar variables de estado
+  // 1. Obtener técnica y nivel actual
   const tecnica = appState.tecnicaSeleccionada; 
   const nivel = appState.flujoReciente?.nivelSeleccionado || appState.currentLevel || 'mid';
   
@@ -184,44 +184,25 @@ function mostrarBriefingIntervencion() {
     flujoReciente: appState.flujoReciente 
   });
 
-  // 2. Verificar objeto global de intervenciones
-  console.log("2. ¿Existe window.INTERVENTIONS?:", !!window.INTERVENTIONS);
-  console.log("2b. Contenido de window.INTERVENTIONS:", window.INTERVENTIONS);
-
   let dataIntervencion = null;
   if (window.INTERVENTIONS) {
+    // Normalizar la clave de búsqueda quitando el prefijo 'interv_'
+    const claveLimpia = tecnica ? tecnica.replace('interv_', '') : '';
     dataIntervencion = window.INTERVENTIONS[tecnica] || 
-                       window.INTERVENTIONS[tecnica?.replace('interv_', '')] || 
-                       window.INTERVENTIONS['anchoring'];
+                       window.INTERVENTIONS[claveLimpia] || 
+                       window.INTERVENTIONS['anchoring'] ||
+                       window.INTERVENTIONS['pulse_check'];
   }
 
-  console.log("3. Objeto de intervención encontrado:", dataIntervencion);
+  console.log("2. Objeto de intervención encontrado:", dataIntervencion);
 
-  // 3. Verificar elementos del DOM / A-Frame
+  // Referencias DOM / A-Frame
   const titleEl = document.getElementById('briefing-title');
   const trapEl = document.getElementById('briefing-trap');
   const tagsEl = document.getElementById('briefing-tags');
 
-  console.log("4. Elementos en el DOM encontrados:", {
-    titleEl: !!titleEl,
-    trapEl: !!trapEl,
-    tagsEl: !!tagsEl
-  });
-
   if (dataIntervencion) {
-    // Intentar buscar la clave específica (ej: "anch_mid_1")
-    const baseKey = tecnica ? tecnica.replace('interv_', '') : 'anch';
-    const scriptKey = `${baseKey}_${nivel}`;
-    const scriptKeyWithOne = `${scriptKey}_1`;
-
-    console.log(`5. Buscando claves en el objeto: "${scriptKey}" o "${scriptKeyWithOne}"`);
-
-    let nivelData = dataIntervencion.levels?.[nivel] || 
-                      dataIntervencion[scriptKey] || 
-                      dataIntervencion[scriptKeyWithOne];
-
-    console.log("6. Datos de nivel encontrados (nivelData):", nivelData);
-
+    // 3. Título y Trap
     if (titleEl) {
       const titulo = (dataIntervencion.title || dataIntervencion.name || tecnica || 'BRIEFING').toUpperCase();
       titleEl.setAttribute('value', `${titulo} BRIEFING`);
@@ -232,35 +213,64 @@ function mostrarBriefingIntervencion() {
       trapEl.setAttribute('value', `TRAP: ${trapText}`);
     }
 
-    if (nivelData) {
-      let textoRenderizado = `NIVEL: ${nivel.toUpperCase()}\n\n`;
-      const scriptTexto = nivelData.text || nivelData.script || nivelData.context || nivelData.description;
-      
-      if (scriptTexto) textoRenderizado += `• Script: "${scriptTexto}"\n\n`;
-      if (nivelData.tags) {
-        const tags = Array.isArray(nivelData.tags) ? nivelData.tags.join(' | ') : nivelData.tags;
-        textoRenderizado += `• Tags: ${tags}`;
-      }
+    // 4. Búsqueda exhaustiva del Nivel/Script
+    const baseKey = tecnica ? tecnica.replace('interv_', '') : 'anch';
+    const scriptKey = `${baseKey}_${nivel}`;
+    const scriptKeyWithOne = `${scriptKey}_1`;
 
-      if (tagsEl) {
-        console.log("7. Actualizando text/value en tagsEl:", textoRenderizado);
-        tagsEl.setAttribute('value', textoRenderizado);
-      }
-    } else {
-      console.warn("⚠️ No se encontró 'nivelData' para el nivel:", nivel);
-      if (tagsEl) {
-        tagsEl.setAttribute('value', dataIntervencion.description || `Sin datos para nivel ${nivel}`);
+    // Intentar ubicar los datos del nivel en múltiples estructuras posibles
+    let nivelData = dataIntervencion.levels?.[nivel] || 
+                    dataIntervencion.levels?.[nivel === 'mid' ? 'intermediate' : nivel] ||
+                    dataIntervencion.scripts?.[nivel] ||
+                    dataIntervencion[scriptKey] || 
+                    dataIntervencion[scriptKeyWithOne];
+
+    // Si nivelData es una cadena directa de texto
+    let scriptTexto = typeof nivelData === 'string' ? nivelData : null;
+    let tagsTexto = '';
+
+    // Si nivelData es un objeto
+    if (nivelData && typeof nivelData === 'object') {
+      scriptTexto = nivelData.text || nivelData.script || nivelData.context || nivelData.description;
+      if (nivelData.tags) {
+        tagsTexto = Array.isArray(nivelData.tags) ? nivelData.tags.join(' | ') : nivelData.tags;
       }
     }
+
+    // Fallback general si no se encontró en nivelData
+    if (!scriptTexto) {
+      scriptTexto = dataIntervencion.script || 
+                    dataIntervencion.text || 
+                    dataIntervencion.description || 
+                    dataIntervencion.context;
+    }
+
+    // 5. Renderizar en la pantalla VR
+    if (tagsEl) {
+      if (scriptTexto) {
+        let textoRenderizado = `NIVEL: ${nivel.toUpperCase()}\n\n`;
+        textoRenderizado += `• Script: "${scriptTexto}"\n\n`;
+        if (tagsTexto) {
+          textoRenderizado += `• Tags: ${tagsTexto}`;
+        }
+        console.log("✅ Renderizando texto en pantalla VR:", textoRenderizado);
+        tagsEl.setAttribute('value', textoRenderizado);
+      } else {
+        console.warn("⚠️ No se encontró texto de script para el nivel:", nivel);
+        tagsEl.setAttribute('value', `NIVEL: ${nivel.toUpperCase()}\n\nSin script disponible para este nivel.`);
+      }
+    }
+
   } else {
     console.error("❌ ERROR CRÍTICO: No se encontró la intervención en window.INTERVENTIONS.");
   }
 
   console.log("=== 🔚 FIN DEPURACIÓN BRIEFING ===");
 
-  // Cambiar a la pantalla de VR briefing
+  // Transición a la pantalla de VR briefing
   cambiarPantallaVR('screen-intervention-briefing');
 }
+
 
 
 
