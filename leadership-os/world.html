@@ -18,14 +18,12 @@
   #mic-btn:hover{transform:translateX(-50%) scale(1.1);}
   #mic-btn.recording{background:linear-gradient(135deg,#ff5ca0,#ff3c6b);box-shadow:0 0 24px #ff5ca0;}
   
-  
 </style>
 </head>
 <body>
 <script>
 (function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
 </script>
-
 
 
 <script>  
@@ -70,10 +68,7 @@ AFRAME.registerComponent('handler-botones-vr', {
   }
 });
 
-
-
 function cambiarPantallaVR(pantallaMostrarId) {
-  // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
 const entornoUniversal = document.getElementById('entorno-universal');
   if (entornoUniversal) {
     if (pantallaMostrarId === 'screen-intro') {
@@ -748,15 +743,6 @@ function ejecutarFlujoGuardado() {
 
   const { tecnicaSeleccionada, modoSeleccionado, nivelSeleccionado, pantallaOrigen } = appState.flujoReciente;
 
-  // console.log(`📌 [REPLAY] Datos recuperados de la última sesión:`);
-  // console.log(`   - 🛠️ Técnica:  ${tecnicaSeleccionada}`);
-  // console.log(`   - 🎮 Modo:     ${modoSeleccionado}`);
-  // console.log(`   - 📊 Nivel:    ${nivelSeleccionado || 'No aplica'}`);
-  // console.log(`   - 📍 Origen:   ${pantallaOrigen}`);
-  // console.log("========================================");
-
-  // Aquí va tu lógica para redirigir al usuario...
-  // Por ejemplo, si el modo es 'practice', debería activar la técnica y saltar directo a goPractice()
   if (tecnicaSeleccionada) {
     appState.tecnicaSeleccionada = tecnicaSeleccionada;
     appState.tecnicaCargada = tecnicaSeleccionada;
