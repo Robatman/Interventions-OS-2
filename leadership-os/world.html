@@ -932,29 +932,35 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
   <!-- ============================================================ -->
-  <!-- ZONA MODIFICADA: TEXTOS Y BOTÓN DE ALTO CONTRASTE PARA DÍA -->
+  <!-- ZONA OPTIMIZADA: PANEL DE INTERFAZ Y TEXTOS DE ALTA VISIBILIDAD -->
   <!-- ============================================================ -->
 
-  <a-entity position="0 1.6 -3">
-    <!-- Título: Cambiado de verde neón a Azul Marino Muy Oscuro -->
-    <a-text value="WELCOME TO NEURAL ACADEMY" align="center" color="#051525" font="exo2bold" width="7"></a-text>
-    
-    <!-- Subtítulo: Cambiado de azul claro a Gris Pizarra Oscuro -->
-    <a-text value="Press the button to start with the experience" position="0 -0.4 0" align="center" color="#2C3E50" width="4" font="mozillavr"></a-text>
-  </a-entity>
+  <a-entity position="0 1.8 -3">
+    <!-- Panel de fondo oscuro traslúcido para asegurar legibilidad -->
+    <a-plane width="4.5" height="1.8" color="#0B1A2E" material="opacity:0.85; transparent:true; shader:flat" position="0 -0.2 -0.05"></a-plane>
+    <!-- Borde sutil brillante para la tarjeta UI -->
+    <a-plane width="4.56" height="1.86" color="#00D2FF" material="opacity:0.4; transparent:true; shader:flat" position="0 -0.2 -0.06"></a-plane>
 
-  <a-entity position="0 2.3 -2.5">
-    <a-plane class="clickable"
-             handler-botones-vr="mensaje: Iniciando sistema; tecnica: start-app"
-             width="1.6" height="0.4"
-             color="#0044CC" 
-             material="opacity:1; shader:flat; side:double">
-      <!-- Borde del botón más oscuro -->
-      <a-plane width="1.64" height="0.44" color="#002266" material="opacity:0.4; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
-      
-      <!-- Texto START: Cambiado de neón a Blanco Puro para contraste sobre el botón azul -->
-      <a-text value="START" align="center" color="#FFFFFF" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
-    </a-plane>
+    <!-- Título Principal: Blanco Puro brillante con tipografía bold -->
+    <a-text value="WELCOME TO NEURAL ACADEMY" align="center" color="#FFFFFF" font="exo2bold" width="6.5" position="0 0.3 0"></a-text>
+    
+    <!-- Subtítulo: Azul Cian Claro para diferenciarse pero mantener contraste -->
+    <a-text value="Press the button to start with the experience" position="0 -0.1 0" align="center" color="#A0E6FF" width="3.8" font="mozillavr"></a-text>
+
+    <!-- Botón START reubicado dentro del panelUI -->
+    <a-entity position="0 -0.5 0.02">
+      <a-plane class="clickable"
+               handler-botones-vr="mensaje: Iniciando sistema; tecnica: start-app"
+               width="1.8" height="0.45"
+               color="#0066FF" 
+               material="opacity:1; shader:flat; side:double">
+        <!-- Borde brillante del botón al hacer hover o foco -->
+        <a-plane width="1.86" height="0.51" color="#00E5FF" material="opacity:0.8; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+        
+        <!-- Texto START: Blanco para máximo contraste -->
+        <a-text value="START" align="center" color="#FFFFFF" width="4" position="0 0 0.01" font="mozillavr"></a-text>
+      </a-plane>
+    </a-entity>
   </a-entity>
   
   <!-- ============================================================ -->
