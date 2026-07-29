@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es"> 
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <title>Centris · Neural Academy</title>
@@ -18,12 +18,14 @@
   #mic-btn:hover{transform:translateX(-50%) scale(1.1);}
   #mic-btn.recording{background:linear-gradient(135deg,#ff5ca0,#ff3c6b);box-shadow:0 0 24px #ff5ca0;}
   
+  
 </style>
 </head>
 <body>
 <script>
 (function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
 </script>
+
 
 
 <script>  
@@ -68,7 +70,10 @@ AFRAME.registerComponent('handler-botones-vr', {
   }
 });
 
+
+
 function cambiarPantallaVR(pantallaMostrarId) {
+  // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
 const entornoUniversal = document.getElementById('entorno-universal');
   if (entornoUniversal) {
     if (pantallaMostrarId === 'screen-intro') {
@@ -743,6 +748,15 @@ function ejecutarFlujoGuardado() {
 
   const { tecnicaSeleccionada, modoSeleccionado, nivelSeleccionado, pantallaOrigen } = appState.flujoReciente;
 
+  // console.log(`📌 [REPLAY] Datos recuperados de la última sesión:`);
+  // console.log(`   - 🛠️ Técnica:  ${tecnicaSeleccionada}`);
+  // console.log(`   - 🎮 Modo:     ${modoSeleccionado}`);
+  // console.log(`   - 📊 Nivel:    ${nivelSeleccionado || 'No aplica'}`);
+  // console.log(`   - 📍 Origen:   ${pantallaOrigen}`);
+  // console.log("========================================");
+
+  // Aquí va tu lógica para redirigir al usuario...
+  // Por ejemplo, si el modo es 'practice', debería activar la técnica y saltar directo a goPractice()
   if (tecnicaSeleccionada) {
     appState.tecnicaSeleccionada = tecnicaSeleccionada;
     appState.tecnicaCargada = tecnicaSeleccionada;
@@ -2761,17 +2775,38 @@ async function goEval(){
   var evalMoodEl=document.getElementById('eval-mood');
   if(evalMoodEl)evalMoodEl.setAttribute('text','value',appState.vrMood+'%');
   setJuanMood('talking');
-  var evalText='Analiza esta conversacion de practica. Agente: '+((appState.currentArchetype&&appState.currentArchetype.name)||'Agente')+' ('+((appState.currentArchetype&&appState.currentArchetype.trait)||'')+'). Mood final: '+appState.vrMood+'/100. Historial: '+appState.agentHistory.length+' turnos. Da feedback en 3 puntos concretos en espanol, maximo 4 oraciones total. Se directo y especifico. No uses lenguaje generico de coaching.';
+  
+  // 1. Cambiamos las instrucciones para que pida el feedback en inglés
+  var evalText='Analyze this practice conversation. Agent: '+((appState.currentArchetype&&appState.currentArchetype.name)||'Agent')+' ('+((appState.currentArchetype&&appState.currentArchetype.trait)||'')+'). Final mood: '+appState.vrMood+'/100. History: '+appState.agentHistory.length+' turns. Give feedback in 3 concrete points in English, maximum 4 sentences total. Be direct and specific. Do not use generic coaching language.';
+  
   try{
-    var res=await fetch('/api/groq',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Eres Juanjolote, coach directo y honesto. Evalua conversaciones de practica de liderazgo. Espanol. Concreto. Sin formalidades.'},{role:'user',content:evalText},...appState.agentHistory.slice(-8)],max_tokens:200,temperature:0.7})});
+    var res=await fetch('/api/groq',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        messages:[
+          // 2. Modificamos el rol del sistema para que responda en inglés
+          {role:'system',content:'You are Juanjolote, a direct and honest coach. Evaluate leadership practice conversations. English. Concrete. No formalities.'},
+          {role:'user',content:evalText},
+          ...appState.agentHistory.slice(-8)
+        ],
+        max_tokens:200,
+        temperature:0.7
+      })
+    });
+    
     var data=await res.json();
-    var feedback=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'Sesion completada.';
+    // 3. Fallback en inglés si no se recibe respuesta
+    var feedback=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'Session completed.';
+    
     var feedbackEl=document.getElementById('eval-feedback');
     if(feedbackEl)feedbackEl.setAttribute('text','value',feedback);
-speakVR(feedback,getVoice('juan'));
+    speakVR(feedback,getVoice('juan'));
   } catch(e){
+    // 3. Fallback en inglés para el bloque catch
     var feedbackEl2=document.getElementById('eval-feedback');
-    if(feedbackEl2)feedbackEl2.setAttribute('text','value','Sesion completada. Buen trabajo.');
+    if(feedbackEl2)feedbackEl2.setAttribute('text','value','Session completed. Great job.');
   }
 }
 
