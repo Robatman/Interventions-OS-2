@@ -859,79 +859,93 @@ function ejecutarFlujoGuardado() {
 
 <a-entity id="screen-intro" visible="true">
 
-  
-<!-- <audio id="audio-intro-bg" src="assets/audio/bosque-intro.mp3" loop preload="auto"></audio> -->
+  <!-- 1. CIELO AÑADIDO (Cielo azul claro degradado) -->
+  <a-sky color="#88CCFF"></a-sky>
 
-<a-light type="ambient" color="#112233" intensity="0.8"></a-light>
-<a-light type="directional" position="-5 15 -5" color="#77aaff" intensity="0.9"></a-light>
-<a-light type="point" position="0 1.5 0" color="#ffaa44" intensity="0.6" distance="10"></a-light>
+  <!-- <audio id="audio-intro-bg" src="assets/audio/bosque-intro.mp3" loop preload="auto"></audio> -->
 
-<a-sphere radius="30" color="#030810" material="shader:flat;side:back"></a-sphere>
+  <!-- 2. LUCES AJUSTADAS (Más brillantes y diurnas) -->
+  <!-- Luz ambiente más clara y suave -->
+  <a-light type="ambient" color="#AABBDD" intensity="0.6"></a-light>
+  <!-- Luz direccional como un sol brillante (más cenital y blanca) -->
+  <a-light type="directional" position="1 10 1" color="#FFFFFF" intensity="1.2"></a-light>
+  <!-- Se elimina la luz de punto naranja para mayor claridad diurna -->
 
-<a-plane position="0 0 0" rotation="-90 0 0" width="40" height="40" color="#0f2115" material="roughness:0.9;metalness:0.1"></a-plane>
+  <!-- 3. ESFERA DE FONDO ELIMINADA (Ya no es necesaria con el a-sky) -->
+  <!-- <a-sphere radius="30" color="#030810" material="shader:flat;side:back"></a-sphere> -->
 
-<a-entity id="bosque-arboles">
-  <a-cylinder position="-6 3 -8" radius="0.4" height="8" color="#1a110a"></a-cylinder>
-  <a-cone position="-6 6 -8" radius-bottom="2.5" radius-top="0.1" height="5" color="#082b13"></a-cone>
+  <!-- Suelo ligeramente más claro -->
+  <a-plane position="0 0 0" rotation="-90 0 0" width="40" height="40" color="#1A2F20" material="roughness:0.9;metalness:0.1"></a-plane>
 
-  <a-cylinder position="6 3 -8" radius="0.5" height="8" color="#1c120c"></a-cylinder>
-  <a-cone position="6 6.5 -8" radius-bottom="3" radius-top="0.1" height="6" color="#06240f"></a-cone>
+  <!-- Bosque con colores de árboles ligeramente suavizados -->
+  <a-entity id="bosque-arboles">
+    <a-cylinder position="-6 3 -8" radius="0.4" height="8" color="#3A211A"></a-cylinder> <!-- Tronco más claro -->
+    <a-cone position="-6 6 -8" radius-bottom="2.5" radius-top="0.1" height="5" color="#184D2A"></a-cone> <!-- Copa más clara -->
 
-  <a-cylinder position="0 3.5 -10" radius="0.6" height="9" color="#180e08"></a-cylinder>
-  <a-cone position="0 7.5 -10" radius-bottom="3.5" radius-top="0.1" height="7" color="#041f0c"></a-cone>
+    <a-cylinder position="6 3 -8" radius="0.5" height="8" color="#3C221C"></a-cylinder>
+    <a-cone position="6 6.5 -8" radius-bottom="3" radius-top="0.1" height="6" color="#164429"></a-cone>
 
-  <!-- Troncos laterales -->
-  <a-cylinder position="-8 3 -2" radius="0.45" height="8" color="#1c120c"></a-cylinder>
-  <a-cone position="-8 6 -2" radius-bottom="2.5" radius-top="0.1" height="5" color="#082b13"></a-cone>
+    <a-cylinder position="0 3.5 -10" radius="0.6" height="9" color="#381E18"></a-cylinder>
+    <a-cone position="0 7.5 -10" radius-bottom="3.5" radius-top="0.1" height="7" color="#143F2C"></a-cone>
 
-  <a-cylinder position="8 3 -2" radius="0.5" height="8" color="#1a110a"></a-cylinder>
-  <a-cone position="8 6.5 -2" radius-bottom="2.8" radius-top="0.1" height="5.5" color="#06240f"></a-cone>
+    <!-- Troncos laterales con colores ajustados -->
+    <a-cylinder position="-8 3 -2" radius="0.45" height="8" color="#3C221C"></a-cylinder>
+    <a-cone position="-8 6 -2" radius-bottom="2.5" radius-top="0.1" height="5" color="#184D2A"></a-cone>
 
-  <a-cylinder position="-5 3 6" radius="0.4" height="8" color="#180e08"></a-cylinder>
-  <a-cone position="-5 6 6" radius-bottom="2.3" radius-top="0.1" height="5" color="#041f0c"></a-cone>
+    <a-cylinder position="8 3 -2" radius="0.5" height="8" color="#3A211A"></a-cylinder>
+    <a-cone position="8 6.5 -2" radius-bottom="2.8" radius-top="0.1" height="5.5" color="#164429"></a-cone>
 
-  <a-cylinder position="5 3 6" radius="0.45" height="8" color="#1c120c"></a-cylinder>
-  <a-cone position="5 6 6" radius-bottom="2.5" radius-top="0.1" height="5" color="#082b13"></a-cone>
-</a-entity>
+    <a-cylinder position="-5 3 6" radius="0.4" height="8" color="#381E18"></a-cylinder>
+    <a-cone position="-5 6 6" radius-bottom="2.3" radius-top="0.1" height="5" color="#143F2C"></a-cone>
 
-<a-dodecahedron position="-2 0.3 -3" radius="0.6" color="#2b3336" rotation="10 45 20"></a-dodecahedron>
-<a-dodecahedron position="3 0.2 -2.5" radius="0.4" color="#1e2426" rotation="30 12 50"></a-dodecahedron>
-<a-dodecahedron position="-3.5 0.25 2" radius="0.5" color="#222b2e" rotation="5 80 15"></a-dodecahedron>
+    <a-cylinder position="5 3 6" radius="0.45" height="8" color="#3C221C"></a-cylinder>
+    <a-cone position="5 6 6" radius-bottom="2.5" radius-top="0.1" height="5" color="#184D2A"></a-cone>
+  </a-entity>
 
-<a-entity id="luciernagas">
-  <a-sphere position="-2 1.5 -3" radius="0.04" color="#88ff44" material="shader:flat;opacity:0.9"
-            animation="property:position;to:-2 2.2 -3;loop:true;dur:3000;dir:alternate;easing:easeInOutSine"></a-sphere>
+  <a-dodecahedron position="-2 0.3 -3" radius="0.6" color="#2b3336" rotation="10 45 20"></a-dodecahedron>
+  <a-dodecahedron position="3 0.2 -2.5" radius="0.4" color="#1e2426" rotation="30 12 50"></a-dodecahedron>
+  <a-dodecahedron position="-3.5 0.25 2" radius="0.5" color="#222b2e" rotation="5 80 15"></a-dodecahedron>
 
-  <a-sphere position="2.5 1.2 -2" radius="0.03" color="#aaff55" material="shader:flat;opacity:0.85"
-            animation="property:position;to:2.5 1.8 -2;loop:true;dur:2400;dir:alternate;easing:easeInOutSine"></a-sphere>
+  <!-- Luciérnagas con colores de luz más diurnos y suaves -->
+  <a-entity id="luciernagas">
+    <a-sphere position="-2 1.5 -3" radius="0.04" color="#BBDD66" material="shader:flat;opacity:0.9"
+              animation="property:position;to:-2 2.2 -3;loop:true;dur:3000;dir:alternate;easing:easeInOutSine"></a-sphere>
 
-  <a-sphere position="-1 2 -5" radius="0.05" color="#00ffaa" material="shader:flat;opacity:0.9"
-            animation="property:position;to:-1 1.4 -5;loop:true;dur:3500;dir:alternate;easing:easeInOutSine"></a-sphere>
+    <a-sphere position="2.5 1.2 -2" radius="0.03" color="#CCEE77" material="shader:flat;opacity:0.85"
+              animation="property:position;to:2.5 1.8 -2;loop:true;dur:2400;dir:alternate;easing:easeInOutSine"></a-sphere>
 
-  <a-sphere position="1.8 2.2 -4" radius="0.035" color="#88ff44" material="shader:flat;opacity:0.8"
-            animation="property:position;to:1.8 2.7 -4;loop:true;dur:2800;dir:alternate;easing:easeInOutSine"></a-sphere>
+    <a-sphere position="-1 2 -5" radius="0.05" color="#77DDAA" material="shader:flat;opacity:0.9"
+              animation="property:position;to:-1 1.4 -5;loop:true;dur:3500;dir:alternate;easing:easeInOutSine"></a-sphere>
 
-  <a-sphere position="-3 1.8 1" radius="0.04" color="#aaff55" material="shader:flat;opacity:0.9"
-            animation="property:position;to:-3 2.3 1;loop:true;dur:3100;dir:alternate;easing:easeInOutSine"></a-sphere>
+    <a-sphere position="1.8 2.2 -4" radius="0.035" color="#BBDD66" material="shader:flat;opacity:0.8"
+              animation="property:position;to:1.8 2.7 -4;loop:true;dur:2800;dir:alternate;easing:easeInOutSine"></a-sphere>
 
-  <a-sphere position="3 1.6 2" radius="0.03" color="#00ffaa" material="shader:flat;opacity:0.8"
-            animation="property:position;to:3 1.1 2;loop:true;dur:2600;dir:alternate;easing:easeInOutSine"></a-sphere>
-</a-entity>  <a-entity position="0 1.6 -3">
+    <a-sphere position="-3 1.8 1" radius="0.04" color="#CCEE77" material="shader:flat;opacity:0.9"
+              animation="property:position;to:-3 2.3 1;loop:true;dur:3100;dir:alternate;easing:easeInOutSine"></a-sphere>
+
+    <a-sphere position="3 1.6 2" radius="0.03" color="#77DDAA" material="shader:flat;opacity:0.8"
+              animation="property:position;to:3 1.1 2;loop:true;dur:2600;dir:alternate;easing:easeInOutSine"></a-sphere>
+  </a-entity>
+
+  <a-entity position="0 1.6 -3">
     <a-text value="WELCOME TO NEURAL ACADEMY" align="center" color="#00e5c0" font="exo2bold" width="7"></a-text>
     <a-text value="Press the button to start with the experience" position="0 -0.4 0" align="center" color="#c8d8ff" width="4" font="mozillavr"></a-text>
   </a-entity>
 
   <a-entity position="0 2.3 -2.5">
-    <a-plane class="clickable" 
+    <a-plane class="clickable"
              handler-botones-vr="mensaje: Iniciando sistema; tecnica: start-app"
-             width="1.6" height="0.4" 
-             color="#0d2060" 
+             width="1.6" height="0.4"
+             color="#0d2060"
              material="opacity:0.9; shader:flat; side:double">
       <a-plane width="1.64" height="0.44" color="#00e5c0" material="opacity:0.4; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
       <a-text value="START" align="center" color="#00e5c0" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
     </a-plane>
   </a-entity>
 </a-entity>
+
+
+
 
   
   <!-- SCREEN: WELCOME -->
@@ -1667,7 +1681,7 @@ function ejecutarFlujoGuardado() {
    <a-entity position="0.8 1.5 -2.5">
       <a-plane width="2.8" height="2.2" color="#080e2a" material="opacity:0.96;shader:flat;side:double"></a-plane>
       <a-plane width="2.84" height="2.24" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text value="SESION COMPLETADA" position="0 0.95 0.01" align="center" color="#00e5c0" width="4.5" font="mozillavr"></a-text>
+      <a-text value="SESSION COMPLETE" position="0 0.95 0.01" align="center" color="#00e5c0" width="4.5" font="mozillavr"></a-text>
       <a-text value="Openness final:" position="-1.25 0.65 0.01" align="left" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr"></a-text>
       <a-text id="eval-mood" value="--%"  position="1.1 0.65 0.01" align="right" color="#00e5c0" width="2" font="mozillavr"></a-text>
       <a-plane width="2.4" height="0.004" color="#2a3a7a" material="shader:flat" position="0 0.48 0.01"></a-plane>
