@@ -862,7 +862,7 @@ function ejecutarFlujoGuardado() {
   <!-- 1. CIELO DIURNO (Azul brillante de día) -->
   <a-sky color="#4A90E2"></a-sky>
 
-  <!-- NUBES (Agrupaciones de geometría nativa) -->
+  <!-- NUBES (Agrupaciones de geometría nativa para estilo low-poly) -->
   <a-entity id="cielo-nubes">
     <!-- Nube 1 (Izquierda superior) -->
     <a-entity position="-8 12 -12">
@@ -886,10 +886,8 @@ function ejecutarFlujoGuardado() {
     </a-entity>
   </a-entity>
 
-  <!-- 2. LUCES DE DÍA (Luz solar natural) -->
-  <!-- Luz ambiental blanca y clara para eliminar sombras oscuras -->
+  <!-- 2. LUCES DE DÍA (Luz solar natural y brillante) -->
   <a-light type="ambient" color="#FFFFFF" intensity="0.8"></a-light>
-  <!-- Sol intenso cenital -->
   <a-light type="directional" position="5 12 5" color="#FFFDF0" intensity="1.4" cast-shadow="true"></a-light>
 
   <!-- Suelo de hierba diurna -->
@@ -924,24 +922,24 @@ function ejecutarFlujoGuardado() {
   <a-dodecahedron position="3 0.2 -2.5" radius="0.4" color="#505C63" rotation="30 12 50"></a-dodecahedron>
   <a-dodecahedron position="-3.5 0.25 2" radius="0.5" color="#5C6B73" rotation="5 80 15"></a-dodecahedron>
 
-  <!-- Partículas de polen/esporas en lugar de luciérnagas nocturnas -->
+  <!-- Partículas de polen/esporas flotando bajo el sol -->
   <a-entity id="particulas-dia">
     <a-sphere position="-2 1.5 -3" radius="0.03" color="#FFFFFF" material="shader:flat; opacity:0.6; transparent:true"
               animation="property:position; to:-2 2.2 -3; loop:true; dur:4000; dir:alternate; easing:easeInOutSine"></a-sphere>
 
     <a-sphere position="2.5 1.2 -2" radius="0.025" color="#FFFFFF" material="shader:flat; opacity:0.5; transparent:true"
               animation="property:position; to:2.5 1.8 -2; loop:true; dur:3400; dir:alternate; easing:easeInOutSine"></a-sphere>
-
-    <a-sphere position="-1 2 -5" radius="0.03" color="#FFFFFF" material="shader:flat; opacity:0.6; transparent:true"
-              animation="property:position; to:-1 1.4 -5; loop:true; dur:4500; dir:alternate; easing:easeInOutSine"></a-sphere>
-
-    <a-sphere position="1.8 2.2 -4" radius="0.02" color="#FFFFFF" material="shader:flat; opacity:0.5; transparent:true"
-              animation="property:position; to:1.8 2.7 -4; loop:true; dur:3800; dir:alternate; easing:easeInOutSine"></a-sphere>
   </a-entity>
 
-  <!-- Textos de interfaz ajustados para alto contraste diurno -->
+  <!-- ============================================================ -->
+  <!-- ZONA MODIFICADA: TEXTOS Y BOTÓN DE ALTO CONTRASTE PARA DÍA -->
+  <!-- ============================================================ -->
+
   <a-entity position="0 1.6 -3">
-    <a-text value="WELCOME TO NEURAL ACADEMY" align="center" color="#0A2540" font="exo2bold" width="7"></a-text>
+    <!-- Título: Cambiado de verde neón a Azul Marino Muy Oscuro -->
+    <a-text value="WELCOME TO NEURAL ACADEMY" align="center" color="#051525" font="exo2bold" width="7"></a-text>
+    
+    <!-- Subtítulo: Cambiado de azul claro a Gris Pizarra Oscuro -->
     <a-text value="Press the button to start with the experience" position="0 -0.4 0" align="center" color="#2C3E50" width="4" font="mozillavr"></a-text>
   </a-entity>
 
@@ -949,12 +947,17 @@ function ejecutarFlujoGuardado() {
     <a-plane class="clickable"
              handler-botones-vr="mensaje: Iniciando sistema; tecnica: start-app"
              width="1.6" height="0.4"
-             color="#0066FF"
-             material="opacity:0.95; shader:flat; side:double">
-      <a-plane width="1.64" height="0.44" color="#003399" material="opacity:0.3; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+             color="#0044CC" 
+             material="opacity:1; shader:flat; side:double">
+      <!-- Borde del botón más oscuro -->
+      <a-plane width="1.64" height="0.44" color="#002266" material="opacity:0.4; transparent:true; shader:flat" position="0 0 -0.005"></a-plane>
+      
+      <!-- Texto START: Cambiado de neón a Blanco Puro para contraste sobre el botón azul -->
       <a-text value="START" align="center" color="#FFFFFF" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
     </a-plane>
   </a-entity>
+  
+  <!-- ============================================================ -->
 
 </a-entity>
 
