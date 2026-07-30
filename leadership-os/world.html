@@ -256,7 +256,7 @@ function mostrarBriefingIntervencion() {
         let textoRenderizado = `Level: ${nivel.toUpperCase()}\n\n`;
         textoRenderizado += `• Scenery: "${scriptTexto}"\n\n`;
         if (tagsTexto) {
-          textoRenderizado += `• Tags: [${tagsTexto}]`;
+          textoRenderizado += `• Tags: ${tagsTexto}`;
         }
         console.log("✅ Renderizando texto en pantalla VR:", textoRenderizado);
         tagsEl.setAttribute('value', textoRenderizado);
@@ -346,10 +346,10 @@ function mostrarBriefingTecnica() {
       scriptTexto = briefingSeleccionado.text;
       
       if (briefingSeleccionado.tags) {
-        tagsTexto = Array.isArray(briefingSeleccionado.tags)
-          ? briefingSeleccionado.tags.map(t => `• ${t}`).join('   ')
-          : briefingSeleccionado.tags;
-      }
+      tagsTexto = Array.isArray(briefingSeleccionado.tags)
+        ? briefingSeleccionado.tags.map(t => `[${t}]`).join(' ')
+        : briefingSeleccionado.tags;
+    }
     } else {
       scriptTexto = dataArquetipo.backstory || dataArquetipo.personality || "No scenario available for this level.";
     }
