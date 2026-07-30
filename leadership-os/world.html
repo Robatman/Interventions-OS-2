@@ -256,7 +256,7 @@ function mostrarBriefingIntervencion() {
         let textoRenderizado = `Level: ${nivel.toUpperCase()}\n\n`;
         textoRenderizado += `• Scenery: "${scriptTexto}"\n\n`;
         if (tagsTexto) {
-          textoRenderizado += `• Tags: ${tagsTexto}`;
+          textoRenderizado += `• Tags: [${tagsTexto}]`;
         }
         console.log("✅ Renderizando texto en pantalla VR:", textoRenderizado);
         tagsEl.setAttribute('value', textoRenderizado);
