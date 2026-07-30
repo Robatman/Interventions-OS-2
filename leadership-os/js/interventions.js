@@ -22,21 +22,18 @@ const INTERVENTIONS = {
     owner: ['Recruiting', 'Training', 'Coach'],
     ownerLabel: 'Paulina (Recruiting) · Kat (Training) · Coach asignado',
 
-    objective: `Primera revisión del agente recién ingresado. Detectar señales tempranas de riesgo de salida antes de que se conviertan en un problema. El agente NO sabe que esto es una intervención formal — para él es solo una conversación de seguimiento.`,
-
+    objective: `First review of the newly joined agent. Detect early signs of risk of leaving before they become a problem. The agent does NOT know that this is a formal intervention — for them it is just a follow-up conversation.`,
     successCriteria: [
-      'El agente se siente escuchado, no evaluado',
-      'Identificaste al menos una área de oportunidad o preocupación real',
-      'El agente sale con más confianza en la empresa, no menos',
-      'Si todo está bien, lo confirmaste genuinamente — no asumiste'
-    ],
+    'The agent feels listened to, not evaluated',
+    'You identified at least one area of opportunity or real concern',
+    'The agent leaves with more confidence in the company, not less',
+    'If everything is fine, you genuinely confirmed it — you did not assume'
+  ],
 
     // What the agent knows/feels at this point in the journey
-    agentContext: `Es día 30. El agente lleva un mes en la empresa. Todavía está aprendiendo, todavía se está adaptando. Puede estar entusiasmado, abrumado, confundido, o simplemente tratando de sobrevivir la curva de aprendizaje. No sabe que esta conversación tiene un objetivo de retención. Para él, alguien de la empresa vino a saludarlo.`,
-
+    agentContext: `It is day 30. The agent has been with the company for one month. They are still learning, they are still adapting. They may be excited, overwhelmed, confused, or simply trying to survive the learning curve. They do not know that this conversation has a retention objective. To them, someone from the company came to say hello.`,
     // The trap — what practitioners often do wrong
-    trap: `Asumir que "bien" significa bien. El agente nuevo a menudo dice que está bien porque no quiere parecer débil o problemático. El Pulse Check real es la conversación después de "estoy bien".`,
-
+    trap: `Assume that "fine" means fine. The new agent often says they are fine because they do not want to seem weak or problematic. The real Pulse Check is the conversation after "I'm fine".`,
     relevantTechniques: ['active_listening', 'powerful_questions'],
 
     // Scenarios per level — what the practitioner is briefed on
@@ -44,8 +41,7 @@ const INTERVENTIONS = {
       novice: [
         {
           id: 'pc_nov_1',
-          text: "Es el día 30 de Karen en el call center. Sus métricas de entrenamiento son normales. No hay ningún incidente registrado. Vas a hacer su Pulse Check — una conversación de seguimiento para ver cómo está.",
-          tags: ["Sin incidentes", "Métricas normales", "Primera conversación formal"],
+          text: "It is Karen's day 30 at the call center. Her training metrics are normal. There are no recorded incidents. You are going to do her Pulse Check — a follow-up conversation to see how she is doing.",          tags: ["Sin incidentes", "Métricas normales", "Primera conversación formal"],
           agentState: "adapting-okay",
           agentHiddenState: "tired-but-hopeful",
           startMood: 55,
@@ -53,8 +49,8 @@ const INTERVENTIONS = {
         },
         {
           id: 'pc_nov_2',
-          text: "Carlos lleva 30 días. En su primera semana tuvo dificultades con el sistema pero mejoró. Esta semana estuvo callado. Vas a hacer su Pulse Check.",
-          tags: ["Dificultad inicial superada", "Callado esta semana", "Sin reporte formal"],
+          text: "Carlos has been here for 30 days. In his first week he had difficulties with the system, but he improved. This week he has been quiet. You are going to do his Pulse Check.",
+          tags: ["Initial difficulty overcome", "Quiet this week", "No formal report"],
           agentState: "guarded-tired",
           agentHiddenState: "doubting-fit",
           startMood: 35,
@@ -64,8 +60,8 @@ const INTERVENTIONS = {
       mid: [
         {
           id: 'pc_mid_1',
-          text: "Miguel lleva 30 días. Ha estado diciendo que todo está bien en cada check-in grupal. Un compañero te comentó que lo vio frustrado en el break. Vas a hacer su Pulse Check.",
-          tags: ["Dice que está bien", "Señal de un compañero", "Sin evidencia directa"],
+          text: "Miguel has been here for 30 days. He has been saying that everything is fine in every group check-in. A coworker told you they saw him frustrated during the break. You are going to do his Pulse Check.",
+          tags: ["Says everything is fine", "Signal from a coworker", "No direct evidence"],
           agentState: "performing-okay",
           agentHiddenState: "overwhelmed-hiding-it",
           startMood: 45,
@@ -76,8 +72,8 @@ const INTERVENTIONS = {
       adv: [
         {
           id: 'pc_adv_1',
-          text: "Es el día 30 de un agente nuevo. No tienes información específica — solo que es su Pulse Check programado. El briefing que recibiste de Recruiting dice 'sin novedades'.",
-          tags: ["Sin información previa", "Briefing vacío", "Cualquier cosa puede pasar"],
+          text: "It is day 30 for a new agent. You do not have any specific information — only that it is their scheduled Pulse Check. The briefing you received from Recruiting says 'nothing new'.",
+          tags: ["No prior information", "Empty briefing", "Anything can happen"],
           agentState: "unknown",
           agentHiddenState: "unknown",
           startMood: null,
@@ -99,18 +95,18 @@ const INTERVENTIONS = {
     owner: ['Manager'],
     ownerLabel: 'Manager directo',
 
-    objective: `Anclar al agente a la empresa cuando ya pasó la etapa inicial pero aún no está totalmente consolidado. Es una conversación de pertenencia, metas y compromiso. El agente ya sobrevivió los primeros 90 días — ahora hay que asegurarse de que quiera quedarse.`,
+    objective: `Anchor the agent to the company now that they have passed the initial stage but are still not fully established. It is a conversation about belonging, goals, and commitment. The agent has already survived the first 90 days — now you have to make sure they want to stay.`,
 
     successCriteria: [
-      'El agente conectó su trabajo con algo que le importa personalmente',
-      'Identificaste qué lo motiva más allá del salario',
-      'El agente siente que tiene un futuro en la empresa, no solo un trabajo',
-      'Salió de la conversación con más claridad sobre su trayectoria'
-    ],
+    'The agent connected their work with something that matters to them personally',
+    'You identified what motivates them beyond the salary',
+    'The agent feels they have a future in the company, not just a job',
+    'They left the conversation with more clarity about their career path'
+  ],
 
-    agentContext: `Es día 100. El agente ya conoce el trabajo, ya tiene sus rutinas, ya formó opiniones sobre la empresa, el equipo, el manager. Puede estar consolidándose positivamente o puede estar entrando en la zona de "esto es solo un trabajo". No sabe que esta conversación tiene un objetivo de anclaje — para él, el manager quiso hablar.`,
+    agentContext: `It is day 100. The agent already knows the job, already has their routines, and has already formed opinions about the company, the team, and the manager. They may be establishing themselves positively, or they may be entering the "this is just a job" zone. They do not know that this conversation has an anchoring objective — to them, the manager wanted to talk.`,
 
-    trap: `Convertir el Anchoring en una revisión de métricas. El agente ya sabe cómo va en números — lo que necesita es sentir que alguien se preocupa por él como persona, no como agente.`,
+    trap: `Turn the Anchoring into a metrics review. The agent already knows how they are doing in terms of numbers — what they need is to feel that someone cares about them as a person, not as an agent.`,
 
     relevantTechniques: ['active_listening', 'powerful_questions'],
 
@@ -118,8 +114,8 @@ const INTERVENTIONS = {
       novice: [
         {
           id: 'anch_nov_1',
-          text: "Carlos lleva 100 días. Sus métricas son estables. Ha integrado bien al equipo. No hay señales de alarma. Es momento de su Anchoring.",
-          tags: ["Estable", "Integrado al equipo", "Sin señales de alarma"],
+          text: "Carlos has been here for 100 days. His metrics are stable. He has integrated well with the team. There are no warning signs. It is time for his Anchoring.",
+          tags: ["Stable", "Integrated with the team", "No warning signs"],
           agentState: "settled-neutral",
           agentHiddenState: "questioning-future",
           startMood: 50,
@@ -129,8 +125,8 @@ const INTERVENTIONS = {
       mid: [
         {
           id: 'anch_mid_1',
-          text: "Valeria lleva 100 días. Empezó muy bien pero en las últimas semanas ha bajado un poco su energía. Sigue cumpliendo métricas. Es momento de su Anchoring.",
-          tags: ["Inicio fuerte", "Energía bajando", "Métricas OK"],
+          text: "Valeria has been here for 100 days. She started very well, but in the last few weeks her energy has gone down a little. She is still meeting her metrics. It is time for her Anchoring.",
+          tags: ["Strong start", "Energy going down", "Metrics OK"],
           agentState: "slightly-withdrawn",
           agentHiddenState: "reconsidering-commitment",
           startMood: 38,
@@ -141,8 +137,8 @@ const INTERVENTIONS = {
       adv: [
         {
           id: 'anch_adv_1',
-          text: "Sandra lleva 100 días. Llegó con mucha experiencia de otra empresa. Ha sido crítica de algunos procesos internamente. Sus métricas son excelentes. Es momento de su Anchoring.",
-          tags: ["Alta experiencia", "Crítica de procesos", "Excelente desempeño"],
+          text: "Sandra has been here for 100 days. She arrived with a lot of experience from another company. She has been critical of some internal processes. Her metrics are excellent. It is time for her Anchoring.",
+          tags: ["High experience", "Criticism of processes", "Excellent performance"],
           agentState: "confident-comparing",
           agentHiddenState: "evaluating-whether-to-stay",
           startMood: 40,
@@ -164,18 +160,18 @@ const INTERVENTIONS = {
     owner: ['HR'],
     ownerLabel: 'Andrea (HR)',
 
-    objective: `Preguntarle al agente directamente por qué se queda, qué le gusta, qué cambiaría. Es la herramienta más poderosa para retención proactiva porque se hace ANTES de que piense en irse. No es una exit interview — es la conversación que evita que llegues a la exit interview.`,
+    objective: `Ask the agent directly why they stay, what they like, what they would change. It is the most powerful tool for proactive retention because it is done BEFORE they think about leaving. It is not an exit interview — it is the conversation that prevents you from reaching the exit interview.`,
 
     successCriteria: [
-      'El agente dijo al menos una cosa genuina que aprecia de la empresa',
-      'El agente mencionó al menos una cosa que cambiaría — y tú la escuchaste sin defenderte',
-      'Saliste con información accionable para mejorar su experiencia',
-      'El agente sintió que esta conversación era real, no un trámite de HR'
-    ],
+    'The agent said at least one genuine thing they appreciate about the company',
+    'The agent mentioned at least one thing they would change — and you listened without defending yourself',
+    'You left with actionable information to improve their experience',
+    'The agent felt that this conversation was real, not an HR procedure'
+  ],
 
-    agentContext: `Es día 121. El agente ya lleva 4 meses. Ya tiene opiniones formadas. Ya sabe qué le gusta y qué no. Puede estar satisfecho, puede estar empezando a dudar, o puede estar activamente considerando opciones. No sabe que esto es un Stay Interview — para él, HR quiso hablar.`,
+    agentContext: `It is day 121. The agent has already been here for 4 months. They already have formed opinions. They already know what they like and what they do not. They may be satisfied, they may be starting to have doubts, or they may be actively considering options. They do not know that this is a Stay Interview — to them, HR wanted to talk.`,
 
-    trap: `Hacer el Stay Interview como una encuesta. Preguntar "¿qué te gusta?" y anotar la respuesta sin profundizar. El Stay Interview real requiere escuchar lo que está detrás de la respuesta, no solo la respuesta.`,
+    trap: `Make the Stay Interview into a survey. Ask "what do you like?" and write down the answer without going deeper. The real Stay Interview requires listening to what is behind the answer, not just the answer itself.`,
 
     relevantTechniques: ['active_listening', 'powerful_questions'],
 
@@ -183,8 +179,8 @@ const INTERVENTIONS = {
       novice: [
         {
           id: 'stay_nov_1',
-          text: "Carlos lleva 121 días. Ha tenido altibajos pero en general está bien. Es momento de su Stay Interview. Tu objetivo es entender genuinamente qué lo mantiene aquí.",
-          tags: ["4 meses", "Altibajos normales", "Primera Stay Interview"],
+          text: "Carlos has been here for 121 days. He has had ups and downs but overall he is doing well. It is time for his Stay Interview. Your goal is to genuinely understand what keeps him here.",
+          tags: ["4 months", "Normal ups and downs", "First Stay Interview"],
           agentState: "guarded-but-open",
           agentHiddenState: "has-real-concerns-not-shared",
           startMood: 42,
@@ -194,8 +190,8 @@ const INTERVENTIONS = {
       mid: [
         {
           id: 'stay_mid_1',
-          text: "Valeria lleva 121 días. Empezó muy comprometida pero últimamente está más callada. Un compañero mencionó que Valeria dijo que 'extraña cómo era antes'. Es momento de su Stay Interview.",
-          tags: ["Compromiso bajando", "Señal indirecta", "Algo cambió"],
+          text: "Valeria has been here for 121 days. She started very committed, but lately she has been quieter. A coworker mentioned that Valeria said she 'misses how things used to be'. It is time for her Stay Interview.",
+          tags: ["Commitment going down", "Indirect signal", "Something changed"],
           agentState: "withdrawn-quiet",
           agentHiddenState: "grieving-something-lost",
           startMood: 30,
@@ -206,8 +202,8 @@ const INTERVENTIONS = {
       adv: [
         {
           id: 'stay_adv_1',
-          text: "Miguel lleva 121 días. En la superficie todo está bien. Sus métricas son buenas. Pero tienes una corazonada. Es momento de su Stay Interview.",
-          tags: ["Corazonada", "Sin evidencia", "Puede ser nada o puede ser todo"],
+          text: "Miguel has been here for 121 days. On the surface everything is fine. His metrics are good. But you have a gut feeling. It is time for his Stay Interview.",
+          tags: ["Gut feeling", "No evidence", "It could be nothing or it could be everything"],
           agentState: "performing-well",
           agentHiddenState: "secretly-job-hunting",
           startMood: 48,
@@ -229,18 +225,18 @@ const INTERVENTIONS = {
     owner: ['Manager', 'Training', 'Coach'],
     ownerLabel: 'Manager · Kat (Training) · Coach asignado — Comité',
 
-    objective: `Reconocer y reforzar el compromiso del agente al cumplir un año. Es un momento de celebración, revisión de trayectoria y renovación del vínculo con la empresa. Es la única intervención en formato comité — el agente siente el peso institucional del reconocimiento.`,
+    objective: `Recognize and reinforce the agent's commitment after completing one year. It is a moment of celebration, reviewing their journey, and renewing the connection with the company. It is the only intervention in a committee format — the agent feels the institutional weight of the recognition.`,
 
     successCriteria: [
-      'El agente se fue sintiendo genuinamente reconocido, no solo felicitado',
-      'Identificaron juntos al menos un logro concreto del año',
-      'El agente tiene claridad sobre qué sigue — desarrollo, metas, oportunidades',
-      'El vínculo con la empresa se renovó, no solo se celebró'
-    ],
+    'The agent left feeling genuinely recognized, not just congratulated',
+    'They identified at least one concrete achievement from the year together',
+    'The agent has clarity about what comes next — development, goals, opportunities',
+    'The connection with the company was renewed, not just celebrated'
+  ],
 
-    agentContext: `Es el día 365. El agente cumple un año. Tiene historia con la empresa, con el equipo, con los procesos. Ha visto cosas buenas y malas. Sabe cómo funciona realmente este lugar. El Tenure Renewal ES una intervención formal — el agente sabe que va a haber una conversación especial por su aniversario.`,
+    agentContext: `It is day 365. The agent has completed one year. They have history with the company, with the team, and with the processes. They have seen good and bad things. They know how this place really works. The Tenure Renewal IS a formal intervention — the agent knows there will be a special conversation for their anniversary.`,
 
-    trap: `Convertirlo en una ceremonia vacía. "Felicidades por tu año, aquí está tu reconocimiento, ¿alguna pregunta?" El agente necesita sentir que la conversación es sobre él específicamente — no un trámite que se hace con todos.`,
+    trap: `Turn it into an empty ceremony. "Congratulations on your year, here is your recognition, any questions?" The agent needs to feel that the conversation is specifically about them — not a procedure that is done with everyone.`,
 
     relevantTechniques: ['active_listening', 'powerful_questions'],
 
@@ -248,8 +244,8 @@ const INTERVENTIONS = {
       novice: [
         {
           id: 'ten_nov_1',
-          text: "Carlos cumple un año hoy. Ha tenido un buen desempeño general. Hay algunas áreas de mejora pero en general es un agente que vale la pena retener. Es su Tenure Renewal.",
-          tags: ["Un año cumplido", "Buen desempeño general", "Vale la pena retener"],
+          text: "Carlos completes one year today. He has had good overall performance. There are some areas for improvement, but overall he is an agent worth retaining. It is his Tenure Renewal.",
+          tags: ["One year completed", "Good overall performance", "Worth retaining"],
           agentState: "proud-but-waiting",
           agentHiddenState: "wants-acknowledgment-of-specific-things",
           startMood: 60,
@@ -259,8 +255,8 @@ const INTERVENTIONS = {
       mid: [
         {
           id: 'ten_mid_1',
-          text: "Sandra cumple un año. Fue el año más difícil de su carrera — cambios de proceso, un manager nuevo, métricas que no reflejaban su esfuerzo. Llegó al año. Es su Tenure Renewal.",
-          tags: ["Año difícil", "Demostró resiliencia", "Puede estar agotada o fortalecida"],
+          text: "Sandra completes one year. It was the most difficult year of her career — process changes, a new manager, metrics that did not reflect her effort. She made it to the one-year mark. It is her Tenure Renewal.",
+          tags: ["Difficult year", "Showed resilience", "May be exhausted or strengthened"],
           agentState: "exhausted-proud",
           agentHiddenState: "needs-real-acknowledgment-or-leaves",
           startMood: 40,
@@ -271,8 +267,8 @@ const INTERVENTIONS = {
       adv: [
         {
           id: 'ten_adv_1',
-          text: "Valeria cumple un año. Fue promovida a senior en mes 8. Ahora tiene más responsabilidades pero el mismo sueldo base. No ha dicho nada. Es su Tenure Renewal.",
-          tags: ["Promovida sin ajuste salarial", "No ha dicho nada", "Bomba de tiempo potencial"],
+          text: "Valeria completes one year. She was promoted to senior in month 8. Now she has more responsibilities but the same base salary. She has not said anything. It is her Tenure Renewal.",
+          tags: ["Promoted without salary adjustment", "Has not said anything", "Potential ticking time bomb"],
           agentState: "composed-professional",
           agentHiddenState: "actively-planning-exit",
           startMood: 35,
