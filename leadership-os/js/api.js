@@ -12,8 +12,14 @@ async function callGroq(messages, systemPrompt, temp = 0.82) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'qwen/qwen3.6-27b',
-      messages: [{ role: 'system', content: systemPrompt }, ...messages],
+      model: 'openai/gpt-oss-120b', // 👈 Este modelo responde directo sin volcar el proceso mental
+      messages: [
+        { 
+          role: 'system', 
+          content: systemPrompt + '\n\nIMPORTANT: Output ONLY the character dialogue. Do NOT write "Here\'s a thinking process" or any internal reasoning steps.' 
+        }, 
+        ...messages
+      ],
       temperature: temp,
       max_tokens: 300
     })
@@ -22,18 +28,16 @@ async function callGroq(messages, systemPrompt, temp = 0.82) {
   const d = await res.json();
   if (d.error) throw new Error(d.error.message);
   
-  let rawContent = d.choices?.[0]?.message?.content || '...';
+  let text = d.choices?.[0]?.message?.content || '...';
 
-  // 1. Remover bloques de pensamiento tipo <think>...</think>
-  rawContent = rawContent.replace(/<think>[\s\S]*?<\/think>/gi, '');
-
-  // 2. Remover pensamiento si empieza con "Here's a thinking process:"
-  if (rawContent.includes("Here's a thinking process:")) {
-    const parts = rawContent.split(/Draft:|Response:|Carlos:|Agent:/i);
-    rawContent = parts[parts.length - 1]; // Toma solo la respuesta final del personaje
+  // Limpieza de emergencia por si algún modelo cuela razonamientos
+  text = text.replace(/<think>[\s\S]*?<\/think>/gi, '');
+  if (text.includes("thinking process:")) {
+    const lines = text.split('\n');
+    text = lines.filter(l => !l.startsWith("Here's a thinking") && !l.startsWith("1.") && !l.startsWith("-")).join('\n');
   }
 
-  return rawContent.trim();
+  return text.trim();
 }
 
 // ─── GROQ TTS ─────────────────────────────
