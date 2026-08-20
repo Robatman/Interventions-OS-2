@@ -26,14 +26,14 @@ async function callGroq(messages, systemPrompt, temp = 0.82) {
 // ─── GROQ TTS ─────────────────────────────
 
 const ARCHETYPE_VOICES = {
-  carlos:  'Fritz-PlayAI',
-  valeria: 'Celeste-PlayAI',
-  miguel:  'Chip-PlayAI',
-  sandra:  'Deedee-PlayAI',
-  default: 'Fritz-PlayAI'
+  carlos:  'austin',
+  valeria: 'diana',
+  miguel:  'daniel',
+  sandra:  'hannah',
+  default: 'troy'
 };
 
-const COACH_VOICE = 'Aaliyah-PlayAI';
+const COACH_VOICE = 'autumn';
 
 let currentAudio = null;
 let isSpeaking   = false;
