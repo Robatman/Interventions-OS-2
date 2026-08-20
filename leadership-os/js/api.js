@@ -7,53 +7,47 @@
 
 // ─── GROQ CHAT ────────────────────────────
 
-async function callGroq(messages, systemPrompt, temp = 0.82) {
+async function callGroq(messages, systemPrompt, temp = 0.7) {
   const res = await fetch('/api/groq', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'qwen/qwen3.6-27b',
-      messages: [{ role: 'system', content: systemPrompt }, ...messages],
+
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages
+      ],
+
       temperature: temp,
-      max_tokens: 300
+      max_tokens: 150,
+
+      // IMPORTANTE: Qwen no debe razonar antes de responder
+      reasoning_effort: 'none',
+      reasoning_format: 'hidden'
     })
   });
-  
+
   const d = await res.json();
-  if (d.error) throw new Error(d.error.message);
-  
-let rawContent = d.choices?.[0]?.message?.content || '';
 
-// Eliminar bloques <think>
-rawContent = rawContent.replace(/<think>[\s\S]*?<\/think>/gi, '');
-
-// Eliminar "Here's a thinking process:" y todo lo que venga
-// después si NO existe una respuesta claramente marcada.
-const thinkingMarkers = [
-  "Here's a thinking process:",
-  "Here is a thinking process:",
-  "Thinking process:",
-  "Let's think",
-  "Analysis:",
-  "Reasoning:"
-];
-
-for (const marker of thinkingMarkers) {
-  const index = rawContent.toLowerCase().indexOf(marker.toLowerCase());
-
-  if (index !== -1) {
-    rawContent = rawContent.substring(0, index);
+  if (d.error) {
+    console.error('[Groq Error]', d.error);
+    throw new Error(d.error.message);
   }
+
+  let rawContent = d.choices?.[0]?.message?.content || '';
+
+  console.log('[Groq raw response]', rawContent);
+  console.log('[Groq finish reason]', d.choices?.[0]?.finish_reason);
+
+  // Por si acaso el modelo llegara a mandar <think>
+  rawContent = rawContent
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .trim();
+
+  return rawContent || '...';
 }
 
-// Limpiar posibles etiquetas
-rawContent = rawContent
-  .replace(/^(Draft:|Response:|Carlos:|Agent:)\s*/i, '')
-  .trim();
-
-return rawContent || '...';
-
-}
 
 // ─── GROQ TTS ─────────────────────────────
 
