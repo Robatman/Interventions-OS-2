@@ -30,19 +30,26 @@ let conversationClosed = false;
 
 async function initLearn() {
   const isIntervention = activeMenu === 'interventions';
-  let opener;
 
+  // Obtener el opener específico desde el system prompt
+  // para que cada técnica e intervención tenga su propia apertura
+  let sysPrompt;
   if (isIntervention && currentIntervention) {
-    opener = `Before we start — tell me, when was the last time you had a conversation with one of your agents where you felt it really mattered? What made it different from the usual check-in?`;
+    sysPrompt = PROMPTS.learnIntervention();
   } else {
-    opener = `Before we talk about what ${currentTechnique.label} is, I want to ask you something. Think of a time when you felt truly heard — when someone was really listening to you. What was different about that conversation?`;
+    sysPrompt = PROMPTS.learn();
   }
+
+  // Extraer el opener del system prompt
+  const openerMatch = sysPrompt.match(/OPENING MESSAGE \(use this EXACTLY[^)]*\):\n([\s\S]+?)(?:\n\nRespond|\n\nMax|$)/);
+  const opener = openerMatch
+    ? openerMatch[1].trim()
+    : `Tell me — where does ${isIntervention ? currentIntervention?.label : currentTechnique?.label} show up as a real challenge for you?`;
 
   addMsg('learn-msgs', 'coach', opener);
   learnHistory.push({ role: 'assistant', content: opener });
   speakWithGroq(opener, 'coach');
 }
-
 async function sendLearn() {
   const inp = document.getElementById('learn-input');
   const txt = inp ? inp.value.trim() : '';
