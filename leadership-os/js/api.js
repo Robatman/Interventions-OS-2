@@ -12,7 +12,7 @@ async function callGroq(messages, systemPrompt, temp = 0.82) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'playai-tts-v2',
+      model: 'canopylabs/orpheus-v1-english',
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       temperature: temp,
       max_tokens: 300
