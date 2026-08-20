@@ -18,9 +18,22 @@ async function callGroq(messages, systemPrompt, temp = 0.82) {
       max_tokens: 300
     })
   });
+  
   const d = await res.json();
   if (d.error) throw new Error(d.error.message);
-  return d.choices?.[0]?.message?.content || '...';
+  
+  let rawContent = d.choices?.[0]?.message?.content || '...';
+
+  // 1. Remover bloques de pensamiento tipo <think>...</think>
+  rawContent = rawContent.replace(/<think>[\s\S]*?<\/think>/gi, '');
+
+  // 2. Remover pensamiento si empieza con "Here's a thinking process:"
+  if (rawContent.includes("Here's a thinking process:")) {
+    const parts = rawContent.split(/Draft:|Response:|Carlos:|Agent:/i);
+    rawContent = parts[parts.length - 1]; // Toma solo la respuesta final del personaje
+  }
+
+  return rawContent.trim();
 }
 
 // ─── GROQ TTS ─────────────────────────────
