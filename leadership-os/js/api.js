@@ -22,18 +22,37 @@ async function callGroq(messages, systemPrompt, temp = 0.82) {
   const d = await res.json();
   if (d.error) throw new Error(d.error.message);
   
-  let rawContent = d.choices?.[0]?.message?.content || '...';
+let rawContent = d.choices?.[0]?.message?.content || '';
 
-  // 1. Remover bloques de pensamiento tipo <think>...</think>
-  rawContent = rawContent.replace(/<think>[\s\S]*?<\/think>/gi, '');
+// Eliminar bloques <think>
+rawContent = rawContent.replace(/<think>[\s\S]*?<\/think>/gi, '');
 
-  // 2. Remover pensamiento si empieza con "Here's a thinking process:"
-  if (rawContent.includes("Here's a thinking process:")) {
-    const parts = rawContent.split(/Draft:|Response:|Carlos:|Agent:/i);
-    rawContent = parts[parts.length - 1]; // Toma solo la respuesta final del personaje
+// Eliminar "Here's a thinking process:" y todo lo que venga
+// después si NO existe una respuesta claramente marcada.
+const thinkingMarkers = [
+  "Here's a thinking process:",
+  "Here is a thinking process:",
+  "Thinking process:",
+  "Let's think",
+  "Analysis:",
+  "Reasoning:"
+];
+
+for (const marker of thinkingMarkers) {
+  const index = rawContent.toLowerCase().indexOf(marker.toLowerCase());
+
+  if (index !== -1) {
+    rawContent = rawContent.substring(0, index);
   }
+}
 
-  return rawContent.trim();
+// Limpiar posibles etiquetas
+rawContent = rawContent
+  .replace(/^(Draft:|Response:|Carlos:|Agent:)\s*/i, '')
+  .trim();
+
+return rawContent || '...';
+
 }
 
 // ─── GROQ TTS ─────────────────────────────
