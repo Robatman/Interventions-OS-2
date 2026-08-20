@@ -255,6 +255,9 @@ function goLearn() {
   show('s-learn');
   activeMode = 'learn';
   learnHistory = [];
+  // AGREGAR ESTAS DOS LÍNEAS:
+  document.getElementById('learn-msgs').innerHTML = '';
+  document.getElementById('learn-pivot')?.classList.remove('show');
   updateLearnHeader();
   initLearn();
 }
