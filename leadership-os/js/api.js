@@ -12,7 +12,7 @@ async function callGroq(messages, systemPrompt, temp = 0.82) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'canopylabs/orpheus-v1-english',
+      model: 'llama-3.3-70b-versatile',
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       temperature: temp,
       max_tokens: 300
@@ -63,7 +63,7 @@ async function speakWithGroq(text, archetypeId = 'default') {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'playai-tts',
+        model: 'canopylabs/orpheus-v1-english',
         input: clean,
         voice: voice,
         response_format: 'wav'
