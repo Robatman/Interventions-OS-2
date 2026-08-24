@@ -2533,7 +2533,7 @@ async function callGroqLLM(mode){
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
+      model: 'qwen/qwen3.6-27b',
       messages: [
         { role: 'system', content: systemPrompt },
         ...appState.agentHistory.slice(-12)
@@ -2807,7 +2807,7 @@ async function goEval(){
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'llama-3.3-70b-versatile',
+        model:'qwen/qwen3.6-27b',
         messages:[
           // 2. Modificamos el rol del sistema para que responda en inglés
           {role:'system',content:'You are Juanjolote, a direct and honest coach. Evaluate leadership practice conversations. English. Concrete. No formalities.'},
