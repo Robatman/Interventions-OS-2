@@ -173,15 +173,14 @@ Respond in the same language the manager uses.`;
 
   // ─── AVATAR (agente simulado) ──────────────
   // Carlos, Valeria, Miguel, Sandra
-  avatar(level) {
-    const a = currentArchetype;
+avatar(level, scenario) {
+  const a = currentArchetype;
 
-    // Estado emocional actual del agente — viene del escenario
-    const scenarioState = currentScenario
-      ? `\nCURRENT EMOTIONAL STATE: ${currentScenario.agentState}
-WHAT YOU'RE ACTUALLY FEELING (never say directly, but let it color everything): ${currentScenario.agentHiddenState}
-SITUATION: ${currentScenario.text}`
-      : '';
+  const scenarioState = scenario
+    ? `\nCURRENT EMOTIONAL STATE: ${scenario.agentState}
+WHAT YOU'RE ACTUALLY FEELING (never say directly, but let it color everything): ${scenario.agentHiddenState}
+SITUATION: ${scenario.text}`
+    : '';
 
     // Contexto de la intervención o técnica que se está practicando
     const practiceContext = typeof activeMenu !== 'undefined' && activeMenu === 'interventions' && typeof currentIntervention !== 'undefined' && currentIntervention
