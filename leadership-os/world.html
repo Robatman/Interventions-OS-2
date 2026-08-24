@@ -2419,7 +2419,7 @@ function goPractice(){
   // console.log("🎬 Escenario final devuelto por pickRandomScenario:", scenario ? scenario.title || "Tiene datos pero no propiedad title" : "❌ ¡NULL/VACÍO!");
 
   appState.currentArchetype = arch;
-  // appState.currentScenario = scenario;
+  appState.currentScenario = scenario;
   appState.agentHistory = [];
   appState.vrMood = (scenario && scenario.startMood) || 30;
   appState.hingesOpened = [];
@@ -2511,7 +2511,10 @@ async function callGroqLLM(mode){
   var systemPrompt = '';
   
   if (mode === 'practice') {
-    systemPrompt = PROMPTS.avatar(appState.currentLevel) + 
+    systemPrompt = PROMPTS.avatar(
+    appState.currentLevel,
+    appState.currentScenario
+)
       "\n\nCRITICAL: You must respond strictly and exclusively in natural English. Even if the user speaks or replies in Spanish, you must ONLY reply in English.";
       
   } else if (mode === 'learn') {
