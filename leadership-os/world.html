@@ -2507,49 +2507,96 @@ function updateVRMood(val){
   if(pctEl)pctEl.setAttribute('text','value',appState.vrMood+'%');
 }
 
-async function callGroqLLM(mode){
+async function callGroqLLM(mode) {
+
   var systemPrompt = '';
-  
+
   if (mode === 'practice') {
-    systemPrompt = PROMPTS.avatar(
-    appState.currentLevel,
-    appState.currentScenario
-)
+
+    systemPrompt =
+      PROMPTS.avatar(
+        appState.currentLevel,
+        appState.currentScenario
+      ) +
       "\n\nCRITICAL: You must respond strictly and exclusively in natural English. Even if the user speaks or replies in Spanish, you must ONLY reply in English.";
-      
+
   } else if (mode === 'learn') {
-    systemPrompt = 'You are Juanjolote, a warm and direct leadership coach at Centris Neural Academy. ' +
-                   'You are teaching about ' + (appState.activeMenu === 'interventions' ? 'retention interventions' : 'communication techniques') + '. ' +
-                   'Speak strictly in English. Be conversational, maximum 3 sentences. Ask questions. Never lecture. ' +
-                   'Connect everything to real-world call center situations. ' +
-                   'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
-                   
+
+    systemPrompt =
+      'You are Juanjolote, a warm and direct leadership coach at Centris Neural Academy. ' +
+      'You are teaching about ' +
+      (appState.activeMenu === 'interventions'
+        ? 'retention interventions'
+        : 'communication techniques') +
+      '. Speak strictly in English. Be conversational, maximum 3 sentences. Ask questions. Never lecture. ' +
+      'Connect everything to real-world call center situations. ' +
+      'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
+
   } else if (mode === 'work') {
-    systemPrompt = 'You are Juanjolote, a Socratic coach at Centris Neural Academy. ' +
-                   'Your role is to ask questions that help the manager discover their own insights. ' +
-                   'NEVER give direct advice. Ask ONLY ONE question at a time. Maximum 2 sentences. ' +
-                   'Speak strictly in English. Be warm but direct. ' +
-                   'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
+
+    systemPrompt =
+      'You are Juanjolote, a Socratic coach at Centris Neural Academy. ' +
+      'Your role is to ask questions that help the manager discover their own insights. ' +
+      'NEVER give direct advice. Ask ONLY ONE question at a time. Maximum 2 sentences. ' +
+      'Speak strictly in English. Be warm but direct. ' +
+      'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
   }
 
   var res = await fetch('/api/groq', {
+
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+
+    headers: {
+      'Content-Type': 'application/json'
+    },
+
     body: JSON.stringify({
+
       model: 'qwen/qwen3.6-27b',
+
       messages: [
-        { role: 'system', content: systemPrompt },
+        {
+          role: 'system',
+          content: systemPrompt
+        },
         ...appState.agentHistory.slice(-12)
       ],
+
       max_tokens: 150,
-      temperature: 0.88
+
+      temperature: 0.88,
+
+      // Evitar razonamiento visible
+      reasoning_effort: 'none',
+
+      reasoning_format: 'hidden'
     })
   });
 
   var data = await res.json();
-  return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '...';
-}
 
+  if (data.error) {
+    console.error('[Groq Error]', data.error);
+    throw new Error(data.error.message || 'Groq API error');
+  }
+
+  var rawContent =
+    data.choices?.[0]?.message?.content || '';
+
+  console.log('[Groq raw response]', rawContent);
+
+  console.log(
+    '[Groq finish reason]',
+    data.choices?.[0]?.finish_reason
+  );
+
+  // Seguridad extra: eliminar bloques <think> si aparecen
+  rawContent = rawContent
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .trim();
+
+  return rawContent || '...';
+}
 
 function parseAgentReply(raw){
   var moodMatch=raw.match(/\[MOOD:(\d+)\]/),boxMatch=raw.match(/\[BOX:(in|out)\]/);
@@ -2796,45 +2843,141 @@ window.goHistory = function() {
 };
 
 
-async function goEval(){
+async function goEval() {
+
   showScreen('eval');
-  var evalMoodEl=document.getElementById('eval-mood');
-  if(evalMoodEl)evalMoodEl.setAttribute('text','value',appState.vrMood+'%');
+
+  var evalMoodEl = document.getElementById('eval-mood');
+
+  if (evalMoodEl) {
+    evalMoodEl.setAttribute(
+      'text',
+      'value',
+      appState.vrMood + '%'
+    );
+  }
+
   setJuanMood('talking');
-  
-  // 1. Cambiamos las instrucciones para que pida el feedback en inglés
-  var evalText='Analyze this practice conversation. Agent: '+((appState.currentArchetype&&appState.currentArchetype.name)||'Agent')+' ('+((appState.currentArchetype&&appState.currentArchetype.trait)||'')+'). Final mood: '+appState.vrMood+'/100. History: '+appState.agentHistory.length+' turns. Give feedback in 3 concrete points in English, maximum 4 sentences total. Be direct and specific. Do not use generic coaching language.';
-  
-  try{
-    var res=await fetch('/api/groq',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'qwen/qwen3.6-27b',
-        messages:[
-          // 2. Modificamos el rol del sistema para que responda en inglés
-          {role:'system',content:'You are Juanjolote, a direct and honest coach. Evaluate leadership practice conversations. English. Concrete. No formalities.'},
-          {role:'user',content:evalText},
+
+  var evalText =
+    'Analyze this practice conversation. ' +
+    'Agent: ' +
+    ((appState.currentArchetype &&
+      appState.currentArchetype.name) || 'Agent') +
+    ' (' +
+    ((appState.currentArchetype &&
+      appState.currentArchetype.trait) || '') +
+    '). ' +
+    'Final mood: ' +
+    appState.vrMood +
+    '/100. ' +
+    'History: ' +
+    appState.agentHistory.length +
+    ' turns. ' +
+    'Give feedback in 3 concrete points in English, maximum 4 sentences total. ' +
+    'Be direct and specific. Do not use generic coaching language. ' +
+    'Return ONLY the final feedback. Do not show analysis, reasoning, thinking, or explanations of your process.';
+
+  try {
+
+    var res = await fetch('/api/groq', {
+
+      method: 'POST',
+
+      headers: {
+        'Content-Type': 'application/json'
+      },
+
+      body: JSON.stringify({
+
+        model: 'qwen/qwen3.6-27b',
+
+        messages: [
+
+          {
+            role: 'system',
+
+            content:
+              'You are Juanjolote, a direct and honest coach. ' +
+              'Evaluate leadership practice conversations. ' +
+              'English. Concrete. No formalities. ' +
+              'Return ONLY the final answer for the user. ' +
+              'Do NOT reveal reasoning, analysis, chain of thought, thinking process, or internal deliberation.'
+          },
+
+          {
+            role: 'user',
+            content: evalText
+          },
+
           ...appState.agentHistory.slice(-8)
         ],
-        max_tokens:200,
-        temperature:0.7
+
+        max_tokens: 200,
+
+        temperature: 0.7,
+
+        // Evitar razonamiento
+        reasoning_effort: 'none',
+
+        reasoning_format: 'hidden'
       })
     });
-    
-    var data=await res.json();
-    // 3. Fallback en inglés si no se recibe respuesta
-    var feedback=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'Session completed.';
-    
-    var feedbackEl=document.getElementById('eval-feedback');
-    if(feedbackEl)feedbackEl.setAttribute('text','value',feedback);
-    speakVR(feedback,getVoice('juan'));
-  } catch(e){
-    // 3. Fallback en inglés para el bloque catch
-    var feedbackEl2=document.getElementById('eval-feedback');
-    if(feedbackEl2)feedbackEl2.setAttribute('text','value','Session completed. Great job.');
+
+    var data = await res.json();
+
+    if (data.error) {
+      console.error('[Groq Error]', data.error);
+      throw new Error(data.error.message || 'Groq API error');
+    }
+
+    var feedback =
+      data.choices?.[0]?.message?.content || '';
+
+    console.log('[Groq Eval raw response]', feedback);
+
+    // Por seguridad, quitar <think> si aparece
+    feedback = feedback
+      .replace(/<think>[\s\S]*?<\/think>/gi, '')
+      .trim();
+
+    if (!feedback) {
+      feedback = 'Session completed.';
+    }
+
+    var feedbackEl =
+      document.getElementById('eval-feedback');
+
+    if (feedbackEl) {
+      feedbackEl.setAttribute(
+        'text',
+        'value',
+        feedback
+      );
+    }
+
+    speakVR(
+      feedback,
+      getVoice('juan')
+    );
+
+  } catch (e) {
+
+    console.error('[Evaluation Error]', e);
+
+    var feedbackEl2 =
+      document.getElementById('eval-feedback');
+
+    if (feedbackEl2) {
+      feedbackEl2.setAttribute(
+        'text',
+        'value',
+        'Session completed. Great job.'
+      );
+    }
   }
 }
+
 
 async function translateToEnglish(text) {
   const res = await fetch('/api/groq_speakvr', {
