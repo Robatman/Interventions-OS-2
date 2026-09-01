@@ -1,27 +1,16 @@
 // ═══════════════════════════════════════════
-//  ui.js
-//  UI helpers — Interventions OS v5
-//  Navigation, chat rendering, mood/box,
-//  voice indicators, glossary, VR helpers
-//  + Auth flow (login / register / admin)
+//  ui.js — Leadership OS v5 FIXED
+//  - Eliminada pantalla de Groq API key setup
+//  - La key vive solo en Vercel env vars
+//  - Login va directo a welcome
 // ═══════════════════════════════════════════
 
 // ─── APP INIT ─────────────────────────────
-// Runs on load — checks for existing session
-
 window.addEventListener('DOMContentLoaded', async () => {
   const loggedIn = await initAuth();
   if (loggedIn) {
-    // Already authenticated — go straight to Groq setup or welcome
-    const groqKey = localStorage.getItem('groq_key') || '';
-    if (groqKey) {
-      GROQ_KEY = groqKey;
-      goWelcome();
-    } else {
-      showAuthenticatedSetup();
-    }
+    goWelcome();
   } else {
-    // Not authenticated — show login
     show('s-login');
   }
 });
@@ -44,7 +33,6 @@ function showRegisterScreen() {
   document.getElementById('register-preview').textContent = '';
 }
 
-// Live format + preview for Game ID input
 function onGameIdInput(inputEl, previewId) {
   const raw       = inputEl.value;
   const formatted = formatGameId(raw);
@@ -89,7 +77,6 @@ async function submitLogin() {
   try {
     await loginUser(gameId, password);
 
-    // Check if account is active
     if (currentProfile && currentProfile.is_active === false) {
       await logoutUser();
       errEl.textContent = 'Your account has been disabled. Contact your admin.';
@@ -98,7 +85,7 @@ async function submitLogin() {
       return;
     }
 
-    showAuthenticatedSetup();
+    goWelcome();
   } catch (e) {
     errEl.textContent = 'Incorrect Game ID or password.';
     btn.disabled    = false;
@@ -133,7 +120,7 @@ async function submitRegister() {
 
   try {
     await registerUser(gameId, password);
-    showAuthenticatedSetup();
+    goWelcome();
   } catch (e) {
     const msg = e.message || '';
     if (msg.includes('already') || msg.includes('duplicate')) {
@@ -146,27 +133,8 @@ async function submitRegister() {
   }
 }
 
-// After auth — check if Groq key is saved
-function showAuthenticatedSetup() {
-  const groqKey = localStorage.getItem('groq_key') || '';
-  if (groqKey) {
-    GROQ_KEY = groqKey;
-    goWelcome();
-  } else {
-    // Show Groq setup with user info
-    const gameId = getGameId();
-    const setupStatus = document.getElementById('auth-status-bar');
-    if (setupStatus) {
-      setupStatus.textContent = `Signed in as ${gameId}`;
-      setupStatus.style.display = 'block';
-    }
-    show('s-setup');
-  }
-}
-
 async function submitLogout() {
   await logoutUser();
-  GROQ_KEY = '';
   show('s-login');
 }
 
@@ -180,14 +148,12 @@ function show(id) {
 }
 
 function goWelcome() {
-  // Update welcome header with user info
   const gameId   = getGameId();
   const statusEl = document.getElementById('welcome-user-status');
   if (statusEl && gameId) {
     statusEl.textContent = `${gameId} · ${currentProfile?.display_name || ''}`;
   }
 
-  // Show admin button only for admins
   const adminBtn = document.getElementById('welcome-admin-btn');
   if (adminBtn) adminBtn.style.display = isAdmin() ? 'block' : 'none';
 
@@ -255,7 +221,6 @@ function goLearn() {
   show('s-learn');
   activeMode = 'learn';
   learnHistory = [];
-  // AGREGAR ESTAS DOS LÍNEAS:
   document.getElementById('learn-msgs').innerHTML = '';
   document.getElementById('learn-pivot')?.classList.remove('show');
   updateLearnHeader();
@@ -302,7 +267,7 @@ function updateLearnHeader() {
       <span class="learn-step" id="ls-4">4. Practica</span>`;
   } else {
     const t = currentTechnique;
-    nameEl.textContent = `Alex — Teaching ${t.label}`;
+    nameEl.textContent = `${t.coachName} — Teaching ${t.label}`;
     philEl.textContent = `Based on ${t.philosophy}`;
     stepsEl.innerHTML  = t.stages.map(s =>
       `<span class="learn-step" id="${s.id}">${s.label}</span>`
@@ -431,14 +396,17 @@ function showTyping(containerId) {
   c.appendChild(typingEl);
   c.scrollTop = c.scrollHeight;
 }
+
 function removeTyping() {
   const el = document.getElementById('typing-el');
   if (el) el.remove();
 }
+
 function setLoading(btnId, loading) {
   const btn = document.getElementById(btnId);
   if (btn) btn.disabled = loading;
 }
+
 function handleKey(e, mode) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -584,9 +552,11 @@ function showGloss(term, event) {
   popup.style.left = Math.min(event.clientX, window.innerWidth - 280) + 'px';
   popup.style.top  = (event.clientY + 12) + 'px';
 }
+
 function hideGloss() {
   document.getElementById('gloss-popup').classList.remove('visible');
 }
+
 document.addEventListener('click', (e) => {
   if (!e.target.classList.contains('gloss')) hideGloss();
 });
@@ -606,11 +576,6 @@ extraStyle.textContent = `
   .vr-mode .send-btn   { display: none; }
   .vr-mode .voice-btn  { flex: 1; padding: 16px; font-size: 28px; }
   #voice-indicator { transition: all .3s; }
-  #auth-status-bar {
-    display: none;
-    font-size: 11px; color: var(--teal);
-    text-align: center; margin-bottom: 8px;
-  }
   #welcome-user-status {
     font-size: 11px; color: var(--text3);
     margin-top: 2px;
@@ -633,35 +598,3 @@ function selectAndPreview(id) {
 function goHistory() {
   showHistory();
 }
-// ======================================
-// WELCOME BUTTONS
-// ======================================
-
-document.getElementById('btn-interventions')
-?.addEventListener('click', () => {
-
-  activeMenu = 'interventions';
-
-  // Primera intervención por default
-  currentIntervention = interventions?.[0] || null;
-
-  updateModeScreen();
-
-  show('s-mode');
-
-});
-
-
-document.getElementById('btn-techniques')
-?.addEventListener('click', () => {
-
-  activeMenu = 'techniques';
-
-  // Primera técnica por default
-  currentTechnique = techniques?.[0] || null;
-
-  updateModeScreen();
-
-  show('s-mode');
-
-});
