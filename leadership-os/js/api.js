@@ -1,72 +1,45 @@
 // ═══════════════════════════════════════════
-//  api.js
-//  API layer — Interventions OS v5
-//  - Groq via proxy /api/groq (key segura en Vercel)
-//  - Groq PlayAI TTS (voice per archetype)
+//  api.js — Leadership OS v5 FIXED
+//  - Sin GROQ_KEY del cliente
+//  - Key vive solo en Vercel (GROQ_API_KEY)
+//  - TTS via /api/groq-tts
 // ═══════════════════════════════════════════
 
 // ─── GROQ CHAT ────────────────────────────
 
-async function callGroq(messages, systemPrompt, temp = 0.7) {
+async function callGroq(messages, systemPrompt, temp = 0.82) {
   const res = await fetch('/api/groq', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'qwen/qwen3.6-27b',
-
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages
-      ],
-
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'system', content: systemPrompt }, ...messages],
       temperature: temp,
-      max_tokens: 150,
-
-      // IMPORTANTE: Qwen no debe razonar antes de responder
-      reasoning_effort: 'none',
-      reasoning_format: 'hidden'
+      max_tokens: 300
     })
   });
-
   const d = await res.json();
-
-  if (d.error) {
-    console.error('[Groq Error]', d.error);
-    throw new Error(d.error.message);
-  }
-
-  let rawContent = d.choices?.[0]?.message?.content || '';
-
-  console.log('[Groq raw response]', rawContent);
-  console.log('[Groq finish reason]', d.choices?.[0]?.finish_reason);
-
-  // Por si acaso el modelo llegara a mandar <think>
-  rawContent = rawContent
-    .replace(/<think>[\s\S]*?<\/think>/gi, '')
-    .trim();
-
-  return rawContent || '...';
+  if (d.error) throw new Error(d.error.message);
+  return d.choices?.[0]?.message?.content || '...';
 }
-
 
 // ─── GROQ TTS ─────────────────────────────
 
 const ARCHETYPE_VOICES = {
-  carlos:  'austin',
-  valeria: 'diana',
-  miguel:  'daniel',
-  sandra:  'hannah',
-  default: 'troy'
+  carlos:  'Fritz-PlayAI',
+  valeria: 'Celeste-PlayAI',
+  miguel:  'Chip-PlayAI',
+  sandra:  'Deedee-PlayAI',
+  default: 'Fritz-PlayAI'
 };
 
-const COACH_VOICE = 'autumn';
+const COACH_VOICE = 'Aaliyah-PlayAI';
 
 let currentAudio = null;
 let isSpeaking   = false;
 
 async function speakWithGroq(text, archetypeId = 'default') {
-  if (!GROQ_KEY) return;
-
+  // SIN verificación de GROQ_KEY — la key está en el servidor
   const clean = text
     .replace(/\[.*?\]/g, '')
     .replace(/\(.*?\)/g, '')
@@ -89,7 +62,7 @@ async function speakWithGroq(text, archetypeId = 'default') {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'canopylabs/orpheus-v1-english',
+        model: 'playai-tts',
         input: clean,
         voice: voice,
         response_format: 'wav'
@@ -176,7 +149,7 @@ function startListening() {
 
   const SR  = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SR();
-  recognition.lang            = 'en-US';
+  recognition.lang            = 'es-MX';
   recognition.interimResults  = false;
   recognition.continuous      = false;
 
@@ -240,27 +213,16 @@ function updateListenIndicator(listening) {
   if (indicator) indicator.classList.toggle('active', listening);
 }
 
-// ─── GROQ KEY MANAGEMENT ──────────────────
+// ─── GROQ KEY — ya no se usa del cliente ──
+// La key está en Vercel como GROQ_API_KEY
+// Esta función se mantiene por compatibilidad
+// pero ya no bloquea el flujo
 
 function saveKey() {
-  GROQ_KEY = document.getElementById('groq-input').value.trim();
-  if (!GROQ_KEY) return;
-  localStorage.setItem('groq_key', GROQ_KEY);
-  document.getElementById('key-dot').className    = 'status-dot sd-on';
-  document.getElementById('key-msg').innerHTML    = '<span style="color:var(--teal)">✓ Connected — Groq ready</span>';
-  document.getElementById('enter-btn').disabled   = false;
+  // Ya no necesario — key está en el servidor
+  goWelcome();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  if (GROQ_KEY) {
-    document.getElementById('groq-input').value   = GROQ_KEY;
-    document.getElementById('key-dot').className  = 'status-dot sd-on';
-    document.getElementById('key-msg').innerHTML  = '<span style="color:var(--teal)">✓ Key loaded from last session</span>';
-    document.getElementById('enter-btn').disabled = false;
-  }
   console.log('[Interventions OS] Session:', getUserId());
 });
-
-// ─── SESSION PERSISTENCE ──────────────────
-// saveSessionProgress está en app.js
-// getSessions y saveSession están en supabase.js
