@@ -12,7 +12,7 @@ async function callGroq(messages, systemPrompt, temp = 0.82) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
+      model: 'openai/gpt-oss-120b',
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       temperature: temp,
       max_tokens: 300
