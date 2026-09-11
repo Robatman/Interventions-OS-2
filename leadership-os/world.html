@@ -3136,20 +3136,84 @@ async function setupMic(){
   }
 }
 
-function startRecording(){
+// Resets the recording UI/state after a failed start (prevents a stuck
+// "recording" button or a silently blocked next attempt).
+function resetRecordingUI(hudMessage){
+  isRecording=false;
+  if(silenceTimer){ cancelAnimationFrame(silenceTimer); silenceTimer=null; }
+  mediaRecorder=null;
+  audioChunks=[];
+  var btn=document.getElementById('mic-btn');
+  if(btn)btn.classList.remove('recording');
+  setHUD('ready', hudMessage || 'Ready to speak');
+}
+
+async function startRecording(){
   //  console.log('[Grabación] Intento de iniciar grabación. Estado actual -> isRecording:', isRecording, 'isProcessing:', isProcessing, 'hasAudioStream:', !!audioStream);
-  if(isRecording||isProcessing||!audioStream) return;
+  if(isRecording||isProcessing) return;
   
   if (audioContext && audioContext.state === 'suspended') {
     // console.log('[Mic] AudioContext suspendido. Intentando reactivar...');
     audioContext.resume();
   }
 
+  // ── Stream validation & permission guard ───────────────────
+  // MediaRecorder.start() throws NotSupportedError si el stream está
+  // cerrado/terminado o no tiene pistas de audio vivas. Si el permiso
+  // nunca se otorgó o el stream murió, re-solicitarlo aquí.
+  var streamUsable = audioStream
+    && audioStream.active
+    && audioStream.getAudioTracks().some(function(t){ return t.readyState==='live'; });
+
+  if (!streamUsable) {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('getUserMedia unavailable (requires HTTPS / supported browser).');
+      }
+      console.warn('[Grabación] Stream de audio inactivo o sin permiso. Re-solicitando micrófono...');
+      audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Reconectar el analizador de volumen al nuevo stream (silence detection).
+      if (audioContext && analyser) {
+        audioContext.createMediaStreamSource(audioStream).connect(analyser);
+      }
+      setHUD('ready','Ready to speak');
+    } catch (permError) {
+      console.warn('[Grabación] Micrófono no disponible:', permError && (permError.name || permError.message));
+      isRecording=false;
+      setHUD('idle','Microphone unavailable - check permissions');
+      return;
+    }
+  }
+
   audioChunks=[]; isRecording=true;
-  var mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
-  console.log('[Grabación] Usando formato MIME:', mime);
+
+  // ── MIME type fallback ─────────────────────────────────────
+  // Nunca hardcodear un solo contenedor: elegir dinámicamente el primero
+  // que el navegador soporte realmente (Safari/iOS solo acepta mp4/aac).
+  const mimeType = [
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/ogg;codecs=opus',
+    'audio/mp4',
+    'audio/aac'
+  ].find(type => MediaRecorder.isTypeSupported(type)) || '';
+
+  const options = mimeType ? { mimeType } : {};
+  console.log('[Grabación] Usando formato MIME:', mimeType || 'browser default');
   
-  mediaRecorder=new MediaRecorder(audioStream,{mimeType:mime});
+  try {
+    mediaRecorder = new MediaRecorder(audioStream, options);
+  } catch (ctorError) {
+    // Algunos navegadores rechazan las opciones incluso tras isTypeSupported():
+    // reintentar una vez con el formato por defecto del navegador.
+    console.warn('[Grabación] MediaRecorder rechazó el MIME type, reintentando con el formato por defecto del navegador:', ctorError.message);
+    try {
+      mediaRecorder = new MediaRecorder(audioStream);
+    } catch (fatalCtorError) {
+      resetRecordingUI('Recording not supported in this browser');
+      return;
+    }
+  }
   
   mediaRecorder.ondataavailable=function(e){
     if(e.data.size>0){
@@ -3161,7 +3225,27 @@ function startRecording(){
   };
   
   mediaRecorder.onstop=onRecordingStop;
-  mediaRecorder.start();
+  mediaRecorder.onerror=function(ev){
+    console.warn('[Grabación] Error durante la grabación:', ev && ev.error && ev.error.name);
+    resetRecordingUI('Recording error - try again');
+  };
+
+  // ── Guarded start ──────────────────────────────────────────
+  // Si .start() aún así falla, registrar un aviso útil y resetear el
+  // estado de grabación en lugar de dejar una excepción sin capturar.
+  try {
+    mediaRecorder.start();
+  } catch (startError) {
+    console.warn(
+      '[Grabación] mediaRecorder.start() falló:',
+      startError.name + ' - ' + startError.message,
+      '| stream.active =', audioStream && audioStream.active,
+      '| tracks =', audioStream ? audioStream.getAudioTracks().map(function(t){ return t.readyState; }).join(',') : 'none'
+    );
+    resetRecordingUI("Couldn't start recording - try again");
+    return;
+  }
+
   setHUD('rec','Recording...');
   var btn=document.getElementById('mic-btn'); if(btn)btn.classList.add('recording');
   
@@ -3217,7 +3301,8 @@ function startSilenceDetection(){
 
 async function onRecordingStop(){
   // console.log('[Recording] MediaRecorder has stopped. Assembling Blob...');
-  var blob = new Blob(audioChunks, { type: 'audio/webm' });
+  // Etiquetar el Blob con el contenedor realmente grabado (Safari → audio/mp4).
+  var blob = new Blob(audioChunks, { type: (mediaRecorder && mediaRecorder.mimeType) || 'audio/webm' });
   // console.log('[Recording] Generated audio file -> Total size:', blob.size, 'bytes');
   
   if (blob.size < 800) {
