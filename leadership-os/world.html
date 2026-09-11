@@ -2263,6 +2263,8 @@ function goWelcome(){
   showScreen('welcome');
   appState.agentHistory=[];
   appState.vrMood=30;
+  appState.currentMode = null;   // leaving an activity — reset mode routing
+  window.activeMode = null;
   
 }
 
@@ -2270,10 +2272,42 @@ function goWelcome(){
 
 function goMode(menuType){
   appState.activeMenu=menuType;
-  if(menuType==='interventions')appState.currentIntervention=(typeof interventions!=='undefined'&&interventions[0])||null;
-  if(menuType==='techniques')appState.currentTechnique=(typeof techniques!=='undefined'&&techniques[0])||null;
+  // ── Standard Web App parity (js/app.js + js/ui.js) ──
+  // PROMPTS.learn()/work()/avatar() read the module-level globals
+  // currentTechnique / currentIntervention / activeMenu that ui.js keeps
+  // in sync in the Standard App. Mirror appState into them here.
+  syncStandardGlobals();
   if(typeof updateModeScreen==='function')updateModeScreen();
   showScreen('mode');
+}
+
+// ─── STANDARD-APP GLOBAL SYNC ─────────────
+// Keeps the same global contract the Standard Web App relies on:
+//   ui.js: selectTechnique(id) → setTechnique(id) → currentTechnique = TECHNIQUES[id]
+//   ui.js: goMode → activeMenu = 'interventions' | 'techniques'
+function syncStandardGlobals(){
+  var sel = appState.tecnicaSeleccionada || appState.tecnicaCargada || null;
+  try {
+    if (appState.activeMenu === 'interventions') {
+      var ivKey = null;
+      if (sel && INTERVENTIONS[sel]) ivKey = sel;                       // e.g. 'interv_pulse_check' if keyed that way
+      else if (sel) {
+        var clean = sel.replace('interv_', '');
+        if (INTERVENTIONS[clean]) ivKey = clean;                        // 'interv_anchoring' → 'anchoring'
+      }
+      if (ivKey && typeof setIntervention === 'function') setIntervention(ivKey);
+      else if (typeof setIntervention === 'function' && !currentIntervention) setIntervention('pulse_check');
+      window.activeMenu = 'interventions';
+    } else {
+      if (sel && typeof TECHNIQUES !== 'undefined' && TECHNIQUES[sel] && TECHNIQUES[sel].available
+          && typeof setTechnique === 'function') setTechnique(sel);
+      window.activeMenu = 'techniques';
+    }
+    appState.currentIntervention = typeof currentIntervention !== 'undefined' ? currentIntervention : null;
+    appState.currentTechnique    = typeof currentTechnique    !== 'undefined' ? currentTechnique    : null;
+  } catch (e) {
+    console.warn('[syncStandardGlobals]', e);
+  }
 }
 
 
@@ -2361,7 +2395,19 @@ function goLearn() {
         intro = 'Let\'s explore communication techniques. Which one are you interested in practicing today?';
     }
   }
-    
+
+  // ── Standard Web App parity (js/app.js initLearn) ──
+  // Build the EXACT system prompt used by the Standard App and extract its
+  // opener, so Learn mode is pedagogically identical per technique/intervention.
+  // The hardcoded switch above only remains as regex-miss fallback.
+  syncStandardGlobals();
+  var learnSysPrompt = appState.activeMenu === 'interventions'
+    ? PROMPTS.learnIntervention()
+    : PROMPTS.learn();
+  var openerMatch = learnSysPrompt.match(/OPENING MESSAGE \(use this EXACTLY[^)]*\):\n([\s\S]+?)(?:\n\nRespond|\n\nMax|$)/);
+  if (openerMatch) intro = openerMatch[1].trim();
+  appState.currentMode = 'learn';
+
   showScreen('practice');
   setJuanMood('happy');
   setDialog('JUANJOLOTE', intro);
@@ -2378,8 +2424,16 @@ function goWork() {
     opennessPanel.setAttribute('visible', 'false');
   }
 
-  // Se traduce directamente a inglés natural para el simulador
-  var intro = 'Tell me, what situation are you dealing with with an agent right now?';
+  // ── Standard Web App parity (js/app.js initWork, submode 'reflect') ──
+  // Work Together uses the Socratic PROMPTS.work() prompt and the same opener.
+  // (The 'urgent' submode has no VR UI yet; appState.workSubmode defaults to
+  // 'reflect' and callGroqLLM() supports 'urgent' via PROMPTS.work_urgent().)
+  appState.workSubmode = appState.workSubmode || 'reflect';
+  syncStandardGlobals();
+  appState.currentMode = 'work';
+  var intro = appState.workSubmode === 'urgent'
+    ? `Okay, we have ${appState.workTimeLimit || 3} minutes. Tell me quickly: who is this person, what happened, and what do you need to handle right now?`
+    : "Tell me about the situation. Who is this person, and what's been going on? Don't filter — just describe it the way you'd tell a colleague.";
   
   showScreen('practice');
   setJuanMood('talking');
@@ -2425,7 +2479,16 @@ function goPractice(){
   appState.hingesOpened = [];
   appState.conversationClosed = false;
   
+  // ── Standard Web App parity (js/app.js goBriefing / startPracticeFromBriefing) ──
+  // PROMPTS.avatar() reads the global currentArchetype (archetypes.js) and
+  // sendPractice() appends scenario + intervention context from
+  // currentScenario / currentIntervention. Set them all here.
   if(typeof currentArchetype !== 'undefined') currentArchetype = arch;
+  window.currentScenario = scenario;
+  window.activeMode = 'practice';
+  appState.workSubmode = null;
+  syncStandardGlobals();
+  appState.currentMode = 'practice';
   
   // Actualizamos Avatar y barra de Mood del Estado Global
   updateAgentAvatar(arch);
@@ -2509,37 +2572,44 @@ function updateVRMood(val){
 
 async function callGroqLLM(mode) {
 
+  // ── Standard Web App parity ─────────────────────────────────────
+  // System prompts are now built by the SAME PROMPTS.* generators used by
+  // js/app.js (sendLearn / sendWork / sendPractice), reading the same
+  // globals (currentTechnique / currentIntervention / currentArchetype /
+  // activeMenu) kept in sync by syncStandardGlobals().
   var systemPrompt = '';
 
   if (mode === 'practice') {
 
+    // js/app.js sendPractice(): PROMPTS.avatar(currentLevel) + scenarioContext + interventionContext
+    var scenarioContext = appState.currentScenario
+      ? `\n\nSITUATION: ${appState.currentScenario.text}\nYour visible state: ${appState.currentScenario.agentState}\nYour hidden inner state (never say this directly, but let it color your responses): ${appState.currentScenario.agentHiddenState}`
+      : '';
+
+    var interventionContext = appState.activeMenu === 'interventions' && currentIntervention
+      ? `\n\nINTERVENTION TYPE: This is a ${currentIntervention.label} conversation (Day ${currentIntervention.day}). The person talking to you may be from: ${currentIntervention.ownerLabel}. You do NOT know this is a formal intervention — to you, someone from the company came to talk.`
+      : '';
+
     systemPrompt =
-      PROMPTS.avatar(
-        appState.currentLevel,
-        appState.currentScenario
-      ) +
+      PROMPTS.avatar(appState.currentLevel) + scenarioContext + interventionContext +
+      // VR-platform constraint: server TTS (Orpheus) is English-only.
       "\n\nCRITICAL: You must respond strictly and exclusively in natural English. Even if the user speaks or replies in Spanish, you must ONLY reply in English.";
 
   } else if (mode === 'learn') {
 
-    systemPrompt =
-      'You are Juanjolote, a warm and direct leadership coach at Centris Neural Academy. ' +
-      'You are teaching about ' +
-      (appState.activeMenu === 'interventions'
-        ? 'retention interventions'
-        : 'communication techniques') +
-      '. Speak strictly in English. Be conversational, maximum 3 sentences. Ask questions. Never lecture. ' +
-      'Connect everything to real-world call center situations. ' +
-      'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
+    // js/app.js sendLearn(): PROMPTS.learn() or PROMPTS.learnIntervention()
+    systemPrompt = (appState.activeMenu === 'interventions'
+      ? PROMPTS.learnIntervention()
+      : PROMPTS.learn()) +
+      "\n\nCRITICAL: You must respond strictly and exclusively in natural English. Even if the user speaks or replies in Spanish, you must ONLY reply in English.";
 
   } else if (mode === 'work') {
 
-    systemPrompt =
-      'You are Juanjolote, a Socratic coach at Centris Neural Academy. ' +
-      'Your role is to ask questions that help the manager discover their own insights. ' +
-      'NEVER give direct advice. Ask ONLY ONE question at a time. Maximum 2 sentences. ' +
-      'Speak strictly in English. Be warm but direct. ' +
-      'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
+    // js/app.js sendWork(): PROMPTS.work() (Socratic) or PROMPTS.work_urgent()
+    systemPrompt = (appState.workSubmode === 'urgent'
+      ? PROMPTS.work_urgent()
+      : PROMPTS.work()) +
+      "\n\nCRITICAL: You must respond strictly and exclusively in natural English. Even if the user speaks or replies in Spanish, you must ONLY reply in English.";
   }
 
   var res = await fetch('/api/groq', {
@@ -2552,24 +2622,25 @@ async function callGroqLLM(mode) {
 
     body: JSON.stringify({
 
-      model: 'qwen/qwen3.6-27b',
+      // Standard Web App parity (js/api.js callGroq):
+      // model openai/gpt-oss-120b, max_tokens 300,
+      // temperature 0.82 (learn/practice default), 0.75 (work), 0.7 (hints).
+      model: 'openai/gpt-oss-120b',
 
       messages: [
         {
           role: 'system',
           content: systemPrompt
         },
-        ...appState.agentHistory.slice(-12)
+        ...appState.agentHistory
       ],
 
-      max_tokens: 150,
+      max_tokens: 300,
 
-      temperature: 0.88,
-
-      // Evitar razonamiento visible
-      reasoning_effort: 'none',
-
-      reasoning_format: 'hidden'
+      temperature:
+        mode === 'work' ? 0.75 :
+        mode === 'learn' ? 0.82 :
+        0.82
     })
   });
 
@@ -2606,12 +2677,15 @@ function parseAgentReply(raw){
 
 async function handleVRSpeech(text) {
   if (!text.trim()) return;
-  var mode = appState.currentArchetype ? 'practice' : 'learn';
+  // ── Standard Web App parity (js/api.js vrMode routing) ──
+  // Route by the explicit current mode instead of inferring from
+  // currentArchetype (which stays set after a practice session ends).
+  var mode = appState.currentMode || (appState.currentArchetype ? 'practice' : 'learn');
   appState.agentHistory.push({ role: 'user', content: text });
   
   try {
-    var reply = await callGroqLLM(mode === 'practice' ? 'practice' : appState.activeMenu ? 'learn' : 'work');
-    var parsed = mode === 'practice' ? parseAgentReply(reply) : { msg: reply, newMood: appState.vrMood, boxState: 'out' };
+    var reply = await callGroqLLM(mode);
+    var parsed = mode === 'practice' ? parseAgentReply(reply) : { msg: reply, newMood: appState.vrMood, boxState: appState.boxState };
     appState.agentHistory.push({ role: 'assistant', content: reply });
     
     if (mode === 'practice') {
