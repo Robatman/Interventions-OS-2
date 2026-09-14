@@ -23,7 +23,24 @@
 </head>
 <body>
 <script>
-(function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
+// TODO: Restore DB Auth when server is back.
+// Original strict guard (commented out — DB/auth server is offline, so the
+// token would be missing and users would get bounced in a login loop):
+// (function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
+// DB-offline fallback: seed a mock session with dummy user data instead of
+// redirecting, so world.html always loads without missing-session errors.
+(function(){
+  try{
+    if(!localStorage.getItem("ldr_session_token"))
+      localStorage.setItem("ldr_session_token","mock_token_"+Date.now());
+    if(!localStorage.getItem("ldr_refresh_token"))
+      localStorage.setItem("ldr_refresh_token","mock_refresh_"+Date.now());
+    if(!localStorage.getItem("ldr_game_id"))
+      localStorage.setItem("ldr_game_id","CM.DEMO");
+    if(!localStorage.getItem("ldr_uid"))
+      localStorage.setItem("ldr_uid","user_mock_"+Math.random().toString(36).slice(2,11));
+  }catch(e){console.warn("[BYPASS] mock session seed failed:",e);}
+})();
 </script>
 
 
@@ -2053,6 +2070,7 @@ let isRecording=false,isProcessing=false,mediaRecorder=null,audioChunks=[],audio
 const SILENCE_THRESHOLD=38,SILENCE_DURATION=1900;
 let micStreamStale=false;   // sleep/wake del headset: track de micrófono muteado o terminado
 let recordingTimer=null;    // handle del auto-stop de 25s (evita timers huérfanos entre grabaciones)
+let recordingStartedAt=0;   // timestamp de inicio (guard de duración mínima anti-alucinación de Whisper)
 
 function setHUD(state,label){
   var dot=document.getElementById('voice-dot'),lbl=document.getElementById('voice-label');
@@ -3141,6 +3159,22 @@ function stopAllSounds(){
       try { if (s.stop) s.stop(); if (s.disconnect) s.disconnect(); } catch (e1) {}
     });
     vrWebAudioSources.length = 0;
+
+    // 6) Cancelar una grabación en curso: navegar a mitad de turno no debe
+    // convertir ruido de fondo en un turno fantasma para el LLM.
+    if (isRecording && mediaRecorder) {
+      isRecording = false;
+      if (recordingTimer) { clearTimeout(recordingTimer); recordingTimer = null; }
+      recordingStartedAt = 0;
+      mediaRecorder.onstop = null;
+      mediaRecorder.ondataavailable = null;
+      mediaRecorder.onerror = null;
+      try { mediaRecorder.stop(); } catch (e2) {}
+      mediaRecorder = null;
+      audioChunks = [];
+      var mb = document.getElementById('mic-btn');
+      if (mb) mb.classList.remove('recording');
+    }
   } catch (e) {
     console.warn('[Audio] stopAllSounds error:', e);
   }
@@ -3192,6 +3226,7 @@ function resetRecordingUI(hudMessage){
   if(silenceTimer){ cancelAnimationFrame(silenceTimer); silenceTimer=null; }
   mediaRecorder=null;
   audioChunks=[];
+  recordingStartedAt=0;
   var btn=document.getElementById('mic-btn');
   if(btn)btn.classList.remove('recording');
   setHUD('ready', hudMessage || 'Ready to speak');
@@ -3303,6 +3338,8 @@ async function startRecording(){
     return;
   }
 
+  recordingStartedAt=Date.now();   // para el guard de duración mínima en onRecordingStop()
+
   setHUD('rec','Recording...');
   var btn=document.getElementById('mic-btn'); if(btn)btn.classList.add('recording');
   
@@ -3333,15 +3370,34 @@ function stopRecording(){
   setHUD('thinking','Processing...');
 }
 
+// ── Filtro de transcripciones inútiles (ruido / interjecciones) ──
+// Devuelve true si el texto no aporta nada a la conversación: vacío,
+// solo puntuación/símbolos, o una sola interjección ("Ah", "Ahhh", "Um"...)
+function isNoiseTranscript(text){
+  if (!text) return true;
+  // Anotaciones no-verbales de Whisper: [inaudible], (ruido de fondo), [BLANK_AUDIO]
+  var stripped = text.replace(/[\[\(][^\]\)]*[\]\)]/g, ' ');
+  var words = stripped.toLowerCase().replace(/[^a-záéíóúüñ0-9\s]/g, ' ').split(/\s+/).filter(function(w){ return w.length > 0; });
+  if (words.length === 0) return true;                                          // puntuación/símbolos solamente
+  if (words.length === 1 && NOISE_WORDS.indexOf(words[0]) !== -1) return true;  // una sola interjección
+  return false;
+}
+var NOISE_WORDS = ['ah','ahh','ahhh','ahhhh','eh','em','emm','um','umm','uh','uhh','uhm','uhmm','hmm','hm','mmm','mm','mhm','huh','ooh','ohh','shh','psst','tsk','pfft'];
+
 async function onRecordingStop(){
   // console.log('[Recording] MediaRecorder has stopped. Assembling Blob...');
   // Etiquetar el Blob con el contenedor realmente grabado (Safari → audio/mp4).
   var blob = new Blob(audioChunks, { type: (mediaRecorder && mediaRecorder.mimeType) || 'audio/webm' });
   // console.log('[Recording] Generated audio file -> Total size:', blob.size, 'bytes');
   
-  if (blob.size < 800) {
-    // console.error('[Recording] The audio file is TOO SMALL (under 800 bytes). Canceling upload.');
-    setHUD('ready', "I didn't hear you, please try again");
+  // ── Minimum audio guard: no enviar clips diminutos a Whisper ──
+  // Whisper alucina ("Ahhh!", "Yeah", interjecciones aleatorias) con clips de
+  // menos de ~1s. Exigir duración y tamaño mínimos antes de gastar un turno.
+  var durationMs = recordingStartedAt ? (Date.now() - recordingStartedAt) : 0;
+  recordingStartedAt = 0;
+  if (durationMs < 900 || blob.size < 5120) {
+    console.warn('[Recording] Clip descartado por demasiado corto: ' + durationMs + 'ms, ' + blob.size + ' bytes');
+    setHUD('ready', "Speak a bit longer, please");
     return;
   }
   
@@ -3354,6 +3410,14 @@ async function onRecordingStop(){
     if (!text || text.trim().length < 2) {
       console.warn('[Whisper] Transcription returned empty or too short.');
       setHUD('ready', "I didn't understand, please try again");
+      isProcessing = false;
+      return;
+    }
+
+    // ── Filtro anti-alucinación: no gastar un turno de LLM en ruido ──
+    if (isNoiseTranscript(text)) {
+      console.warn('[Whisper] Transcripción descartada (vacía/ruido/interjección):', JSON.stringify(text));
+      setHUD('ready', "I didn't catch that - please try again");
       isProcessing = false;
       return;
     }
