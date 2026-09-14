@@ -23,24 +23,7 @@
 </head>
 <body>
 <script>
-// TODO: Restore DB Auth when server is back.
-// Original strict guard (commented out — DB/auth server is offline, so the
-// token would be missing and users would get bounced in a login loop):
-// (function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
-// DB-offline fallback: seed a mock session with dummy user data instead of
-// redirecting, so world.html always loads without missing-session errors.
-(function(){
-  try{
-    if(!localStorage.getItem("ldr_session_token"))
-      localStorage.setItem("ldr_session_token","mock_token_"+Date.now());
-    if(!localStorage.getItem("ldr_refresh_token"))
-      localStorage.setItem("ldr_refresh_token","mock_refresh_"+Date.now());
-    if(!localStorage.getItem("ldr_game_id"))
-      localStorage.setItem("ldr_game_id","CM.DEMO");
-    if(!localStorage.getItem("ldr_uid"))
-      localStorage.setItem("ldr_uid","user_mock_"+Math.random().toString(36).slice(2,11));
-  }catch(e){console.warn("[BYPASS] mock session seed failed:",e);}
-})();
+(function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
 </script>
 
 
@@ -90,8 +73,6 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 
 function cambiarPantallaVR(pantallaMostrarId) {
-  // ── Audio guard: detener TODO audio en curso al cambiar de pantalla ──
-  if (typeof stopAllSounds === 'function') stopAllSounds();
   // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
 const entornoUniversal = document.getElementById('entorno-universal');
   if (entornoUniversal) {
@@ -824,7 +805,7 @@ function ejecutarFlujoGuardado() {
 <!-- <a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018"> -->
 <a-scene vr-mode-ui="enabled:true" 
          background="color:#04060d" 
-         renderer="antialias:true;colorManagement:true;alpha:false;foveationLevel:1" 
+         renderer="antialias:true;colorManagement:true;alpha:true" 
          fog="type:exponential;color:#070a14;density:0.025">
            <a-assets>
     <img id="juan-neutral"    src="assets/juanjolote_neutral.png">
@@ -2068,9 +2049,6 @@ let appState = {
 
 let isRecording=false,isProcessing=false,mediaRecorder=null,audioChunks=[],audioStream=null,audioContext=null,analyser=null,silenceTimer=null;
 const SILENCE_THRESHOLD=38,SILENCE_DURATION=1900;
-let micStreamStale=false;   // sleep/wake del headset: track de micrófono muteado o terminado
-let recordingTimer=null;    // handle del auto-stop de 25s (evita timers huérfanos entre grabaciones)
-let recordingStartedAt=0;   // timestamp de inicio (guard de duración mínima anti-alucinación de Whisper)
 
 function setHUD(state,label){
   var dot=document.getElementById('voice-dot'),lbl=document.getElementById('voice-label');
@@ -2282,12 +2260,9 @@ function showScreen(name) {
 
 function goWelcome(){
 
-  if (typeof stopAllSounds === 'function') stopAllSounds();
   showScreen('welcome');
   appState.agentHistory=[];
   appState.vrMood=30;
-  appState.currentMode = null;   // leaving an activity — reset mode routing
-  window.activeMode = null;
   
 }
 
@@ -2295,48 +2270,15 @@ function goWelcome(){
 
 function goMode(menuType){
   appState.activeMenu=menuType;
-  // ── Standard Web App parity (js/app.js + js/ui.js) ──
-  // PROMPTS.learn()/work()/avatar() read the module-level globals
-  // currentTechnique / currentIntervention / activeMenu that ui.js keeps
-  // in sync in the Standard App. Mirror appState into them here.
-  syncStandardGlobals();
+  if(menuType==='interventions')appState.currentIntervention=(typeof interventions!=='undefined'&&interventions[0])||null;
+  if(menuType==='techniques')appState.currentTechnique=(typeof techniques!=='undefined'&&techniques[0])||null;
   if(typeof updateModeScreen==='function')updateModeScreen();
   showScreen('mode');
-}
-
-// ─── STANDARD-APP GLOBAL SYNC ─────────────
-// Keeps the same global contract the Standard Web App relies on:
-//   ui.js: selectTechnique(id) → setTechnique(id) → currentTechnique = TECHNIQUES[id]
-//   ui.js: goMode → activeMenu = 'interventions' | 'techniques'
-function syncStandardGlobals(){
-  var sel = appState.tecnicaSeleccionada || appState.tecnicaCargada || null;
-  try {
-    if (appState.activeMenu === 'interventions') {
-      var ivKey = null;
-      if (sel && INTERVENTIONS[sel]) ivKey = sel;                       // e.g. 'interv_pulse_check' if keyed that way
-      else if (sel) {
-        var clean = sel.replace('interv_', '');
-        if (INTERVENTIONS[clean]) ivKey = clean;                        // 'interv_anchoring' → 'anchoring'
-      }
-      if (ivKey && typeof setIntervention === 'function') setIntervention(ivKey);
-      else if (typeof setIntervention === 'function' && !currentIntervention) setIntervention('pulse_check');
-      window.activeMenu = 'interventions';
-    } else {
-      if (sel && typeof TECHNIQUES !== 'undefined' && TECHNIQUES[sel] && TECHNIQUES[sel].available
-          && typeof setTechnique === 'function') setTechnique(sel);
-      window.activeMenu = 'techniques';
-    }
-    appState.currentIntervention = typeof currentIntervention !== 'undefined' ? currentIntervention : null;
-    appState.currentTechnique    = typeof currentTechnique    !== 'undefined' ? currentTechnique    : null;
-  } catch (e) {
-    console.warn('[syncStandardGlobals]', e);
-  }
 }
 
 
 
 function goLearn() {
-  if (typeof stopAllSounds === 'function') stopAllSounds();
   appState.agentHistory = [];
   
   const opennessPanel = document.getElementById('openness-panel');
@@ -2419,19 +2361,7 @@ function goLearn() {
         intro = 'Let\'s explore communication techniques. Which one are you interested in practicing today?';
     }
   }
-
-  // ── Standard Web App parity (js/app.js initLearn) ──
-  // Build the EXACT system prompt used by the Standard App and extract its
-  // opener, so Learn mode is pedagogically identical per technique/intervention.
-  // The hardcoded switch above only remains as regex-miss fallback.
-  syncStandardGlobals();
-  var learnSysPrompt = appState.activeMenu === 'interventions'
-    ? PROMPTS.learnIntervention()
-    : PROMPTS.learn();
-  var openerMatch = learnSysPrompt.match(/OPENING MESSAGE \(use this EXACTLY[^)]*\):\n([\s\S]+?)(?:\n\nRespond|\n\nMax|$)/);
-  if (openerMatch) intro = openerMatch[1].trim();
-  appState.currentMode = 'learn';
-
+    
   showScreen('practice');
   setJuanMood('happy');
   setDialog('JUANJOLOTE', intro);
@@ -2441,7 +2371,6 @@ function goLearn() {
 
 
 function goWork() {
-  if (typeof stopAllSounds === 'function') stopAllSounds();
   appState.agentHistory = [];
   
   const opennessPanel = document.getElementById('openness-panel');
@@ -2449,16 +2378,8 @@ function goWork() {
     opennessPanel.setAttribute('visible', 'false');
   }
 
-  // ── Standard Web App parity (js/app.js initWork, submode 'reflect') ──
-  // Work Together uses the Socratic PROMPTS.work() prompt and the same opener.
-  // (The 'urgent' submode has no VR UI yet; appState.workSubmode defaults to
-  // 'reflect' and callGroqLLM() supports 'urgent' via PROMPTS.work_urgent().)
-  appState.workSubmode = appState.workSubmode || 'reflect';
-  syncStandardGlobals();
-  appState.currentMode = 'work';
-  var intro = appState.workSubmode === 'urgent'
-    ? `Okay, we have ${appState.workTimeLimit || 3} minutes. Tell me quickly: who is this person, what happened, and what do you need to handle right now?`
-    : "Tell me about the situation. Who is this person, and what's been going on? Don't filter — just describe it the way you'd tell a colleague.";
+  // Se traduce directamente a inglés natural para el simulador
+  var intro = 'Tell me, what situation are you dealing with with an agent right now?';
   
   showScreen('practice');
   setJuanMood('talking');
@@ -2472,7 +2393,6 @@ function goWork() {
 
 function goPractice(){
 
-  if (typeof stopAllSounds === 'function') stopAllSounds();
   if (!appState.tecnicaSeleccionada || appState.tecnicaSeleccionada.startsWith('level-')) {
     if (appState.ultimaActividad && appState.ultimaActividad.tecnica) {
       appState.tecnicaSeleccionada = appState.ultimaActividad.tecnica;
@@ -2505,16 +2425,7 @@ function goPractice(){
   appState.hingesOpened = [];
   appState.conversationClosed = false;
   
-  // ── Standard Web App parity (js/app.js goBriefing / startPracticeFromBriefing) ──
-  // PROMPTS.avatar() reads the global currentArchetype (archetypes.js) and
-  // sendPractice() appends scenario + intervention context from
-  // currentScenario / currentIntervention. Set them all here.
   if(typeof currentArchetype !== 'undefined') currentArchetype = arch;
-  window.currentScenario = scenario;
-  window.activeMode = 'practice';
-  appState.workSubmode = null;
-  syncStandardGlobals();
-  appState.currentMode = 'practice';
   
   // Actualizamos Avatar y barra de Mood del Estado Global
   updateAgentAvatar(arch);
@@ -2598,44 +2509,37 @@ function updateVRMood(val){
 
 async function callGroqLLM(mode) {
 
-  // ── Standard Web App parity ─────────────────────────────────────
-  // System prompts are now built by the SAME PROMPTS.* generators used by
-  // js/app.js (sendLearn / sendWork / sendPractice), reading the same
-  // globals (currentTechnique / currentIntervention / currentArchetype /
-  // activeMenu) kept in sync by syncStandardGlobals().
   var systemPrompt = '';
 
   if (mode === 'practice') {
 
-    // js/app.js sendPractice(): PROMPTS.avatar(currentLevel) + scenarioContext + interventionContext
-    var scenarioContext = appState.currentScenario
-      ? `\n\nSITUATION: ${appState.currentScenario.text}\nYour visible state: ${appState.currentScenario.agentState}\nYour hidden inner state (never say this directly, but let it color your responses): ${appState.currentScenario.agentHiddenState}`
-      : '';
-
-    var interventionContext = appState.activeMenu === 'interventions' && currentIntervention
-      ? `\n\nINTERVENTION TYPE: This is a ${currentIntervention.label} conversation (Day ${currentIntervention.day}). The person talking to you may be from: ${currentIntervention.ownerLabel}. You do NOT know this is a formal intervention — to you, someone from the company came to talk.`
-      : '';
-
     systemPrompt =
-      PROMPTS.avatar(appState.currentLevel) + scenarioContext + interventionContext +
-      // VR-platform constraint: server TTS (Orpheus) is English-only.
+      PROMPTS.avatar(
+        appState.currentLevel,
+        appState.currentScenario
+      ) +
       "\n\nCRITICAL: You must respond strictly and exclusively in natural English. Even if the user speaks or replies in Spanish, you must ONLY reply in English.";
 
   } else if (mode === 'learn') {
 
-    // js/app.js sendLearn(): PROMPTS.learn() or PROMPTS.learnIntervention()
-    systemPrompt = (appState.activeMenu === 'interventions'
-      ? PROMPTS.learnIntervention()
-      : PROMPTS.learn()) +
-      "\n\nCRITICAL: You must respond strictly and exclusively in natural English. Even if the user speaks or replies in Spanish, you must ONLY reply in English.";
+    systemPrompt =
+      'You are Juanjolote, a warm and direct leadership coach at Centris Neural Academy. ' +
+      'You are teaching about ' +
+      (appState.activeMenu === 'interventions'
+        ? 'retention interventions'
+        : 'communication techniques') +
+      '. Speak strictly in English. Be conversational, maximum 3 sentences. Ask questions. Never lecture. ' +
+      'Connect everything to real-world call center situations. ' +
+      'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
 
   } else if (mode === 'work') {
 
-    // js/app.js sendWork(): PROMPTS.work() (Socratic) or PROMPTS.work_urgent()
-    systemPrompt = (appState.workSubmode === 'urgent'
-      ? PROMPTS.work_urgent()
-      : PROMPTS.work()) +
-      "\n\nCRITICAL: You must respond strictly and exclusively in natural English. Even if the user speaks or replies in Spanish, you must ONLY reply in English.";
+    systemPrompt =
+      'You are Juanjolote, a Socratic coach at Centris Neural Academy. ' +
+      'Your role is to ask questions that help the manager discover their own insights. ' +
+      'NEVER give direct advice. Ask ONLY ONE question at a time. Maximum 2 sentences. ' +
+      'Speak strictly in English. Be warm but direct. ' +
+      'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
   }
 
   var res = await fetch('/api/groq', {
@@ -2648,25 +2552,24 @@ async function callGroqLLM(mode) {
 
     body: JSON.stringify({
 
-      // Standard Web App parity (js/api.js callGroq):
-      // model openai/gpt-oss-120b, max_tokens 300,
-      // temperature 0.82 (learn/practice default), 0.75 (work), 0.7 (hints).
-      model: 'openai/gpt-oss-120b',
+      model: 'qwen/qwen3.6-27b',
 
       messages: [
         {
           role: 'system',
           content: systemPrompt
         },
-        ...appState.agentHistory
+        ...appState.agentHistory.slice(-12)
       ],
 
-      max_tokens: 300,
+      max_tokens: 150,
 
-      temperature:
-        mode === 'work' ? 0.75 :
-        mode === 'learn' ? 0.82 :
-        0.82
+      temperature: 0.88,
+
+      // Evitar razonamiento visible
+      reasoning_effort: 'none',
+
+      reasoning_format: 'hidden'
     })
   });
 
@@ -2697,35 +2600,18 @@ async function callGroqLLM(mode) {
 
 function parseAgentReply(raw){
   var moodMatch=raw.match(/\[MOOD:(\d+)\]/),boxMatch=raw.match(/\[BOX:(in|out)\]/);
-  var triggerMatch=raw.match(/\[TRIGGER:(none|positive|negative)\]/i);
-  var closedMatch=raw.match(/\[CLOSED:(true|false)\]/i);
   var msg=raw.replace(/\[MOOD:\d+\]/g,'').replace(/\[BOX:(in|out)\]/g,'').replace(/\[TRIGGER:\w+\]/g,'').replace(/\[CLOSED:(true|false)\]/g,'').trim();
-  return {
-    msg:msg,
-    newMood:moodMatch?parseInt(moodMatch[1]):appState.vrMood,
-    boxState:boxMatch?boxMatch[1]:appState.boxState,
-    trigger:triggerMatch?triggerMatch[1].toLowerCase():'none',
-    closed:closedMatch?closedMatch[1]==='true':false
-  };
+  return {msg:msg,newMood:moodMatch?parseInt(moodMatch[1]):appState.vrMood,boxState:boxMatch?boxMatch[1]:appState.boxState};
 }
 
 async function handleVRSpeech(text) {
   if (!text.trim()) return;
-  // ── [CLOSED] guard — un agente cerrado no recibe más turnos ──
-  if (appState.currentMode === 'practice' && appState.conversationClosed) {
-    setDialog(appState.currentArchetype.name.toUpperCase(), '(They have shut down. Go to End & reflect.)');
-    setHUD('idle', 'Conversation ended');
-    return;
-  }
-  // ── Standard Web App parity (js/api.js vrMode routing) ──
-  // Route by the explicit current mode instead of inferring from
-  // currentArchetype (which stays set after a practice session ends).
-  var mode = appState.currentMode || (appState.currentArchetype ? 'practice' : 'learn');
+  var mode = appState.currentArchetype ? 'practice' : 'learn';
   appState.agentHistory.push({ role: 'user', content: text });
   
   try {
-    var reply = await callGroqLLM(mode);
-    var parsed = mode === 'practice' ? parseAgentReply(reply) : { msg: reply, newMood: appState.vrMood, boxState: appState.boxState };
+    var reply = await callGroqLLM(mode === 'practice' ? 'practice' : appState.activeMenu ? 'learn' : 'work');
+    var parsed = mode === 'practice' ? parseAgentReply(reply) : { msg: reply, newMood: appState.vrMood, boxState: 'out' };
     appState.agentHistory.push({ role: 'assistant', content: reply });
     
     if (mode === 'practice') {
@@ -2735,30 +2621,6 @@ async function handleVRSpeech(text) {
       else if (parsed.newMood < 30) setAjolinMood('sad');
       else setAjolinMood('talking');
       setDialog(appState.currentArchetype.name.toUpperCase(), parsed.msg);
-
-      // ── [TRIGGER] gameplay feedback (parity con js/app.js sendPractice) ──
-      if (parsed.trigger && parsed.trigger !== 'none') {
-        // Alimentar PROMPTS.eval() con el contexto del trigger
-        appState.hingesOpened.push(
-          parsed.trigger === 'positive' ? 'unexpected positive reaction' : 'unexpected negative reaction'
-        );
-        setHUD(
-          parsed.trigger === 'positive' ? 'ready' : 'rec',
-          parsed.trigger === 'positive'
-            ? 'Something you said landed well'
-            : 'Something hit a nerve'
-        );
-        setTimeout(function(){
-          if (!appState.conversationClosed) setHUD('ready', 'Ready to speak');
-        }, 4000);
-      }
-
-      // ── [CLOSED] estado de conversación cerrada ──
-      if (parsed.closed) {
-        appState.conversationClosed = true;
-        setAjolinMood('sad');
-        setHUD('idle', 'They shut down - conversation ended');
-      }
     } else {
       setJuanMood('talking');
       setDialog('JUANJOLOTE', parsed.msg);
@@ -2781,6 +2643,84 @@ async function handleVRSpeech(text) {
     console.error('[LLM]', e);
     setHUD('ready', 'Error, intenta de nuevo');
   }
+}
+
+
+function guardarSesionDePrueba() {
+  let sessions = JSON.parse(localStorage.getItem('interventions_sessions') || '[]');
+  
+  sessions.unshift({
+    date: new Date().toISOString(),
+    intervention: "Simulación de Retención",
+    technique: "Manejo de Objeciones",
+    level: "novice",
+    archetype: "ajolin",
+    mood_final: 88,
+    eval_summary: "¡Nueva sesión completada con éxito!"
+  });
+  
+  localStorage.setItem('interventions_sessions', JSON.stringify(sessions));
+}
+
+function goHistory() {
+  // console.log("🗣️ Mostrando panel de historial en el espacio VR...");
+  
+  cambiarPantallaVR('screen-history');
+
+  let localSessions = localStorage.getItem('interventions_sessions');
+  let sessions = [];
+
+  if (localSessions) {
+    sessions = JSON.parse(localSessions);
+  } else {
+    sessions = [
+      {
+        date: new Date().toISOString(),
+        intervention: "performance_review", 
+        technique: "active_listening",
+        level: "mid",
+        archetype: "ajolin",
+        mood_final: 75,
+        eval_summary: "Excelente manejo de la objecion del colaborador. Se mantuvo la empatia en todo momento."
+      },
+      {
+        date: new Date(Date.now() - 86400000).toISOString(), 
+        intervention: "disengagement",
+        technique: "growth_mindset",
+        level: "adv",
+        archetype: "juanjolote",
+        mood_final: 42,
+        eval_summary: "Falto profundizar en los motivos de la baja motivacion del agente, usar preguntas abiertas."
+      }
+    ];
+    localStorage.setItem('interventions_sessions', JSON.stringify(sessions));
+  }
+
+  const vrTextComponent = document.getElementById('history-content-text');
+  if (!vrTextComponent) {
+    console.error("⚠️ No se encontró la entidad de texto #history-content-text en la escena VR.");
+    return;
+  }
+
+  if (sessions.length === 0) {
+    vrTextComponent.setAttribute('value', 'No tienes sesiones registradas aun.');
+    return;
+  }
+
+  const textVR = sessions.map(s => {
+    const d = new Date(s.date || Date.now());
+    const date = isNaN(d.getTime()) ? '—' : `${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+    const context = s.intervention ? s.intervention : (s.technique || '—');
+    const level = (s.level || '—').toUpperCase();
+    const agentName = s.archetype ? s.archetype : '—';
+    const mood = s.mood_final || 0;
+    
+    const summary = s.eval_summary ? `\n"${s.eval_summary.substring(0, 55)}..."` : '';
+
+    return `* ${date} | ${context}\n  Nivel: ${level} | Agente: ${agentName} | Mood: ${mood}%\n  ${summary}`;
+  }).join('\n\n');
+
+  vrTextComponent.setAttribute('value', textVR);
 }
 
 
@@ -2846,7 +2786,6 @@ sessionStorage.removeItem("flujo_vr_guardado");
 
 
 window.goHistory = function() {
-  if (typeof stopAllSounds === 'function') stopAllSounds();
   // console.log("🗣️ Mostrando panel de historial en el espacio VR...");
   
   if (typeof cambiarPantallaVR === 'function') {
@@ -2904,137 +2843,159 @@ window.goHistory = function() {
 };
 
 
-// ── Structured eval parser (ported from js/app.js parseEval) ──
-// Extrae las 5 secciones del PROMPTS.eval() del Standard App,
-// con los mismos patrones y valores por defecto.
-function parseEval(raw) {
-  const m1 = raw.match(/1[.)]\s*([\s\S]*?)(?=2[.)]|$)/i);
-  const m2 = raw.match(/2[.)]\s*([\s\S]*?)(?=3[.)]|$)/i);
-  const m3 = raw.match(/3[.)]\s*([\s\S]*?)(?=4[.)]|$)/i);
-  const m4 = raw.match(/4[.)]\s*([\s\S]*?)(?=5[.)]|$)/i);
-  const m5 = raw.match(/5[.)]\s*([\s\S]*?)(?=MOVE:|TECHNIQUE|$)/i);
-  const landedMatch        = raw.match(/WHAT LANDED:?\s*([\s\S]*?)(?=WHAT TO LOOK|ASSUMPTION|EFFECTIVENESS|ONE THING|2[.)]|$)/i);
-  const lookMatch          = raw.match(/WHAT TO LOOK.*?:?\s*([\s\S]*?)(?=ASSUMPTION|EFFECTIVENESS|ONE THING|3[.)]|$)/i);
-  const assumptionMatch    = raw.match(/ASSUMPTION CHECK:?\s*([\s\S]*?)(?=EFFECTIVENESS|ONE THING|4[.)]|$)/i);
-  const effectivenessMatch = raw.match(/EFFECTIVENESS:?\s*([\s\S]*?)(?=ONE THING|5[.)]|MOVE:|TECHNIQUE|$)/i);
-  const carryMatch         = raw.match(/ONE THING.*?:?\s*([\s\S]*?)(?=MOVE:|TECHNIQUE|$)/i);
-  return {
-    landed:        ((m1?.[1] || landedMatch?.[1]        || '') + '').replace(/^WHAT LANDED:?\s*/i,'').trim(),
-    look:          ((m2?.[1] || lookMatch?.[1]           || '') + '').replace(/^WHAT TO LOOK.*?:?\s*/i,'').trim(),
-    assumption:    ((m3?.[1] || assumptionMatch?.[1]     || '') + '').replace(/^ASSUMPTION CHECK:?\s*/i,'').trim(),
-    effectiveness: ((m4?.[1] || effectivenessMatch?.[1]  || '') + '').replace(/^EFFECTIVENESS:?\s*/i,'').trim(),
-    carry:         ((m5?.[1] || carryMatch?.[1]          || '') + '').replace(/^ONE THING.*?:?\s*/i,'').trim()
-  };
-}
-
 async function goEval() {
 
-  if (typeof stopAllSounds === 'function') stopAllSounds();
   showScreen('eval');
 
   var evalMoodEl = document.getElementById('eval-mood');
-  if (evalMoodEl) {
-    evalMoodEl.setAttribute('text', 'value', appState.vrMood + '%');
-  }
 
-  var feedbackEl = document.getElementById('eval-feedback');
-  if (feedbackEl) feedbackEl.setAttribute('text', 'value', 'Analyzing conversation...');
+  if (evalMoodEl) {
+    evalMoodEl.setAttribute(
+      'text',
+      'value',
+      appState.vrMood + '%'
+    );
+  }
 
   setJuanMood('talking');
 
-  // ── Standard Web App parity (js/app.js goEval) ──
-  // Mismo PROMPTS.eval(), mismo formato de transcript, temperature 0.4
-  // y modelo openai/gpt-oss-120b (igual que callGroqLLM()).
-  if (typeof syncStandardGlobals === 'function') syncStandardGlobals();
-
-  var agentFirstName = ((appState.currentArchetype && appState.currentArchetype.name) || 'Agent').split(' ')[0].toUpperCase();
-  var transcript = appState.agentHistory
-    .map(function(m){ return (m.role === 'user' ? 'YOU' : agentFirstName) + ': ' + m.content; })
-    .join('\n');
-
-  var interventionLabel = (appState.activeMenu === 'interventions' && typeof currentIntervention !== 'undefined' && currentIntervention)
-    ? currentIntervention.label
-    : null;
-
-  var evalPrompt = PROMPTS.eval(
-    (appState.currentScenario && appState.currentScenario.text) || 'Standard scenario',
-    (appState.currentScenario && appState.currentScenario.agentState) || 'guarded',
-    (appState.currentScenario && appState.currentScenario.agentHiddenState) || 'unknown',
-    appState.preAssumption || '(none)',
-    appState.vrMood,
-    appState.boxState,
-    appState.conversationClosed,
-    appState.hingesOpened || [],
-    appState.currentLevel,
-    interventionLabel
-  );
+  var evalText =
+    'Analyze this practice conversation. ' +
+    'Agent: ' +
+    ((appState.currentArchetype &&
+      appState.currentArchetype.name) || 'Agent') +
+    ' (' +
+    ((appState.currentArchetype &&
+      appState.currentArchetype.trait) || '') +
+    '). ' +
+    'Final mood: ' +
+    appState.vrMood +
+    '/100. ' +
+    'History: ' +
+    appState.agentHistory.length +
+    ' turns. ' +
+    'Give feedback in 3 concrete points in English, maximum 4 sentences total. ' +
+    'Be direct and specific. Do not use generic coaching language. ' +
+    'Return ONLY the final feedback. Do not show analysis, reasoning, thinking, or explanations of your process.';
 
   try {
 
     var res = await fetch('/api/groq', {
+
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+
+      headers: {
+        'Content-Type': 'application/json'
+      },
+
       body: JSON.stringify({
-        model: 'openai/gpt-oss-120b',
+
+        model: 'qwen/qwen3.6-27b',
+
         messages: [
-          { role: 'system', content: evalPrompt },
-          { role: 'user', content: 'Transcript:\n' + transcript + '\n\nAnalyze this session.' }
+
+          {
+            role: 'system',
+
+            content:
+              'You are Juanjolote, a direct and honest coach. ' +
+              'Evaluate leadership practice conversations. ' +
+              'English. Concrete. No formalities. ' +
+              'Return ONLY the final answer for the user. ' +
+              'Do NOT reveal reasoning, analysis, chain of thought, thinking process, or internal deliberation.'
+          },
+
+          {
+            role: 'user',
+            content: evalText
+          },
+
+          ...appState.agentHistory.slice(-8)
         ],
-        temperature: 0.4,
-        max_tokens: 300
+
+        max_tokens: 200,
+
+        temperature: 0.7,
+
+        // Evitar razonamiento
+        reasoning_effort: 'none',
+
+        reasoning_format: 'hidden'
       })
     });
 
     var data = await res.json();
+
     if (data.error) {
-      console.error('[Groq Eval Error]', data.error);
+      console.error('[Groq Error]', data.error);
       throw new Error(data.error.message || 'Groq API error');
     }
 
-    var raw = data.choices?.[0]?.message?.content || '';
-    console.log('[Groq Eval raw response]', raw);
+    var feedback =
+      data.choices?.[0]?.message?.content || '';
 
-    // Por seguridad, quitar bloques de razonamiento si aparecen
-    // (regex construido por concatenación para no emitir la etiqueta cruda)
-    var thinkRe = new RegExp('<th' + 'ink>[\\s\\S]*?<\\/think>', 'gi');
-    raw = raw.replace(thinkRe, '').trim();
-    if (!raw) throw new Error('Empty evaluation response');
+    console.log('[Groq Eval raw response]', feedback);
 
-    // Mismo parser estructurado del Standard App — 5 secciones
-    var sections = parseEval(raw);
+    // Por seguridad, quitar <think> si aparece
+    feedback = feedback
+      .replace(/<think>[\s\S]*?<\/think>/gi, '')
+      .trim();
 
-    var displayText = [
-      'WHAT LANDED',
-      sections.landed || '—',
-      '',
-      'WHAT TO LOOK AT',
-      sections.look || '—',
-      '',
-      'ASSUMPTION CHECK',
-      sections.assumption || '—',
-      '',
-      'EFFECTIVENESS',
-      sections.effectiveness || '—',
-      '',
-      'ONE THING TO CARRY FORWARD',
-      sections.carry || '—'
-    ].join('\n');
+    if (!feedback) {
+      feedback = 'Session completed.';
+    }
 
-    if (feedbackEl) feedbackEl.setAttribute('text', 'value', displayText);
+    var feedbackEl =
+      document.getElementById('eval-feedback');
 
-    // TTS: resumen hablado limpio (no las 5 secciones completas)
-    var spoken =
-      'Session complete. Final openness ' + appState.vrMood + ' percent. ' +
-      (sections.landed ? 'What landed: ' + sections.landed + ' ' : '') +
-      (sections.carry ? 'One thing to carry forward: ' + sections.carry : '');
-    spoken = spoken.replace(/\s+/g, ' ').trim() || 'Session completed.';
-    speakVR(spoken, getVoice('juan'));
+    if (feedbackEl) {
+      feedbackEl.setAttribute(
+        'text',
+        'value',
+        feedback
+      );
+    }
+
+    speakVR(
+      feedback,
+      getVoice('juan')
+    );
 
   } catch (e) {
+
     console.error('[Evaluation Error]', e);
-    if (feedbackEl) feedbackEl.setAttribute('text', 'value', 'Session completed. Great job.');
+
+    var feedbackEl2 =
+      document.getElementById('eval-feedback');
+
+    if (feedbackEl2) {
+      feedbackEl2.setAttribute(
+        'text',
+        'value',
+        'Session completed. Great job.'
+      );
+    }
   }
 }
+
+
+async function translateToEnglish(text) {
+  const res = await fetch('/api/groq_speakvr', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      type: 'translate',
+      text: text
+    })
+  });
+
+  const data = await res.json();
+
+  return data.translation || text;
+}
+
 function getVoice(character) {
 
   return {
@@ -3048,160 +3009,43 @@ async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
   // ❌ ELIMINA O COMENTA ESTA LÍNEA (Ya no necesitas traducir un texto que ya viene en inglés):
   // const englishText = await translateToEnglish(text);
 
-  // pedir audio — con timeout de 15s (AbortController) para que una red
-  // lenta o colgada del headset no deje el HUD en "thinking" para siempre.
-  const ttsController = new AbortController();
-  const ttsTimeoutId = setTimeout(function(){ ttsController.abort(); }, 15000);
+  // pedir audio
+  const speechResponse = await fetch('/api/groq_speakvr', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      type: 'speech',
+      text: text, //  <-- CAMBIA 'englishText' por 'text' para usar el texto original directo
+      voice: voice
+    })
+  });
 
-  let speechResponse, blob;
-  try {
-    speechResponse = await fetch('/api/groq_speakvr', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        type: 'speech',
-        text: text, //  <-- CAMBIA 'englishText' por 'text' para usar el texto original directo
-        voice: voice
-      }),
-      signal: ttsController.signal
-    });
-
-    if (!speechResponse.ok) {
-      const err = await speechResponse.text();
-      console.error("TTS ERROR:", err);
-      if (callback) callback();
-      return;
-    }
-
-    blob = await speechResponse.blob();
-  } catch (ttsError) {
-    console.error("TTS ERROR:", ttsError && ttsError.name, '-', ttsError && ttsError.message);
-    if (callback) callback();
+  if (!speechResponse.ok) {
+    const err = await speechResponse.text();
+    console.error("TTS ERROR:", err);
     return;
-  } finally {
-    clearTimeout(ttsTimeoutId);
   }
 
+  const blob = await speechResponse.blob();
   const url = URL.createObjectURL(blob);
   const audio = new Audio(url);
 
-  // ── Registro en el audio guard global ──
-  // Permite que stopAllSounds() pause, resetee y libere este audio al
-  // instante cuando cambia la pantalla.
-  vrActiveAudios.push({ el: audio, url: url });
-  var unregisterAudio = function(){
-    var idx = vrActiveAudios.findIndex(function(a){ return a.el === audio; });
-    if (idx > -1) vrActiveAudios.splice(idx, 1);
-  };
-
   audio.onended = () => {
-    unregisterAudio();
     URL.revokeObjectURL(url);
     if (callback) {
       callback();
     }
   };
 
-  audio.onerror = () => {
-    unregisterAudio();
-    URL.revokeObjectURL(url);
-  };
-
   await audio.play();
-}
-
-// ─── GLOBAL AUDIO GUARD ───────────────────
-// Registro central de todo audio dinámico (TTS de speakVR, sonidos UI vía
-// Web Audio API) para poder detenerlo al instante en cada cambio de pantalla.
-let vrActiveAudios = [];    // elementos <audio> dinámicos creados por speakVR()
-let vrWebAudioSources = []; // BufferSourceNode / MediaElementSourceNode activos
-
-function stopAllSounds(){
-  try {
-    // 1) Audios dinámicos de TTS creados por speakVR()
-    vrActiveAudios.forEach(function(entry){
-      try {
-        if (entry.el) {
-          entry.el.pause();
-          try { entry.el.currentTime = 0; } catch (e2) {}
-          entry.el.onended = null;
-          entry.el.onerror = null;
-        }
-        if (entry.url && entry.url.indexOf('blob:') === 0) URL.revokeObjectURL(entry.url);
-      } catch (e1) {}
-    });
-    vrActiveAudios.length = 0;
-
-    // 2) Cualquier otro elemento <audio>/<video> presente en el DOM
-    document.querySelectorAll('audio, video').forEach(function(m){
-      try { m.pause(); try { m.currentTime = 0; } catch (e2) {} } catch (e1) {}
-    });
-
-    // 3) Componentes de sonido de A-Frame (audio ambiental / posicional)
-    document.querySelectorAll('[sound]').forEach(function(el){
-      try {
-        if (el.components && el.components.sound && el.components.sound.stop) {
-          el.components.sound.stop();
-        }
-      } catch (e1) {}
-    });
-
-    // 4) SpeechSynthesis (TTS del navegador)
-    if ('speechSynthesis' in window) {
-      try { window.speechSynthesis.cancel(); } catch (e1) {}
-    }
-
-    // 5) Sources de Web Audio API (buffers/sources de TTS o sonidos UI)
-    //    NOTA: el AudioContext del micrófono (analyser) NO se toca.
-    vrWebAudioSources.forEach(function(s){
-      try { if (s.stop) s.stop(); if (s.disconnect) s.disconnect(); } catch (e1) {}
-    });
-    vrWebAudioSources.length = 0;
-
-    // 6) Cancelar una grabación en curso: navegar a mitad de turno no debe
-    // convertir ruido de fondo en un turno fantasma para el LLM.
-    if (isRecording && mediaRecorder) {
-      isRecording = false;
-      if (recordingTimer) { clearTimeout(recordingTimer); recordingTimer = null; }
-      recordingStartedAt = 0;
-      mediaRecorder.onstop = null;
-      mediaRecorder.ondataavailable = null;
-      mediaRecorder.onerror = null;
-      try { mediaRecorder.stop(); } catch (e2) {}
-      mediaRecorder = null;
-      audioChunks = [];
-      var mb = document.getElementById('mic-btn');
-      if (mb) mb.classList.remove('recording');
-    }
-  } catch (e) {
-    console.warn('[Audio] stopAllSounds error:', e);
-  }
-}
-
-// ── Sleep/wake guard: vigilar las pistas del micrófono ──
-// Quest Browser suspende/mutea el stream al dormir el headset; marcamos el
-// stream como no fiable para que startRecording() lo re-solicite solo.
-function markMicStreamStale(reason){
-  console.warn('[Mic] Stream de micrófono no fiable:', reason);
-  micStreamStale = true;
-}
-
-function watchMicTracks(stream){
-  if (!stream || !stream.getAudioTracks) return;
-  stream.getAudioTracks().forEach(function(track){
-    track.onended  = function(){ markMicStreamStale('track ended'); };
-    track.onmute   = function(){ markMicStreamStale('track muted'); };
-    track.onunmute = function(){ micStreamStale = false; };
-  });
 }
 
 async function setupMic(){
   try{
     // console.log('[Mic] Solicitando permisos de micrófono...');
     audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
-    watchMicTracks(audioStream);
     // console.log('[Mic] Permisos concedidos. Stream obtenido:', audioStream.id);
     
     audioContext=new (window.AudioContext||window.webkitAudioContext)();
@@ -3218,94 +3062,20 @@ async function setupMic(){
   }
 }
 
-// Resets the recording UI/state after a failed start (prevents a stuck
-// "recording" button or a silently blocked next attempt).
-function resetRecordingUI(hudMessage){
-  isRecording=false;
-  if(recordingTimer){ clearTimeout(recordingTimer); recordingTimer=null; }
-  if(silenceTimer){ cancelAnimationFrame(silenceTimer); silenceTimer=null; }
-  mediaRecorder=null;
-  audioChunks=[];
-  recordingStartedAt=0;
-  var btn=document.getElementById('mic-btn');
-  if(btn)btn.classList.remove('recording');
-  setHUD('ready', hudMessage || 'Ready to speak');
-}
-
-async function startRecording(){
+function startRecording(){
   //  console.log('[Grabación] Intento de iniciar grabación. Estado actual -> isRecording:', isRecording, 'isProcessing:', isProcessing, 'hasAudioStream:', !!audioStream);
-  if(isRecording||isProcessing) return;
-
-  // ── [CLOSED] guard: no se puede grabar en una conversación cerrada ──
-  if (appState.currentMode === 'practice' && appState.conversationClosed) {
-    setHUD('idle', 'Conversation ended - go to evaluation');
-    return;
-  }
+  if(isRecording||isProcessing||!audioStream) return;
   
   if (audioContext && audioContext.state === 'suspended') {
     // console.log('[Mic] AudioContext suspendido. Intentando reactivar...');
     audioContext.resume();
   }
 
-  // ── Stream validation & permission guard ───────────────────
-  // MediaRecorder.start() throws NotSupportedError si el stream está
-  // cerrado/terminado o no tiene pistas de audio vivas. Si el permiso
-  // nunca se otorgó o el stream murió, re-solicitarlo aquí.
-  var streamUsable = !micStreamStale && audioStream
-    && audioStream.active
-    && audioStream.getAudioTracks().some(function(t){ return t.readyState==='live'; });
-
-  if (!streamUsable) {
-    try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('getUserMedia unavailable (requires HTTPS / supported browser).');
-      }
-      console.warn('[Grabación] Stream de audio inactivo o sin permiso. Re-solicitando micrófono...');
-      audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      micStreamStale = false;
-      watchMicTracks(audioStream);
-      // Reconectar el analizador de volumen al nuevo stream (silence detection).
-      if (audioContext && analyser) {
-        audioContext.createMediaStreamSource(audioStream).connect(analyser);
-      }
-      setHUD('ready','Ready to speak');
-    } catch (permError) {
-      console.warn('[Grabación] Micrófono no disponible:', permError && (permError.name || permError.message));
-      isRecording=false;
-      setHUD('idle','Microphone unavailable - check permissions');
-      return;
-    }
-  }
-
   audioChunks=[]; isRecording=true;
-
-  // ── MIME type fallback ─────────────────────────────────────
-  // Nunca hardcodear un solo contenedor: elegir dinámicamente el primero
-  // que el navegador soporte realmente (Safari/iOS solo acepta mp4/aac).
-  const mimeType = [
-    'audio/webm;codecs=opus',
-    'audio/webm',
-    'audio/ogg;codecs=opus',
-    'audio/mp4',
-    'audio/aac'
-  ].find(type => MediaRecorder.isTypeSupported(type)) || '';
-
-  const options = mimeType ? { mimeType } : {};
-  console.log('[Grabación] Usando formato MIME:', mimeType || 'browser default');
+  var mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
+  console.log('[Grabación] Usando formato MIME:', mime);
   
-  try {
-    mediaRecorder = new MediaRecorder(audioStream, options);
-  } catch (ctorError) {
-    // Algunos navegadores rechazan las opciones incluso tras isTypeSupported():
-    // reintentar una vez con el formato por defecto del navegador.
-    console.warn('[Grabación] MediaRecorder rechazó el MIME type, reintentando con el formato por defecto del navegador:', ctorError.message);
-    try {
-      mediaRecorder = new MediaRecorder(audioStream);
-    } catch (fatalCtorError) {
-      resetRecordingUI('Recording not supported in this browser');
-      return;
-    }
-  }
+  mediaRecorder=new MediaRecorder(audioStream,{mimeType:mime});
   
   mediaRecorder.ondataavailable=function(e){
     if(e.data.size>0){
@@ -3317,37 +3087,11 @@ async function startRecording(){
   };
   
   mediaRecorder.onstop=onRecordingStop;
-  mediaRecorder.onerror=function(ev){
-    console.warn('[Grabación] Error durante la grabación:', ev && ev.error && ev.error.name);
-    resetRecordingUI('Recording error - try again');
-  };
-
-  // ── Guarded start ──────────────────────────────────────────
-  // Si .start() aún así falla, registrar un aviso útil y resetear el
-  // estado de grabación en lugar de dejar una excepción sin capturar.
-  try {
-    mediaRecorder.start();
-  } catch (startError) {
-    console.warn(
-      '[Grabación] mediaRecorder.start() falló:',
-      startError.name + ' - ' + startError.message,
-      '| stream.active =', audioStream && audioStream.active,
-      '| tracks =', audioStream ? audioStream.getAudioTracks().map(function(t){ return t.readyState; }).join(',') : 'none'
-    );
-    resetRecordingUI("Couldn't start recording - try again");
-    return;
-  }
-
-  recordingStartedAt=Date.now();   // para el guard de duración mínima en onRecordingStop()
-
+  mediaRecorder.start();
   setHUD('rec','Recording...');
   var btn=document.getElementById('mic-btn'); if(btn)btn.classList.add('recording');
   
-  // ── Auto-stop de 25s: guardar el handle y limpiar el anterior para que
-  // un timer huérfano de una grabación previa no corte la nueva ──
-  if (recordingTimer) clearTimeout(recordingTimer);
-  recordingTimer=setTimeout(function(){
-    recordingTimer=null;
+  setTimeout(function(){
     if(isRecording){
       // console.log('[Grabación] Límite de 25 segundos alcanzado. Forzando parada.');
       stopRecording();
@@ -3359,7 +3103,6 @@ function stopRecording(){
    // console.log('[Grabación] stopRecording invocado. ¿Registrando?:', isRecording);
   if(!isRecording||!mediaRecorder)return;
   isRecording=false;
-  if(recordingTimer){ clearTimeout(recordingTimer); recordingTimer=null; }
   if(silenceTimer){
     // console.log('[Grabación] Limpiando temporizador de silencio.');
     cancelAnimationFrame(silenceTimer);
@@ -3370,34 +3113,42 @@ function stopRecording(){
   setHUD('thinking','Processing...');
 }
 
-// ── Filtro de transcripciones inútiles (ruido / interjecciones) ──
-// Devuelve true si el texto no aporta nada a la conversación: vacío,
-// solo puntuación/símbolos, o una sola interjección ("Ah", "Ahhh", "Um"...)
-function isNoiseTranscript(text){
-  if (!text) return true;
-  // Anotaciones no-verbales de Whisper: [inaudible], (ruido de fondo), [BLANK_AUDIO]
-  var stripped = text.replace(/[\[\(][^\]\)]*[\]\)]/g, ' ');
-  var words = stripped.toLowerCase().replace(/[^a-záéíóúüñ0-9\s]/g, ' ').split(/\s+/).filter(function(w){ return w.length > 0; });
-  if (words.length === 0) return true;                                          // puntuación/símbolos solamente
-  if (words.length === 1 && NOISE_WORDS.indexOf(words[0]) !== -1) return true;  // una sola interjección
-  return false;
+function startSilenceDetection(){
+  var data=new Uint8Array(analyser.frequencyBinCount),silenceMs=0,lastTime=performance.now();
+  // console.log('[Silencio] Detección iniciada. Umbral (SILENCE_THRESHOLD):', typeof SILENCE_THRESHOLD !== 'undefined' ? SILENCE_THRESHOLD : 'No definido');
+  
+  function check(){
+    if(!isRecording) return;
+    analyser.getByteFrequencyData(data);
+    var avg=data.reduce(function(a,b){return a+b;},0)/data.length;
+    var now=performance.now(),dt=now-lastTime; lastTime=now;
+    
+    // console.log('[Silencio] Volumen promedio actual:', avg);
+    
+    if(avg<SILENCE_THRESHOLD){
+      silenceMs+=dt;
+      if(silenceMs>=SILENCE_DURATION){
+        console.log(`[Silencio] Silencio detectado por ${silenceMs}ms (Límite: ${SILENCE_DURATION}ms). Deteniendo grabación automáticamente.`);
+        stopRecording();
+        return;
+      }
+    } else {
+      if(silenceMs > 0) console.log('[Silencio] Ruido detectado, reseteando contador de silencio. Volumen:', avg);
+      silenceMs=0;
+    }
+    silenceTimer=requestAnimationFrame(check);
+  }
+  check();
 }
-var NOISE_WORDS = ['ah','ahh','ahhh','ahhhh','eh','em','emm','um','umm','uh','uhh','uhm','uhmm','hmm','hm','mmm','mm','mhm','huh','ooh','ohh','shh','psst','tsk','pfft'];
 
 async function onRecordingStop(){
   // console.log('[Recording] MediaRecorder has stopped. Assembling Blob...');
-  // Etiquetar el Blob con el contenedor realmente grabado (Safari → audio/mp4).
-  var blob = new Blob(audioChunks, { type: (mediaRecorder && mediaRecorder.mimeType) || 'audio/webm' });
+  var blob = new Blob(audioChunks, { type: 'audio/webm' });
   // console.log('[Recording] Generated audio file -> Total size:', blob.size, 'bytes');
   
-  // ── Minimum audio guard: no enviar clips diminutos a Whisper ──
-  // Whisper alucina ("Ahhh!", "Yeah", interjecciones aleatorias) con clips de
-  // menos de ~1s. Exigir duración y tamaño mínimos antes de gastar un turno.
-  var durationMs = recordingStartedAt ? (Date.now() - recordingStartedAt) : 0;
-  recordingStartedAt = 0;
-  if (durationMs < 900 || blob.size < 5120) {
-    console.warn('[Recording] Clip descartado por demasiado corto: ' + durationMs + 'ms, ' + blob.size + ' bytes');
-    setHUD('ready', "Speak a bit longer, please");
+  if (blob.size < 800) {
+    // console.error('[Recording] The audio file is TOO SMALL (under 800 bytes). Canceling upload.');
+    setHUD('ready', "I didn't hear you, please try again");
     return;
   }
   
@@ -3410,14 +3161,6 @@ async function onRecordingStop(){
     if (!text || text.trim().length < 2) {
       console.warn('[Whisper] Transcription returned empty or too short.');
       setHUD('ready', "I didn't understand, please try again");
-      isProcessing = false;
-      return;
-    }
-
-    // ── Filtro anti-alucinación: no gastar un turno de LLM en ruido ──
-    if (isNoiseTranscript(text)) {
-      console.warn('[Whisper] Transcripción descartada (vacía/ruido/interjección):', JSON.stringify(text));
-      setHUD('ready', "I didn't catch that - please try again");
       isProcessing = false;
       return;
     }
