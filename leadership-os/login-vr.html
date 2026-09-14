@@ -279,12 +279,40 @@ function showStatus(msg, color) {
 }
 
 // ── LOGIN ─────────────────────────────────
-async function doLogin() {
-  const gameId = document.getElementById('input-gameid').value.trim().toUpperCase();
-  const pass   = document.getElementById('input-pass').value.trim();
+// TODO: Restore DB Auth when server is back.
+// The backend DB/auth server (Supabase) is currently disconnected, so the
+// real authentication fetch below is commented out (NOT deleted).
+// MOCK BYPASS: any login attempt — even with empty/dummy credentials —
+// seeds a mock session and goes straight to world.html.
+// Set BYPASS_AUTH = false to re-enable the real DB auth flow.
+const BYPASS_AUTH      = true;              // TODO: set to false when server is back
+const DEFAULT_GAME_ID  = 'CM.DEMO';         // used when the Game ID field is empty
 
-  if (!gameId) { showStatus('Ingresa tu Game ID');    document.getElementById('input-gameid').focus(); return; }
-  if (!pass)   { showStatus('Ingresa tu contraseña'); document.getElementById('input-pass').focus();   return; }
+// ── MOCK SESSION SEEDER (DB-offline fallback) ──
+// world.html expects these localStorage keys (its token guard at the top of
+// the file and its greeting logic read them). Seed dummy values so nothing
+// blocks or throws with missing token/user session data.
+function seedMockSession(gameId) {
+  try {
+    localStorage.setItem('ldr_session_token', 'mock_token_'   + Date.now());
+    localStorage.setItem('ldr_refresh_token', 'mock_refresh_' + Date.now());
+    localStorage.setItem('ldr_game_id',       gameId || DEFAULT_GAME_ID);
+    if (!localStorage.getItem('ldr_uid'))
+      localStorage.setItem('ldr_uid', 'user_mock_' + Math.random().toString(36).slice(2, 11));
+  } catch (e) {
+    console.warn('[BYPASS] Could not seed mock session:', e);
+  }
+}
+
+async function doLogin() {
+  let  gameId = document.getElementById('input-gameid').value.trim().toUpperCase();
+  const pass  = document.getElementById('input-pass').value.trim();
+
+  // TODO: Restore DB Auth when server is back.
+  // Original credential validation (bypassed so empty/dummy credentials work):
+  // if (!gameId) { showStatus('Ingresa tu Game ID');    document.getElementById('input-gameid').focus(); return; }
+  // if (!pass)   { showStatus('Ingresa tu contraseña'); document.getElementById('input-pass').focus();   return; }
+  if (!gameId) gameId = DEFAULT_GAME_ID; // mock bypass: accept empty credentials
 
   // Deshabilitar botón mientras procesa
   const btn = document.getElementById('btn-login');
@@ -292,6 +320,20 @@ async function doLogin() {
   btn.textContent = 'Verificando…';
   showStatus('Conectando…', '#00e5a0');
 
+  // ── MOCK BYPASS (DB offline) ─────────────
+  // TODO: Restore DB Auth when server is back — remove/flip BYPASS_AUTH.
+  if (BYPASS_AUTH) {
+    seedMockSession(gameId);
+    showStatus('¡Bienvenido ' + gameId + '! (Modo sin BD)', '#00e5a0');
+    btn.textContent = '✓ Entrando…';
+    btn.style.background = '#00e5a0';
+    btn.style.color = '#0d1628';
+
+    setTimeout(() => { window.location.href = 'world.html'; }, 900);
+    return;
+  }
+
+  /* TODO: Restore DB Auth when server is back.
   try {
     const email = gameId + '@leadershipos.app';
     const res   = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`, {
@@ -325,6 +367,7 @@ async function doLogin() {
     btn.disabled = false;
     btn.textContent = 'INGRESAR →';
   }
+  TODO: Restore DB Auth when server is back. */
 }
 </script>
 </body>
