@@ -73,6 +73,8 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 
 function cambiarPantallaVR(pantallaMostrarId) {
+  // ── Audio guard: detener TODO audio en curso al cambiar de pantalla ──
+  if (typeof stopAllSounds === 'function') stopAllSounds();
   // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
 const entornoUniversal = document.getElementById('entorno-universal');
   if (entornoUniversal) {
@@ -2260,6 +2262,7 @@ function showScreen(name) {
 
 function goWelcome(){
 
+  if (typeof stopAllSounds === 'function') stopAllSounds();
   showScreen('welcome');
   appState.agentHistory=[];
   appState.vrMood=30;
@@ -2313,6 +2316,7 @@ function syncStandardGlobals(){
 
 
 function goLearn() {
+  if (typeof stopAllSounds === 'function') stopAllSounds();
   appState.agentHistory = [];
   
   const opennessPanel = document.getElementById('openness-panel');
@@ -2417,6 +2421,7 @@ function goLearn() {
 
 
 function goWork() {
+  if (typeof stopAllSounds === 'function') stopAllSounds();
   appState.agentHistory = [];
   
   const opennessPanel = document.getElementById('openness-panel');
@@ -2447,6 +2452,7 @@ function goWork() {
 
 function goPractice(){
 
+  if (typeof stopAllSounds === 'function') stopAllSounds();
   if (!appState.tecnicaSeleccionada || appState.tecnicaSeleccionada.startsWith('level-')) {
     if (appState.ultimaActividad && appState.ultimaActividad.tecnica) {
       appState.tecnicaSeleccionada = appState.ultimaActividad.tecnica;
@@ -2671,12 +2677,26 @@ async function callGroqLLM(mode) {
 
 function parseAgentReply(raw){
   var moodMatch=raw.match(/\[MOOD:(\d+)\]/),boxMatch=raw.match(/\[BOX:(in|out)\]/);
+  var triggerMatch=raw.match(/\[TRIGGER:(none|positive|negative)\]/i);
+  var closedMatch=raw.match(/\[CLOSED:(true|false)\]/i);
   var msg=raw.replace(/\[MOOD:\d+\]/g,'').replace(/\[BOX:(in|out)\]/g,'').replace(/\[TRIGGER:\w+\]/g,'').replace(/\[CLOSED:(true|false)\]/g,'').trim();
-  return {msg:msg,newMood:moodMatch?parseInt(moodMatch[1]):appState.vrMood,boxState:boxMatch?boxMatch[1]:appState.boxState};
+  return {
+    msg:msg,
+    newMood:moodMatch?parseInt(moodMatch[1]):appState.vrMood,
+    boxState:boxMatch?boxMatch[1]:appState.boxState,
+    trigger:triggerMatch?triggerMatch[1].toLowerCase():'none',
+    closed:closedMatch?closedMatch[1]==='true':false
+  };
 }
 
 async function handleVRSpeech(text) {
   if (!text.trim()) return;
+  // ── [CLOSED] guard — un agente cerrado no recibe más turnos ──
+  if (appState.currentMode === 'practice' && appState.conversationClosed) {
+    setDialog(appState.currentArchetype.name.toUpperCase(), '(They have shut down. Go to End & reflect.)');
+    setHUD('idle', 'Conversation ended');
+    return;
+  }
   // ── Standard Web App parity (js/api.js vrMode routing) ──
   // Route by the explicit current mode instead of inferring from
   // currentArchetype (which stays set after a practice session ends).
@@ -2695,6 +2715,30 @@ async function handleVRSpeech(text) {
       else if (parsed.newMood < 30) setAjolinMood('sad');
       else setAjolinMood('talking');
       setDialog(appState.currentArchetype.name.toUpperCase(), parsed.msg);
+
+      // ── [TRIGGER] gameplay feedback (parity con js/app.js sendPractice) ──
+      if (parsed.trigger && parsed.trigger !== 'none') {
+        // Alimentar PROMPTS.eval() con el contexto del trigger
+        appState.hingesOpened.push(
+          parsed.trigger === 'positive' ? 'unexpected positive reaction' : 'unexpected negative reaction'
+        );
+        setHUD(
+          parsed.trigger === 'positive' ? 'ready' : 'rec',
+          parsed.trigger === 'positive'
+            ? 'Something you said landed well'
+            : 'Something hit a nerve'
+        );
+        setTimeout(function(){
+          if (!appState.conversationClosed) setHUD('ready', 'Ready to speak');
+        }, 4000);
+      }
+
+      // ── [CLOSED] estado de conversación cerrada ──
+      if (parsed.closed) {
+        appState.conversationClosed = true;
+        setAjolinMood('sad');
+        setHUD('idle', 'They shut down - conversation ended');
+      }
     } else {
       setJuanMood('talking');
       setDialog('JUANJOLOTE', parsed.msg);
@@ -2860,6 +2904,7 @@ sessionStorage.removeItem("flujo_vr_guardado");
 
 
 window.goHistory = function() {
+  if (typeof stopAllSounds === 'function') stopAllSounds();
   // console.log("🗣️ Mostrando panel de historial en el espacio VR...");
   
   if (typeof cambiarPantallaVR === 'function') {
@@ -2917,142 +2962,137 @@ window.goHistory = function() {
 };
 
 
+// ── Structured eval parser (ported from js/app.js parseEval) ──
+// Extrae las 5 secciones del PROMPTS.eval() del Standard App,
+// con los mismos patrones y valores por defecto.
+function parseEval(raw) {
+  const m1 = raw.match(/1[.)]\s*([\s\S]*?)(?=2[.)]|$)/i);
+  const m2 = raw.match(/2[.)]\s*([\s\S]*?)(?=3[.)]|$)/i);
+  const m3 = raw.match(/3[.)]\s*([\s\S]*?)(?=4[.)]|$)/i);
+  const m4 = raw.match(/4[.)]\s*([\s\S]*?)(?=5[.)]|$)/i);
+  const m5 = raw.match(/5[.)]\s*([\s\S]*?)(?=MOVE:|TECHNIQUE|$)/i);
+  const landedMatch        = raw.match(/WHAT LANDED:?\s*([\s\S]*?)(?=WHAT TO LOOK|ASSUMPTION|EFFECTIVENESS|ONE THING|2[.)]|$)/i);
+  const lookMatch          = raw.match(/WHAT TO LOOK.*?:?\s*([\s\S]*?)(?=ASSUMPTION|EFFECTIVENESS|ONE THING|3[.)]|$)/i);
+  const assumptionMatch    = raw.match(/ASSUMPTION CHECK:?\s*([\s\S]*?)(?=EFFECTIVENESS|ONE THING|4[.)]|$)/i);
+  const effectivenessMatch = raw.match(/EFFECTIVENESS:?\s*([\s\S]*?)(?=ONE THING|5[.)]|MOVE:|TECHNIQUE|$)/i);
+  const carryMatch         = raw.match(/ONE THING.*?:?\s*([\s\S]*?)(?=MOVE:|TECHNIQUE|$)/i);
+  return {
+    landed:        ((m1?.[1] || landedMatch?.[1]        || '') + '').replace(/^WHAT LANDED:?\s*/i,'').trim(),
+    look:          ((m2?.[1] || lookMatch?.[1]           || '') + '').replace(/^WHAT TO LOOK.*?:?\s*/i,'').trim(),
+    assumption:    ((m3?.[1] || assumptionMatch?.[1]     || '') + '').replace(/^ASSUMPTION CHECK:?\s*/i,'').trim(),
+    effectiveness: ((m4?.[1] || effectivenessMatch?.[1]  || '') + '').replace(/^EFFECTIVENESS:?\s*/i,'').trim(),
+    carry:         ((m5?.[1] || carryMatch?.[1]          || '') + '').replace(/^ONE THING.*?:?\s*/i,'').trim()
+  };
+}
+
 async function goEval() {
 
+  if (typeof stopAllSounds === 'function') stopAllSounds();
   showScreen('eval');
 
   var evalMoodEl = document.getElementById('eval-mood');
-
   if (evalMoodEl) {
-    evalMoodEl.setAttribute(
-      'text',
-      'value',
-      appState.vrMood + '%'
-    );
+    evalMoodEl.setAttribute('text', 'value', appState.vrMood + '%');
   }
+
+  var feedbackEl = document.getElementById('eval-feedback');
+  if (feedbackEl) feedbackEl.setAttribute('text', 'value', 'Analyzing conversation...');
 
   setJuanMood('talking');
 
-  var evalText =
-    'Analyze this practice conversation. ' +
-    'Agent: ' +
-    ((appState.currentArchetype &&
-      appState.currentArchetype.name) || 'Agent') +
-    ' (' +
-    ((appState.currentArchetype &&
-      appState.currentArchetype.trait) || '') +
-    '). ' +
-    'Final mood: ' +
-    appState.vrMood +
-    '/100. ' +
-    'History: ' +
-    appState.agentHistory.length +
-    ' turns. ' +
-    'Give feedback in 3 concrete points in English, maximum 4 sentences total. ' +
-    'Be direct and specific. Do not use generic coaching language. ' +
-    'Return ONLY the final feedback. Do not show analysis, reasoning, thinking, or explanations of your process.';
+  // ── Standard Web App parity (js/app.js goEval) ──
+  // Mismo PROMPTS.eval(), mismo formato de transcript, temperature 0.4
+  // y modelo openai/gpt-oss-120b (igual que callGroqLLM()).
+  if (typeof syncStandardGlobals === 'function') syncStandardGlobals();
+
+  var agentFirstName = ((appState.currentArchetype && appState.currentArchetype.name) || 'Agent').split(' ')[0].toUpperCase();
+  var transcript = appState.agentHistory
+    .map(function(m){ return (m.role === 'user' ? 'YOU' : agentFirstName) + ': ' + m.content; })
+    .join('\n');
+
+  var interventionLabel = (appState.activeMenu === 'interventions' && typeof currentIntervention !== 'undefined' && currentIntervention)
+    ? currentIntervention.label
+    : null;
+
+  var evalPrompt = PROMPTS.eval(
+    (appState.currentScenario && appState.currentScenario.text) || 'Standard scenario',
+    (appState.currentScenario && appState.currentScenario.agentState) || 'guarded',
+    (appState.currentScenario && appState.currentScenario.agentHiddenState) || 'unknown',
+    appState.preAssumption || '(none)',
+    appState.vrMood,
+    appState.boxState,
+    appState.conversationClosed,
+    appState.hingesOpened || [],
+    appState.currentLevel,
+    interventionLabel
+  );
 
   try {
 
     var res = await fetch('/api/groq', {
-
       method: 'POST',
-
-      headers: {
-        'Content-Type': 'application/json'
-      },
-
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-
-        model: 'qwen/qwen3.6-27b',
-
+        model: 'openai/gpt-oss-120b',
         messages: [
-
-          {
-            role: 'system',
-
-            content:
-              'You are Juanjolote, a direct and honest coach. ' +
-              'Evaluate leadership practice conversations. ' +
-              'English. Concrete. No formalities. ' +
-              'Return ONLY the final answer for the user. ' +
-              'Do NOT reveal reasoning, analysis, chain of thought, thinking process, or internal deliberation.'
-          },
-
-          {
-            role: 'user',
-            content: evalText
-          },
-
-          ...appState.agentHistory.slice(-8)
+          { role: 'system', content: evalPrompt },
+          { role: 'user', content: 'Transcript:\n' + transcript + '\n\nAnalyze this session.' }
         ],
-
-        max_tokens: 200,
-
-        temperature: 0.7,
-
-        // Evitar razonamiento
-        reasoning_effort: 'none',
-
-        reasoning_format: 'hidden'
+        temperature: 0.4,
+        max_tokens: 300
       })
     });
 
     var data = await res.json();
-
     if (data.error) {
-      console.error('[Groq Error]', data.error);
+      console.error('[Groq Eval Error]', data.error);
       throw new Error(data.error.message || 'Groq API error');
     }
 
-    var feedback =
-      data.choices?.[0]?.message?.content || '';
+    var raw = data.choices?.[0]?.message?.content || '';
+    console.log('[Groq Eval raw response]', raw);
 
-    console.log('[Groq Eval raw response]', feedback);
+    // Por seguridad, quitar bloques de razonamiento si aparecen
+    // (regex construido por concatenación para no emitir la etiqueta cruda)
+    var thinkRe = new RegExp('<th' + 'ink>[\\s\\S]*?<\\/think>', 'gi');
+    raw = raw.replace(thinkRe, '').trim();
+    if (!raw) throw new Error('Empty evaluation response');
 
-    // Por seguridad, quitar <think> si aparece
-    feedback = feedback
-      .replace(/<think>[\s\S]*?<\/think>/gi, '')
-      .trim();
+    // Mismo parser estructurado del Standard App — 5 secciones
+    var sections = parseEval(raw);
 
-    if (!feedback) {
-      feedback = 'Session completed.';
-    }
+    var displayText = [
+      'WHAT LANDED',
+      sections.landed || '—',
+      '',
+      'WHAT TO LOOK AT',
+      sections.look || '—',
+      '',
+      'ASSUMPTION CHECK',
+      sections.assumption || '—',
+      '',
+      'EFFECTIVENESS',
+      sections.effectiveness || '—',
+      '',
+      'ONE THING TO CARRY FORWARD',
+      sections.carry || '—'
+    ].join('\n');
 
-    var feedbackEl =
-      document.getElementById('eval-feedback');
+    if (feedbackEl) feedbackEl.setAttribute('text', 'value', displayText);
 
-    if (feedbackEl) {
-      feedbackEl.setAttribute(
-        'text',
-        'value',
-        feedback
-      );
-    }
-
-    speakVR(
-      feedback,
-      getVoice('juan')
-    );
+    // TTS: resumen hablado limpio (no las 5 secciones completas)
+    var spoken =
+      'Session complete. Final openness ' + appState.vrMood + ' percent. ' +
+      (sections.landed ? 'What landed: ' + sections.landed + ' ' : '') +
+      (sections.carry ? 'One thing to carry forward: ' + sections.carry : '');
+    spoken = spoken.replace(/\s+/g, ' ').trim() || 'Session completed.';
+    speakVR(spoken, getVoice('juan'));
 
   } catch (e) {
-
     console.error('[Evaluation Error]', e);
-
-    var feedbackEl2 =
-      document.getElementById('eval-feedback');
-
-    if (feedbackEl2) {
-      feedbackEl2.setAttribute(
-        'text',
-        'value',
-        'Session completed. Great job.'
-      );
-    }
+    if (feedbackEl) feedbackEl.setAttribute('text', 'value', 'Session completed. Great job.');
   }
 }
-
-
 async function translateToEnglish(text) {
   const res = await fetch('/api/groq_speakvr', {
     method: 'POST',
@@ -3099,6 +3139,7 @@ async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
   if (!speechResponse.ok) {
     const err = await speechResponse.text();
     console.error("TTS ERROR:", err);
+    if (callback) callback();
     return;
   }
 
@@ -3106,14 +3147,81 @@ async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
   const url = URL.createObjectURL(blob);
   const audio = new Audio(url);
 
+  // ── Registro en el audio guard global ──
+  // Permite que stopAllSounds() pause, resetee y libere este audio al
+  // instante cuando cambia la pantalla.
+  vrActiveAudios.push({ el: audio, url: url });
+  var unregisterAudio = function(){
+    var idx = vrActiveAudios.findIndex(function(a){ return a.el === audio; });
+    if (idx > -1) vrActiveAudios.splice(idx, 1);
+  };
+
   audio.onended = () => {
+    unregisterAudio();
     URL.revokeObjectURL(url);
     if (callback) {
       callback();
     }
   };
 
+  audio.onerror = () => {
+    unregisterAudio();
+    URL.revokeObjectURL(url);
+  };
+
   await audio.play();
+}
+
+// ─── GLOBAL AUDIO GUARD ───────────────────
+// Registro central de todo audio dinámico (TTS de speakVR, sonidos UI vía
+// Web Audio API) para poder detenerlo al instante en cada cambio de pantalla.
+let vrActiveAudios = [];    // elementos <audio> dinámicos creados por speakVR()
+let vrWebAudioSources = []; // BufferSourceNode / MediaElementSourceNode activos
+
+function stopAllSounds(){
+  try {
+    // 1) Audios dinámicos de TTS creados por speakVR()
+    vrActiveAudios.forEach(function(entry){
+      try {
+        if (entry.el) {
+          entry.el.pause();
+          try { entry.el.currentTime = 0; } catch (e2) {}
+          entry.el.onended = null;
+          entry.el.onerror = null;
+        }
+        if (entry.url && entry.url.indexOf('blob:') === 0) URL.revokeObjectURL(entry.url);
+      } catch (e1) {}
+    });
+    vrActiveAudios.length = 0;
+
+    // 2) Cualquier otro elemento <audio>/<video> presente en el DOM
+    document.querySelectorAll('audio, video').forEach(function(m){
+      try { m.pause(); try { m.currentTime = 0; } catch (e2) {} } catch (e1) {}
+    });
+
+    // 3) Componentes de sonido de A-Frame (audio ambiental / posicional)
+    document.querySelectorAll('[sound]').forEach(function(el){
+      try {
+        if (el.components && el.components.sound && el.components.sound.stop) {
+          el.components.sound.stop();
+        }
+      } catch (e1) {}
+    });
+
+    // 4) SpeechSynthesis (TTS del navegador)
+    if ('speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch (e1) {}
+    }
+
+    // 5) Sources de Web Audio API (buffers/sources de TTS o sonidos UI)
+    //    NOTA: el AudioContext del micrófono (analyser) NO se toca.
+    vrWebAudioSources.forEach(function(s){
+      try { if (s.stop) s.stop(); if (s.disconnect) s.disconnect(); } catch (e1) {}
+    });
+    vrWebAudioSources.length = 0;
+  } catch (e) {
+    console.warn('[Audio] stopAllSounds error:', e);
+  }
 }
 
 async function setupMic(){
@@ -3151,6 +3259,12 @@ function resetRecordingUI(hudMessage){
 async function startRecording(){
   //  console.log('[Grabación] Intento de iniciar grabación. Estado actual -> isRecording:', isRecording, 'isProcessing:', isProcessing, 'hasAudioStream:', !!audioStream);
   if(isRecording||isProcessing) return;
+
+  // ── [CLOSED] guard: no se puede grabar en una conversación cerrada ──
+  if (appState.currentMode === 'practice' && appState.conversationClosed) {
+    setHUD('idle', 'Conversation ended - go to evaluation');
+    return;
+  }
   
   if (audioContext && audioContext.state === 'suspended') {
     // console.log('[Mic] AudioContext suspendido. Intentando reactivar...');
