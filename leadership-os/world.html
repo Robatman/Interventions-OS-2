@@ -1840,25 +1840,34 @@ function ejecutarFlujoGuardado() {
 
 
     
-    <!-- AXOLOTL · fila izquierda: los DOS a la MISMA altura (y 0.30), uno al lado
-         del otro, alineados con la esquina inferior izquierda del globo.
+    <!-- AXOLOTL · UN ÚNICO punto compartido y 100% ESTÁTICO (sin flotación/bob).
+         Los DOS van en la MISMA position (-2.06 0.25 0.05): idéntico x, y, z, así el
+         cambio de hablante sólo alterna 'visible' y nunca hay salto ni desplazamiento
+         lateral entre Juanjolote y Ajolín.
+         No llevan atributo animation (ni bob propio), no usan look-at y ningún
+         ancestro está animado (#listening-session-content y
+         #screen-active-listening-activity sólo cambian de 'visible'); el JS únicamente
+         alterna 'visible' e initActiveListeningConversation() limpia cualquier
+         'animation' / 'animation__*' y copia la position de Juan a Ajolín (candado
+         anti-deriva: los axolotl no flotan ni oscilan).
          Los PNG de los axolotl también son 1080×1350 (arte 91-95% de ancho × 85-88%
          de alto del lienzo) → rect 0.4 × 0.5 = 4:5 = la proporción del lienzo: mismo
          factor en X y en Y (0.00037 u/px), así que crecen ~10% de ancho y ~35% de
          alto respecto a 0.35 × 0.35 y dejan de verse achatados (el rect cuadrado
          estiraba el arte 25% en horizontal). Tamaño visible real: Juan 0.37 × 0.42,
-         Ajolín 0.38 × 0.44.
-         El globo va de y -0.005 a 0.991 con la cola en la esquina inferior izquierda
-         (x -2.218…-2.096 en y -0.005…0.249): la pareja queda en la mitad inferior
-         (y 0.08…0.52), cubre la unión de la cola dejando asomar su punta por debajo,
-         y su x -2.46…-1.65 arranca pegado al borde del panel (-2.5), cruza el borde
-         del globo (-2.096) sin salirse y no toca el texto, que empieza en x -1.45. -->
+         Ajolín 0.38 × 0.44 → arte en x -2.25…-1.87 · y 0.03…0.47.
+         y 0.25 = 0.05 MÁS BAJO que antes (0.30): la pareja baja al área inferior
+         izquierda del globo (que ahora va de y -0.063 a 0.933, con la cola en
+         x -2.218…-2.096 · y -0.063…0.191), deja asomar la punta de la cola por debajo
+         y no toca el texto, que ocupa x ±1.45 (0.42 de margen hasta -1.87).
+         x -2.06 centra el arte sobre el borde izquierdo del globo (-2.096): mitad
+         dentro, mitad fuera, a 0.44 del borde del panel (-2.5). -->
     <a-image 
         id="activity-juan" 
         src="#juan-neutral" 
         width="0.4" 
         height="0.5" 
-        position="-2.28 0.3 0.05" 
+        position="-2.06 0.25 0.05" 
         visible="true">
     </a-image>
 
@@ -1867,7 +1876,7 @@ function ejecutarFlujoGuardado() {
         src="#ajolin-neutral" 
         width="0.4" 
         height="0.5" 
-        position="-1.84 0.3 0.05" 
+        position="-2.06 0.25 0.05" 
         visible="false">
     </a-image>
 
@@ -1877,7 +1886,9 @@ function ejecutarFlujoGuardado() {
     <a-entity id="listening-session-content" visible="true">
 
         <!-- CAJA DE DIÁLOGO → assets/CuadroTexto.png · único contenedor estático,
-             detrás del texto activo, eje Y = 0.5 alineado con los axolotl.
+             detrás del texto activo, eje Y = 0.435 (el del texto) y un poco por
+             encima de la fila estática de axolotl (y 0.25), que se apoya en su
+             esquina inferior izquierda.
              El arte es un globo VERTICAL (lienzo 1080×1350; el arte visible ocupa
              sólo 326×1237 px = 30% del ancho del lienzo, con la cola en la esquina
              superior izquierda). Se gira 90° (rotation Z +90 = antihorario): la cola
@@ -1890,17 +1901,22 @@ function ejecutarFlujoGuardado() {
              las medidas pedidas); para un globo SIN deformación usar el rect en 4:5,
              p.ej. 3.3 × 4.125 → 3.79 × 1.00, o el anterior 4 × 5 → 4.58 × 1.21.
              Resultado visible en VR (medido sobre el canal alfa del PNG): x -2.207…+2.207
-             · y -0.005…+0.991 (centro y 0.493); el borde izquierdo del cuerpo queda en
-             x -2.096 y la cola asoma abajo-izquierda en x -2.218…-2.096 · y -0.005…0.249.
-             El rect se apoya en y 0.478 (no 0.5) porque el arte está 0.5% descentrado
-             en el lienzo ((382+708)/2 = 545 px de 1080). El panel de fondo NO se toca:
-             el globo entra con ~0.29 de margen a cada lado. -->
+             · y -0.063…+0.933 (centro y 0.435); el borde izquierdo del cuerpo queda en
+             x -2.096 y la cola asoma abajo-izquierda en x -2.218…-2.096 · y -0.063…0.191.
+             El rect se apoya en y 0.42 —antes 0.478— (no 0.5) porque el arte está 0.5%
+             descentrado en el lienzo ((382+708)/2 = 545 px de 1080); se baja 0.058 para
+             que el globo quede un poco más bajo en la escena, y #vr-preview-stage baja
+             los mismos 0.058 (0.48 → 0.422) para que el texto siga centrado en el arte.
+             Con eso el borde inferior (-0.063) queda a 0.107 del borde superior del botón
+             Next (y -0.17) y por encima del contador (y -0.28), sin tocarlos.
+             El panel de fondo NO se toca: el globo entra con ~0.29 de margen a cada
+             lado y ~0.62 / ~0.69 por arriba y por abajo (panel y -0.75…1.55). -->
         <a-image id="dialogue-box-img"
                  src="assets/CuadroTexto.png"
                  width="3.3"
                  height="4.82"
                  rotation="0 0 90"
-                 position="0 0.478 0.01"></a-image>
+                 position="0 0.42 0.01"></a-image>
 
         <!-- Nombre del hablante -->
         <a-text anchor="center" baseline="center"
@@ -1913,10 +1929,13 @@ function ejecutarFlujoGuardado() {
             font="exo2bold">
         </a-text>
 
-        <!-- Contenedor del mensaje -->
+        <!-- Contenedor del mensaje: acompaña al globo (baja los mismos 0.058:
+             0.48 → 0.422) para que el texto quede centrado en el arte del globo
+             (centro y 0.435). El texto se inyecta dentro en "0 0.02 0" → y absoluta
+             0.442, el mismo desvío mínimo (+0.007) que ya tenía el diseño original. -->
         <a-entity
             id="vr-preview-stage"
-            position="0 0.48 0.03">
+            position="0 0.422 0.03">
         </a-entity>
 
         <!-- Contador -->
@@ -3454,7 +3473,25 @@ function initActiveListeningConversation() {
   const ajolin = document.getElementById('activity-ajolin');
   const speaker = document.getElementById('speaker-name');
   
-  // Juanjolote inicia visible a la izquierda
+  // 🔒 CANDADOS DE LOS AXOLOTL (sólo presentación; no tocan el flujo ni el estado):
+  // 1) ANTI-FLOTACIÓN: los dos axolotl son estáticos (sin bob/drift) → se quita
+  //    cualquier 'animation' o 'animation__*' que pudiera añadirse en runtime.
+  // 2) COORDENADAS COMPARTIDAS: Ajolín copia la position exacta de Juan
+  //    (-2.06 0.25 0.05) → el cambio de hablante no salta ni se desplaza.
+  [juan, ajolin].forEach(function (el) {
+    if (!el) return;
+    Object.keys(el.components || {}).forEach(function (name) {
+      if (name === 'animation' || name.indexOf('animation__') === 0) el.removeAttribute(name);
+    });
+  });
+  if (juan && ajolin) {
+    const sharedPos = juan.getAttribute('position');
+    if (sharedPos && typeof sharedPos.x === 'number') {
+      ajolin.setAttribute('position', {x: sharedPos.x, y: sharedPos.y, z: sharedPos.z});
+    }
+  }
+
+  // Juanjolote inicia visible: el único cambio de turno es 'visible' (sin motion)
   if (juan) juan.setAttribute('visible', 'true');
   if (ajolin) ajolin.setAttribute('visible', 'false');
   
@@ -3471,14 +3508,14 @@ function avanzarConversacionActiva() {
   const speaker = document.getElementById('speaker-name');
   
   if (activeListeningStep === 0) {
-    // Cambiamos el turno a Ajolin (Derecha)
+    // Cambiamos el turno a Ajolin: sólo alterna 'visible' (la position es la MISMA)
     if (juan) juan.setAttribute('visible', 'false');
     if (ajolin) ajolin.setAttribute('visible', 'true');
     
     if (speaker) {
       speaker.setAttribute('value', ' ');
       speaker.setAttribute('color', '#9d5cff'); // Color morado de Ajolin
-      speaker.setAttribute('position', '0 -0.55 0.02'); // Lo movemos un poco a la derecha
+      speaker.setAttribute('position', '0 -0.55 0.02'); // Coordenada fija para ambos (sin desplazar)
     }
     activeListeningStep = 1;
   } else {
@@ -3603,7 +3640,9 @@ function showNextConversation() {
   // Tamaño de fuente = 2 * width / wrapCount = 2*2.9/34 ≈ 0.171 → ≤4 líneas ≈ 0.68 de
   // alto y 2.9 de ancho (los diálogos más largos son ~88 chars + el nombre → 3-4 líneas):
   // queda holgado dentro del globo visible de CuadroTexto.png (4.41 de ancho × 1.00 de
-  // alto, centrado en y 0.493) con ~0.65 de margen lateral y ~0.16 arriba/abajo.
+  // alto, centro y 0.435) con ~0.65 de margen lateral y ~0.16 arriba/abajo. El texto va
+  // a y absoluta 0.442 (stage 0.422 + 0.02): 0.007 por encima del centro del globo, el
+  // mismo desvío mínimo que ya tenía el diseño original (0.50 vs 0.493).
   const entity = document.createElement("a-entity");
   entity.setAttribute("position", "0 0.02 0");
   entity.setAttribute("text", {
@@ -3618,8 +3657,8 @@ function showNextConversation() {
 }
 
 // INSIGHT: se pinta directo sobre assets/CuadroTexto.png (sin marcos generados),
-// centrado en el eje del cuadro (y = 0.02 dentro del stage → absoluto 0.50, que es
-// el centro del globo visible, cuya banda va de y -0.005 a 0.991; el insight más largo
+// centrado en el eje del cuadro (y = 0.02 dentro del stage → absoluto 0.442, que es
+// el centro del globo visible, cuya banda va de y -0.063 a 0.933; el insight más largo
 // son 97 chars → 3 líneas a wrapCount 44 + el renglón "INSIGHT:" = 4 líneas de 0.123
 // ≈ 0.49-0.59 de alto, holgado dentro de 1.00).
 function renderInsightText(stage, textContent) {
