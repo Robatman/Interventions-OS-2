@@ -1137,7 +1137,7 @@ function ejecutarFlujoGuardado() {
   <a-entity id="practice-buttons-container">
     
     <!-- 1. BOTÓN PRACTICE (Simulación Interactiva de Rol) -->
-    <a-entity id="btn-practice-intervention" position="-1.65 1.4 -2.6" rotation="0 12 0">
+    <a-entity id="btn-practice-intervention" position="-1.65 1.44 -2.6" rotation="0 12 0">
       <a-plane class="sub-tecnica" 
                handler-botones-vr="mensaje: Abriendo Practice Intervention; tecnica: practice-intervention"
                width="1.55" height="0.9" 
@@ -1157,7 +1157,7 @@ function ejecutarFlujoGuardado() {
     </a-entity>
 
     <!-- 2. BOTÓN LEARN (Base Conceptual y Teoría) -->
-    <a-entity id="btn-learn-intervention" position="0 1.4 -2.8" rotation="0 0 0">
+    <a-entity id="btn-learn-intervention" position="0 1.44 -2.8" rotation="0 0 0">
       <a-plane class="sub-tecnica" 
                handler-botones-vr="mensaje: Abriendo Learn Intervention; tecnica: learn-intervention"
                width="1.55" height="0.9" 
@@ -1177,7 +1177,7 @@ function ejecutarFlujoGuardado() {
     </a-entity>
 
     <!-- 3. BOTÓN WORK TOGETHER (Método Empírico: Hipótesis, Experimento y Análisis) -->
-    <a-entity id="btn-work-together-intervention" position="1.65 1.4 -2.6" rotation="0 -12 0">
+    <a-entity id="btn-work-together-intervention" position="1.65 1.44 -2.6" rotation="0 -12 0">
       <a-plane class="sub-tecnica" 
                handler-botones-vr="mensaje: Abriendo Work Together Intervention; tecnica: work-together-intervention"
                width="1.55" height="0.9" 
@@ -1189,9 +1189,9 @@ function ejecutarFlujoGuardado() {
                animation__colorOut="property: material.color; to: #111830; dur: 200; startEvents: mouseleave"
                animation__click="property: scale; to: 0.95 0.95 1; dur: 80; dir: alternate; loop: 1; startEvents: click">
         
-        <a-text anchor="center" baseline="center" value="WORK TOGETHER" align="center" color="#ffffff" width="3" position="0 0.14 0.02" font="mozillavr" shader="msdf"></a-text>
+        <a-text anchor="center" baseline="center" value="WORK TOGETHER" align="center" color="#ffffff" width="3" position="0 0.17 0.02" font="mozillavr" shader="msdf"></a-text>
         <!-- CAMBIO AQUÍ: Añadimos explícitamente los pasos del método empírico -->
-        <a-text anchor="center" baseline="center" value="Empirical Method: Hypothesize, experiment, and analyze team dynamics." align="center" color="#ffedd5" width="1.3" position="0 -0.14 0.02" opacity="0.75" wrap-count="22" font="mozillavr" shader="msdf"></a-text>
+        <a-text anchor="center" baseline="center" value="Empirical Method: Hypothesize, experiment, and analyze team dynamics." align="center" color="#ffedd5" width="1.3" position="0 -0.06 0.02" opacity="0.75" wrap-count="26" font="mozillavr" shader="msdf"></a-text>
         <a-plane width="1.35" height="0.02" color="#f59e0b" position="0 -0.36 0.03" material="opacity: 0.8"></a-plane>
       </a-plane>
     </a-entity>
@@ -1253,7 +1253,7 @@ function ejecutarFlujoGuardado() {
   <!-- ================================================================= -->
 
   <!-- ACTIVE LISTENING -->
-  <a-entity id="btn-active-listening" position="-2.2 2.8 -2.8">
+  <a-entity id="btn-active-listening" class="tech-p0" position="-1.35 2.55 -2.8">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Iniciando módulo de Escucha Activa; tecnica: active-listening"
              width="1.8" height="0.55" 
@@ -1272,7 +1272,7 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
   <!-- POWERFUL QUESTIONS -->
-  <a-entity id="btn-powerful-questions" position="-2.2 2.15 -2.8">
+  <a-entity id="btn-powerful-questions" class="tech-p0" position="1.35 2.55 -2.8">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Abriendo panel de Preguntas Poderosas; tecnica: powerful-questions"
              width="1.8" height="0.55" 
@@ -1291,7 +1291,7 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
   <!-- MOTIVATIONAL INTERVIEWING -->
-  <a-entity id="btn-motivational-interviewing" position="-2.2 1.5 -2.8">
+  <a-entity id="btn-motivational-interviewing" class="tech-p0" position="-1.35 1.85 -2.8">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Desplegando Entrevista Motivacional; tecnica: motivational-interviewing"
              width="1.8" height="0.55" 
@@ -1310,7 +1310,7 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
   <!-- NONVIOLENT COMMUNICATION -->
-  <a-entity id="btn-nonviolent-communication" position="-2.2 0.85 -2.8">
+  <a-entity id="btn-nonviolent-communication" class="tech-p0" position="1.35 1.85 -2.8">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Iniciando Comunicación No Violenta; tecnica: nonviolent-communication"
              width="1.8" height="0.55" 
@@ -1329,7 +1329,7 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
   <!-- RADICAL CANDOR -->
-  <a-entity id="btn-radical-candor" position="-2.2 0.2 -2.8">
+  <a-entity id="btn-radical-candor" class="tech-p0" position="-1.35 1.15 -2.8">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Abriendo Radical Candor; tecnica: radical-candor"
              width="1.8" height="0.55" 
@@ -1348,7 +1348,7 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
   <!-- CRUCIAL CONVERSATIONS -->
-  <a-entity id="btn-crucial-conversations" position="-2.2 -0.45 -2.8">
+  <a-entity id="btn-crucial-conversations" class="tech-p0" position="1.35 1.15 -2.8">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Abriendo Crucial Conversations; tecnica: crucial-conversations"
              width="1.8" height="0.55" 
@@ -1372,7 +1372,7 @@ function ejecutarFlujoGuardado() {
   <!-- ================================================================= -->
 
   <!-- TACTICAL EMPATHY -->
-  <a-entity id="btn-tactical-empathy" position="0 2.8 -2.8">
+  <a-entity id="btn-tactical-empathy" class="tech-p1" position="-1.35 2.55 -2.8" visible="false">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Abriendo Tactical Empathy; tecnica: tactical-empathy"
              width="1.8" height="0.55" 
@@ -1391,7 +1391,7 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
   <!-- SCARF MODEL -->
-  <a-entity id="btn-scarf-model" position="0 2.15 -2.8">
+  <a-entity id="btn-scarf-model" class="tech-p1" position="1.35 2.55 -2.8" visible="false">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Abriendo SCARF Model; tecnica: scarf-model"
              width="1.8" height="0.55" 
@@ -1410,7 +1410,7 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
   <!-- IMMUNITY TO CHANGE -->
-  <a-entity id="btn-immunity-to-change" position="0 1.5 -2.8">
+  <a-entity id="btn-immunity-to-change" class="tech-p1" position="-1.35 1.85 -2.8" visible="false">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Abriendo Immunity to Change; tecnica: immunity-to-change"
              width="1.8" height="0.55" 
@@ -1429,7 +1429,7 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
   <!-- DRAMA TRIANGLE -->
-  <a-entity id="btn-drama-triangle" position="0 0.85 -2.8">
+  <a-entity id="btn-drama-triangle" class="tech-p1" position="1.35 1.85 -2.8" visible="false">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Abriendo Drama Triangle; tecnica: drama-triangle"
              width="1.8" height="0.55" 
@@ -1478,7 +1478,7 @@ function ejecutarFlujoGuardado() {
   <!-- ================================================================= -->
 
   <!-- GROW MODEL -->
-  <a-entity id="btn-grow-model" position="2.2 2.8 -2.8">
+  <a-entity id="btn-grow-model" class="tech-p1" position="-1.35 1.15 -2.8" visible="false">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Abriendo GROW Model; tecnica: grow-model"
              width="1.8" height="0.55" 
@@ -1497,7 +1497,7 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
   <!-- STRENGTHS-BASED COACHING -->
-  <a-entity id="btn-strengths-based-coaching" position="2.2 2.15 -2.8">
+  <a-entity id="btn-strengths-based-coaching" class="tech-p1" position="1.35 1.15 -2.8" visible="false">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Abriendo Strengths-Based Coaching; tecnica: strengths-based-coaching"
              width="1.8" height="0.55" 
@@ -1516,7 +1516,7 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
   <!-- GROWTH MINDSET -->
-  <a-entity id="btn-growth-mindset" position="2.2 1.5 -2.8">
+  <a-entity id="btn-growth-mindset" class="tech-p2" position="-1.35 2.55 -2.8" visible="false">
     <a-plane class="sub-tecnica" 
              handler-botones-vr="mensaje: Abriendo Growth Mindset; tecnica: growth-mindset"
              width="1.8" height="0.55" 
@@ -1535,7 +1535,7 @@ function ejecutarFlujoGuardado() {
   </a-entity>
 
   <!-- SOLUTION-FOCUSED COACHING -->
-  <a-entity id="btn-solution-focused-coaching" position="2.2 0.85 -2.8">
+  <a-entity id="btn-solution-focused-coaching" class="tech-p2" position="1.35 2.55 -2.8" visible="false">
     <a-plane class="clickable sub-tecnica" 
              handler-botones-vr="mensaje: Abriendo Solution-Focused Coaching; tecnica: solution-focused-coaching"
              width="1.8" height="0.55" 
@@ -1553,6 +1553,33 @@ function ejecutarFlujoGuardado() {
     </a-plane>
   </a-entity>
 
+
+  <!-- NAVEGACIÓN POR PÁGINAS DEL GRID DE TÉCNICAS -->
+  <a-entity id="btn-tech-prev" position="-1.05 0.55 -2.8">
+    <a-plane class="clickable" onclick="techniquePagePrev()"
+             width="1.0" height="0.3" color="#111830"
+             material="opacity:0.85;shader:flat"></a-plane>
+    <a-plane width="1.04" height="0.34" color="#4466ff"
+             material="opacity:0.3;transparent:true;shader:flat"
+             position="0 0 -0.005"></a-plane>
+    <a-text anchor="center" baseline="center" value="◀ PREV" align="center"
+            color="#4466ff" width="3" position="0 0 0.01" font="mozillavr" shader="msdf"></a-text>
+  </a-entity>
+
+  <a-text id="tech-page-indicator" anchor="center" baseline="center" value="PAGE 1 / 3"
+          position="0 0.55 -2.8" align="center" color="#c8d8ff" width="2"
+          opacity="0.7" font="mozillavr"></a-text>
+
+  <a-entity id="btn-tech-next" position="1.05 0.55 -2.8">
+    <a-plane class="clickable" onclick="techniquePageNext()"
+             width="1.0" height="0.3" color="#111830"
+             material="opacity:0.85;shader:flat"></a-plane>
+    <a-plane width="1.04" height="0.34" color="#4466ff"
+             material="opacity:0.3;transparent:true;shader:flat"
+             position="0 0 -0.005"></a-plane>
+    <a-text anchor="center" baseline="center" value="NEXT ▶" align="center"
+            color="#4466ff" width="3" position="0 0 0.01" font="mozillavr" shader="msdf"></a-text>
+  </a-entity>
 
   <!-- BOTÓN REGRESAR -->
   <a-entity id="btn-tech-list-back"
@@ -1901,7 +1928,7 @@ function ejecutarFlujoGuardado() {
     </a-entity>
 
 
-    <a-entity id="moves-container" position="0 0.15 0.01" visible="false">
+    <a-entity id="moves-container" position="0 0.215 0.01" visible="false">
         <!-- Pay Attention -->
         <a-entity id="move-pay-attention" position="-1.0 0.5 0.01">
             <a-plane width="1.6" height="0.7" color="#0b1230" material="opacity:0.9; shader:flat">
@@ -1951,7 +1978,7 @@ function ejecutarFlujoGuardado() {
     height="0.3"
     color="#253570"
     material="opacity: 0.95; shader: flat; transparent: true"
-    position="0 -1.35 0.02"
+    position="0 -1.1 0.02"
     visible="false"
     onclick="toggleListeningMoves()">
 
@@ -3562,19 +3589,54 @@ function showNextConversation() {
   currentMessageIndex++;
 }
 
-// Función auxiliar para pintar los Insights de manera limpia y uniforme
+// Tarjeta dedicada de INSIGHT: contenedor con borde, centrado equidistante
+// entre el divisor superior y el botón inferior (zona de conversación).
 function renderInsightText(stage, textContent) {
+  const border = document.createElement("a-plane");
+  border.setAttribute("width", 3.24);
+  border.setAttribute("height", 0.95);
+  border.setAttribute("color", "#f59e0b");
+  border.setAttribute("material", "shader:flat; opacity:0.5; transparent:true; side:double");
+  border.setAttribute("position", "0 0.185 -0.005");
+  stage.appendChild(border);
+
+  const card = document.createElement("a-plane");
+  card.setAttribute("width", 3.16);
+  card.setAttribute("height", 0.88);
+  card.setAttribute("color", "#141031");
+  card.setAttribute("material", "shader:flat; opacity:0.97; transparent:true; side:double");
+  card.setAttribute("position", "0 0.185 0");
+  stage.appendChild(card);
+
   const entity = document.createElement("a-entity");
-  entity.setAttribute("position", "0 0.02 0");
+  entity.setAttribute("position", "0 0.185 0.01");
   entity.setAttribute("text", {
     value: `INSIGHT:\n${textContent}`,
     align: "center",
-    width: 3.2,
-    wrapCount: 30,
+    anchor: "center",
+    baseline: "center",
+    width: 2.9,
+    wrapCount: 40,
     color: "#ffedd5" // Color distinguible y cálido para las reflexiones
   });
   stage.appendChild(entity);
 }
+
+// ─── PAGINACIÓN DEL MENÚ DE TÉCNICAS (solo UI) ───
+var techniquePageCount = 3;
+var techniquePageIdx = 0;
+function applyTechniquePage() {
+  for (var p = 0; p < techniquePageCount; p++) {
+    var btns = document.querySelectorAll('#screen-technique-list .tech-p' + p);
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].setAttribute('visible', p === techniquePageIdx ? 'true' : 'false');
+    }
+  }
+  var ind = document.getElementById('tech-page-indicator');
+  if (ind) ind.setAttribute('text', 'value', 'PAGE ' + (techniquePageIdx + 1) + ' / ' + techniquePageCount);
+}
+function techniquePageNext() { techniquePageIdx = (techniquePageIdx + 1) % techniquePageCount; applyTechniquePage(); }
+function techniquePagePrev() { techniquePageIdx = (techniquePageIdx + techniquePageCount - 1) % techniquePageCount; applyTechniquePage(); }
 
 function exitPreviewVR() {
   document.querySelector('#screen-active-listening-activity').setAttribute('visible', 'false');
