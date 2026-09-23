@@ -1817,9 +1817,9 @@ function ejecutarFlujoGuardado() {
 <!-- SCREEN: ACTIVE LISTENING ACTIVITY -->
 <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
 
-    <!-- Fondo principal -->
+    <!-- Fondo principal (ensanchado a 5.0 para alojar el cuadro CuadroTexto.png 4.2 y la columna de axolotl a la izquierda) -->
     <a-plane
-        width="4"
+        width="5"
         height="2.3"
         color="#1a1a2e"
         material="opacity:0.95; shader:flat"
@@ -1840,12 +1840,13 @@ function ejecutarFlujoGuardado() {
 
 
     
+    <!-- AXOLOTL · columna izquierda (la cola del cuadro apunta hacia ellos) -->
     <a-image 
         id="activity-juan" 
         src="#juan-neutral" 
         width="0.35" 
         height="0.35" 
-        position="-1.825 0.5 0.05" 
+        position="-2.32 0.7 0.05" 
         visible="true">
     </a-image>
 
@@ -1854,7 +1855,7 @@ function ejecutarFlujoGuardado() {
         src="#ajolin-neutral" 
         width="0.35" 
         height="0.35" 
-        position="1.825 0.5 0.05" 
+        position="-2.32 0.3 0.05" 
         visible="false">
     </a-image>
 
@@ -1867,8 +1868,8 @@ function ejecutarFlujoGuardado() {
              detrás del texto activo, eje Y = 0.5 alineado con los axolotl -->
         <a-image id="dialogue-box-img"
                  src="assets/CuadroTexto.png"
-                 width="3.4"
-                 height="0.75"
+                 width="4.2"
+                 height="0.88"
                  position="0 0.5 0.01"></a-image>
 
         <!-- Nombre del hablante -->
@@ -1893,7 +1894,7 @@ function ejecutarFlujoGuardado() {
             id="conversation-counter"
             value=""
             align="right"
-            position="1.5 0.05 0.02"
+            position="1.5 -0.06 0.02"
             width="1.6"
             color="#8ca6d8"
             font="mozillavr">
@@ -1906,7 +1907,7 @@ function ejecutarFlujoGuardado() {
         width="0.65"
         height="0.22"
         color="#4F7CFF"
-        position="0 0.05 0.02"
+        position="0 -0.06 0.02"
         material="shader:flat">
 
         <a-text anchor="center" baseline="center"
@@ -3569,13 +3570,15 @@ function showNextConversation() {
   }
 
   // Imprimir el diálogo en el panel VR
+  // Tamaño de fuente = 2 * width / wrapCount = 2*3.1/34 ≈ 0.182 → bloque de máx
+  // ~1.55 de ancho y ≤4 líneas (~0.84 de alto): queda dentro de CuadroTexto.png (4.2 × 0.88).
   const entity = document.createElement("a-entity");
   entity.setAttribute("position", "0 0.02 0");
   entity.setAttribute("text", {
     value: `${speakerName}: ${msg.text}`,
     align: "center",
-    width: 3.2,
-    wrapCount: 30
+    width: 3.1,
+    wrapCount: 34
   });
 
   stage.appendChild(entity);
