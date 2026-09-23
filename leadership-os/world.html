@@ -824,10 +824,11 @@ function ejecutarFlujoGuardado() {
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   BOSQUE ORGÁNICO PROCEDURAL (solo visual — no toca lógica)
-   Pinta #forest-sky-canvas: gradiente de cielo, nubes suaves,
-   niebla y línea de bosque con copas circulares (sin polígonos
-   duros), con costuras horizontales invisibles.
+   BOSQUE ORGÁNICO PROCEDURAL · TEMA NOCTURNO (solo visual — no toca lógica)
+   Pinta #forest-sky-canvas: cielo nocturno con gradiente profundo,
+   resplandor y disco de luna, estrellas deterministas, jirones de
+   calima y una línea de bosque en silueta con copas circulares (sin
+   polígonos duros), con costuras horizontales invisibles.
    ═══════════════════════════════════════════════════════════════ */
 (function () {
   var c = document.getElementById('forest-sky-canvas');
@@ -835,53 +836,135 @@ function ejecutarFlujoGuardado() {
   var ctx = c.getContext('2d');
   var W = c.width, H = c.height, i;
   var horizon = Math.round(H * 0.5);
+  var moonX = W * 0.70, moonY = H * 0.16;   /* misma posición que tenía el sol */
 
-  /* 1 · Cielo: cenital intenso → horizonte pálido */
+  /* Ruido determinista: el cielo sale idéntico en cada carga (sin Math.random) */
+  function noise(n) {
+    var t = Math.sin(n * 12.9898) * 43758.5453;
+    return t - Math.floor(t);
+  }
+
+  /* 1 · Cielo nocturno: cenital profundo → índigo/violeta en el horizonte */
   var sky = ctx.createLinearGradient(0, 0, 0, horizon);
-  sky.addColorStop(0.00, '#3E86D6');
-  sky.addColorStop(0.55, '#6FAEE8');
-  sky.addColorStop(1.00, '#D6ECFB');
+  sky.addColorStop(0.00, '#050a18');
+  sky.addColorStop(0.42, '#0b132b');
+  sky.addColorStop(0.74, '#151a33');
+  sky.addColorStop(1.00, '#241c3d');
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, W, horizon);
 
-  /* 2 · Sol suave (degradado radial) */
-  var sun = ctx.createRadialGradient(W * 0.70, H * 0.16, 0, W * 0.70, H * 0.16, 430);
-  sun.addColorStop(0, 'rgba(255,250,228,0.55)');
-  sun.addColorStop(1, 'rgba(255,250,228,0)');
-  ctx.fillStyle = sun;
-  ctx.fillRect(0, 0, W, Math.round(H * 0.6));
+  /* 2 · Luna: halo ancho + corona + disco pálido con mares tenues (antes: sol cálido) */
+  var bloom = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, 620);
+  bloom.addColorStop(0, 'rgba(122,165,209,0.16)');
+  bloom.addColorStop(1, 'rgba(122,165,209,0)');
+  ctx.fillStyle = bloom;
+  ctx.fillRect(0, 0, W, horizon);
 
-  /* 3 · Nubes orgánicas (puffs de degradado radial, dentro del lienzo) */
+  var halo = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, 250);
+  halo.addColorStop(0, 'rgba(176,204,238,0.22)');
+  halo.addColorStop(1, 'rgba(176,204,238,0)');
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, W, horizon);
+
+  var discR = 46;
+  var disc = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, discR);
+  disc.addColorStop(0.00, 'rgba(248,251,255,0.98)');
+  disc.addColorStop(0.62, 'rgba(236,244,255,0.95)');
+  disc.addColorStop(0.84, 'rgba(214,231,251,0.70)');
+  disc.addColorStop(1.00, 'rgba(196,219,247,0)');
+  ctx.fillStyle = disc;
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, discR, 0, Math.PI * 2);
+  ctx.fill();
+
+  /* mares lunares: manchas muy tenues, siempre dentro del disco */
+  ctx.fillStyle = 'rgba(186,204,232,0.16)';
+  ctx.beginPath(); ctx.arc(moonX - 14, moonY + 6, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(moonX + 10, moonY - 12, 8, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(moonX + 14, moonY + 15, 6, 0, Math.PI * 2); ctx.fill();
+
+  /* 3 · Estrellas: 460 puntos finos + 18 con destello suave (posiciones deterministas;
+        se dibujan antes del bosque para que las copas las tapen por detrás) */
+  var tints = ['255,255,255', '219,234,255', '188,212,255', '236,243,255', '255,243,220'];
+  for (i = 0; i < 460; i++) {
+    var sx = noise(i * 5 + 1) * W;
+    var sy = noise(i * 5 + 2) * (horizon - 34);
+    var sr = 0.55 + noise(i * 5 + 3) * 1.35;
+    var sa = 0.28 + noise(i * 5 + 4) * 0.62;
+    var tint = tints[Math.floor(noise(i * 5 + 5) * tints.length) % tints.length];
+    var dx = sx - moonX, dy = sy - moonY;
+    if (dx * dx + dy * dy < 150 * 150) continue;   /* halo de la luna despejado */
+    ctx.fillStyle = 'rgba(' + tint + ',' + sa.toFixed(3) + ')';
+    ctx.beginPath();
+    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  for (i = 0; i < 18; i++) {
+    var gx = noise(i * 3 + 601) * W;
+    var gy = noise(i * 3 + 602) * (horizon - 60);
+    var gdx = gx - moonX, gdy = gy - moonY;
+    if (gdx * gdx + gdy * gdy < 150 * 150) continue;
+    var glow = ctx.createRadialGradient(gx, gy, 0, gx, gy, 9);
+    glow.addColorStop(0, 'rgba(232,242,255,0.55)');
+    glow.addColorStop(1, 'rgba(232,242,255,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(gx, gy, 9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.beginPath();
+    ctx.arc(gx, gy, 1.1, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  /* 4 · Nubes nocturnas: jirones fríos muy tenues (antes nubes blancas de día) */
   function cloud(cx, cy, r, a) {
     var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    g.addColorStop(0, 'rgba(255,255,255,' + a + ')');
-    g.addColorStop(1, 'rgba(255,255,255,0)');
+    g.addColorStop(0, 'rgba(124,154,204,' + a + ')');
+    g.addColorStop(1, 'rgba(124,154,204,0)');
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.fill();
   }
-  cloud(W * 0.18, H * 0.20, 175, 0.85); cloud(W * 0.26, H * 0.24, 120, 0.70);
-  cloud(W * 0.52, H * 0.14, 205, 0.75); cloud(W * 0.60, H * 0.19, 140, 0.60);
-  cloud(W * 0.82, H * 0.24, 165, 0.80); cloud(W * 0.88, H * 0.20, 110, 0.55);
-  cloud(W * 0.10, H * 0.30, 135, 0.50); cloud(W * 0.40, H * 0.30, 150, 0.45);
+  cloud(W * 0.18, H * 0.20, 175, 0.13); cloud(W * 0.26, H * 0.24, 120, 0.10);
+  cloud(W * 0.52, H * 0.14, 205, 0.11); cloud(W * 0.60, H * 0.19, 140, 0.09);
+  cloud(W * 0.82, H * 0.24, 165, 0.12); cloud(W * 0.88, H * 0.20, 110, 0.08);
+  cloud(W * 0.10, H * 0.30, 135, 0.07); cloud(W * 0.40, H * 0.30, 150, 0.06);
 
-  /* 4 · Niebla luminosa sobre la línea del bosque */
+  /* jirón con borde de plata, iluminado por la luna */
+  var lit = ctx.createRadialGradient(moonX - 130, moonY + 78, 0, moonX - 130, moonY + 78, 215);
+  lit.addColorStop(0, 'rgba(198,220,246,0.14)');
+  lit.addColorStop(1, 'rgba(198,220,246,0)');
+  ctx.fillStyle = lit;
+  ctx.beginPath();
+  ctx.arc(moonX - 130, moonY + 78, 215, 0, Math.PI * 2);
+  ctx.fill();
+
+  /* 5 · Calima fría sobre la línea del bosque (aire que la luna ilumina) */
   var mist = ctx.createLinearGradient(0, horizon - 140, 0, horizon + 8);
-  mist.addColorStop(0, 'rgba(232,244,255,0)');
-  mist.addColorStop(1, 'rgba(232,244,255,0.55)');
+  mist.addColorStop(0, 'rgba(132,172,219,0)');
+  mist.addColorStop(1, 'rgba(132,172,219,0.30)');
   ctx.fillStyle = mist;
   ctx.fillRect(0, horizon - 140, W, 148);
 
-  /* 5 · Pradera bajo el horizonte (fusión con el plano de suelo) */
+  /* banda plateada justo encima del horizonte */
+  var silver = ctx.createLinearGradient(0, horizon - 46, 0, horizon + 6);
+  silver.addColorStop(0, 'rgba(198,220,246,0)');
+  silver.addColorStop(1, 'rgba(198,220,246,0.18)');
+  ctx.fillStyle = silver;
+  ctx.fillRect(0, horizon - 46, W, 52);
+
+  /* 6 · Pradera nocturna bajo el horizonte (verde apagado, no el de día) */
   var ground = ctx.createLinearGradient(0, horizon, 0, H);
-  ground.addColorStop(0.00, '#4C956C');
-  ground.addColorStop(0.35, '#3B7A57');
-  ground.addColorStop(1.00, '#2C5F45');
+  ground.addColorStop(0.00, '#1b2f28');
+  ground.addColorStop(0.35, '#122019');
+  ground.addColorStop(1.00, '#091310');
   ctx.fillStyle = ground;
   ctx.fillRect(0, horizon, W, H - horizon);
 
-  /* 6 · Capas de bosque: copas circulares suaves con envoltura (costura invisible) */
+  /* 7 · Capas de bosque: siluetas profundas con copas circulares suaves y envoltura
+        (costura horizontal invisible; misma forma orgánica, sólo cambia el color) */
   function treeline(baseY, rMin, rMax, color, step, seed) {
     ctx.fillStyle = color;
     var n = Math.ceil(W / step) + 1;
@@ -898,11 +981,11 @@ function ejecutarFlujoGuardado() {
     }
     ctx.fillRect(0, baseY, W, 60);
   }
-  /* de lejos (pequeñas y claras) → cerca (grandes y oscuras) */
-  treeline(horizon + 2,  20,  38, 'rgba(134,172,150,0.90)', 56,  3);
-  treeline(horizon + 6,  32,  56, '#4E8B63', 72, 11);
-  treeline(horizon + 12, 46,  78, '#35714E', 92, 27);
-  treeline(horizon + 22, 58,  96, '#266047', 116, 41);
+  /* de lejos (pequeñas y azuladas por la bruma) → cerca (grandes y casi negras) */
+  treeline(horizon + 2,  20,  38, 'rgba(44,62,82,0.90)', 56,  3);
+  treeline(horizon + 6,  32,  56, '#1d2c3e', 72, 11);
+  treeline(horizon + 12, 46,  78, '#12202e', 92, 27);
+  treeline(horizon + 22, 58,  96, '#080f18', 116, 41);
 })();
 </script>
  
