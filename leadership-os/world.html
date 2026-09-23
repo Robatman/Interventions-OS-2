@@ -1841,7 +1841,7 @@ function ejecutarFlujoGuardado() {
 
     
     <!-- AXOLOTL · UN ÚNICO punto compartido y 100% ESTÁTICO (sin flotación/bob).
-         Los DOS van en la MISMA position (-2.06 0.25 0.05): idéntico x, y, z, así el
+         Los DOS van en la MISMA position (-2.38 0.20 0.05): idéntico x, y, z, así el
          cambio de hablante sólo alterna 'visible' y nunca hay salto ni desplazamiento
          lateral entre Juanjolote y Ajolín.
          No llevan atributo animation (ni bob propio), no usan look-at y ningún
@@ -1855,19 +1855,25 @@ function ejecutarFlujoGuardado() {
          factor en X y en Y (0.00037 u/px), así que crecen ~10% de ancho y ~35% de
          alto respecto a 0.35 × 0.35 y dejan de verse achatados (el rect cuadrado
          estiraba el arte 25% en horizontal). Tamaño visible real: Juan 0.37 × 0.42,
-         Ajolín 0.38 × 0.44 → arte en x -2.25…-1.87 · y 0.03…0.47.
-         y 0.25 = 0.05 MÁS BAJO que antes (0.30): la pareja baja al área inferior
-         izquierda del globo (que ahora va de y -0.063 a 0.933, con la cola en
-         x -2.218…-2.096 · y -0.063…0.191), deja asomar la punta de la cola por debajo
-         y no toca el texto, que ocupa x ±1.45 (0.42 de margen hasta -1.87).
-         x -2.06 centra el arte sobre el borde izquierdo del globo (-2.096): mitad
-         dentro, mitad fuera, a 0.44 del borde del panel (-2.5). -->
+         Ajolín 0.38 × 0.44 → arte en x -2.57…-2.19 · y -0.02…0.42.
+         y 0.20 = 0.05 MÁS BAJO que antes (0.25, que ya era 0.05 más bajo que los 0.30
+         originales): la pareja se asienta en el ángulo inferior izquierdo del globo
+         (banda y -0.063…0.933, con la cola en x -2.218…-2.096 · y -0.063…0.191) y deja
+         asomar la punta de la cola junto a su costado izquierdo.
+         x -2.38 = 0.32 más a la IZQUIERDA que el punto anterior (-2.06): el arte queda
+         totalmente FUERA del cuadro, porque su borde derecho -2.19 no llega al borde
+         izquierdo del cuerpo del globo (-2.096) —0.094 de hueco— y queda a 0.74 del
+         texto (x ±1.45): no tapa ni el globo ni el texto.
+         Matiz inherente (margen físico del panel): el arte mide 0.38 y el hueco libre a
+         la izquierda del globo es 0.293, así que el axolotl sobresale 0.07 del borde
+         izquierdo del panel (-2.5). Para que quede 100% dentro del panel, usar x -2.31
+         (arte -2.50…-2.12: roza el borde del panel y sigue 0.02 fuera del cuadro). -->
     <a-image 
         id="activity-juan" 
         src="#juan-neutral" 
         width="0.4" 
         height="0.5" 
-        position="-2.06 0.25 0.05" 
+        position="-2.38 0.20 0.05" 
         visible="true">
     </a-image>
 
@@ -1876,7 +1882,7 @@ function ejecutarFlujoGuardado() {
         src="#ajolin-neutral" 
         width="0.4" 
         height="0.5" 
-        position="-2.06 0.25 0.05" 
+        position="-2.38 0.20 0.05" 
         visible="false">
     </a-image>
 
@@ -1886,9 +1892,9 @@ function ejecutarFlujoGuardado() {
     <a-entity id="listening-session-content" visible="true">
 
         <!-- CAJA DE DIÁLOGO → assets/CuadroTexto.png · único contenedor estático,
-             detrás del texto activo, eje Y = 0.435 (el del texto) y un poco por
-             encima de la fila estática de axolotl (y 0.25), que se apoya en su
-             esquina inferior izquierda.
+             detrás del texto activo, eje Y = 0.435 (el del texto) y a la derecha de la
+             fila estática de axolotl (y 0.20), que queda a su izquierda, en la esquina
+             inferior izquierda (su arte acaba en x -2.19, fuera del borde -2.096).
              El arte es un globo VERTICAL (lienzo 1080×1350; el arte visible ocupa
              sólo 326×1237 px = 30% del ancho del lienzo, con la cola en la esquina
              superior izquierda). Se gira 90° (rotation Z +90 = antihorario): la cola
@@ -3477,7 +3483,7 @@ function initActiveListeningConversation() {
   // 1) ANTI-FLOTACIÓN: los dos axolotl son estáticos (sin bob/drift) → se quita
   //    cualquier 'animation' o 'animation__*' que pudiera añadirse en runtime.
   // 2) COORDENADAS COMPARTIDAS: Ajolín copia la position exacta de Juan
-  //    (-2.06 0.25 0.05) → el cambio de hablante no salta ni se desplaza.
+  //    (-2.38 0.20 0.05) → el cambio de hablante no salta ni se desplaza.
   [juan, ajolin].forEach(function (el) {
     if (!el) return;
     Object.keys(el.components || {}).forEach(function (name) {
