@@ -1918,10 +1918,11 @@ function ejecutarFlujoGuardado() {
 <!-- SCREEN: ACTIVE LISTENING ACTIVITY -->
 <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
 
-    <!-- Fondo principal · 4.6 × 2.3 (x ±2.3 · y -0.75…1.55).
-         Anchura reducida; altura y posición vertical original conservadas. -->
+    <!-- Fondo principal · 5.8 × 2.3 (x ±2.9 · y -0.75…1.55).
+         La anchura cubre por completo las imágenes de los axolotl (hasta x=-2.78),
+         manteniendo la altura y posición vertical calibradas. -->
     <a-plane
-        width="4.6"
+        width="5.8"
         height="2.3"
         color="#1a1a2e"
         material="opacity:0.95; shader:flat"
@@ -2015,8 +2016,8 @@ function ejecutarFlujoGuardado() {
              los mismos 0.058 (0.48 → 0.422) para que el texto siga centrado en el arte.
              Con eso el borde inferior (-0.063) queda a 0.107 del borde superior del botón
              Next (y -0.17) y por encima del contador (y -0.28), sin tocarlos.
-             El panel mide 4.6 × 2.3 (±2.3; y -0.75…1.55), con menos margen
-             horizontal y los límites verticales originales. -->
+             El panel mide 5.8 × 2.3 (±2.9; y -0.75…1.55), cubre los
+             avatares a la izquierda y conserva los límites verticales calibrados. -->
         <a-image id="dialogue-box-img"
                  src="assets/CuadroTexto.png"
                  width="2.64"
