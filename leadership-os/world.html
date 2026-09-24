@@ -1918,15 +1918,14 @@ function ejecutarFlujoGuardado() {
 <!-- SCREEN: ACTIVE LISTENING ACTIVITY -->
 <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
 
-    <!-- Fondo principal compacto · 4.8 × 2.0, centrado en y=0.45.
-         Límites: x ±2.4 · y -0.55…1.45. El título, los avatares, el globo
-         de diálogo y los controles quedan dentro sin mover sus posiciones. -->
+    <!-- Fondo principal · 4.6 × 2.3 (x ±2.3 · y -0.75…1.55).
+         Anchura reducida; altura y posición vertical original conservadas. -->
     <a-plane
-        width="4.8"
-        height="2.0"
+        width="4.6"
+        height="2.3"
         color="#1a1a2e"
         material="opacity:0.95; shader:flat"
-        position="0 0.45 0">
+        position="0 0.4 0">
     </a-plane>
 
     <!-- Título -->
@@ -2016,8 +2015,8 @@ function ejecutarFlujoGuardado() {
              los mismos 0.058 (0.48 → 0.422) para que el texto siga centrado en el arte.
              Con eso el borde inferior (-0.063) queda a 0.107 del borde superior del botón
              Next (y -0.17) y por encima del contador (y -0.28), sin tocarlos.
-             El panel compacto mide 4.8 × 2.0 (±2.4; y -0.55…1.45), dejando
-             márgenes equilibrados alrededor del globo, avatar y controles. -->
+             El panel mide 4.6 × 2.3 (±2.3; y -0.75…1.55), con menos margen
+             horizontal y los límites verticales originales. -->
         <a-image id="dialogue-box-img"
                  src="assets/CuadroTexto.png"
                  width="2.64"
