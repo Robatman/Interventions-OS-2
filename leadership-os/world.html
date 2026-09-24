@@ -1918,16 +1918,15 @@ function ejecutarFlujoGuardado() {
 <!-- SCREEN: ACTIVE LISTENING ACTIVITY -->
 <a-entity id="screen-active-listening-activity" position="0 1.6 -2" visible="false">
 
-    <!-- Fondo principal · 5.4 × 2.3 (x ±2.7 · y -0.75…1.55), ensanchado desde 5.0 para
-         que el cuadro CuadroTexto.png (arte 4.41 de ancho → ±2.207) y la columna de
-         axolotl de la izquierda queden holgados dentro del panel: 0.49 de margen hasta el
-         globo y 0.13 hasta el arte del axolotl (x -2.57 con su posición actual). -->
+    <!-- Fondo principal compacto · 4.8 × 2.0, centrado en y=0.45.
+         Límites: x ±2.4 · y -0.55…1.45. El título, los avatares, el globo
+         de diálogo y los controles quedan dentro sin mover sus posiciones. -->
     <a-plane
-        width="5.4"
-        height="2.3"
+        width="4.8"
+        height="2.0"
         color="#1a1a2e"
         material="opacity:0.95; shader:flat"
-        position="0 0.4 0">
+        position="0 0.45 0">
     </a-plane>
 
     <!-- Título -->
@@ -1968,9 +1967,8 @@ function ejecutarFlujoGuardado() {
          totalmente FUERA del cuadro, porque su borde derecho -2.19 no llega al borde
          izquierdo del cuerpo del globo (-2.096) —0.094 de hueco— y queda a 0.74 del
          texto (x ±1.45): no tapa ni el globo ni el texto.
-         Encaje en el panel de fondo: su arte (0.38 de ancho) entra ahora 0.13 dentro del
-         borde izquierdo del panel (x -2.57 frente a -2.7 con el fondo de 5.4), así que ya
-         no asoma nada fuera del marco: no hace falta recortar ni mover al axolotl. -->
+         Encaje en el panel compacto: su imagen conserva la posición bloqueada
+         en el lado izquierdo, sin necesidad de recortar ni mover al axolotl. -->
     <a-image 
         id="activity-juan" 
         src="#juan-neutral" 
@@ -2018,8 +2016,8 @@ function ejecutarFlujoGuardado() {
              los mismos 0.058 (0.48 → 0.422) para que el texto siga centrado en el arte.
              Con eso el borde inferior (-0.063) queda a 0.107 del borde superior del botón
              Next (y -0.17) y por encima del contador (y -0.28), sin tocarlos.
-             El panel de fondo mide 5.4 (±2.7): el globo entra con ~0.49 de margen a cada
-             lado y ~0.62 / ~0.69 por arriba y por abajo (panel y -0.75…1.55). -->
+             El panel compacto mide 4.8 × 2.0 (±2.4; y -0.55…1.45), dejando
+             márgenes equilibrados alrededor del globo, avatar y controles. -->
         <a-image id="dialogue-box-img"
                  src="assets/CuadroTexto.png"
                  width="2.64"
