@@ -72,6 +72,66 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 
 
+/* ───────────────────────────────────────────────────────────────────────────
+   RAYCAST COMPARTIDO · cursor de mirada (cámara) + láser de los mandos VR
+   ───────────────────────────────────────────────────────────────────────────
+   Un ÚNICO juego de clases objetivo para todos los raycasters de la escena,
+   de modo que cualquier botón responda igual a la mirada y al gatillo del
+   control VR. Clases usadas por los botones interactivos:
+     · .clickable   → botones fijos y los que se activan dinámicamente
+     · .sub-tecnica → tarjetas del grid de técnicas y PRACTICE / LEARN /
+                      WORK TOGETHER (el cursor de mirada ya las incluía; el
+                      láser de los mandos NO, y por eso no las detectaba).
+   El atributo raycaster="objects: ..." del #vr-cursor (HTML) debe coincidir
+   con esta constante; setupControllers() lo re-sincroniza si hiciera falta. */
+var VR_RAYCAST_OBJECTS = '.clickable, .sub-tecnica';
+
+/**
+ * Recalcula la lista de objetos de TODOS los raycasters (cursor de la cámara
+ * + mando derecho + mando izquierdo).
+ * Antes solo se refrescaba el primero de la escena (document.querySelector
+ * devuelve solo el primero), así que la caché del láser de los mandos se
+ * quedaba obsoleta al activar/desactivar botones o cambiar de página.
+ */
+function refreshAllRaycasters() {
+  var raycasters = document.querySelectorAll('[raycaster]');
+  for (var i = 0; i < raycasters.length; i++) {
+    var comp = raycasters[i].components && raycasters[i].components.raycaster;
+    if (comp && typeof comp.refreshObjects === 'function') {
+      try { comp.refreshObjects(); } catch (e) { /* nunca debe romper el flujo */ }
+    }
+  }
+}
+
+/**
+ * Devuelve el primer objetivo VÁLIDO del láser de un mando: descarta los
+ * botones fantasma (pantallas inactivas, elementos ocultos o con escala 0) y
+ * exige una clase de interacción. Así un botón de otra pantalla situado por
+ * delante no se "come" el gatillo y el mando dispara el botón que se ve.
+ */
+function getActiveRaycastTarget(ctrl) {
+  var comp = ctrl && ctrl.components && ctrl.components.raycaster;
+  var els = (comp && comp.intersectedEls) || [];
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    if (!el || !el.classList) { continue; }
+    if (!el.classList.contains('clickable') && !el.classList.contains('sub-tecnica')) { continue; }
+    if (el.object3D) {
+      // Misma regla de visibilidad que usa handler-botones-vr.
+      var node = el.object3D;
+      var activo = true;
+      while (node) {
+        if (node.visible === false || node.scale.x === 0) { activo = false; break; }
+        node = node.parent;
+      }
+      if (!activo) { continue; }
+    }
+    return el;
+  }
+  return null;
+}
+
+
 function cambiarPantallaVR(pantallaMostrarId) {
   // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
 const entornoUniversal = document.getElementById('entorno-universal');
@@ -165,10 +225,9 @@ const entornoUniversal = document.getElementById('entorno-universal');
     console.warn("⚠️ [DEBUG-FLUJO] ERROR: ¡No se encontró el elemento HTML #btn-back-activity-previous!");
   }
 
-  const raycasterEl = document.querySelector('[raycaster]');
-  if (raycasterEl && raycasterEl.components.raycaster) {
-    raycasterEl.components.raycaster.refreshObjects();
-  }
+  // Refresca mirada + ambos mandos VR por igual (antes solo se refrescaba el
+  // primer raycaster de la escena, es decir, únicamente el cursor de mirada).
+  refreshAllRaycasters();
 }
 
 function mostrarBriefingIntervencion() {
@@ -1669,7 +1728,11 @@ function ejecutarFlujoGuardado() {
             position="0 -1.1 -2.4"
             class="clickable">
 
-    <a-plane width="0.82"
+    <!-- La clase .clickable va también en la CARA con geometría: A-Frame solo
+         puede raycastear elementos con mesh, así que teniéndola solo en el
+         elemento padre (a-entity) este botón no recibía clics de ningún
+         cursor. El evento burbujea al padre, que conserva su listener de JS. -->
+    <a-plane class="clickable" width="0.82"
              height="0.24"
              color="#111830"
              material="opacity:0.85;shader:flat">
@@ -2449,11 +2512,10 @@ function showScreen(name) {
     }
   });
 
-  const raycasterEl = document.querySelector('[raycaster]');
-  if (raycasterEl && raycasterEl.components.raycaster) {
-    raycasterEl.components.raycaster.refreshObjects();
-  }
-
+  // OJO: el refresco de raycasters se hace al FINAL de esta función, después
+  // de activar/desactivar las clases .clickable/.sub-tecnica. Refrescar aquí
+  // (antes de tocar las clases) mantenía la lista antigua de objetivos en
+  // los raycasters, así que los botones recién activados no eran clicables.
   appState.screen = name;
 
   var planosTecnicas = document.querySelectorAll('.sub-tecnica');
@@ -2461,6 +2523,9 @@ function showScreen(name) {
   if (name === 'technique-list') {
     planosTecnicas.forEach(function(el) {
       el.classList.add('clickable');
+      // Recuerda la tarjeta para que la paginación pueda devolverle
+      // .clickable al volver a su página aunque ahora no esté activa.
+      if (el.parentElement) el.parentElement.setAttribute('data-tech-clickable', '1');
       // console.log("🟢 Botón de técnica ACTIVADO: " + el.id);
     });
     // console.log("🟢 14 botones de técnicas específicos ACTIVADOS");
@@ -2483,6 +2548,10 @@ function showScreen(name) {
     });
     // console.log("🔴 14 botones de técnicas específicos DESACTIVADOS");
   }
+
+  // Refresco final: ya incluye las clases recién activadas/desactivadas, en el
+  // cursor de mirada Y en el láser de los dos mandos VR.
+  refreshAllRaycasters();
 }
 
 function goWelcome(){
@@ -3439,27 +3508,44 @@ function setupControllers(){
   
   // Mano Derecha
   var rc=document.createElement('a-entity');
+  rc.setAttribute('id','vr-hand-right');
   rc.setAttribute('oculus-touch-controls','hand:right');
-  rc.setAttribute('raycaster','objects: .clickable; far:6; showLine:true; lineColor:#00e5c0; lineOpacity:0.7');
+  // Mismo selector de objetivos que el cursor de la mirada: incluye
+  // .sub-tecnica además de .clickable. Con ".clickable" a secas el láser no
+  // detectaba las 14 tarjetas de técnicas ni PRACTICE / LEARN / WORK TOGETHER.
+  rc.setAttribute('raycaster','objects: ' + VR_RAYCAST_OBJECTS + '; far:6; showLine:true; lineColor:#00e5c0; lineOpacity:0.7');
   scene.appendChild(rc);
   
   // Mano Izquierda
   var lc=document.createElement('a-entity');
+  lc.setAttribute('id','vr-hand-left');
   lc.setAttribute('oculus-touch-controls','hand:left');
-  lc.setAttribute('raycaster','objects: .clickable; far:6; showLine:true; lineColor:#9d5cff; lineOpacity:0.5');
+  lc.setAttribute('raycaster','objects: ' + VR_RAYCAST_OBJECTS + '; far:6; showLine:true; lineColor:#9d5cff; lineOpacity:0.5');
   scene.appendChild(lc);
+
+  // Re-sincroniza cualquier otro raycaster de la escena con el selector único
+  // (p. ej. el #vr-cursor declarado en el HTML), sin tocar su geometría.
+  var otrosRay = scene.querySelectorAll('[raycaster]');
+  for (var r = 0; r < otrosRay.length; r++) {
+    var rComp = otrosRay[r].components && otrosRay[r].components.raycaster;
+    if (rComp && rComp.data.objects && rComp.data.objects.indexOf('.sub-tecnica') === -1) {
+      otrosRay[r].setAttribute('raycaster', 'objects', VR_RAYCAST_OBJECTS);
+    }
+  }
+  refreshAllRaycasters();
   
   [rc,lc].forEach(function(ctrl){
     ctrl.addEventListener('triggerdown',function(){
       // console.log('[VR Controles] Trigger presionado en:', ctrl.getAttribute('oculus-touch-controls'));
-      var hit=ctrl.components&&ctrl.components.raycaster&&ctrl.components.raycaster.intersectedEls&&ctrl.components.raycaster.intersectedEls[0];
-      
+      // Primer objetivo REALMENTE activo del láser: descarta botones fantasma
+      // de pantallas inactivas en vez de tirar el gatillo a la basura.
+      var hit=getActiveRaycastTarget(ctrl);
+
       if(hit){
-        if (hit.object3D && hit.object3D.visible === false) {
-          // console.log("🔒 Clic fantasma bloqueado en elemento oculto:", hit.id);
-          return; 
-        }
         // console.log('[VR Controles] Clic ejecutado en elemento objetivo:', hit.id || hit.tagName);
+        // hit.click() lanza un click DOM nativo: mismo efecto que el click que
+        // emite el cursor de la mirada, así que handler-botones-vr, onclick y
+        // addEventListener('click') responden igual por mirada y por gatillo.
         hit.click();
         return;
       }
@@ -3486,6 +3572,32 @@ function setupControllers(){
       else if(isRecording) stopRecording();
     }
   });
+
+  // ── Red de seguridad: cualquier cambio de class/visible dentro de la escena
+  //    (activar/desactivar botones, paginar técnicas, cambiar de pantalla)
+  //    recalcula los objetivos de TODOS los raycasters, agrupando los cambios
+  //    en un único refresco por lote (setTimeout 0).
+  if (window.MutationObserver && !window.__vrRaycastObserver) {
+    var refrescoPendiente = false;
+    var programarRefresco = function () {
+      if (refrescoPendiente) { return; }
+      refrescoPendiente = true;
+      setTimeout(function () {
+        refrescoPendiente = false;
+        refreshAllRaycasters();
+      }, 0);
+    };
+    var observador = new MutationObserver(programarRefresco);
+    observador.observe(scene, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'visible']
+    });
+    window.__vrRaycastObserver = observador;
+  }
+
+  // Objetivos ya listos desde el arranque (mirada + ambos mandos).
+  refreshAllRaycasters();
 }
 
 let currentConversation = [];
@@ -3544,6 +3656,7 @@ const nextBtn = document.querySelector('#btn-next-conversation');
 if (nextBtn) {
   nextBtn.setAttribute('visible', true);
   nextBtn.classList.add('clickable'); // 🌟 Le devolvemos la clase para que el raycaster lo detecte de nuevo
+  refreshAllRaycasters();              // 🌟 …y actualizamos mirada + mandos VR
   
   const nextBtnText = nextBtn.querySelector('a-text');
   if (nextBtnText) nextBtnText.setAttribute('value', '▶ Next');
@@ -3692,11 +3805,8 @@ function showNextConversation() {
       if (toggleText) toggleText.setAttribute('value', 'See the moves');
     }
 
-    // Forzar al raycaster a actualizarse
-    const raycasterEl = document.querySelector('[raycaster]');
-    if (raycasterEl && raycasterEl.components.raycaster) {
-      raycasterEl.components.raycaster.refreshObjects();
-    }
+    // Forzar a TODOS los raycasters a actualizarse (mirada + mandos VR)
+    refreshAllRaycasters();
     return;
   }
 
@@ -3783,25 +3893,25 @@ function applyTechniquePage() {
       el.setAttribute('visible', active ? 'true' : 'false');
       var plane = el.querySelector('a-plane');
       if (!plane) continue;
+      // Toda tarjeta del grid es un objetivo válido de raycast: se marca
+      // SIEMPRE, para poder devolverle .clickable al volver a su página.
+      // (Antes solo se marcaba si ya tenía la clase, así que las páginas 2 y 3
+      // se quedaban sin .clickable/.sub-tecnica y no respondían al gatillo.)
+      el.setAttribute('data-tech-clickable', '1');
       if (active) {
         plane.classList.add('sub-tecnica');
-        if (el.getAttribute('data-tech-clickable') === '1') plane.classList.add('clickable');
+        plane.classList.add('clickable');
       } else {
-        if (plane.classList.contains('clickable')) {
-          el.setAttribute('data-tech-clickable', '1');
-          plane.classList.remove('clickable');
-        }
+        plane.classList.remove('clickable');
         plane.classList.remove('sub-tecnica');
       }
     }
   }
   var ind = document.getElementById('tech-page-indicator');
   if (ind) ind.setAttribute('text', 'value', 'PAGE ' + (techniquePageIdx + 1) + ' / ' + techniquePageCount);
-  // Rebuild de objetivos del raycaster para reflejar el cambio de clases
-  var rayEl = document.querySelector('[raycaster]');
-  if (rayEl && rayEl.components && rayEl.components.raycaster) {
-    rayEl.components.raycaster.refreshObjects();
-  }
+  // Rebuild de objetivos de TODOS los raycasters para reflejar el cambio de
+  // clases (cursor de mirada + ambos mandos VR).
+  refreshAllRaycasters();
 }
 function techniquePageNext() { techniquePageIdx = (techniquePageIdx + 1) % techniquePageCount; applyTechniquePage(); }
 function techniquePagePrev() { techniquePageIdx = (techniquePageIdx + techniquePageCount - 1) % techniquePageCount; applyTechniquePage(); }
