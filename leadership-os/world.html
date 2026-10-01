@@ -22,9 +22,8 @@
 </style>
 </head>
 <body>
-<script>
-(function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
-</script>
+<script src="js/device-auth.js"></script>
+<script>requireDeviceToken();</script>
 
 
 
@@ -2271,8 +2270,6 @@ function ejecutarFlujoGuardado() {
 </a-scene>
 
 <script>
-const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
-const SUPA_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
 
 let appState = {
   screen: 'welcome',
@@ -2762,7 +2759,7 @@ async function callGroqLLM(mode) {
       'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
   }
 
-  var res = await fetch('/api/groq', {
+  var res = await authFetch('/api/groq', {
 
     method: 'POST',
 
@@ -3100,7 +3097,7 @@ async function goEval() {
 
   try {
 
-    var res = await fetch('/api/groq', {
+    var res = await authFetch('/api/groq', {
 
       method: 'POST',
 
@@ -3200,7 +3197,7 @@ async function goEval() {
 
 
 async function translateToEnglish(text) {
-  const res = await fetch('/api/groq_speakvr', {
+  const res = await authFetch('/api/groq_speakvr', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -3230,7 +3227,7 @@ async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
   // const englishText = await translateToEnglish(text);
 
   // pedir audio
-  const speechResponse = await fetch('/api/groq_speakvr', {
+  const speechResponse = await authFetch('/api/groq_speakvr', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -3407,7 +3404,7 @@ async function transcribeAudio(blob) {
 
   // console.log('[Frontend] Enviando audio a nuestro backend seguro...');
   try {
-    var res = await fetch('/api/transcribe', {
+    var res = await authFetch('/api/transcribe', {
       method: 'POST',
       body: form // 👈 ¡ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ AQUÍ!
     });
@@ -3953,8 +3950,7 @@ if (btnNewSession) {
 }
   var btnLogout=document.getElementById('btn-logout');
   if(btnLogout)btnLogout.addEventListener('click',function(){
-    localStorage.removeItem('ldr_session_token');
-    localStorage.removeItem('ldr_refresh_token');
+    clearDeviceToken();
     window.location.href='login-vr.html';
   });
 

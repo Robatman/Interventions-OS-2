@@ -189,12 +189,12 @@
     <div class="sep"></div>
 
     <div class="field">
-      <label>GAME ID</label>
+      <label>CÓDIGO DE EMPAREJAMIENTO</label>
       <input
-        id="input-gameid"
+        id="input-code"
         type="text"
-        placeholder="ej: CM.RODRIGUEZ"
-        maxlength="24"
+        placeholder="XXXX-XXXX"
+        maxlength="9"
         autocomplete="off"
         autocorrect="off"
         autocapitalize="characters"
@@ -202,74 +202,56 @@
       >
     </div>
 
-    <div class="field">
-      <label>CONTRASEÑA</label>
-      <input
-        id="input-pass"
-        type="password"
-        placeholder="••••••••"
-        maxlength="32"
-        autocomplete="current-password"
-      >
-    </div>
-
     <div id="status"></div>
 
     <div class="btn-row">
       <button id="btn-clear">LIMPIAR</button>
-      <button id="btn-login">INGRESAR →</button>
+      <button id="btn-login">EMPAREJAR →</button>
     </div>
 
     <div class="hint">
-      En Quest: apunta al campo con el control<br>
+      Pide el código a quien administra los visores<br>En Quest: apunta al campo con el control<br>
       <span>Trigger</span> para activar · el teclado aparece solo
     </div>
 
   </div>
 </div>
 
+<script src="js/device-auth.js"></script>
 <script>
 // ══════════════════════════════════════════
-//  CENTRIS VR LOGIN
+//  CENTRIS VR — EMPAREJAMIENTO DE VISOR
+//  El código se genera con scripts/pairing-code.mjs (vale 10 min).
+//  El servidor lo valida y entrega un token que queda guardado en el visor.
 // ══════════════════════════════════════════
 
-const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
-const SUPA_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
+// Si este visor ya está emparejado, entra directo
+if (window.hasDeviceToken()) window.location.replace('world.html');
 
-// Loading out
+const codeInput = document.getElementById('input-code');
+const btn = document.getElementById('btn-login');
+
 window.addEventListener('load', () => {
   setTimeout(() => {
     const l = document.getElementById('loading');
     l.style.opacity = '0';
     setTimeout(() => l.style.display = 'none', 600);
-    // Focus automático al campo Game ID
-    document.getElementById('input-gameid').focus();
+    codeInput.focus();
   }, 800);
 });
 
-// Auto-mayúsculas en Game ID
-document.getElementById('input-gameid').addEventListener('input', function() {
-  const pos = this.selectionStart;
-  this.value = this.value.toUpperCase();
-  this.setSelectionRange(pos, pos);
+// Mayúsculas automáticas y guion después del 4.º carácter
+codeInput.addEventListener('input', function () {
+  const raw = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+  this.value = raw.length > 4 ? raw.slice(0, 4) + '-' + raw.slice(4) : raw;
 });
+codeInput.addEventListener('keydown', e => { if (e.key === 'Enter') doPair(); });
 
-// Enter en cualquier campo → login
-document.getElementById('input-gameid').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('input-pass').focus();
-});
-document.getElementById('input-pass').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-
-// Botones
-document.getElementById('btn-login').addEventListener('click', doLogin);
+btn.addEventListener('click', doPair);
 document.getElementById('btn-clear').addEventListener('click', () => {
-  document.getElementById('input-gameid').value = '';
-  document.getElementById('input-pass').value = '';
-  document.getElementById('status').textContent = '';
-  document.getElementById('status').style.color = '#ff5c5c';
-  document.getElementById('input-gameid').focus();
+  codeInput.value = '';
+  showStatus('');
+  codeInput.focus();
 });
 
 function showStatus(msg, color) {
@@ -278,96 +260,40 @@ function showStatus(msg, color) {
   el.style.color = color || '#ff5c5c';
 }
 
-// ── LOGIN ─────────────────────────────────
-// TODO: Restore DB Auth when server is back.
-// The backend DB/auth server (Supabase) is currently disconnected, so the
-// real authentication fetch below is commented out (NOT deleted).
-// MOCK BYPASS: any login attempt — even with empty/dummy credentials —
-// seeds a mock session and goes straight to world.html.
-// Set BYPASS_AUTH = false to re-enable the real DB auth flow.
-const BYPASS_AUTH      = true;              // TODO: set to false when server is back
-const DEFAULT_GAME_ID  = 'CM.DEMO';         // used when the Game ID field is empty
+async function doPair() {
+  const code = codeInput.value.replace(/[^A-Z0-9]/g, '');
+  if (code.length !== 8) { showStatus('Escribe el código de 8 caracteres'); codeInput.focus(); return; }
 
-// ── MOCK SESSION SEEDER (DB-offline fallback) ──
-// world.html expects these localStorage keys (its token guard at the top of
-// the file and its greeting logic read them). Seed dummy values so nothing
-// blocks or throws with missing token/user session data.
-function seedMockSession(gameId) {
-  try {
-    localStorage.setItem('ldr_session_token', 'mock_token_'   + Date.now());
-    localStorage.setItem('ldr_refresh_token', 'mock_refresh_' + Date.now());
-    localStorage.setItem('ldr_game_id',       gameId || DEFAULT_GAME_ID);
-    if (!localStorage.getItem('ldr_uid'))
-      localStorage.setItem('ldr_uid', 'user_mock_' + Math.random().toString(36).slice(2, 11));
-  } catch (e) {
-    console.warn('[BYPASS] Could not seed mock session:', e);
-  }
-}
-
-async function doLogin() {
-  let  gameId = document.getElementById('input-gameid').value.trim().toUpperCase();
-  const pass  = document.getElementById('input-pass').value.trim();
-
-  // TODO: Restore DB Auth when server is back.
-  // Original credential validation (bypassed so empty/dummy credentials work):
-  // if (!gameId) { showStatus('Ingresa tu Game ID');    document.getElementById('input-gameid').focus(); return; }
-  // if (!pass)   { showStatus('Ingresa tu contraseña'); document.getElementById('input-pass').focus();   return; }
-  if (!gameId) gameId = DEFAULT_GAME_ID; // mock bypass: accept empty credentials
-
-  // Deshabilitar botón mientras procesa
-  const btn = document.getElementById('btn-login');
   btn.disabled = true;
   btn.textContent = 'Verificando…';
   showStatus('Conectando…', '#00e5a0');
 
-  // ── MOCK BYPASS (DB offline) ─────────────
-  // TODO: Restore DB Auth when server is back — remove/flip BYPASS_AUTH.
-  if (BYPASS_AUTH) {
-    seedMockSession(gameId);
-    showStatus('¡Bienvenido ' + gameId + '! (Modo sin BD)', '#00e5a0');
-    btn.textContent = '✓ Entrando…';
-    btn.style.background = '#00e5a0';
-    btn.style.color = '#0d1628';
-
-    setTimeout(() => { window.location.href = 'world.html'; }, 900);
-    return;
-  }
-
-  /* TODO: Restore DB Auth when server is back.
   try {
-    const email = gameId + '@leadershipos.app';
-    const res   = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
-      body:    JSON.stringify({ email, password: pass })
+    const res = await fetch('/api/pair', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
     });
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
 
-    if (!res.ok || data.error) {
-      showStatus(data.error_description || 'Game ID o contraseña incorrectos');
+    if (!res.ok || !data.token) {
+      showStatus(data.error || 'No se pudo emparejar. Intenta de nuevo.');
       btn.disabled = false;
-      btn.textContent = 'INGRESAR →';
+      btn.textContent = 'EMPAREJAR →';
       return;
     }
 
-    // Guardar igual que auth.js
-    localStorage.setItem('ldr_session_token',  data.access_token);
-    if (data.refresh_token)
-      localStorage.setItem('ldr_refresh_token', data.refresh_token);
-
-    showStatus('¡Bienvenido ' + gameId + '!', '#00e5a0');
+    window.setDeviceToken(data.token);
+    showStatus('¡Visor emparejado!', '#00e5a0');
     btn.textContent = '✓ Entrando…';
     btn.style.background = '#00e5a0';
     btn.style.color = '#0d1628';
-
     setTimeout(() => { window.location.href = 'world.html'; }, 900);
-
-  } catch(e) {
+  } catch (e) {
     showStatus('Error de conexión. Intenta de nuevo.');
     btn.disabled = false;
-    btn.textContent = 'INGRESAR →';
+    btn.textContent = 'EMPAREJAR →';
   }
-  TODO: Restore DB Auth when server is back. */
 }
 </script>
 </body>

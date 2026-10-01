@@ -212,6 +212,7 @@
 <canvas id="vr-canvas" style="display:none;"></canvas>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/device-auth.js"></script>
 <script>
 // ─── STATE ────────────────────────────────
 let vrSession    = null;
@@ -527,7 +528,7 @@ At the end of EVERY response add EXACTLY: [MOOD:XX] where XX is 0-100 representi
 Start at 30. Increase if supervisor listens well. Decrease if they pressure or blame.
 Keep responses SHORT — 1-3 sentences max. This is a spoken VR conversation.`;
 
-  const res = await fetch('/api/groq', {
+  const res = await authFetch('/api/groq', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

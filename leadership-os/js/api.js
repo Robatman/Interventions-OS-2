@@ -8,7 +8,7 @@
 // ─── GROQ CHAT ────────────────────────────
 
 async function callGroq(messages, systemPrompt, temp = 0.82) {
-  const res = await fetch('/api/groq', {
+  const res = await authFetch('/api/groq', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -58,7 +58,7 @@ async function speakWithGroq(text, archetypeId = 'default') {
     isSpeaking = true;
     updateVoiceIndicator(true);
 
-    const res = await fetch('/api/groq-tts', {
+    const res = await authFetch('/api/groq-tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
