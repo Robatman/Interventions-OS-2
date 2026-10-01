@@ -164,6 +164,7 @@
     e.addEventListener('mouseleave', function () { e.setAttribute('scale', '1 1 1'); });
     e.addEventListener('click', function (evt) {
       if (!isActive(e)) return;
+      if (typeof unlockAudio === 'function') unlockAudio();
       if (o.action) { evt.stopImmediatePropagation(); evt.stopPropagation(); if (typeof ejecutarFuncionPorTecnica === 'function') ejecutarFuncionPorTecnica(o.action); }
       else if (o.onClick) { evt.stopImmediatePropagation(); evt.stopPropagation(); o.onClick(evt); }
       // sin acción ni onClick: los listeners por id de world.html se encargan
@@ -601,6 +602,19 @@
     var pv = screen('screen-active-listening-activity', false);
     CASTS['screen-active-listening-activity'] = { juan: { a: -48, r: 2.9, y: .6, s: .95 }, ajo: { a: 48, r: 2.9, y: .6, s: .95 } };
     hud(ROOT);
+    // Aviso temporal (por ejemplo cuando la voz no está disponible)
+    P.toast = add(ROOT, panel({
+      a: 0, r: 2.5, y: -.07, w: 3.4, h: .32, px: 200, state: { text: '' }, noFly: true,
+      draw: function (g, W, H, s) {
+        if (!s.text) return; var p = 6; shadow(g, 'rgba(20,34,74,.3)', 14); rr(g, p, p, W - 2 * p, H - 2 * p, (H - 2 * p) / 2); g.fillStyle = 'rgba(255,183,3,.95)'; g.fill(); shadow(g, 'transparent', 0);
+        g.fillStyle = '#3a2500'; g.font = '800 ' + (H * .4) + 'px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(s.text, W / 2, H / 2 + 2);
+      }
+    }));
+    // Botón para salir de VR: solo se ve dentro del visor
+    P.exitVR = add(ROOT, pill({ a: 36, r: 2.4, y: .3, w: 1.15, h: .3, label: 'Exit VR', bg: C.coral, fs: .4, onClick: function () { try { SCENE.exitVR(); } catch (e) {} } }));
+    P.exitVR._noFly = true; P.exitVR.setAttribute('visible', 'false'); P.exitVR.setAttribute('scale', '0 0 0');
+    SCENE.addEventListener('enter-vr', function () { P.exitVR.setAttribute('visible', 'true'); P.exitVR.setAttribute('scale', '1 1 1'); if (typeof refreshAllRaycasters === 'function') refreshAllRaycasters(); });
+    SCENE.addEventListener('exit-vr', function () { P.exitVR.setAttribute('visible', 'false'); P.exitVR.setAttribute('scale', '0 0 0'); });
     P.pvHead = add(pv, panel({
       x: 0, y: 3.12, z: -3.0, w: 5.4, h: .85, px: 200, state: PV,
       draw: function (g, W, H, s) {
@@ -819,6 +833,12 @@
   };
 
   // Etapa de la lección ("STEP 2/4 · WHAT IT IS") que se muestra en la burbuja de Juanjolote
+  var toastTimer = null;
+  UI3D.toast = function (text, ms) {
+    if (!P.toast) return; P.toast.upd({ text: text }); clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { P.toast.upd({ text: '' }); }, ms || 7000);
+  };
+
   UI3D.setLearnStage = function (label) { S.stageLabel = label || ''; if (P.bubble) P.bubble.redraw(); };
 
   // Los elementos de la pantalla llegan volando, uno tras otro (da relieve y sensación de movimiento)

@@ -76,7 +76,22 @@ AFRAME.registerComponent('handler-botones-vr', {
 // ═══ Director de audio ═══
 // Un solo audio a la vez. Al cambiar de pantalla o pedir otro audio, el anterior se corta,
 // y cualquier audio que llegue tarde (la red tardó) se descarta.
-var _voice = { seq: 0, audio: null };
+var _voice = { seq: 0, audio: null, el: null, unlocked: false };
+
+// El navegador del visor solo deja sonar el audio si "se desbloqueó" con un toque real.
+// Se crea UN elemento de audio, se desbloquea en el primer toque/clic y se reutiliza siempre.
+function unlockAudio() {
+  if (_voice.unlocked) return;
+  try {
+    var a = _voice.el || (_voice.el = new Audio());
+    a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+    var p = a.play();
+    if (p && p.then) p.then(function () { a.pause(); _voice.unlocked = true; }).catch(function () {});
+    else _voice.unlocked = true;
+  } catch (e) {}
+}
+['pointerdown', 'click', 'touchstart', 'keydown'].forEach(function (ev) { document.addEventListener(ev, unlockAudio, true); });
+function voiceNote(msg) { console.warn('[Voz]', msg); try { if (window.UI3D) UI3D.toast(msg); } catch (e) {} }
 
 function stopVoice() {
   _voice.seq++;
@@ -1909,12 +1924,13 @@ function getVoice(character) {
 // Voz gratuita del navegador: se usa cuando la voz de Groq falla o llega a su límite de uso
 function speakBrowser(text, done) {
   try {
-    if (!('speechSynthesis' in window)) { done(); return; }
+    if (!('speechSynthesis' in window)) { voiceNote('No voice available on this device'); done(); return; }
     window.speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US';
     var voices = window.speechSynthesis.getVoices() || [];
     var en = voices.filter(function (v) { return /^en[-_]/i.test(v.lang); })[0];
+    if (!voices.length) voiceNote('No basic voice on this device - text only');
     if (en) u.voice = en;
     u.onend = done;
     u.onerror = done;
@@ -1956,21 +1972,24 @@ async function speakVR(text, voice = "daniel", callback = null) {
         var blob = await speechResponse.blob();
         if (mySeq !== _voice.seq) { done(); return; }
         var url = URL.createObjectURL(blob);
-        var audio = new Audio(url);
+        var audio = _voice.el || (_voice.el = new Audio());
+        audio.src = url;
         _voice.audio = audio;
         audio.onended = function () { URL.revokeObjectURL(url); if (_voice.audio === audio) _voice.audio = null; done(); };
-        audio.onerror = function () { URL.revokeObjectURL(url); if (mySeq === _voice.seq) speakBrowser(text, done); else done(); };
-        await audio.play();
+        audio.onerror = function () { URL.revokeObjectURL(url); if (mySeq === _voice.seq) { voiceNote('Voice: audio error - using basic voice'); speakBrowser(text, done); } else done(); };
+        try { await audio.play(); } catch (pe) { voiceNote('Voice blocked by the browser (touch the screen once)'); if (mySeq === _voice.seq) speakBrowser(text, done); else done(); }
         return;
       }
 
       console.warn('[TTS] Groq respondió', speechResponse.status, '- usando la voz del navegador');
+      voiceNote(speechResponse.status === 401 ? 'Voice: device not paired' : speechResponse.status === 429 ? 'Voice: usage limit reached' : 'Voice: server error ' + speechResponse.status);
       if (speechResponse.status === 429) {
         appState.ttsPausedUntil = Date.now() + 10 * 60 * 1000;
         setHUD('ready', 'Voice limit reached - using basic voice');
       }
     } catch (e) {
       console.warn('[TTS] Error de voz, usando la voz del navegador:', e);
+      voiceNote('Voice: connection error - using basic voice');
     }
   }
 
