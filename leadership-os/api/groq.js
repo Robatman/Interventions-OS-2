@@ -3,14 +3,17 @@ import { requireAuth } from './_auth.js';
 // El servidor elige el modelo. No todas las cuentas de Groq tienen acceso a los mismos modelos,
 // así que se prueban en orden de preferencia y se recuerda el primero que funcione.
 // Para forzar uno: variable de entorno GROQ_CHAT_MODEL.
+// Los Llama de Groq figuran como "Enterprise" (solo con ventas), por eso van al final.
+// gpt-oss-120b / gpt-oss-20b están disponibles en cuentas normales.
 const PREFERRED_MODELS = [
-  'llama-3.3-70b-versatile',
   'openai/gpt-oss-120b',
-  'qwen/qwen3.8-27b',
   'openai/gpt-oss-20b',
+  'qwen/qwen3.8-27b',
+  'llama-3.3-70b-versatile',
   'llama-3.1-8b-instant',
 ];
 const MAX_TOKENS_CAP = 600;
+const REASONING_HEADROOM = 250;   // gpt-oss "piensa" antes de responder y eso cuenta en max_tokens
 const MAX_MESSAGES   = 40;
 const MAX_CHARS      = 24000;
 const BLOCK_MS       = 10 * 60 * 1000;
@@ -23,6 +26,11 @@ function reasoningParams(model) {
   if (model.startsWith('qwen/')) return { reasoning_effort: 'none', reasoning_format: 'hidden' };
   if (model.startsWith('openai/gpt-oss')) return { reasoning_effort: 'low', include_reasoning: false };
   return {};
+}
+
+// En los modelos con razonamiento, parte del presupuesto se gasta pensando: se amplía para que la respuesta no salga vacía
+function tokenBudget(model, requested) {
+  return model.startsWith('openai/gpt-oss') ? requested + REASONING_HEADROOM : requested;
 }
 
 function candidates() {
@@ -78,7 +86,7 @@ export default async function handler(req, res) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
         },
-        body: JSON.stringify({ ...base, model, ...reasoningParams(model) }),
+        body: JSON.stringify({ ...base, max_tokens: tokenBudget(model, base.max_tokens), model, ...reasoningParams(model) }),
       });
       const data = await response.json();
 
