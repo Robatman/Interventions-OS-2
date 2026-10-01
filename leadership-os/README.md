@@ -53,6 +53,7 @@ leadership-os/
    node scripts/pairing-code.mjs
    ```
 3. Abre `login-vr.html` en el visor (o en la computadora), escribe el código y pulsa **EMPAREJAR**. Cada dispositivo se empareja una sola vez (el token dura 180 días).
+   **Computadora prestada / invitado:** genera el código con `node scripts/pairing-code.mjs guest`. Ese acceso dura 3 horas y se borra al cerrar la pestaña, así que la computadora no queda emparejada.
 4. Si se pierde un dispositivo: cambia `VR_TOKEN_EPOCH` en Vercel (por ejemplo a `2`) y vuelve a emparejar los demás.
 
 Todos los endpoints `/api/*` exigen el token. El límite de uso por token es por instancia de Vercel (red de seguridad, no garantía).
