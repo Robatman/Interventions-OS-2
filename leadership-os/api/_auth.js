@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════
-//  _auth.mjs — acceso por visor emparejado (sin base de datos)
+//  _auth.js — acceso por visor emparejado (sin base de datos)
 //
 //  Variables de entorno en Vercel:
 //    VR_TOKEN_SECRET  (obligatoria) cadena larga y aleatoria (32+ caracteres)
@@ -12,10 +12,10 @@
 //    3. Cada endpoint exige  Authorization: Bearer <token>
 // ═══════════════════════════════════════════════════════════
 
-import crypto from 'node:crypto';
+const crypto = require('node:crypto');
 
-export const TOKEN_TTL_MS    = 180 * 24 * 60 * 60 * 1000;
-export const PAIR_WINDOW_MS  = 10 * 60 * 1000;
+const TOKEN_TTL_MS = 180 * 24 * 60 * 60 * 1000;
+const PAIR_WINDOW_MS = 10 * 60 * 1000;
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sin 0/O/1/I
 
 const b64u = (buf) => Buffer.from(buf).toString('base64url');
@@ -26,7 +26,7 @@ function safeEqual(a, b) {
   return ba.length === bb.length && crypto.timingSafeEqual(ba, bb);
 }
 
-export function getSecret() {
+function getSecret() {
   const s = process.env.VR_TOKEN_SECRET;
   return s && s.length >= 16 ? s : null;
 }
@@ -34,14 +34,14 @@ export function getSecret() {
 const currentEpoch = () => String(process.env.VR_TOKEN_EPOCH || '1');
 
 // ─── Código de emparejamiento (sin estado, por ventana de tiempo) ──────
-export function pairingCodeFor(secret, windowIndex) {
+function pairingCodeFor(secret, windowIndex) {
   const d = hmac(secret, `pair:${windowIndex}`);
   let out = '';
   for (let i = 0; i < 8; i++) out += ALPHABET[d[i] % ALPHABET.length];
   return out;
 }
 
-export function currentPairingCode(secret, now = Date.now()) {
+function currentPairingCode(secret, now = Date.now()) {
   const w = Math.floor(now / PAIR_WINDOW_MS);
   return {
     code: pairingCodeFor(secret, w),
@@ -49,7 +49,7 @@ export function currentPairingCode(secret, now = Date.now()) {
   };
 }
 
-export function verifyPairingCode(secret, input, now = Date.now()) {
+function verifyPairingCode(secret, input, now = Date.now()) {
   const clean = String(input || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
   if (clean.length !== 8) return false;
   const w = Math.floor(now / PAIR_WINDOW_MS);
@@ -58,7 +58,7 @@ export function verifyPairingCode(secret, input, now = Date.now()) {
 }
 
 // ─── Token del visor ───────────────────────────────────────────────────
-export function signToken(secret, now = Date.now()) {
+function signToken(secret, now = Date.now()) {
   const payload = b64u(JSON.stringify({
     v: 1,
     iat: now,
@@ -69,7 +69,7 @@ export function signToken(secret, now = Date.now()) {
   return { token: `${payload}.${b64u(hmac(secret, payload))}`, exp: now + TOKEN_TTL_MS };
 }
 
-export function verifyToken(secret, token, now = Date.now()) {
+function verifyToken(secret, token, now = Date.now()) {
   if (typeof token !== 'string' || token.length > 400) return null;
   const [payload, sig] = token.split('.');
   if (!payload || !sig) return null;
@@ -85,7 +85,7 @@ export function verifyToken(secret, token, now = Date.now()) {
 
 // ─── Límite de uso (por instancia; red de seguridad, no garantía) ──────
 const buckets = new Map();
-export function rateLimit(key, max, windowMs, now = Date.now()) {
+function rateLimit(key, max, windowMs, now = Date.now()) {
   const b = buckets.get(key);
   if (!b || now > b.reset) {
     buckets.set(key, { n: 1, reset: now + windowMs });
@@ -95,7 +95,7 @@ export function rateLimit(key, max, windowMs, now = Date.now()) {
   return ++b.n <= max;
 }
 
-export function clientIp(req) {
+function clientIp(req) {
   return String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
 }
 
@@ -103,7 +103,7 @@ export function clientIp(req) {
  * Exige un token válido. Devuelve true si se puede continuar; si no,
  * ya respondió (401 / 429 / 500) y el endpoint debe hacer `return`.
  */
-export function requireAuth(req, res, { perMinute = 40 } = {}) {
+function requireAuth(req, res, { perMinute = 40 } = {}) {
   const secret = getSecret();
   if (!secret) {
     res.status(500).json({ error: 'Servidor sin configurar (VR_TOKEN_SECRET).' });
@@ -122,3 +122,17 @@ export function requireAuth(req, res, { perMinute = 40 } = {}) {
   }
   return true;
 }
+
+// CommonJS a propósito: Vercel compila las funciones de api/ a CommonJS y
+// así este módulo se carga igual en Vercel, en Node y en scripts/.
+exports.TOKEN_TTL_MS = TOKEN_TTL_MS;
+exports.PAIR_WINDOW_MS = PAIR_WINDOW_MS;
+exports.getSecret = getSecret;
+exports.pairingCodeFor = pairingCodeFor;
+exports.currentPairingCode = currentPairingCode;
+exports.verifyPairingCode = verifyPairingCode;
+exports.signToken = signToken;
+exports.verifyToken = verifyToken;
+exports.rateLimit = rateLimit;
+exports.clientIp = clientIp;
+exports.requireAuth = requireAuth;

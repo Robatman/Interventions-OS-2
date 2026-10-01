@@ -1,4 +1,4 @@
-import { requireAuth } from './_auth.mjs';
+import { requireAuth } from './_auth.js';
 
 // Solo estos modelos pueden usarse desde los visores.
 const ALLOWED_MODELS = new Set([

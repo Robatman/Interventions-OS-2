@@ -1,4 +1,4 @@
-import { requireAuth } from './_auth.mjs';
+import { requireAuth } from './_auth.js';
 
 const MAX_AUDIO_BYTES = 8 * 1024 * 1024; // ~8 MB
 

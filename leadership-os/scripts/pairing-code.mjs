@@ -3,7 +3,8 @@
 //   PowerShell:  $env:VR_TOKEN_SECRET="<el mismo valor que en Vercel>"; node scripts/pairing-code.mjs
 //   Bash:        VR_TOKEN_SECRET="<el mismo valor que en Vercel>" node scripts/pairing-code.mjs
 
-import { getSecret, currentPairingCode } from '../api/_auth.mjs';
+import { createRequire } from 'node:module';
+const { getSecret, currentPairingCode } = createRequire(import.meta.url)('../api/_auth.js');
 
 const secret = getSecret();
 if (!secret) {
