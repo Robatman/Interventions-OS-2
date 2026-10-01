@@ -71,6 +71,38 @@ AFRAME.registerComponent('handler-botones-vr', {
 
 
 
+// ═══ Director de audio ═══
+// Un solo audio a la vez. Al cambiar de pantalla o pedir otro audio, el anterior se corta,
+// y cualquier audio que llegue tarde (la red tardó) se descarta.
+var _voice = { seq: 0, audio: null };
+
+function stopVoice() {
+  _voice.seq++;
+  if (_voice.audio) { try { _voice.audio.pause(); } catch (e) {} _voice.audio = null; }
+  try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch (e) {}
+}
+
+// Qué se dice según lo que elige el staff. Más adelante cada clave puede apuntar a un audio pregrabado.
+var VOICE_LINES = {
+  welcome: function () {
+    var gameId = ''; try { gameId = localStorage.getItem('ldr_game_id') || ''; } catch (e) {}
+    var name = gameId.split('.')[1];
+    return 'Welcome' + (name && name !== 'VISOR' ? ' ' + name : '') + '. I am Juanjolote. ' +
+      'Choose a path: Interventions, to practice real check-in conversations, or Techniques, to build the skills to run them well.';
+  },
+  interventions: 'These are the check-ins that help you spot attrition early. Pick the one you want to practice.',
+  techniques: 'These are your tools. Pick one and I will show you a quick before and after example.'
+};
+
+function sayLine(key) {
+  var t = VOICE_LINES[key];
+  if (typeof t === 'function') t = t();
+  if (t) speakVR(t, 'daniel');
+}
+
+// Frase al ENTRAR a ciertas pantallas (la de bienvenida se dice al pulsar START, no al cargar)
+var SCREEN_INTRO_LINES = { 'screen-interventions': 'interventions', 'screen-technique-list': 'techniques' };
+
 /* Shared target selector for the gaze cursor and both VR controller lasers. */
 var VR_RAYCAST_OBJECTS = '.clickable, .sub-tecnica';
 
@@ -87,6 +119,8 @@ function refreshAllRaycasters() {
 
 
 function cambiarPantallaVR(pantallaMostrarId) {
+  stopVoice();   // lo que se estaba diciendo ya no aplica a la pantalla nueva
+  if (typeof setHUD === 'function' && typeof isRecording !== 'undefined' && !isRecording && !isProcessing) setHUD('ready', 'Ready to speak');
   // console.log(`🎬 [DEBUG-PANTALLAS] Cambiando a la pantalla: ${pantallaMostrarId}`);
 const entornoUniversal = document.getElementById('entorno-universal');
   if (entornoUniversal) {
@@ -183,6 +217,9 @@ const entornoUniversal = document.getElementById('entorno-universal');
   // Refresca mirada + ambos mandos VR por igual (antes solo se refrescaba el
   // primer raycaster de la escena, es decir, únicamente el cursor de mirada).
   refreshAllRaycasters();
+
+  var introKey = SCREEN_INTRO_LINES[pantallaMostrarId];
+  if (introKey) sayLine(introKey);
 }
 
 function mostrarBriefingIntervencion() {
@@ -452,6 +489,8 @@ function ejecutarFuncionPorTecnica(tecnica) {
 
     case 'start-app':
       cambiarPantallaVR('screen-welcome');
+      if (typeof setJuanMood === 'function') setJuanMood('happy');
+      sayLine('welcome');
       break;
 
       
@@ -3253,6 +3292,8 @@ function speakBrowser(text, done) {
 }
 
 async function speakVR(text, voice = "daniel", callback = null) {
+  stopVoice();                 // cada audio nuevo corta el anterior
+  var mySeq = _voice.seq;
   // 'done' se ejecuta una sola vez, pase lo que pase (así el indicador nunca se queda en "Thinking...")
   var finished = false;
   var done = function () {
@@ -3273,12 +3314,17 @@ async function speakVR(text, voice = "daniel", callback = null) {
         body: JSON.stringify({ type: 'speech', text: text, voice: voice })
       });
 
+      // Si mientras llegaba el audio el staff cambió de pantalla o pidió otro, este ya no se reproduce
+      if (mySeq !== _voice.seq) { done(); return; }
+
       if (speechResponse.ok) {
         var blob = await speechResponse.blob();
+        if (mySeq !== _voice.seq) { done(); return; }
         var url = URL.createObjectURL(blob);
         var audio = new Audio(url);
-        audio.onended = function () { URL.revokeObjectURL(url); done(); };
-        audio.onerror = function () { URL.revokeObjectURL(url); speakBrowser(text, done); };
+        _voice.audio = audio;
+        audio.onended = function () { URL.revokeObjectURL(url); if (_voice.audio === audio) _voice.audio = null; done(); };
+        audio.onerror = function () { URL.revokeObjectURL(url); if (mySeq === _voice.seq) speakBrowser(text, done); else done(); };
         await audio.play();
         return;
       }
@@ -3293,6 +3339,7 @@ async function speakVR(text, voice = "daniel", callback = null) {
     }
   }
 
+  if (mySeq !== _voice.seq) { done(); return; }
   speakBrowser(text, done);
 }
 
@@ -3997,7 +4044,7 @@ if (btnNewSession) {
     setupMic().then(function(){
       var gameId=localStorage.getItem('ldr_game_id')||'';
       var name=gameId.split('.')[1]||'Manager';
-      var greet='Welcome'+(name?' '+name:'')+'. I am Juanjolote. Choose a path: Interventions to practice retention conversations, or Techniques to develop specific communication skills.';      setTimeout(function(){setJuanMood('happy');speakVR(greet,'daniel');},800);
+      var greet='Welcome'+(name?' '+name:'')+'. I am Juanjolote. Choose a path: Interventions to practice retention conversations, or Techniques to develop specific communication skills.';      
     });
     var stars=document.getElementById('stars-1');
     if(stars)stars.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:180000;easing:linear');
