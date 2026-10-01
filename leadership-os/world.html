@@ -78,7 +78,8 @@ function refreshAllRaycasters() {
   var raycasters = document.querySelectorAll('[raycaster]');
   for (var i = 0; i < raycasters.length; i++) {
     var comp = raycasters[i].components && raycasters[i].components.raycaster;
-    if (comp && typeof comp.refreshObjects === 'function') {
+    // comp.data aún no existe si el rayo se acaba de crear (evita el TypeError 'objects')
+    if (comp && comp.data && typeof comp.refreshObjects === 'function') {
       comp.refreshObjects();
     }
   }
