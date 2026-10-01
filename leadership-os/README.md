@@ -31,6 +31,7 @@ leadership-os/
     preview.js        Ejemplos "cómo no / cómo sí" de cada técnica
     prompts.js        Prompts del avatar, del coach y de la evaluación
     case-engine.js    Crea UN caso por práctica (agente, escenario, ánimo, giros)
+    ui3d.js           Interfaz 3D: ambiente, pantallas, avatares con caras y boca, efectos
     device-auth.js    Token del dispositivo emparejado (authFetch)
   api/                Funciones serverless (Vercel)
     _auth.js          Código de emparejamiento y token firmado (sin base de datos)
@@ -38,6 +39,7 @@ leadership-os/
     groq.js           Chat (modelos permitidos, límites)
     transcribe.js     Voz a texto (Whisper)
     groq_speakvr.js   Texto a voz y traducción
+  assets/ajolotes/    Modelos 3D (GLB) de Juanjolote y Ajolín y sus 9 caras (PNG)
   scripts/
     pairing-code.mjs  Genera el código de emparejamiento
 ```
@@ -65,6 +67,6 @@ Todos los endpoints `/api/*` exigen el token. El límite de uso por token es por
 
 ## Pendientes conocidos
 
-- Integrar los avatares 3D (GLB) con caras por estado de ánimo y boca sincronizada.
-- Rediseño visual 360 (paleta clara y viva).
+- Pantalla de progreso ("My progress") con el nuevo diseño.
+- Audios pregrabados para los guiones fijos.
 - Voz más natural (streaming, turnos cortos, interrupciones).
