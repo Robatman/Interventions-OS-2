@@ -4,7 +4,12 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const secret = getSecret();
-  if (!secret) return res.status(500).json({ error: 'Servidor sin configurar (VR_TOKEN_SECRET).' });
+  if (!secret) {
+    // TEMPORAL (diagnóstico): no revela el secreto, solo si existe y cuánto mide
+    const raw = process.env.VR_TOKEN_SECRET;
+    const diag = `entorno=${process.env.VERCEL_ENV || '?'} variable=${raw === undefined ? 'NO existe' : 'existe, largo ' + raw.length} commit=${(process.env.VERCEL_GIT_COMMIT_SHA || '?').slice(0, 7)}`;
+    return res.status(500).json({ error: `Servidor sin configurar (VR_TOKEN_SECRET). [${diag}]` });
+  }
 
   // Freno a la fuerza bruta (por instancia)
   if (!rateLimit(`pair:${clientIp(req)}`, 8, 10 * 60_000)) {
