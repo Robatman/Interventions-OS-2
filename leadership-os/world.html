@@ -816,8 +816,9 @@ function ejecutarFlujoGuardado() {
 <div id="voice-hud"><div id="voice-dot" class="idle"></div><span id="voice-label">Starting Neural Academy...</span></div>
 <button id="mic-btn" title="Hablar">&#127908;</button>
 <!-- <a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018"> -->
-<a-scene vr-mode-ui="enabled:true" 
-         background="color:#04060d" 
+<a-scene vr-mode-ui="enabled:true"
+         cursor="rayOrigin: mouse" raycaster="objects: .clickable, .sub-tecnica"
+         background="color:#04060d"
          renderer="antialias:true;colorManagement:true;alpha:true" 
          fog="type:exponential;color:#070a14;density:0.025">
            <a-assets>
