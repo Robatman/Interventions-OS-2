@@ -218,15 +218,39 @@
     });
   }
 
+  // Color más claro/oscuro (solo para #rrggbb; otros formatos se dejan igual)
+  function shade(col, k) {
+    var m = /^#([0-9a-f]{6})$/i.exec(col || ''); if (!m) return col;
+    var n = parseInt(m[1], 16), c = [n >> 16 & 255, n >> 8 & 255, n & 255].map(function (v) { return Math.max(0, Math.min(255, Math.round(k > 0 ? v + (255 - v) * k : v * (1 + k)))); });
+    return '#' + c.map(function (v) { return ('0' + v.toString(16)).slice(-2); }).join('');
+  }
+  // Losa con forma de píldora: da grosor al botón (se ve el borde al mirarlo de lado)
+  function slab(w, h, depth, color) {
+    var r = h / 2, sh = new THREE.Shape();
+    sh.moveTo(-w / 2 + r, -h / 2); sh.lineTo(w / 2 - r, -h / 2); sh.absarc(w / 2 - r, 0, r, -Math.PI / 2, Math.PI / 2, false);
+    sh.lineTo(-w / 2 + r, h / 2); sh.absarc(-w / 2 + r, 0, r, Math.PI / 2, Math.PI * 1.5, false);
+    var g = new THREE.ExtrudeGeometry(sh, { depth: depth, bevelEnabled: false, curveSegments: 20 }); g.translate(0, 0, -depth);
+    return new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: color, toneMapped: false }));
+  }
+
   function pill(o) {
     placed(o);
-    return panel({
+    var e = panel({
       x: o.x, y: o.y, z: o.z, w: o.w, h: o.h, id: o.id, action: o.action, onClick: o.onClick, clickable: o.clickable, sheen: !!o.sheen, state: { label: o.label },
       draw: function (g, W, H, s) {
-        var p = 8; shadow(g, 'rgba(20,34,74,.25)', 14); rr(g, p, p, W - 2 * p, H - 2 * p, (H - 2 * p) / 2); g.fillStyle = s.bg || o.bg || C.navy; g.fill(); shadow(g, 'transparent', 0);
-        g.fillStyle = o.fg || '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '800 ' + (H * (o.fs || .38)) + 'px ' + FONT; g.fillText(s.label, W / 2, H / 2 + 2);
+        var p = 10, base = s.bg || o.bg || C.navy, rad = (H - 2 * p) / 2;
+        var gr = g.createLinearGradient(0, p, 0, H - p); gr.addColorStop(0, shade(base, .28)); gr.addColorStop(.55, base); gr.addColorStop(1, shade(base, -.22));
+        rr(g, p, p, W - 2 * p, H - 2 * p, rad); g.fillStyle = typeof shade(base, .1) === 'string' && /^#/.test(base) ? gr : base; g.fill();
+        g.save(); rr(g, p, p, W - 2 * p, H - 2 * p, rad); g.clip(); var hl = g.createLinearGradient(0, p, 0, H * .55); hl.addColorStop(0, 'rgba(255,255,255,.55)'); hl.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = hl; g.fillRect(p, p, W - 2 * p, (H - 2 * p) * .5); g.restore();
+        g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.7)'; rr(g, p + 1.5, p + 1.5, W - 2 * p - 3, H - 2 * p - 3, rad); g.stroke();
+        g.fillStyle = o.fg || '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '800 ' + (H * (o.fs || .38)) + 'px ' + FONT;
+        if (!o.fg) { g.shadowColor = 'rgba(10,20,70,.45)'; g.shadowBlur = 6; }
+        g.fillText(s.label, W / 2, H / 2 + 2); g.shadowBlur = 0;
       }
     });
+    var base0 = o.bg || C.navy, side = /^#/.test(base0) ? shade(base0, -.42) : '#2b3a66';
+    e.setObject3D('slab', slab(o.w - .05, o.h - .05, .09, side));
+    return e;
   }
 
   function label(o) {
@@ -337,7 +361,7 @@
                          briefing: { title: '', trap: '', raw: '' }, evalRaw: '' };
   var P = UI3D.p = {};      // paneles dinámicos
   var PV = UI3D.pv = { phase: 'bad', title: '', msg: null, insight: '', moves: [], roleA: 'Coach', last: { A: 'neutral', B: 'neutral' } };   // estado del ejemplo
-  var TECH_PAGE = 0, TECH_CARDS = [], TECH_PER_PAGE = 6;
+  var TECH_PAGE = 0, TECH_CARDS = [], TECH_PER_PAGE = 8;
 
   function techList() {
     var ids = ['active-listening', 'powerful-questions', 'motivational-interviewing', 'nonviolent-communication', 'radical-candor', 'crucial-conversations',
@@ -352,8 +376,8 @@
   }
 
   // Posiciones de los personajes por pantalla (a = grados alrededor de ti; 0 = al frente)
-  var JL = { juan: { a: 0, r: 1.9, y: .6, s: .85 } };
-  var AJR = { ajo: { a: 0, r: 1.9, y: .6, s: .85 } };
+  var JL = { juan: { a: 0, r: 2.3, y: .25, s: .8 } };
+  var AJR = { ajo: { a: 0, r: 2.3, y: .25, s: .8 } };
   var CASTS = {};
   var CRUMB = { 'screen-welcome': 'HOME', 'screen-interventions': 'HOME  ›  INTERVENTIONS', 'screen-technique-list': 'HOME  ›  TECHNIQUES', 'screen-learn-work-practice': 'CHOOSE A MODE',
                 'screen-level-selector': 'CHOOSE A LEVEL', 'screen-intervention-briefing': 'BRIEFING', 'screen-active-listening-activity': 'QUICK EXAMPLE', 'screen-eval': 'RESULTS' };
@@ -366,7 +390,7 @@
   function tip(parent, a, y, text, col, r) {
     var left = a < 0;
     return add(parent, panel({
-      a: a, r: r || 3.4, y: y, w: 1.4, h: .62, px: 240, float: true, state: { text: text }, noFly: false,
+      a: a, r: r || 3.4, y: y, w: 1.9, h: .78, px: 220, float: true, state: { text: text }, noFly: false,
       draw: function (g, W, H, s) {
         var p = 10, bh = H - 16; shadow(g, 'rgba(10,20,70,.3)', 16); rr(g, p, p, W - 2 * p, bh - p, 26);
         var f = g.createLinearGradient(0, 0, W, H); f.addColorStop(0, 'rgba(34,70,190,.7)'); f.addColorStop(1, 'rgba(96,58,205,.65)'); g.fillStyle = f; g.fill();
@@ -452,7 +476,7 @@
     I.chips.forEach(function (c, i) {
       var o = c.object3D;
       if (i >= cnt) { c.setAttribute('visible', 'false'); o.scale.set(.001, .001, .001); return; }
-      var it = items[i], a = (i - (cnt - 1) / 2) * 26, r = i % 2 ? 2.75 : 3.1, pos = polar(a, r, 1.5 + (i % 2 ? -.08 : .1));
+      var it = items[i], a = (i - (cnt - 1) / 2) * 34, r = i % 2 ? 2.9 : 3.15, pos = polar(a, r, 1.95 + (i % 2 ? -.08 : .1));
       c.upd({ icon: it[0], title: it[1], sub: it[2], color: it[3], tag: it[4] || '' });
       c.setAttribute('visible', 'true'); c._base = pos; o.rotation.y = -a * Math.PI / 180;
       o.position.set(pos.x * 1.4, pos.y - .7, pos.z - 1.2); o.scale.set(.001, .001, .001);
@@ -462,13 +486,13 @@
     I.holos.forEach(function (h, i) {
       var o = h.object3D, on = !!d.ready; h.setAttribute('visible', on ? 'true' : 'false');
       if (!on) { o.scale.set(.001, .001, .001); return; }
-      var a = (i ? 1 : -1) * 42, pos = polar(a, 3.4, 2.0); o.rotation.y = -a * Math.PI / 180;
+      var a = (i ? 1 : -1) * 52, pos = polar(a, 3.4, 2.15); o.rotation.y = -a * Math.PI / 180;
       o.position.set(pos.x * 1.5, pos.y - .5, pos.z - 1.4); o.scale.set(.001, .001, .001); tween(o, { x: pos.x, y: pos.y, z: pos.z, s: 1 }, 900, 200 + i * 150, 'back');
     });
     // personajes
     var cast = {};
-    if (d.juan) cast.juan = { a: n === last ? -30 : -45, r: 2.4, y: n === last ? .55 : .75, s: .9 };
-    if (d.ajo) cast.ajo = { a: n === last ? 30 : 45, r: 2.4, y: n === last ? .55 : .75, s: .9 };
+    if (d.juan) cast.juan = { a: n === last ? -28 : -40, r: 2.4, y: .2, s: .85 };
+    if (d.ajo) cast.ajo = { a: n === last ? 28 : 40, r: 2.4, y: .2, s: .85 };
     UI3D.cast(cast);
     if (d.juan) UI3D.setFace('juan', d.juan === 'happy' ? 'happy' : d.juan);
     if (d.ajo) UI3D.setFace('ajo', 'happy');
@@ -485,7 +509,7 @@
     add(I.gTitle, label({ a: 0, r: 3.2, y: 3.1, w: 5, h: .8, text: 'Neural Academy', size: .62 }));
     add(I.gTitle, label({ a: 0, r: 3.2, y: 2.62, w: 5.4, h: .4, text: 'Learn to spot attrition risk — and follow up well', size: .5, weight: 600, color: C.sky }));
     P.slide = add(intro, panel({
-      a: 0, r: 3.0, y: 3.0, w: 3.3, h: 1.3, px: 190, sheen: true, float: true, state: { kicker: '', head: '', body: '' }, noFly: true,
+      a: 0, r: 3.0, y: 3.15, w: 3.3, h: 1.3, px: 190, sheen: true, float: true, state: { kicker: '', head: '', body: '' }, noFly: true,
       draw: function (g, W, H, s) {
         var p = 12; glass(g, W, H, p, 32);
         g.textAlign = 'left'; g.fillStyle = '#7cf0ff'; g.font = '800 ' + (H * .085) + 'px ' + FONT; g.fillText('//  ' + (s.kicker || ''), 44, H * .2);
@@ -513,16 +537,16 @@
 
     // ── BIENVENIDA (Juanjolote presenta) ──
     var wel = screen('screen-welcome', false); CASTS['screen-welcome'] = JL;
-    add(wel, label({ a: 0, r: 3.2, y: 3.55, w: 5, h: .3, text: '// ATTRITION DETECTION TRAINING', size: .5, weight: 700, color: '#0a9bd8' }));
-    add(wel, label({ a: 0, r: 3.2, y: 3.1, w: 5, h: .8, text: 'Neural Academy', size: .62 }));
-    add(wel, label({ a: 0, r: 3.2, y: 2.62, w: 5.4, h: .4, text: 'Where do you want to start?', size: .5, weight: 600, color: C.sky }));
-    add(wel, card({ a: -33, r: 3.0, y: 1.75, w: 1.75, h: 2.0, color: C.teal, icon: '🎯', title: 'Interventions', sub: 'Practice real check-in conversations', action: 'interventions', subSize: .075 }));
-    add(wel, card({ a: 33, r: 3.0, y: 1.75, w: 1.75, h: 2.0, color: C.violet, icon: '🧠', title: 'Techniques', sub: '14 tools to run them well', action: 'techniques', subSize: .075 }));
-    add(wel, pill({ a: 0, r: 2.9, y: 2.05, w: 1.4, h: .36, label: 'My progress', bg: '#ffffff', fg: C.navy, action: 'progress' }));
-    var back = add(wel, pill({ id: 'btn-back-activity-previous', a: 0, r: 2.9, y: 1.75, w: 2.1, h: .3, label: 'Back to previous activity', bg: C.sun, fs: .34, action: 'replay-previous-flow' }));
+    add(wel, label({ a: 0, r: 3.4, y: 3.85, w: 5, h: .3, text: '// ATTRITION DETECTION TRAINING', size: .5, weight: 700, color: '#0a9bd8' }));
+    add(wel, label({ a: 0, r: 3.4, y: 3.4, w: 5, h: .8, text: 'Neural Academy', size: .62 }));
+    add(wel, label({ a: 0, r: 3.4, y: 2.92, w: 5.4, h: .4, text: 'Where do you want to start?', size: .5, weight: 600, color: C.sky }));
+    add(wel, card({ a: -42, r: 3.0, y: 1.85, w: 1.7, h: 2.0, color: C.teal, icon: '🎯', title: 'Interventions', sub: 'Practice real check-in conversations', action: 'interventions', subSize: .06 }));
+    add(wel, card({ a: 42, r: 3.0, y: 1.85, w: 1.7, h: 2.0, color: C.violet, icon: '🧠', title: 'Techniques', sub: '14 tools to run them well', action: 'techniques', subSize: .06 }));
+    add(wel, pill({ a: -42, r: 2.7, y: .55, w: 1.5, h: .42, label: 'My progress', bg: '#ffffff', fg: C.navy, action: 'progress' }));
+    var back = add(wel, pill({ id: 'btn-back-activity-previous', a: 42, r: 2.7, y: .55, w: 2.3, h: .42, label: 'Back to previous activity', bg: C.sun, fs: .34, action: 'replay-previous-flow' }));
     back.setAttribute('visible', 'false');
-    add(wel, pill({ id: 'btn-logout', a: -42, r: 2.4, y: .45, w: 1.15, h: .26, label: 'Unpair device', bg: 'rgba(20,34,74,.55)', fs: .34, clickable: true }));
-    tip(wel, 25, .6, 'Pick a path — I\'ll guide you.', C.teal, 2.5);
+    add(wel, pill({ id: 'btn-logout', a: -78, r: 2.6, y: .9, w: 1.25, h: .34, label: 'Unpair device', bg: '#5b6b8c', fs: .34, clickable: true }));
+    tip(wel, 0, 1.75, 'Pick a path — I\'ll guide you.', C.teal, 2.7);
 
     // ── INTERVENCIONES (aparece Ajolín) ──
     var iv = screen('screen-interventions', false); CASTS['screen-interventions'] = AJR;
@@ -531,54 +555,53 @@
               ['⚓', 'Anchoring', 'Engagement and belonging', C.blue, 'interv-soporte-critico', 'DAY 100'],
               ['🗣️', 'Stay Interview', 'Retention risks and unmet needs', C.violet, 'interv-reclamaciones', 'DAY 121'],
               ['🏅', 'Tenure Renewal', 'Long-term retention', C.coral, 'interv-tenure-renewal', 'DAY 365']];
+    var IVA = [-58, -24, 24, 58];
     IV.forEach(function (d, i) {
-      add(iv, card({ a: (i - 1.5) * 30, r: (i === 0 || i === 3) ? 3.35 : 2.95, y: 1.85 + (i % 2 ? -.1 : .08), w: 1.2, h: 1.75, color: d[3], icon: d[0], title: d[1], sub: d[2], chip: d[5], action: d[4], subSize: .07 }));
+      add(iv, card({ a: IVA[i], r: 3.0, y: 2.1 + (i % 2 ? -.08 : .08), w: 1.2, h: 1.75, color: d[3], icon: d[0], title: d[1], sub: d[2], chip: d[5], action: d[4], subSize: .07 }));
     });
-    add(iv, pill({ a: -42, r: 2.4, y: .5, w: 1.0, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'close-history' }));
-    tip(iv, -25, .6, 'I\'m the employee. Pick a check-in.', C.blue, 2.5);
+    add(iv, pill({ a: -40, r: 2.6, y: .5, w: 1.1, h: .4, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'close-history' }));
 
     // ── MODO (Learn / Work Together / Practice) ──
     var md = screen('screen-learn-work-practice', false); CASTS['screen-learn-work-practice'] = JL;
-    P.modeTitle = add(md, label({ a: 0, r: 3.0, y: 3.2, w: 5.6, h: .55, text: 'Choose a mode', size: .6 }));
-    P.modeSub = add(md, label({ a: 0, r: 3.0, y: 2.82, w: 5.6, h: .34, text: '', size: .5, weight: 600, color: C.sky }));
+    P.modeTitle = add(md, label({ a: 0, r: 3.4, y: 3.7, w: 5.6, h: .55, text: 'Choose a mode', size: .6 }));
+    P.modeSub = add(md, label({ a: 0, r: 3.4, y: 3.3, w: 5.6, h: .34, text: '', size: .5, weight: 600, color: C.sky }));
     var MD = [['📖', 'Learn', 'Juanjolote teaches using your own experience', C.teal, 'learn-intervention'],
               ['🧩', 'Work Together', 'Bring a real case and find the answer yourself', C.blue, 'work-together-intervention'],
               ['🎭', 'Practice', 'Role-play with an agent and get feedback', C.coral, 'practice-intervention']];
-    MD.forEach(function (d, i) { add(md, card({ a: (i - 1) * 32, r: i === 1 ? 3.0 : 3.25, y: 1.85 + (i === 1 ? .1 : 0), w: 1.5, h: 1.8, color: d[3], icon: d[0], title: d[1], sub: d[2], action: d[4], subSize: .075 })); });
-    add(md, pill({ a: -42, r: 2.4, y: .5, w: 1.0, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-technicas' }));
-    tip(md, 25, .6, 'How do you want to work today?', C.teal, 2.5);
+    MD.forEach(function (d, i) { add(md, card({ a: (i - 1) * 38, r: 3.1, y: 2.2 + (i === 1 ? .1 : 0), w: 1.5, h: 1.7, color: d[3], icon: d[0], title: d[1], sub: d[2], action: d[4], subSize: .062 })); });
+    add(md, pill({ a: -40, r: 2.6, y: .5, w: 1.1, h: .4, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-technicas' }));
 
     // ── TÉCNICAS (Juanjolote) ──
-    var tl = screen('screen-technique-list', false); CASTS['screen-technique-list'] = { juan: { a: 0, r: 1.8, y: .55, s: .7 } };
-    add(tl, label({ a: 0, r: 3.0, y: 3.75, w: 5, h: .55, text: 'Choose a technique', size: .6 }));
-    add(tl, label({ a: 0, r: 3.0, y: 3.37, w: 5.6, h: .34, text: 'Quick example · guided lesson · practice', size: .5, weight: 600, color: C.sky }));
+    var tl = screen('screen-technique-list', false); CASTS['screen-technique-list'] = { juan: { a: 0, r: 2.3, y: .15, s: .72 } };
+    add(tl, label({ a: 0, r: 3.4, y: 3.95, w: 5, h: .55, text: 'Choose a technique', size: .6 }));
+    add(tl, label({ a: 0, r: 3.4, y: 3.55, w: 5.6, h: .34, text: 'Quick example · guided lesson · practice', size: .5, weight: 600, color: C.sky }));
+    var TCOL = [-52, -18, 18, 52];
     techList().forEach(function (t, i) {
-      var pg = Math.floor(i / TECH_PER_PAGE), k = i % TECH_PER_PAGE, col = k % 3, row = Math.floor(k / 3);
-      var cd = card({ a: (col - 1) * 31, r: 3.1, y: 2.6 - row * 1.3, w: 1.55, h: 1.1, color: t.color, icon: t.icon, title: t.title, action: t.action });
+      var pg = Math.floor(i / TECH_PER_PAGE), k = i % TECH_PER_PAGE, col = k % 4, row = Math.floor(k / 4);
+      var cd = card({ a: TCOL[col], r: 3.1, y: 2.65 - row * 1.3 + (col % 2 ? .05 : 0), w: 1.5, h: 1.1, color: t.color, icon: t.icon, title: t.title, action: t.action });
       cd._page = pg; add(tl, cd); TECH_CARDS.push(cd);
     });
-    add(tl, pill({ id: 'btn-tech-list-back', a: -42, r: 2.4, y: .5, w: .9, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-technicas' }));
-    P.techPage = add(tl, label({ id: 'tech-page-indicator', a: 52, r: 3.0, y: 1.8, w: 1.0, h: .3, text: '1 / 3', size: .5, weight: 700, color: C.navy }));
+    add(tl, pill({ id: 'btn-tech-list-back', a: -40, r: 2.6, y: .5, w: 1.1, h: .4, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-technicas' }));
+    P.techPage = add(tl, label({ id: 'tech-page-indicator', a: 84, r: 3.0, y: 1.45, w: 1.0, h: .3, text: '1 / 2', size: .5, weight: 700, color: C.navy }));
     // El código antiguo le escribe un 'text' a este id; se ignora para que no aparezca un texto duplicado
     (function (el) { var orig = el.setAttribute.bind(el); el.setAttribute = function (n) { if (n === 'text') return; return orig.apply(null, arguments); }; })(P.techPage);
-    add(tl, pill({ a: -52, r: 3.0, y: 2.4, w: .6, h: .5, label: '‹', bg: C.navy, fs: .6, onClick: function () { UI3D.techPage(-1); } }));
-    add(tl, pill({ a: 52, r: 3.0, y: 2.4, w: .6, h: .5, label: '›', bg: C.navy, fs: .6, onClick: function () { UI3D.techPage(1); } }));
+    add(tl, pill({ a: -84, r: 3.0, y: 2.1, w: .8, h: .8, label: '‹', bg: C.violet, fs: .6, onClick: function () { UI3D.techPage(-1); } }));
+    add(tl, pill({ a: 84, r: 3.0, y: 2.1, w: .8, h: .8, label: '›', bg: C.violet, fs: .6, onClick: function () { UI3D.techPage(1); } }));
 
     // ── NIVEL (Ajolín) ──
     var lv = screen('screen-level-selector', false); CASTS['screen-level-selector'] = AJR;
-    add(lv, label({ a: 0, r: 3.0, y: 3.2, w: 5, h: .55, text: 'Select your level', size: .6 }));
-    add(lv, label({ a: 0, r: 3.0, y: 2.82, w: 5.6, h: .34, text: 'Choose how challenging I will be', size: .5, weight: 600, color: C.sky }));
+    add(lv, label({ a: 0, r: 3.4, y: 3.7, w: 5, h: .55, text: 'Select your level', size: .6 }));
+    add(lv, label({ a: 0, r: 3.4, y: 3.3, w: 5.6, h: .34, text: 'Choose how challenging I will be', size: .5, weight: 600, color: C.sky }));
     var LV = [['🌱', 'Beginner', 'Guides on screen · open, receptive agent', C.green, 'level-novice'],
               ['⚖️', 'Intermediate', 'Less help · realistic reactions', C.sun, 'level-intermediate'],
               ['🔥', 'Expert', 'No help · guarded or emotional agent', C.coral, 'level-expert']];
-    LV.forEach(function (d, i) { add(lv, card({ a: (i - 1) * 32, r: i === 1 ? 3.0 : 3.25, y: 1.85 + (i === 1 ? .1 : 0), w: 1.5, h: 1.8, color: d[3], icon: d[0], title: d[1], sub: d[2], action: d[4], subSize: .075 })); });
-    add(lv, pill({ id: 'btn-level-back', a: -42, r: 2.4, y: .5, w: 1.0, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-to-learn-work' }));
-    tip(lv, -25, .6, 'Be gentle… or not.', C.blue, 2.5);
+    LV.forEach(function (d, i) { add(lv, card({ a: (i - 1) * 38, r: 3.1, y: 2.2 + (i === 1 ? .1 : 0), w: 1.5, h: 1.7, color: d[3], icon: d[0], title: d[1], sub: d[2], action: d[4], subSize: .062 })); });
+    add(lv, pill({ id: 'btn-level-back', a: -40, r: 2.6, y: .5, w: 1.1, h: .4, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-to-learn-work' }));
 
     // ── BRIEFING (Ajolín, con misterio) ──
-    var br = screen('screen-intervention-briefing', false); CASTS['screen-intervention-briefing'] = { ajo: { a: 50, r: 2.6, y: .45, s: 1.1 } };
+    var br = screen('screen-intervention-briefing', false); CASTS['screen-intervention-briefing'] = { ajo: { a: 50, r: 2.6, y: .3, s: .9 } };
     P.briefing = add(br, panel({
-      a: -12, r: 2.8, y: 1.85, w: 3.5, h: 2.4, px: 150, sheen: true, state: { title: '', trap: '', level: '', scenario: '', tags: [] },
+      a: -8, r: 3.0, y: 2.15, w: 3.3, h: 2.3, px: 150, sheen: true, state: { title: '', trap: '', level: '', scenario: '', tags: [] },
       draw: function (g, W, H, s) {
         var p = 14; shadow(g, 'rgba(20,34,74,.3)', 26); rr(g, p, p, W - 2 * p, H - 2 * p, 36); g.fillStyle = '#fff'; g.fill(); shadow(g, 'transparent', 0); neon(g, W, H, p, 36, 4);
         g.textAlign = 'left'; g.fillStyle = C.blue; g.font = '800 ' + (H * .05) + 'px ' + FONT; g.fillText('BRIEFING' + (s.level ? '  ·  ' + s.level : ''), 46, H * .105);
@@ -591,27 +614,27 @@
         drawLines(g, '⚠  ' + String(s.trap || '').replace(/^TRAP:\s*/i, 'Watch out: '), 66, H - H * .118, W - 132, H * .045, 2);
       }
     }));
-    add(br, pill({ a: -30, r: 2.6, y: .5, w: 1.1, h: .34, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-to-learn-work' }));
-    add(br, pill({ a: 0, r: 2.6, y: .5, w: 2.0, h: .38, label: 'Start practice  ➔', bg: C.teal, action: 'start-briefed-practice', sheen: true }));
-    tip(br, 42, 1.95, 'Read the case… then meet me.', C.blue, 3.0);
+    add(br, pill({ a: -34, r: 2.6, y: .5, w: 1.1, h: .4, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-to-learn-work' }));
+    add(br, pill({ a: 0, r: 2.6, y: .5, w: 2.1, h: .44, label: 'Start practice  ➔', bg: C.teal, action: 'start-briefed-practice', sheen: true }));
+    tip(br, 50, 1.6, 'Read the case… then meet me.', C.blue, 2.7);
     stub(br, 'briefing-title', function (v) { S.briefing.title = v; refreshBriefing(); });
     stub(br, 'briefing-trap', function (v) { S.briefing.trap = v; refreshBriefing(); });
     stub(br, 'briefing-tags', function (v) { S.briefing.raw = v; refreshBriefing(); });
 
     // ── EJEMPLO "CÓMO NO / CÓMO SÍ" (reemplaza la pantalla vieja, que usaba el mismo id) ──
     var pv = screen('screen-active-listening-activity', false);
-    CASTS['screen-active-listening-activity'] = { juan: { a: -48, r: 2.9, y: .6, s: .95 }, ajo: { a: 48, r: 2.9, y: .6, s: .95 } };
+    CASTS['screen-active-listening-activity'] = { juan: { a: -52, r: 2.8, y: .3, s: .9 }, ajo: { a: 52, r: 2.8, y: .3, s: .9 } };
     hud(ROOT);
     // Aviso temporal (por ejemplo cuando la voz no está disponible)
     P.toast = add(ROOT, panel({
-      a: 0, r: 2.5, y: -.07, w: 3.4, h: .32, px: 200, state: { text: '' }, noFly: true,
+      a: 0, r: 2.5, y: .02, w: 3.4, h: .32, px: 200, state: { text: '' }, noFly: true,
       draw: function (g, W, H, s) {
         if (!s.text) return; var p = 6; shadow(g, 'rgba(20,34,74,.3)', 14); rr(g, p, p, W - 2 * p, H - 2 * p, (H - 2 * p) / 2); g.fillStyle = 'rgba(255,183,3,.95)'; g.fill(); shadow(g, 'transparent', 0);
         g.fillStyle = '#3a2500'; g.font = '800 ' + (H * .4) + 'px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(s.text, W / 2, H / 2 + 2);
       }
     }));
     // Botón para salir de VR: solo se ve dentro del visor
-    P.exitVR = add(ROOT, pill({ a: 36, r: 2.4, y: .3, w: 1.15, h: .3, label: 'Exit VR', bg: C.coral, fs: .4, onClick: function () { try { SCENE.exitVR(); } catch (e) {} } }));
+    P.exitVR = add(ROOT, pill({ a: 62, r: 2.5, y: .55, w: 1.2, h: .38, label: 'Exit VR', bg: C.coral, fs: .4, onClick: function () { try { SCENE.exitVR(); } catch (e) {} } }));
     P.exitVR._noFly = true; P.exitVR.setAttribute('visible', 'false'); P.exitVR.setAttribute('scale', '0 0 0');
     SCENE.addEventListener('enter-vr', function () { P.exitVR.setAttribute('visible', 'true'); P.exitVR.setAttribute('scale', '1 1 1'); if (typeof refreshAllRaycasters === 'function') refreshAllRaycasters(); });
     SCENE.addEventListener('exit-vr', function () { P.exitVR.setAttribute('visible', 'false'); P.exitVR.setAttribute('scale', '0 0 0'); });
@@ -710,7 +733,7 @@
       }
     }));
     P.mic = add(pr, panel({
-      id: 'vr-mic', x: .75, y: .66, z: -2.1, w: .62, h: .62, state: S, clickable: true,
+      id: 'vr-mic', x: 1.5, y: .75, z: -2.1, w: .62, h: .62, state: S, clickable: true,
       draw: function (g, W, H, s) {
         var rec = s.status === 'rec', col = rec ? C.coral : C.violet; shadow(g, rec ? 'rgba(255,107,107,.7)' : 'rgba(123,92,255,.55)', 22);
         g.beginPath(); g.arc(W / 2, H / 2, W * .36, 0, 7); g.fillStyle = col; g.fill(); shadow(g, 'transparent', 0);
@@ -723,8 +746,8 @@
         if (!isRecording && !isProcessing) startRecording(); else if (isRecording) stopRecording();
       }
     });
-    P.status = add(pr, label({ id: 'vr-voice-bar', x: .75, y: .28, z: -2.1, w: 1.7, h: .28, text: 'Tap the mic to talk', size: .5, weight: 700, color: C.navy }));
-    var endBtn = add(pr, pill({ id: 'btn-end-practice', x: -.75, y: .66, z: -2.1, w: .9, h: .3, label: 'Finish', bg: C.coral, clickable: true }));
+    P.status = add(pr, label({ id: 'vr-voice-bar', x: 1.5, y: .3, z: -2.1, w: 1.7, h: .28, text: 'Tap the mic to talk', size: .5, weight: 700, color: C.navy }));
+    var endBtn = add(pr, pill({ id: 'btn-end-practice', x: -1.5, y: .28, z: -2.1, w: .9, h: .3, label: 'Finish', bg: C.coral, clickable: true }));
     stub(pr, 'vr-voice-dot', function () {}); stub(pr, 'vr-voice-label', function () {});
 
     // ── EVALUACIÓN ──
@@ -751,7 +774,7 @@
     stub(ev, 'eval-mood', function () {}); stub(ev, 'juan-eval-img', function () {});
     add(ev, pill({ id: 'btn-practice-again', x: -.35, y: .32, z: -2.3, w: 1.45, h: .36, label: 'Practice again', bg: C.teal, clickable: true, sheen: true }));
     add(ev, pill({ id: 'btn-new-session', x: 1.35, y: .32, z: -2.3, w: 1.45, h: .36, label: 'Back to menu', bg: C.navy, clickable: true }));
-    CASTS['screen-eval'] = { juan: { a: -42, r: 2.6, y: .5, s: 1.05 } };
+    CASTS['screen-eval'] = { juan: { a: -50, r: 2.6, y: .3, s: .95 } };
     stub(ev, 'juan-img', function () {});
   }
 
@@ -965,6 +988,8 @@
   buildEnvironment();
   buildScreens();
   ROOT.appendChild(makeActor('juan')); ROOT.appendChild(makeActor('ajo'));
+  // Todo (menos el cielo) se aleja 1.45 veces desde la posición de los ojos (1.6 m): se ve igual de grande pero más cómodo en el visor
+  ROOT.setAttribute('scale', '1.45 1.45 1.45'); ROOT.setAttribute('position', '0 ' + (1.6 * (1 - 1.45)).toFixed(3) + ' 0');
   SCENE.appendChild(ROOT);
   UI3D.techPage(0);
   introStep(0);
