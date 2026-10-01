@@ -182,6 +182,19 @@ WHAT YOU'RE ACTUALLY FEELING (never say directly, but let it color everything): 
 SITUATION: ${scenario.text}`
     : '';
 
+  // Perfil secreto generado por case-engine.js: hace que el ánimo y las reacciones no sean predecibles
+  const secretProfile = scenario && scenario.reactions && scenario.reactions.length
+    ? `\nSECRET REACTION PROFILE (never reveal it; let it surface naturally and unpredictably — do not announce it):
+${scenario.reactions.map(r => '- ' + r.text).join('\n')}
+- Your tone in the FIRST reply must not give away how you really feel. Moods can move up OR down, not only in a straight line.${scenario.humor ? '\n- You use light, natural humor now and then (never forced, never mocking the supervisor).' : ''}${scenario.twist ? '\nHIDDEN TWIST (only surfaces if the supervisor earns it with good questions): ' + scenario.twist : ''}`
+    : '';
+
+  const tenureLine = scenario && scenario.tenureNote
+    ? `\nTENURE FACT: ${scenario.tenureNote}`
+    : '';
+
+  const storyText = scenario && scenario.tenureNote ? (a.coreStory || a.backstory) : a.backstory;
+
     // Contexto de la intervención o técnica que se está practicando
     const practiceContext = typeof activeMenu !== 'undefined' && activeMenu === 'interventions' && typeof currentIntervention !== 'undefined' && currentIntervention
       ? `\nINTERVENTION CONTEXT: Someone from the company came to talk to you. This is a ${currentIntervention.label} conversation (Day ${currentIntervention.day} of your journey). YOU DON'T KNOW THIS IS A FORMAL INTERVENTION. To you, someone just came to talk.`
@@ -234,8 +247,8 @@ At the END of every reply add:
 
 PERSONALITY: ${a.personality}
 
-YOUR STORY: ${a.backstory}
-${scenarioState}
+YOUR STORY: ${storyText}${tenureLine}
+${scenarioState}${secretProfile}
 ${practiceContext}
 
 DYNAMIC RESPONSE RULES (these drive your behavior):
@@ -251,6 +264,52 @@ ${levelRules[level] || levelRules.novice}
 
 Keep replies 2-3 sentences. Casual, real language — how a real call center agent talks. No corporate speak.
 Respond in the same language the supervisor uses — if they speak Spanish, respond in Spanish.`;
+  },
+
+  // ─── EVALUACIÓN COMPACTA PARA EL VISOR ────
+  // Mide el balance: objetivo de la empresa + técnica + detección de señales + seguimiento.
+  // Conoce la "verdad" del caso (lo que el agente sentía de verdad), que el practicante nunca vio.
+  evalVR(caso, opts) {
+    opts = opts || {};
+    const iv = caso && caso.intervention;
+    const sc = (caso && caso.scenario) || {};
+    const t = (typeof TECHNIQUES !== 'undefined' && opts.techniqueId && TECHNIQUES[opts.techniqueId]) || null;
+
+    const companyGoal = iv
+      ? `INTERVENTION: ${iv.label} (day ${iv.day})
+COMPANY OBJECTIVE: ${iv.objective}
+SUCCESS CRITERIA: ${(iv.successCriteria || []).join(' | ')}
+COMMON TRAP: ${iv.trap}`
+      : `COMPANY OBJECTIVE: understand the agent's real situation, show genuine care, spot early signs of risk of leaving, and agree a realistic next step that keeps the agent engaged. Never promise what the company cannot deliver, and never just agree with everything.`;
+
+    const tools = iv && (iv.relevantTechniques || []).length && typeof TECHNIQUES !== 'undefined'
+      ? `TOOLS THAT FIT THIS CONVERSATION: ${iv.relevantTechniques.map(id => (TECHNIQUES[id] && TECHNIQUES[id].label) || id).join(', ')}`
+      : '';
+    const technique = t
+      ? `TECHNIQUE PRACTICED: ${t.label}. KEY MOVES: ${(t.evalMoves || []).map(m => m.key).join(', ')}`
+      : tools;
+
+    const truth = `GROUND TRUTH (the practitioner never saw this): the agent really felt "${sc.agentHiddenState || 'unknown'}" (visible state: ${sc.agentState || 'unknown'}).${sc.twist ? ' Hidden twist: ' + sc.twist : ''}${(sc.reactions || []).length ? ' Secret reactions: ' + sc.reactions.map(r => r.id).join(', ') + '.' : ''}`;
+
+    return `You are Juanjolote, a direct, warm and honest coach. You evaluate a practice conversation between a staff member (the "Supervisor") and an agent. The learning goal: detect possible attrition (risk of the agent leaving) and follow up well.
+
+${companyGoal}
+${technique}
+AGENT: ${(caso && caso.archetype && caso.archetype.name) || 'Agent'}. Level: ${opts.level || 'novice'}. Final openness: ${opts.mood}/100.
+${truth}
+
+BALANCE RULES:
+- A high openness score does NOT mean success. Agreeing with everything, over-promising, or avoiding the real issue = failure on the company goal (being an enabler).
+- Also fail interrogating or pushing for results while ignoring the person.
+- Credit only what is actually in the transcript. Quote or paraphrase real moments.
+
+Return EXACTLY these lines, plain ASCII, no emojis, no markdown, each line max 28 words:
+COMPANY GOAL: <met / partly / not met - one reason>
+TECHNIQUE: <how well they applied it, citing a real moment>
+RISK SIGNALS: <which real signals the agent gave, and whether the supervisor caught or missed them>
+FOLLOW-UP: <was there a concrete, realistic next step? if not, what to add>
+TRY NEXT TIME: "<one exact sentence they could have said>"
+SPOKEN: <two short warm sentences, max 40 words, as Juanjolote would say them aloud>`;
   },
 
   // ─── EVALUACIÓN ───────────────────────────

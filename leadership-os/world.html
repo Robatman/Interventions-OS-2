@@ -1866,28 +1866,28 @@ function ejecutarFlujoGuardado() {
       <a-torus position="0 0.06 0" radius="0.75" radius-tubular="0.012" rotation="-90 0 0" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:8000;easing:linear"></a-torus>
     </a-entity>
 
-   <a-entity position="0.8 1.5 -2.5">
-      <a-plane width="2.8" height="2.2" color="#080e2a" material="opacity:0.96;shader:flat;side:double"></a-plane>
-      <a-plane width="2.84" height="2.24" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text anchor="center" baseline="center" value="SESSION COMPLETE" position="0 0.95 0.01" align="center" color="#00e5c0" width="4.5" font="mozillavr"></a-text>
-      <a-text anchor="left" baseline="center" value="Openness final:" position="-1.25 0.65 0.01" align="left" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr"></a-text>
-      <a-text anchor="right" baseline="center" id="eval-mood" value="--%"  position="1.25 0.65 0.01" align="right" color="#00e5c0" width="2" font="mozillavr"></a-text>
-      <a-plane width="2.4" height="0.004" color="#2a3a7a" material="shader:flat" position="0 0.48 0.01"></a-plane>
-      <a-text anchor="center" baseline="center" id="eval-feedback" value="Analyzing conversation..." position="0 -0.15 0.01" align="center" color="#e8eeff" width="4.8" wrap-count="50" font="mozillavr"></a-text>
+   <a-entity position="1.0 1.55 -2.5">
+      <a-plane width="3.4" height="2.7" color="#080e2a" material="opacity:0.96;shader:flat;side:double"></a-plane>
+      <a-plane width="3.44" height="2.74" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text anchor="center" baseline="center" value="SESSION COMPLETE" position="0 1.15 0.01" align="center" color="#00e5c0" width="4.5" font="mozillavr"></a-text>
+      <a-text anchor="left" baseline="center" value="Openness final:" position="-1.5 0.85 0.01" align="left" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr"></a-text>
+      <a-text anchor="right" baseline="center" id="eval-mood" value="--%"  position="1.5 0.85 0.01" align="right" color="#00e5c0" width="2" font="mozillavr"></a-text>
+      <a-plane width="3.0" height="0.004" color="#2a3a7a" material="shader:flat" position="0 0.68 0.01"></a-plane>
+      <a-text anchor="left" baseline="top" id="eval-feedback" value="Analyzing conversation..." position="-1.5 0.6 0.01" align="left" color="#e8eeff" width="3.0" wrap-count="52" font="mozillavr"></a-text>
 
       <a-plane id="btn-new-session" 
                handler-botones-vr="mensaje: Regresando al inicio y activando reanudación; tecnica: go-welcome-reset"
                width="1.1" height="0.22" 
                color="#0d2060" 
                material="opacity:0.9;shader:flat;side:double" 
-               position="-0.65 -0.88 0.01" 
+               position="-0.65 -1.15 0.01" 
                class="clickable">
         <a-plane width="1.12" height="0.24" color="#4466ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text anchor="center" baseline="center" value="New Session" color="#4466ff" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
       </a-plane>
 
 
-       <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
+       <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -1.15 0.01" class="clickable">
         <a-plane width="1.12" height="0.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text anchor="center" baseline="center" value="Practice Again" color="#00e5c0" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
       </a-plane> 
@@ -2684,7 +2684,7 @@ function updateAgentAvatar(arch){
   var imgEl=document.getElementById('agent-img'),halo=document.getElementById('agent-halo'),ring=document.getElementById('agent-ring');
   if(nameEl)nameEl.setAttribute('text','value',arch.name);
   if(roleEl)roleEl.setAttribute('text','value',arch.role);
-  var colors={carlos:'#ff5ca0',valeria:'#9d5cff',miguel:'#00e5c0',sandra:'#f5a623'};
+  var colors={carlos:'#ff5ca0',valeria:'#9d5cff',miguel:'#00e5c0',sandra:'#f5a623',karen:'#34d399'};
   var col=colors[arch.id]||'#9d5cff';
   if(halo)halo.setAttribute('color',col);
   if(ring)ring.setAttribute('color',col);
@@ -3073,24 +3073,19 @@ async function goEval() {
 
   setJuanMood('talking');
 
+  // Evaluador que conoce el caso: objetivo de la empresa, técnica, señales reales y lo que el agente sentía
+  var evalTechId = (typeof TECHNIQUES !== 'undefined' && TECHNIQUES[appState.tecnicaSeleccionada]) ? appState.tecnicaSeleccionada : null;
+  var evalSystem = (appState.caso && typeof PROMPTS.evalVR === 'function')
+    ? PROMPTS.evalVR(appState.caso, { techniqueId: evalTechId, level: appState.currentLevel, mood: appState.vrMood })
+    : 'You are Juanjolote, a direct and honest coach. Evaluate this practice conversation in English, plain ASCII, max 4 sentences.';
+
+  var transcript = appState.agentHistory.slice(-30).map(function (m) {
+    return (m.role === 'user' ? 'SUPERVISOR: ' : 'AGENT: ') + String(m.content || '').replace(/\[[A-Z]+:[^\]]*\]/g, '').slice(0, 300);
+  }).join('\n');
+
   var evalText =
-    'Analyze this practice conversation. ' +
-    'Agent: ' +
-    ((appState.currentArchetype &&
-      appState.currentArchetype.name) || 'Agent') +
-    ' (' +
-    ((appState.currentArchetype &&
-      appState.currentArchetype.trait) || '') +
-    '). ' +
-    'Final mood: ' +
-    appState.vrMood +
-    '/100. ' +
-    'History: ' +
-    appState.agentHistory.length +
-    ' turns. ' +
-    'Give feedback in 3 concrete points in English, maximum 4 sentences total. ' +
-    'Be direct and specific. Do not use generic coaching language. ' +
-    'Return ONLY the final feedback. Do not show analysis, reasoning, thinking, or explanations of your process.';
+    'TRANSCRIPT (' + appState.agentHistory.length + ' messages, most recent last):\n' + transcript +
+    '\n\nEvaluate it now using the exact required format.';
 
   try {
 
@@ -3111,23 +3106,16 @@ async function goEval() {
           {
             role: 'system',
 
-            content:
-              'You are Juanjolote, a direct and honest coach. ' +
-              'Evaluate leadership practice conversations. ' +
-              'English. Concrete. No formalities. ' +
-              'Return ONLY the final answer for the user. ' +
-              'Do NOT reveal reasoning, analysis, chain of thought, thinking process, or internal deliberation.'
+            content: evalSystem
           },
 
           {
             role: 'user',
             content: evalText
-          },
-
-          ...appState.agentHistory.slice(-8)
+          }
         ],
 
-        max_tokens: 200,
+        max_tokens: 420,
 
         temperature: 0.7,
 
@@ -3159,6 +3147,14 @@ async function goEval() {
       feedback = 'Session completed.';
     }
 
+    // Separa lo que se muestra en el panel de lo que Juanjolote dice en voz alta
+    var spoken = '';
+    var spokenMatch = feedback.match(/SPOKEN:\s*([\s\S]*)$/i);
+    if (spokenMatch) {
+      spoken = spokenMatch[1].trim();
+      feedback = feedback.slice(0, spokenMatch.index).trim() || feedback;
+    }
+
     var feedbackEl =
       document.getElementById('eval-feedback');
 
@@ -3171,7 +3167,7 @@ async function goEval() {
     }
 
     speakVR(
-      feedback,
+      spoken || feedback.slice(0, 280),
       getVoice('juan')
     );
 
