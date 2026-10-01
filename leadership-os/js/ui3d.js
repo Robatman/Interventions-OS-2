@@ -266,7 +266,6 @@
     w.setAttribute('position', '0 -2 -4'); w.setAttribute('scale', '0.001 0.001 0.001');
     var e = document.createElement('a-entity');
     e.setAttribute('gltf-model', 'assets/ajolotes/' + who + '.glb');
-    e.setAttribute('look-at', '[camera]');
     e.setAttribute('animation', 'property:position;from:0 0 0;to:0 .1 0;dir:alternate;loop:true;dur:2400;easing:easeInOutSine');
     w._who = who; w._face = UI3D.baseFace[who] || 'neutral'; w.shown = false;
     w.setFace = function (face) {
@@ -289,12 +288,12 @@
       var A = ACT[who]; if (!A) return;
       var p = spec[who], o = A.object3D;
       if (!p) { if (A.shown) { A.shown = false; tween(o, { s: .001, y: o.position.y - .4 }, 260, 0, 'in'); } return; }
-      var pos = polar(p.a, p.r || 2.7, p.y === undefined ? .5 : p.y), sc = p.s || 1.15;
+      var pos = polar(p.a, p.r || 2.7, p.y === undefined ? .5 : p.y), sc = p.s || 1.15, ry = -p.a * .3 * Math.PI / 180;
       if (!A.shown) {
         A.shown = true; var side = p.a < 0 ? -1 : 1;
-        o.position.set(pos.x + side * 1.2, pos.y - .9, pos.z - 1.6); o.scale.set(.001, .001, .001);
-        tween(o, { x: pos.x, y: pos.y, z: pos.z, s: sc }, 950, 120, 'back');
-      } else tween(o, { x: pos.x, y: pos.y, z: pos.z, s: sc }, 750, 0, 'io');
+        o.position.set(pos.x + side * 1.2, pos.y - .9, pos.z - 1.6); o.scale.set(.001, .001, .001); o.rotation.y = ry;
+        tween(o, { x: pos.x, y: pos.y, z: pos.z, s: sc, ry: ry }, 950, 120, 'back');
+      } else tween(o, { x: pos.x, y: pos.y, z: pos.z, s: sc, ry: ry }, 750, 0, 'io');
     });
   };
 
@@ -352,8 +351,8 @@
   }
 
   // Posiciones de los personajes por pantalla (a = grados alrededor de ti; 0 = al frente)
-  var JL = { juan: { a: 0, r: 1.9, y: .45, s: .85 } };
-  var AJR = { ajo: { a: 0, r: 1.9, y: .45, s: .85 } };
+  var JL = { juan: { a: 0, r: 1.9, y: .6, s: .85 } };
+  var AJR = { ajo: { a: 0, r: 1.9, y: .6, s: .85 } };
   var CASTS = {};
   var CRUMB = { 'screen-welcome': 'HOME', 'screen-interventions': 'HOME  ›  INTERVENTIONS', 'screen-technique-list': 'HOME  ›  TECHNIQUES', 'screen-learn-work-practice': 'CHOOSE A MODE',
                 'screen-level-selector': 'CHOOSE A LEVEL', 'screen-intervention-briefing': 'BRIEFING', 'screen-active-listening-activity': 'QUICK EXAMPLE', 'screen-eval': 'RESULTS' };
@@ -380,7 +379,7 @@
   // Fila de ruta (HUD) en la parte baja
   function hud(parent) {
     P.hud = add(parent, panel({
-      a: 0, r: 2.6, y: -.32, w: 3.4, h: .3, px: 180, state: { text: '' }, noFly: true,
+      a: 0, r: 2.6, y: -.4, w: 2.8, h: .26, px: 180, state: { text: '' }, noFly: true,
       draw: function (g, W, H, s) {
         if (!s.text) return; var p = 6; shadow(g, 'rgba(20,34,74,.25)', 12); rr(g, p, p, W - 2 * p, H - 2 * p, (H - 2 * p) / 2); g.fillStyle = 'rgba(20,34,74,.82)'; g.fill(); shadow(g, 'transparent', 0);
         g.strokeStyle = '#19e3ff'; g.lineWidth = 3; rr(g, p, p, W - 2 * p, H - 2 * p, (H - 2 * p) / 2); g.stroke();
@@ -549,21 +548,20 @@
     tip(md, 25, .6, 'How do you want to work today?', C.teal, 2.5);
 
     // ── TÉCNICAS (Juanjolote) ──
-    var tl = screen('screen-technique-list', false); CASTS['screen-technique-list'] = { juan: { a: 0, r: 1.8, y: .35, s: .72 } };
-    add(tl, label({ a: 0, r: 3.0, y: 3.4, w: 5, h: .55, text: 'Choose a technique', size: .6 }));
-    add(tl, label({ a: 0, r: 3.0, y: 3.02, w: 5.6, h: .34, text: 'Quick example · guided lesson · practice', size: .5, weight: 600, color: C.sky }));
+    var tl = screen('screen-technique-list', false); CASTS['screen-technique-list'] = { juan: { a: 0, r: 1.8, y: .55, s: .7 } };
+    add(tl, label({ a: 0, r: 3.0, y: 3.75, w: 5, h: .55, text: 'Choose a technique', size: .6 }));
+    add(tl, label({ a: 0, r: 3.0, y: 3.37, w: 5.6, h: .34, text: 'Quick example · guided lesson · practice', size: .5, weight: 600, color: C.sky }));
     techList().forEach(function (t, i) {
       var pg = Math.floor(i / TECH_PER_PAGE), k = i % TECH_PER_PAGE, col = k % 3, row = Math.floor(k / 3);
-      var cd = card({ a: (col - 1) * 31, r: 3.1, y: 2.2 - row * 1.3, w: 1.55, h: 1.1, color: t.color, icon: t.icon, title: t.title, action: t.action });
+      var cd = card({ a: (col - 1) * 31, r: 3.1, y: 2.6 - row * 1.3, w: 1.55, h: 1.1, color: t.color, icon: t.icon, title: t.title, action: t.action });
       cd._page = pg; add(tl, cd); TECH_CARDS.push(cd);
     });
     add(tl, pill({ id: 'btn-tech-list-back', a: -42, r: 2.4, y: .5, w: .9, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-technicas' }));
-    P.techPage = add(tl, label({ id: 'tech-page-indicator', a: 52, r: 3.0, y: 1.5, w: 1.0, h: .3, text: '1 / 3', size: .5, weight: 700, color: C.navy }));
+    P.techPage = add(tl, label({ id: 'tech-page-indicator', a: 52, r: 3.0, y: 1.8, w: 1.0, h: .3, text: '1 / 3', size: .5, weight: 700, color: C.navy }));
     // El código antiguo le escribe un 'text' a este id; se ignora para que no aparezca un texto duplicado
     (function (el) { var orig = el.setAttribute.bind(el); el.setAttribute = function (n) { if (n === 'text') return; return orig.apply(null, arguments); }; })(P.techPage);
-    add(tl, pill({ a: -46, r: 3.0, y: 2.0, w: .6, h: .5, label: '‹', bg: C.navy, fs: .6, onClick: function () { UI3D.techPage(-1); } }));
-    add(tl, pill({ a: 46, r: 3.0, y: 2.0, w: .6, h: .5, label: '›', bg: C.navy, fs: .6, onClick: function () { UI3D.techPage(1); } }));
-    tip(tl, 31, .3, 'These are my tools. Pick one!', C.teal, 2.5);
+    add(tl, pill({ a: -52, r: 3.0, y: 2.4, w: .6, h: .5, label: '‹', bg: C.navy, fs: .6, onClick: function () { UI3D.techPage(-1); } }));
+    add(tl, pill({ a: 52, r: 3.0, y: 2.4, w: .6, h: .5, label: '›', bg: C.navy, fs: .6, onClick: function () { UI3D.techPage(1); } }));
 
     // ── NIVEL (Ajolín) ──
     var lv = screen('screen-level-selector', false); CASTS['screen-level-selector'] = AJR;
@@ -601,7 +599,7 @@
 
     // ── EJEMPLO "CÓMO NO / CÓMO SÍ" (reemplaza la pantalla vieja, que usaba el mismo id) ──
     var pv = screen('screen-active-listening-activity', false);
-    CASTS['screen-active-listening-activity'] = { juan: { a: -46, r: 2.7, y: .45, s: 1.1 }, ajo: { a: 46, r: 2.7, y: .45, s: 1.1 } };
+    CASTS['screen-active-listening-activity'] = { juan: { a: -48, r: 2.9, y: .6, s: .95 }, ajo: { a: 48, r: 2.9, y: .6, s: .95 } };
     hud(ROOT);
     P.pvHead = add(pv, panel({
       x: 0, y: 3.12, z: -3.0, w: 5.4, h: .85, px: 200, state: PV,
@@ -651,8 +649,8 @@
         });
       }
     }));
-    P.pvNext = add(pv, pill({ x: .4, y: .42, z: -2.3, w: 2.4, h: .4, label: 'Next  ▶', bg: C.violet, sheen: true, fs: .36, onClick: function () { UI3D.pvAdvance(); } }));
-    add(pv, pill({ x: -1.5, y: .42, z: -2.3, w: 1.1, h: .34, label: '‹ Back', bg: '#ffffff', fg: C.navy, onClick: function () { if (typeof cambiarPantallaVR === 'function') cambiarPantallaVR('screen-technique-list'); } }));
+    P.pvNext = add(pv, pill({ x: .55, y: .55, z: -2.3, w: 2.2, h: .4, label: 'Next  ▶', bg: C.violet, sheen: true, fs: .36, onClick: function () { UI3D.pvAdvance(); } }));
+    add(pv, pill({ x: -1.35, y: .55, z: -2.3, w: 1.0, h: .34, label: '‹ Back', bg: '#ffffff', fg: C.navy, onClick: function () { if (typeof cambiarPantallaVR === 'function') cambiarPantallaVR('screen-technique-list'); } }));
     ['activity-juan', 'activity-ajolin', 'speaker-name', 'listening-session-content', 'moves-container', 'text-btn-toggle-listening', 'btn-next-conversation'].forEach(function (id) { stub(pv, id, function () {}); });
     stub(pv, 'btn-toggle-active-listening', function () {});
 
