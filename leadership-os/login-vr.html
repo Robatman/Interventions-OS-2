@@ -285,7 +285,7 @@ async function doPair() {
       return;
     }
 
-    window.setDeviceToken(data.token);
+    window.setDeviceToken(data.token, !!data.guest);
     showStatus('¡Visor emparejado!', '#00e5a0');
     btn.textContent = '✓ Entrando…';
     btn.style.background = '#00e5a0';

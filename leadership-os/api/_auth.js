@@ -8,13 +8,16 @@
 //
 //  Flujo:
 //    1. scripts/pairing-code.mjs genera un código de emparejamiento (10 min)
-//    2. El visor lo envía a /api/pair y recibe un token firmado (180 días)
+//       (con el argumento `guest` genera un código de INVITADO: acceso de 3 horas
+//       que además se borra al cerrar la pestaña, para una computadora prestada)
+//    2. El visor lo envía a /api/pair y recibe un token firmado (180 días; invitado: 3 horas)
 //    3. Cada endpoint exige  Authorization: Bearer <token>
 // ═══════════════════════════════════════════════════════════
 
 const crypto = require('node:crypto');
 
 const TOKEN_TTL_MS = 180 * 24 * 60 * 60 * 1000;
+const GUEST_TTL_MS = 3 * 60 * 60 * 1000;
 const PAIR_WINDOW_MS = 10 * 60 * 1000;
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sin 0/O/1/I
 
@@ -34,39 +37,46 @@ function getSecret() {
 const currentEpoch = () => String(process.env.VR_TOKEN_EPOCH || '1');
 
 // ─── Código de emparejamiento (sin estado, por ventana de tiempo) ──────
-function pairingCodeFor(secret, windowIndex) {
-  const d = hmac(secret, `pair:${windowIndex}`);
+// kind: 'pair' (visor, conserva el cálculo original) o 'guest' (invitado)
+function pairingCodeFor(secret, windowIndex, kind = 'pair') {
+  const d = hmac(secret, `${kind}:${windowIndex}`);
   let out = '';
   for (let i = 0; i < 8; i++) out += ALPHABET[d[i] % ALPHABET.length];
   return out;
 }
 
-function currentPairingCode(secret, now = Date.now()) {
+function currentPairingCode(secret, now = Date.now(), kind = 'pair') {
   const w = Math.floor(now / PAIR_WINDOW_MS);
   return {
-    code: pairingCodeFor(secret, w),
+    code: pairingCodeFor(secret, w, kind),
     expiresInSec: Math.ceil(((w + 1) * PAIR_WINDOW_MS - now) / 1000),
   };
 }
 
+// Devuelve 'pair', 'guest' o false
 function verifyPairingCode(secret, input, now = Date.now()) {
   const clean = String(input || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
   if (clean.length !== 8) return false;
   const w = Math.floor(now / PAIR_WINDOW_MS);
   // Acepta la ventana actual y la anterior (por si se generó justo antes del corte)
-  return [w, w - 1].some((i) => safeEqual(clean, pairingCodeFor(secret, i)));
+  for (const kind of ['pair', 'guest']) {
+    if ([w, w - 1].some((i) => safeEqual(clean, pairingCodeFor(secret, i, kind)))) return kind;
+  }
+  return false;
 }
 
 // ─── Token del visor ───────────────────────────────────────────────────
-function signToken(secret, now = Date.now()) {
+function signToken(secret, now = Date.now(), { guest = false } = {}) {
+  const ttl = guest ? GUEST_TTL_MS : TOKEN_TTL_MS;
   const payload = b64u(JSON.stringify({
     v: 1,
     iat: now,
-    exp: now + TOKEN_TTL_MS,
+    exp: now + ttl,
+    g: guest ? 1 : 0,
     e: currentEpoch(),
     id: crypto.randomBytes(6).toString('hex'),
   }));
-  return { token: `${payload}.${b64u(hmac(secret, payload))}`, exp: now + TOKEN_TTL_MS };
+  return { token: `${payload}.${b64u(hmac(secret, payload))}`, exp: now + ttl };
 }
 
 function verifyToken(secret, token, now = Date.now()) {
@@ -126,6 +136,7 @@ function requireAuth(req, res, { perMinute = 40 } = {}) {
 // CommonJS a propósito: Vercel compila las funciones de api/ a CommonJS y
 // así este módulo se carga igual en Vercel, en Node y en scripts/.
 exports.TOKEN_TTL_MS = TOKEN_TTL_MS;
+exports.GUEST_TTL_MS = GUEST_TTL_MS;
 exports.PAIR_WINDOW_MS = PAIR_WINDOW_MS;
 exports.getSecret = getSecret;
 exports.pairingCodeFor = pairingCodeFor;

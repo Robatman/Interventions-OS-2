@@ -6,8 +6,9 @@
   var KEY = 'ldr_device_token';
   var LOGIN = 'login-vr.html';
 
+  // Invitado: el token vive en sessionStorage (se borra al cerrar la pestaña). Dispositivo propio: localStorage.
   function read() {
-    try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; }
+    try { return sessionStorage.getItem(KEY) || localStorage.getItem(KEY) || ''; } catch (e) { return ''; }
   }
 
   function expired(token) {
@@ -22,9 +23,10 @@
     return !!t && !expired(t);
   };
 
-  window.setDeviceToken = function (token) {
+  window.setDeviceToken = function (token, guest) {
     try {
-      localStorage.setItem(KEY, token);
+      if (guest) { sessionStorage.setItem(KEY, token); localStorage.removeItem(KEY); }
+      else { localStorage.setItem(KEY, token); sessionStorage.removeItem(KEY); }
       // Claves que world.html usa para el saludo
       localStorage.setItem('ldr_game_id', 'VISOR');
       if (!localStorage.getItem('ldr_uid'))
@@ -34,7 +36,7 @@
 
   window.clearDeviceToken = function () {
     try {
-      localStorage.removeItem(KEY);
+      localStorage.removeItem(KEY); sessionStorage.removeItem(KEY);
       localStorage.removeItem('ldr_session_token');
       localStorage.removeItem('ldr_refresh_token');
     } catch (e) {}

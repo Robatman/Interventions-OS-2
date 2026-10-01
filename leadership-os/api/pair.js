@@ -13,10 +13,12 @@ export default async function handler(req, res) {
   }
 
   const code = typeof req.body === 'object' && req.body ? req.body.code : '';
-  if (!verifyPairingCode(secret, code)) {
+  const kind = verifyPairingCode(secret, code);
+  if (!kind) {
     return res.status(401).json({ error: 'Código incorrecto o vencido.' });
   }
 
-  const { token, exp } = signToken(secret);
-  return res.status(200).json({ token, exp });
+  const guest = kind === 'guest';
+  const { token, exp } = signToken(secret, Date.now(), { guest });
+  return res.status(200).json({ token, exp, guest });
 }
