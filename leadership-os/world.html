@@ -226,16 +226,18 @@ function mostrarBriefingIntervencion() {
       trapEl.setAttribute('value', `TRAP: ${trapText}`);
     }
 
-    // 4. Buscar dentro de 'scenarios' según el nivel
-    let scenarioData = null;
+    // 4. UN solo caso (agente + escenario) para briefing Y práctica.
+    //    Antes se mostraba siempre scenarios[nivel][0] y la práctica sorteaba otro agente.
+    const caso = CaseEngine.build({ interventionId: dataIntervencion.id, level: nivel });
+    appState.caso = caso;
+    let scenarioData = caso && caso.mode === 'intervention' ? caso.scenario : null;
 
-    if (dataIntervencion.scenarios) {
-      const arrayNivel = dataIntervencion.scenarios[nivel] || 
+    if (!scenarioData && dataIntervencion.scenarios) {
+      const arrayNivel = dataIntervencion.scenarios[nivel] ||
                          dataIntervencion.scenarios[nivel === 'mid' ? 'intermediate' : nivel];
 
       if (Array.isArray(arrayNivel) && arrayNivel.length > 0) {
-        // Tomamos el primer escenario del arreglo para ese nivel (ej. pc_mid_1)
-        scenarioData = arrayNivel[0]; 
+        scenarioData = arrayNivel[0];
       } else if (typeof arrayNivel === 'object') {
         scenarioData = arrayNivel;
       }
@@ -299,25 +301,16 @@ function mostrarBriefingTecnica() {
   // 1. Get current level ('novice', 'mid', 'adv')
   const nivel = appState.flujoReciente?.nivelSeleccionado || appState.currentLevel || 'novice';
 
-  // 2. Get list of available archetypes
-  const objetoArquetipos = typeof ARCHETYPES !== 'undefined' ? ARCHETYPES : (window.ARCHETYPES || {});
-  const listaIdsArquetipos = Object.keys(objetoArquetipos).filter(id => objetoArquetipos[id].available !== false);
-
-  if (listaIdsArquetipos.length === 0) {
+  // 2-3. UN solo caso (agente + escenario) para briefing Y práctica
+  const caso = CaseEngine.build({ techniqueId: appState.tecnicaSeleccionada, level: nivel });
+  if (!caso) {
     console.error("❌ ERROR: No available archetypes found.");
     return;
   }
+  appState.caso = caso;
 
-  // 3. Archetype Selection
-  let arquetipoId = appState.arquetipoSeleccionado || appState.agenteSeleccionado;
-
-  if (!arquetipoId || !objetoArquetipos[arquetipoId]) {
-    const indiceArquetipoAzar = Math.floor(Math.random() * listaIdsArquetipos.length);
-    arquetipoId = listaIdsArquetipos[indiceArquetipoAzar];
-    console.log(`🎲 Random archetype selected: ${arquetipoId.toUpperCase()}`);
-  }
-
-  const dataArquetipo = objetoArquetipos[arquetipoId];
+  const arquetipoId = caso.archetype.id;
+  const dataArquetipo = caso.archetype;
 
   // DOM / A-Frame References
   const titleEl = document.getElementById('briefing-title');
@@ -339,18 +332,8 @@ function mostrarBriefingTecnica() {
       trapEl.setAttribute('value', traitInfo);
     }
 
-    // C. Get briefings per level
-    let listaBriefings = [];
-    if (dataArquetipo.briefings && dataArquetipo.briefings[nivel]) {
-      listaBriefings = dataArquetipo.briefings[nivel];
-    }
-
-    let briefingSeleccionado = null;
-
-    if (listaBriefings.length > 0) {
-      const indiceBriefingAzar = Math.floor(Math.random() * listaBriefings.length);
-      briefingSeleccionado = listaBriefings[indiceBriefingAzar];
-    }
+    // C. El escenario ya viene definido en el caso (el mismo que usará la práctica)
+    let briefingSeleccionado = caso.scenario && caso.scenario.text ? caso.scenario : null;
 
     // D. Text & Tags extraction
     let scriptTexto = null;
@@ -813,6 +796,7 @@ function ejecutarFlujoGuardado() {
 <script src="js/archetypes.js"></script>
 <script src="js/techniques.js"></script>
 <script src="js/prompts.js"></script>
+<script src="js/case-engine.js"></script>
 <script src="js/preview.js"></script>
 <div id="voice-hud"><div id="voice-dot" class="idle"></div><span id="voice-label">Starting Neural Academy...</span></div>
 <button id="mic-btn" title="Hablar">&#127908;</button>
@@ -2630,12 +2614,23 @@ function goPractice(){
     }
   }, 50);
 
-  var arch = pickRandomArchetype();
-  // console.log("👤 Arquetipo elegido al azar:", arch ? arch.name : "¡NINGUNO!");
-  
-  // Enviamos la técnica como tercer parámetro
-  var scenario = pickRandomScenario(arch, appState.currentLevel, appState.tecnicaSeleccionada);
-  // console.log("🎬 Escenario final devuelto por pickRandomScenario:", scenario ? scenario.title || "Tiene datos pero no propiedad title" : "❌ ¡NULL/VACÍO!");
+  // Usa el MISMO caso que mostró el briefing (agente + escenario + nivel).
+  // Solo si no hubo briefing (o ya se usó) se crea uno nuevo.
+  var caso = (appState.caso && !appState.caso.used) ? appState.caso : CaseEngine.build({
+    interventionId: (appState.tecnicaSeleccionada || '').indexOf('interv_') === 0 ? appState.tecnicaSeleccionada : null,
+    techniqueId: appState.tecnicaSeleccionada,
+    level: appState.currentLevel
+  });
+  caso.used = true;
+  appState.caso = caso;
+  appState.currentLevel = caso.level;
+
+  var arch = caso.archetype;
+  var scenario = caso.scenario;
+
+  // El prompt del avatar (prompts.js) lee estas globales para saber QUÉ conversación es
+  window.activeMenu = caso.mode === 'intervention' ? 'interventions' : 'techniques';
+  currentIntervention = caso.intervention;
 
   appState.currentArchetype = arch;
   appState.currentScenario = scenario;
@@ -2663,7 +2658,7 @@ function goPractice(){
     if (traitEl) traitEl.setAttribute('value', arch.trait ? `Trait: ${arch.trait}` : '');
   }
   
-  var opener = pickRandomOpener(arch, scenario);
+  var opener = caso.opener;
   // console.log("💬 Opener generado para el inicio:", opener);
 
   appState.agentHistory.push({role:'assistant', content:opener});
