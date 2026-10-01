@@ -288,7 +288,7 @@
       var A = ACT[who]; if (!A) return;
       var p = spec[who], o = A.object3D;
       if (!p) { if (A.shown) { A.shown = false; tween(o, { s: .001, y: o.position.y - .4 }, 260, 0, 'in'); } return; }
-      var pos = polar(p.a, p.r || 2.7, p.y === undefined ? .5 : p.y), sc = p.s || 1.15, ry = -p.a * .3 * Math.PI / 180;
+      var pos = polar(p.a, p.r || 2.7, p.y === undefined ? .5 : p.y), sc = p.s || 1.15, ry = p.a * .15 * Math.PI / 180;
       if (!A.shown) {
         A.shown = true; var side = p.a < 0 ? -1 : 1;
         o.position.set(pos.x + side * 1.2, pos.y - .9, pos.z - 1.6); o.scale.set(.001, .001, .001); o.rotation.y = ry;
