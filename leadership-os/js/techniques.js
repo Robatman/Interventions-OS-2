@@ -69,7 +69,7 @@ const TECHNIQUES = {
       high:   "They're opening up. Keep listening — don't pivot to solutions yet."
     },
 
-    coachName: 'Alex',
+    coachName: 'Juanjolote',
     coachPersona: 'warm, intelligent leadership coach'
   },
 
@@ -135,7 +135,7 @@ const TECHNIQUES = {
       high:   "Strong. Ask one forward-facing question — something about possibility, not problem."
     },
 
-    coachName: 'Alex',
+    coachName: 'Juanjolote',
     coachPersona: 'incisive, Socratic leadership coach'
   },
 
@@ -201,7 +201,7 @@ const TECHNIQUES = {
       high:   "They're generating their own reasons to change. Stay with it. Ask: 'What would a first step look like?'"
     },
 
-    coachName: 'Sam',
+    coachName: 'Juanjolote',
     coachPersona: 'patient, non-judgmental motivational coach who draws out internal motivation'
   },
 
@@ -267,7 +267,7 @@ const TECHNIQUES = {
       high:   "You're in the need. Make a specific, gentle request — not a demand disguised as a question."
     },
 
-    coachName: 'Morgan',
+    coachName: 'Juanjolote',
     coachPersona: 'compassionate, precise NVC coach who helps leaders speak from their humanity'
   },
 
@@ -333,7 +333,7 @@ const TECHNIQUES = {
       high:   "You've named the impact. Ask them how they experienced it — their perspective matters too."
     },
 
-    coachName: 'Jordan',
+    coachName: 'Juanjolote',
     coachPersona: 'direct, clear-eyed leadership coach who models caring honesty without hesitation'
   },
 
@@ -399,7 +399,7 @@ const TECHNIQUES = {
       high:   "You're doing well. Check safety: are they withdrawing or escalating? If so, step out of the content."
     },
 
-    coachName: 'Casey',
+    coachName: 'Juanjolote',
     coachPersona: 'calm, grounded leadership coach who specializes in high-stakes dialogue'
   },
 
@@ -465,7 +465,7 @@ const TECHNIQUES = {
       high:   "They're opening up. Shift to a calibrated question: 'What would need to change for this to feel better?'"
     },
 
-    coachName: 'Chris',
+    coachName: 'Juanjolote',
     coachPersona: 'sharp, tactical leadership coach trained in high-stakes negotiation and emotional intelligence'
   },
 
@@ -531,7 +531,7 @@ const TECHNIQUES = {
       high:   "They're calmer. Check: have you addressed fairness? Is there anything that feels unfair in how this landed?"
     },
 
-    coachName: 'Robin',
+    coachName: 'Juanjolote',
     coachPersona: 'neuroscience-informed leadership coach who translates brain science into practical leadership moves'
   },
 
@@ -597,7 +597,7 @@ const TECHNIQUES = {
       high:   "You've found the competing commitment. Now surface the assumption underneath it. 'What would happen if you did X?'"
     },
 
-    coachName: 'Sam',
+    coachName: 'Juanjolote',
     coachPersona: 'developmental coach who helps leaders see their own hidden systems with compassion and precision'
   },
 
@@ -663,7 +663,7 @@ const TECHNIQUES = {
       high:   "Shift them from 'What's wrong?' to 'What do you want?' That's the exit from Victim to Creator."
     },
 
-    coachName: 'Taylor',
+    coachName: 'Juanjolote',
     coachPersona: 'sharp, pattern-aware leadership coach who helps leaders see relational dynamics clearly and exit gracefully'
   },
 
@@ -729,7 +729,7 @@ const TECHNIQUES = {
       high:   "Now move to Options. Ask: 'What else could you do?' Keep expanding — don't pick the answer for them."
     },
 
-    coachName: 'Alex',
+    coachName: 'Juanjolote',
     coachPersona: 'structured, curious leadership coach who uses the GROW framework with precision and warmth'
   },
 
@@ -795,7 +795,7 @@ const TECHNIQUES = {
       high:   "Connect the strength to the challenge directly. 'Given that you're good at X — how could you use that here?'"
     },
 
-    coachName: 'Morgan',
+    coachName: 'Juanjolote',
     coachPersona: 'energizing, positive leadership coach who helps people see and leverage what\'s already working'
   },
 
@@ -861,7 +861,7 @@ const TECHNIQUES = {
       high:   "Help them reframe the setback as data. Ask: 'What would you do differently — not better, differently?'"
     },
 
-    coachName: 'Jordan',
+    coachName: 'Juanjolote',
     coachPersona: 'encouraging, growth-oriented leadership coach who helps people see ability as dynamic, not fixed'
   },
 
@@ -927,7 +927,7 @@ const TECHNIQUES = {
       high:   "Great. Use the scale: 'Where are you on 1–10? What would make it one step higher?' Keep it small and specific."
     },
 
-    coachName: 'Casey',
+    coachName: 'Juanjolote',
     coachPersona: 'optimistic, future-focused coaching guide who looks for what\'s already working and builds from there'
   }
 

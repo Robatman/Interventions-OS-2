@@ -458,7 +458,7 @@
         var p = 12; shadow(g, 'rgba(20,34,74,.25)', 20); rr(g, p, p, W - 2 * p, H - 2 * p - 16, 30); g.fillStyle = '#fff'; g.fill();
         g.beginPath(); g.moveTo(W / 2 - 18, H - 20); g.lineTo(W / 2, H - 2); g.lineTo(W / 2 + 18, H - 20); g.fill(); shadow(g, 'transparent', 0); neon(g, W, H - 16, 12, 30, 3);
         var coach = UI3D.stage === 'coach';
-        var head = coach ? 'JUANJOLOTE  ·  YOUR COACH' : (String(s.agentName || 'AGENT') + (s.agentRole ? '  ·  ' + s.agentRole : '')).toUpperCase();
+        var head = coach ? 'JUANJOLOTE  ·  YOUR COACH' + (s.stageLabel ? '  ·  ' + s.stageLabel : '') : (String(s.agentName || 'AGENT') + (s.agentRole ? '  ·  ' + s.agentRole : '')).toUpperCase();
         g.fillStyle = coach ? C.teal : C.blue; g.font = '800 ' + (H * .095) + 'px ' + FONT; g.textAlign = 'left'; g.fillText(head, 34, H * .23);
         g.fillStyle = C.navy; g.font = '600 ' + (H * .135) + 'px ' + FONT; drawLines(g, s.text || '…', 34, H * .43, W - 68, H * .16, 4);
       }
@@ -616,6 +616,9 @@
     if (P.bubble) P.bubble.redraw();
   };
 
+  // Etapa de la lección ("STEP 2/4 · WHAT IT IS") que se muestra en la burbuja de Juanjolote
+  UI3D.setLearnStage = function (label) { S.stageLabel = label || ''; if (P.bubble) P.bubble.redraw(); };
+
   UI3D.onShow = function (id) {
     if (id === 'screen-learn-work-practice') {
       var sel = (typeof appState !== 'undefined' && appState.tecnicaSeleccionada) || '', t = '', sub = '';
@@ -625,7 +628,7 @@
       P.modeTitle.upd({ text: t || 'Choose a mode' }); P.modeSub.upd({ text: sub });
     } else if (id === 'screen-technique-list') { UI3D.techPage(0); }
     else if (id === 'screen-practice') {
-      var inPractice = typeof appState !== 'undefined' && !!appState.currentArchetype;
+      var inPractice = typeof appState !== 'undefined' && (appState.sessionMode ? appState.sessionMode === 'practice' : !!appState.currentArchetype);
       UI3D.setStage(inPractice ? 'agent' : 'coach'); P.gauge.redraw(); P.you.upd({ you: '' });
     } else if (id === 'screen-welcome' || id === 'screen-intro') { UI3D.setFace('juan', 'happy'); UI3D.setFace('ajo', 'neutral');
     } else if (id === 'screen-eval') { S.evalRaw = ''; P.eval.upd({ rows: null, text: 'Analyzing your conversation…' }); UI3D.setFace('juan', 'happy'); }
@@ -670,7 +673,12 @@
     window.updateVRMood = function (val) {
       appState.vrMood = Math.max(0, Math.min(100, val)); S.mood = appState.vrMood; P.gauge.redraw();
       if (UI3D.stage === 'agent') {
-        var m = S.mood; UI3D.setFace('ajo', m < 18 ? 'angry' : m < 35 ? 'sad' : m < 62 ? 'neutral' : 'happy');
+        var m = S.mood, face = m < 18 ? 'angry' : m < 35 ? 'sad' : m < 62 ? 'neutral' : 'happy';
+        // Si le faltaron al respeto, la cara reacciona según la personalidad (los más duros se enojan; los demás se ven heridos)
+        var tone = appState.lastTone, who = appState.currentArchetype && appState.currentArchetype.id;
+        if (tone === 'hostile') face = (who === 'carlos' || who === 'sandra') ? 'angry' : 'sad';
+        else if (tone === 'dismissive' && m < 55) face = (who === 'carlos' || who === 'sandra') ? 'angry' : 'sad';
+        UI3D.setFace('ajo', face);
       }
     };
     window.setJuanMood = function (mood) { UI3D.setFace('juan', ({ neutral: 'neutral', happy: 'happy', talking: 'neutral', sad: 'sad', thinking: 'thinking', open: 'open' })[mood] || 'neutral'); };

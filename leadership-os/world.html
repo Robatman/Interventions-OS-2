@@ -1177,93 +1177,72 @@ function goMode(menuType){
 
 
 
+// ─── ENSEÑANZA (Learn / Work Together) ───
+// Usa la lógica completa de prompts.js: filosofía de la técnica (p. ej. Leadership and Self-Deception),
+// etapas (por qué → qué es → cómo → verificar), apertura propia por técnica e intervención y preguntas guía.
+
+// Deja listas las globales que leen los prompts (currentTechnique, currentIntervention, activeMenu)
+function prepareTeachingContext() {
+  var sel = String(appState.tecnicaSeleccionada || '');
+  if (sel.indexOf('interv_') === 0 && typeof INTERVENTIONS !== 'undefined' && INTERVENTIONS[sel.replace('interv_', '')]) {
+    currentIntervention = INTERVENTIONS[sel.replace('interv_', '')];
+    appState.activeMenu = 'interventions';
+  } else if (typeof TECHNIQUES !== 'undefined' && TECHNIQUES[sel]) {
+    currentTechnique = TECHNIQUES[sel];
+    currentIntervention = null;
+    appState.activeMenu = 'techniques';
+  }
+  window.activeMenu = appState.activeMenu;
+}
+
+// La primera frase de Juanjolote: una pregunta propia de cada técnica o intervención (no una clase)
+function teachingOpener() {
+  prepareTeachingContext();
+  var p = appState.activeMenu === 'interventions' ? PROMPTS.learnIntervention() : PROMPTS.learn();
+  var m = p.match(/OPENING MESSAGE \(use this EXACTLY[^)]*\):\n([\s\S]+?)(?:\n\nRespond|\n\nMax|$)/);
+  if (m) return m[1].trim();
+  var label = appState.activeMenu === 'interventions' ? (currentIntervention && currentIntervention.label) : (currentTechnique && currentTechnique.label);
+  return 'Tell me, where does ' + (label || 'this') + ' show up as a real challenge for you?';
+}
+
+function showLearnStage() {
+  if (!window.UI3D) return;
+  var t = (typeof currentTechnique !== 'undefined') ? currentTechnique : null;
+  if (appState.sessionMode !== 'learn' || appState.activeMenu !== 'techniques' || !t || !t.stages) { UI3D.setLearnStage(''); return; }
+  var st = t.stages[(appState.learnStage || 1) - 1];
+  UI3D.setLearnStage(st ? 'STEP ' + (appState.learnStage || 1) + '/' + t.stages.length + '  ·  ' + st.label.replace(/^\d+\.\s*/, '').toUpperCase() : '');
+}
+
+// Avanza la etapa según lo que dice Juanjolote (palabras clave de cada técnica)
+function updateLearnStage(reply) {
+  if (appState.sessionMode !== 'learn' || appState.activeMenu !== 'techniques') return;
+  var t = currentTechnique;
+  if (!t || !t.stageKeywords || !t.stages) return;
+  var r = String(reply || '').toLowerCase(), st = appState.learnStage || 1;
+  [1, 2, 3].forEach(function (k) {
+    if ((t.stageKeywords[k] || []).some(function (w) { return r.indexOf(w) >= 0; })) st = Math.max(st, k + 1);
+  });
+  appState.learnStage = st;
+  showLearnStage();
+}
+
 function goLearn() {
   appState.agentHistory = [];
-  
+  appState.sessionMode = 'learn';
+  appState.currentArchetype = null;      // no es una práctica: sin avatar de agente
+  appState.learnStage = 1;
+
   const opennessPanel = document.getElementById('openness-panel');
-  if (opennessPanel) {
-    opennessPanel.setAttribute('visible', 'false');
-  } 
+  if (opennessPanel) opennessPanel.setAttribute('visible', 'false');
 
-  // console.log("=== ENTRANDO A GOLEARN ===");
-  // console.log("appState.tecnicaSeleccionada al entrar a goLearn:", appState.tecnicaSeleccionada);
+  var intro = appState.tecnicaSeleccionada
+    ? teachingOpener()
+    : 'Which intervention or technique would you like to explore first?';
 
-  var intro = '';
-  
-  if (appState.activeMenu === 'interventions' && !appState.tecnicaSeleccionada) {
-    intro = 'Let\'s explore retention interventions. Which one would you like to start with: Pulse Check, Anchoring, Stay Interview, or Tenure Renewal?';
-  } else {
-    switch(appState.tecnicaSeleccionada) {
-      // --- COLUMNA 1 ---
-      case 'active_listening':
-        intro = 'Very well, let\'s learn and practice Active Listening. Pay close attention to what I am about to tell you.';
-        break;
-      case 'powerful_questions':
-        intro = 'Excellent choice! Let\'s dive deeper into the art of Powerful Questions to open up new perspectives.';
-        break;
-      case 'motivational_interviewing':
-        intro = 'Great, let\'s explore Motivational Interviewing to guide change by connecting with internal motivation.';
-        break;
-      case 'nonviolent_communication':
-        intro = 'Perfect, let\'s start with Nonviolent Communication. We will focus on observations, feelings, and needs.';
-        break;
-      case 'radical_candor':
-        intro = 'Excellent! Let\'s work on Radical Candor: challenging directly while showing that you truly care.';
-        break;
-      case 'crucial_conversations':
-        intro = 'Very well, let\'s enter Crucial Conversations. We will learn how to maintain safety when emotions run high.';
-        break;
-
-      // --- COLUMNA 2 ---
-      case 'tactical_empathy':
-        intro = 'Excellent! Let\'s begin with Tactical Empathy. We will learn to recognize the other person\'s emotions to negotiate better.';
-        break;
-      case 'scarf_model':
-        intro = 'Very well, let\'s analyze the SCARF Model to understand social threats and rewards during interactions.';
-        break;
-      case 'immunity_to_change':
-        intro = 'Perfect, let\'s explore Immunity to Change to uncover the hidden beliefs that block progress.';
-        break;
-      case 'drama_triangle':
-        intro = 'Excellent! Let\'s start with the Drama Triangle technique. Let\'s begin analyzing the case.';
-        break;
-
-      // --- COLUMNA 3 ---
-      case 'grow_model':
-        intro = 'Very well, let\'s move forward using the GROW Model. Let\'s define clear goals and options.';
-        break;
-      case 'strengths_based_coaching':
-        intro = 'Excellent choice! Let\'s work on Strengths-Based Coaching to enhance natural talent.';
-        break;
-      case 'growth_mindset':
-        intro = 'Perfect, let\'s focus on a Growth Mindset to transform challenges into opportunities.';
-        break;
-      case 'solution_focused_coaching':
-        intro = 'Very well, let\'s start with Solution-Focused Coaching, directing attention toward resources and the future.';
-        break;
-
-      // === CASES DE INTERVENTIONS ===
-      case 'interv_pulse_check':
-        intro = 'Very well, let\'s start the Pulse Check simulation. Let\'s analyze the user\'s retention status.';
-        break;
-      case 'interv_anchoring':
-        intro = 'Excellent, we will begin the Anchoring technique training. We will focus on setting retention expectations.';
-        break;
-      case 'interv_stay_interview':
-        intro = 'Perfect, we will start with the Stay Interview. Let\'s evaluate key factors to prevent customer churn.';
-        break;
-      case 'interv_tenure_renewal':
-        intro = 'Very well, let\'s dive into Tenure Renewal. We will review the strategy to manage seniority-based renewals effectively.';
-        break;
-
-      default:
-        intro = 'Let\'s explore communication techniques. Which one are you interested in practicing today?';
-    }
-  }
-    
   showScreen('practice');
   setJuanMood('happy');
   setDialog('JUANJOLOTE', intro);
+  showLearnStage();
   speakVR(intro, 'daniel', function() { setHUD('ready', 'Ready to respond'); });
   appState.agentHistory.push({ role: 'assistant', content: intro });
 }
@@ -1271,26 +1250,28 @@ function goLearn() {
 
 function goWork() {
   appState.agentHistory = [];
-  
-  const opennessPanel = document.getElementById('openness-panel');
-  if (opennessPanel) {
-    opennessPanel.setAttribute('visible', 'false');
-  }
+  appState.sessionMode = 'work';
+  appState.currentArchetype = null;
+  prepareTeachingContext();
 
-  // Se traduce directamente a inglés natural para el simulador
-  var intro = 'Tell me, what situation are you dealing with with an agent right now?';
-  
+  const opennessPanel = document.getElementById('openness-panel');
+  if (opennessPanel) opennessPanel.setAttribute('visible', 'false');
+
+  var intro = "Tell me about the situation. Who is this person, and what has been going on? Don't filter it, just describe it the way you would tell a colleague.";
+
   showScreen('practice');
-  setJuanMood('talking');
+  setJuanMood('thinking');
   setDialog('JUANJOLOTE', intro);
-  
-  // Cambiamos el HUD al estado "Ready to respond" para mantener la consistencia del idioma
+  showLearnStage();
   speakVR(intro, 'daniel', function() { setHUD('ready', 'Ready to respond'); });
-  
+
   appState.agentHistory.push({ role: 'assistant', content: intro });
 }
 
 function goPractice(){
+  appState.sessionMode = 'practice';
+  appState.lastTone = 'neutral';
+  if (window.UI3D) UI3D.setLearnStage('');
 
   if (!appState.tecnicaSeleccionada || appState.tecnicaSeleccionada.startsWith('level-')) {
     if (appState.ultimaActividad && appState.ultimaActividad.tecnica) {
@@ -1432,24 +1413,30 @@ async function callGroqLLM(mode) {
 
   } else if (mode === 'learn') {
 
+    // La lógica de enseñanza completa de prompts.js: filosofía (p. ej. Leadership and Self-Deception),
+    // etapas (por qué → qué es → cómo → verificar), preguntas de apertura propias y práctica con casos reales
+    prepareTeachingContext();
     systemPrompt =
-      'You are Juanjolote, a warm and direct leadership coach at Centris Neural Academy. ' +
-      'You are teaching about ' +
-      (appState.activeMenu === 'interventions'
-        ? 'retention interventions'
-        : 'communication techniques') +
-      '. Speak strictly in English. Be conversational, maximum 3 sentences. Ask questions. Never lecture. ' +
-      'Connect everything to real-world call center situations. ' +
-      'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
+      (appState.activeMenu === 'interventions' ? PROMPTS.learnIntervention() : PROMPTS.learn()) +
+      "\n\nLANGUAGE: The voice is English-only. Reply strictly in English, even if the manager writes in Spanish (understand it, answer in English).";
 
   } else if (mode === 'work') {
 
+    prepareTeachingContext();
     systemPrompt =
-      'You are Juanjolote, a Socratic coach at Centris Neural Academy. ' +
-      'Your role is to ask questions that help the manager discover their own insights. ' +
-      'NEVER give direct advice. Ask ONLY ONE question at a time. Maximum 2 sentences. ' +
-      'Speak strictly in English. Be warm but direct. ' +
-      'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
+      PROMPTS.work() +
+      "\n\nLANGUAGE: The voice is English-only. Reply strictly in English, even if the manager writes in Spanish (understand it, answer in English).";
+  }
+
+  var llmMessages = [
+    { role: 'system', content: systemPrompt },
+    ...appState.agentHistory.slice(-12)
+  ];
+
+  // Práctica: se avisa al agente del tono con el que le hablaron en ESTE turno
+  if (mode === 'practice' && typeof CaseEngine !== 'undefined') {
+    var hint = CaseEngine.toneHint(appState.lastTone);
+    if (hint) llmMessages.push({ role: 'system', content: hint });
   }
 
   var res = await authFetch('/api/groq', {
@@ -1462,18 +1449,11 @@ async function callGroqLLM(mode) {
 
     body: JSON.stringify({
 
+      messages: llmMessages,
 
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt
-        },
-        ...appState.agentHistory.slice(-12)
-      ],
+      max_tokens: mode === 'practice' ? 170 : 230,
 
-      max_tokens: 150,
-
-      temperature: 0.88,
+      temperature: mode === 'practice' ? 0.88 : 0.7,
 
       // Evitar razonamiento visible
       reasoning_effort: 'none',
@@ -1520,7 +1500,10 @@ var MAX_PRACTICE_TURNS = 10;
 
 async function handleVRSpeech(text) {
   if (!text.trim()) return;
-  var mode = appState.currentArchetype ? 'practice' : 'learn';
+  // sessionMode lo fijan goPractice / goLearn / goWork (antes se adivinaba con currentArchetype, que podía venir de una práctica anterior)
+  var sessionMode = appState.sessionMode || (appState.currentArchetype ? 'practice' : 'learn');
+  var mode = sessionMode === 'practice' ? 'practice' : 'learn';
+  var llmMode = sessionMode === 'practice' ? 'practice' : (sessionMode === 'work' ? 'work' : 'learn');
 
   if (mode === 'practice') {
     var userTurns = appState.agentHistory.filter(function (m) { return m.role === 'user'; }).length;
@@ -1532,21 +1515,25 @@ async function handleVRSpeech(text) {
 
   appState.agentHistory.push({ role: 'user', content: text });
 
+  // Tono con el que habló el staff: el agente reacciona a CÓMO le hablan, no solo a QUÉ le dicen
+  var prevMood = appState.vrMood;
+  appState.lastTone = mode === 'practice' && typeof CaseEngine !== 'undefined' ? CaseEngine.tone(text) : 'neutral';
+
   try {
-    var reply = await callGroqLLM(mode === 'practice' ? 'practice' : appState.activeMenu ? 'learn' : 'work');
+    var reply = await callGroqLLM(llmMode);
     var parsed = mode === 'practice' ? parseAgentReply(reply) : { msg: reply, newMood: appState.vrMood, boxState: 'out' };
     appState.agentHistory.push({ role: 'assistant', content: reply });
-    
+
     if (mode === 'practice') {
-      updateVRMood(parsed.newMood);
+      // Si le faltaron al respeto, el ánimo baja sí o sí (aunque el modelo se haya quedado corto)
+      parsed.newMood = CaseEngine.enforceMood(appState.lastTone, prevMood, parsed.newMood);
+      updateVRMood(parsed.newMood);          // también cambia la cara del avatar (enojado, triste, neutral, feliz)
       appState.boxState = parsed.boxState;
-      if (parsed.newMood > 60) setAjolinMood('happy');
-      else if (parsed.newMood < 30) setAjolinMood('sad');
-      else setAjolinMood('talking');
       setDialog(appState.currentArchetype.name.toUpperCase(), parsed.msg);
     } else {
-      setJuanMood('talking');
+      setJuanMood('thinking');
       setDialog('JUANJOLOTE', parsed.msg);
+      if (typeof updateLearnStage === 'function') updateLearnStage(parsed.msg);
     }
 
     speakVR(
@@ -1554,11 +1541,7 @@ async function handleVRSpeech(text) {
       getVoice(mode === 'practice' ? 'agent' : 'juan'),
       function () {
         setHUD('ready', 'Ready to speak');
-        if (mode === 'practice') {
-          setAjolinMood('neutral');
-        } else {
-          setJuanMood('neutral');
-        }
+        if (mode !== 'practice') setJuanMood('neutral');
       }
     );
 

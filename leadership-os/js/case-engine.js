@@ -184,5 +184,52 @@ const CaseEngine = (function () {
     };
   }
 
-  return { build: build, interventionKey: interventionKey };
+  // ─── Tono del staff: detector sencillo (inglés y español) ───
+  // Sirve para que el agente reaccione como una persona real a la falta de respeto,
+  // aunque el modelo se quede corto: se le avisa del tono y se garantiza que el ánimo baje.
+  var HOSTILE = [
+    /\b(shut up|stupid|idiot|useless|incompetent|pathetic|loser|lazy|worthless)\b/,
+    /\b(i do not care|i don'?t care|don'?t care|no one cares|nobody cares)\b/,
+    /\b(not my problem|your problem|that'?s on you|your fault|deal with it|get over it|suck it up)\b/,
+    /\b(stop (complaining|whining|crying|making excuses))\b/,
+    /\b(you'?re fired|or you'?re fired|i('| wi)ll write you up|write you up|i('| wi)ll fire you)\b/,
+    /\b(yes or yes|whatever)\b/,
+    /\bperiod\.?\s*$/,
+    /(c[aá]llate|no me importa|es tu problema|no es mi problema|sup[eé]ralo|a m[ií] qu[eé]|tu culpa|in[uú]til|est[uú]pid|te voy a correr|o te corro|lo que sea|deja de (quejarte|llorar))/
+  ];
+  var DISMISSIVE = [
+    /\b(you (have|need|must|got) to be here|you should have|that'?s not (a|an) (excuse|reason)|excuses|everyone has (problems|issues)|man up)\b/,
+    /\b(just|simply) (focus|do your job|be on time|work harder|deal)\b/,
+    /\b(i (already )?told you|how many times)\b/,
+    /(no es excusa|todos tenemos problemas|solo (enf[oó]cate|haz tu trabajo)|ya te dije)/
+  ];
+  var WARM = [
+    /\b(i appreciate|thank you for|thanks for sharing|tell me more|how are you (feeling|doing)|i'?m sorry|that sounds (hard|tough|difficult)|help me understand|what would help|i hear you)\b/,
+    /(gracias por|cu[eé]ntame|c[oó]mo te sientes|lo siento|suena (dif[ií]cil|duro)|ay[uú]dame a entender)/
+  ];
+  function tone(text) {
+    var t = ' ' + String(text || '').toLowerCase().replace(/\s+/g, ' ').trim() + ' ';
+    var any = function (list) { return list.some(function (re) { return re.test(t); }); };
+    if (any(HOSTILE)) return 'hostile';
+    if (any(DISMISSIVE)) return 'dismissive';
+    if (any(WARM)) return 'warm';
+    return 'neutral';
+  }
+  // Nota que se añade al prompt de ESTE turno
+  function toneHint(t) {
+    if (t === 'hostile') return 'SUPERVISOR TONE THIS TURN: HOSTILE / DISRESPECTFUL. Your reply MUST show a strong, believable reaction in line with your personality (hurt, anger, shutting down, tears). Do NOT be calm, polite or reassuring, and do NOT say you understand. Your mood must drop at least 18 points. Keep it short.';
+    if (t === 'dismissive') return 'SUPERVISOR TONE THIS TURN: DISMISSIVE. Show visible cooling or defensiveness in line with your personality. Do NOT warmly agree. Your mood must drop at least 8 points.';
+    if (t === 'warm') return 'SUPERVISOR TONE THIS TURN: WARM. You may soften slightly, but only as much as feels earned by what they actually said.';
+    return '';
+  }
+  // El ánimo nunca debe subir (ni bajar poco) justo después de una falta de respeto
+  function enforceMood(t, prev, proposed) {
+    var m = Number(proposed);
+    if (isNaN(m)) m = prev;
+    if (t === 'hostile') m = Math.min(m, prev - 18);
+    else if (t === 'dismissive') m = Math.min(m, prev - 8);
+    return Math.max(0, Math.min(100, Math.round(m)));
+  }
+
+  return { build: build, interventionKey: interventionKey, tone: tone, toneHint: toneHint, enforceMood: enforceMood };
 })();
