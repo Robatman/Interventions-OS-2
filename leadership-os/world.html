@@ -2162,6 +2162,12 @@ function setupControllers(){
   lc.setAttribute('cursor','rayOrigin: entity; downEvents: triggerdown; upEvents: triggerup');
   scene.appendChild(lc);
 
+  // El rayo de los controles solo se ve dentro del visor (en la PC quedaba una línea fija en el centro)
+  function showRays(on) { rc.setAttribute('visible', on); lc.setAttribute('visible', on); }
+  showRays(false);
+  scene.addEventListener('enter-vr', function () { showRays(true); });
+  scene.addEventListener('exit-vr', function () { showRays(false); });
+
   refreshAllRaycasters();
 }
 

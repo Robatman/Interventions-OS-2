@@ -144,7 +144,7 @@
     var PX = Math.max(o.px || 0, 260), cw = Math.round(o.w * PX), ch = Math.round(o.h * PX);   // alta resolución: el texto se lee bien en el visor
     var c = document.createElement('canvas'); c.width = cw; c.height = ch; var g = c.getContext('2d');
     var tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
-    var mat = o.sheen ? sheenMaterial(tex) : new THREE.MeshBasicMaterial({ map: tex, transparent: true, toneMapped: false });
+    var mat = o.sheen ? sheenMaterial(tex) : new THREE.MeshBasicMaterial({ map: tex, transparent: true, toneMapped: false, depthWrite: false });
     var e = document.createElement('a-entity');
     if (o.id) e.setAttribute('id', o.id);
     e.setAttribute('position', (o.x || 0) + ' ' + (o.y || 0) + ' ' + (o.z || 0));
@@ -550,20 +550,20 @@
 
     // ── TÉCNICAS (Juanjolote) ──
     var tl = screen('screen-technique-list', false); CASTS['screen-technique-list'] = { juan: { a: 0, r: 1.8, y: .35, s: .72 } };
-    add(tl, label({ a: 0, r: 3.0, y: 3.2, w: 5, h: .55, text: 'Choose a technique', size: .6 }));
-    add(tl, label({ a: 0, r: 3.0, y: 2.82, w: 5.6, h: .34, text: 'Quick example · guided lesson · practice', size: .5, weight: 600, color: C.sky }));
+    add(tl, label({ a: 0, r: 3.0, y: 3.4, w: 5, h: .55, text: 'Choose a technique', size: .6 }));
+    add(tl, label({ a: 0, r: 3.0, y: 3.02, w: 5.6, h: .34, text: 'Quick example · guided lesson · practice', size: .5, weight: 600, color: C.sky }));
     techList().forEach(function (t, i) {
       var pg = Math.floor(i / TECH_PER_PAGE), k = i % TECH_PER_PAGE, col = k % 3, row = Math.floor(k / 3);
-      var cd = card({ a: (col - 1) * 30, r: col === 1 ? 3.0 : 3.2, y: 2.2 - row * 1.2 + (col === 1 ? .06 : 0), w: 1.6, h: 1.12, color: t.color, icon: t.icon, title: t.title, action: t.action });
+      var cd = card({ a: (col - 1) * 31, r: 3.1, y: 2.2 - row * 1.3, w: 1.55, h: 1.1, color: t.color, icon: t.icon, title: t.title, action: t.action });
       cd._page = pg; add(tl, cd); TECH_CARDS.push(cd);
     });
     add(tl, pill({ id: 'btn-tech-list-back', a: -42, r: 2.4, y: .5, w: .9, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-technicas' }));
-    P.techPage = add(tl, label({ id: 'tech-page-indicator', a: 46, r: 3.0, y: 1.3, w: 1.0, h: .3, text: '1 / 3', size: .5, weight: 700, color: C.navy }));
+    P.techPage = add(tl, label({ id: 'tech-page-indicator', a: 52, r: 3.0, y: 1.5, w: 1.0, h: .3, text: '1 / 3', size: .5, weight: 700, color: C.navy }));
     // El código antiguo le escribe un 'text' a este id; se ignora para que no aparezca un texto duplicado
     (function (el) { var orig = el.setAttribute.bind(el); el.setAttribute = function (n) { if (n === 'text') return; return orig.apply(null, arguments); }; })(P.techPage);
     add(tl, pill({ a: -46, r: 3.0, y: 2.0, w: .6, h: .5, label: '‹', bg: C.navy, fs: .6, onClick: function () { UI3D.techPage(-1); } }));
     add(tl, pill({ a: 46, r: 3.0, y: 2.0, w: .6, h: .5, label: '›', bg: C.navy, fs: .6, onClick: function () { UI3D.techPage(1); } }));
-    tip(tl, 25, .6, 'These are my tools. Pick one!', C.teal, 2.5);
+    tip(tl, 31, .3, 'These are my tools. Pick one!', C.teal, 2.5);
 
     // ── NIVEL (Ajolín) ──
     var lv = screen('screen-level-selector', false); CASTS['screen-level-selector'] = AJR;
