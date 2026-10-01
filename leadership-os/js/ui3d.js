@@ -70,22 +70,39 @@
     });
     FX.sheen.push(m); return m;
   }
-  function holoTexture(col) {
-    var c = document.createElement('canvas'); c.width = 8; c.height = 256; var g = c.getContext('2d');
-    var gr = g.createLinearGradient(0, 256, 0, 0); gr.addColorStop(0, col + '88'); gr.addColorStop(.5, col + '1c'); gr.addColorStop(1, col + '00');
-    g.fillStyle = gr; g.fillRect(0, 0, 8, 256); g.fillStyle = 'rgba(255,255,255,.28)';
-    for (var y = 0; y < 256; y += 10) g.fillRect(0, y, 8, 1);
-    var t = new THREE.CanvasTexture(c); t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; return t;
+  function glowTexture() {
+    var c = document.createElement('canvas'); c.width = c.height = 128; var g = c.getContext('2d');
+    var gr = g.createRadialGradient(64, 64, 2, 64, 64, 62); gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(.45, 'rgba(255,255,255,.4)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+    var t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   }
-  function polarGrid() {
-    var S = 1024, c = document.createElement('canvas'); c.width = c.height = S; var g = c.getContext('2d'); g.translate(S / 2, S / 2);
-    g.strokeStyle = 'rgba(0,150,255,.55)'; g.lineWidth = 2;
-    for (var i = 1; i <= 12; i++) { g.beginPath(); g.arc(0, 0, i * S / 25, 0, 7); g.stroke(); }
-    g.strokeStyle = 'rgba(123,92,255,.4)'; g.lineWidth = 1.5;
-    for (var a = 0; a < 48; a++) { g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(a * Math.PI / 24) * S / 2, Math.sin(a * Math.PI / 24) * S / 2); g.stroke(); }
-    var rg = g.createRadialGradient(0, 0, S * .1, 0, 0, S / 2); rg.addColorStop(0, 'rgba(0,0,0,0)'); rg.addColorStop(.62, 'rgba(0,0,0,0)'); rg.addColorStop(1, 'rgba(0,0,0,1)');
-    g.globalCompositeOperation = 'destination-out'; g.fillStyle = rg; g.fillRect(-S / 2, -S / 2, S, S);
-    var t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+
+  // ── Animaciones suaves (entradas, vuelos) sin depender de componentes ──
+  var TW = [], FLOAT = [];
+  var EASE = {
+    out: function (k) { return 1 - Math.pow(1 - k, 3); },
+    in: function (k) { return k * k * k; },
+    io: function (k) { return k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; },
+    back: function (k) { var c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); }
+  };
+  // to: {x,y,z,s,ry}; arranca desde el estado que tenga el objeto cuando llega su turno (delay)
+  function tween(o, to, dur, delay, ease, done) {
+    for (var i = TW.length - 1; i >= 0; i--) if (TW[i].o === o) TW.splice(i, 1);
+    TW.push({ o: o, to: to, dur: dur || 600, t0: performance.now() + (delay || 0), ease: EASE[ease || 'out'], done: done, from: null });
+  }
+  function stepTweens(now) {
+    for (var i = TW.length - 1; i >= 0; i--) {
+      var t = TW[i]; if (now < t.t0) continue;
+      var o = t.o, to = t.to;
+      if (!t.from) t.from = { x: o.position.x, y: o.position.y, z: o.position.z, s: o.scale.x, ry: o.rotation.y };
+      var f = t.from, k = Math.min(1, (now - t.t0) / t.dur), e = t.ease(k);
+      if (to.x !== undefined) o.position.x = f.x + (to.x - f.x) * e;
+      if (to.y !== undefined) o.position.y = f.y + (to.y - f.y) * e;
+      if (to.z !== undefined) o.position.z = f.z + (to.z - f.z) * e;
+      if (to.s !== undefined) { var s = Math.max(.001, f.s + (to.s - f.s) * e); o.scale.set(s, s, s); }
+      if (to.ry !== undefined) o.rotation.y = f.ry + (to.ry - f.ry) * e;
+      if (k >= 1) { TW.splice(i, 1); if (t.done) t.done(); }
+    }
   }
 
   // Reloj de los efectos: se registra como componente (los sistemas no se pueden añadir tarde)
@@ -93,11 +110,16 @@
     tick: function (t) {
       var s = t / 1000, i;
       for (i = 0; i < FX.sheen.length; i++) FX.sheen[i].uniforms.time.value = s;
-      for (i = 0; i < FX.beams.length; i++) FX.beams[i].offset.y = -s * .18;
-      if (FX.floor) FX.floor.rotation.z = s * .012;
+      stepTweens(performance.now());
+      for (i = 0; i < FLOAT.length; i++) { var m = FLOAT[i].getObject3D('mesh'); if (m) m.position.y = Math.sin(s * 1.1 + FLOAT[i]._ph) * .028; }
+      if (FX.sky) {
+        FX.sky.rotation.y = s * .01;
+        for (i = 0; i < FX.bokeh.length; i++) { var b = FX.bokeh[i]; b.position.y = b.userData.y0 + Math.sin(s * b.userData.sp + b.userData.ph) * b.userData.amp; }
+        for (i = 0; i < FX.rings.length; i++) { FX.rings[i].rotation.x += .0016; FX.rings[i].rotation.y += .0022; }
+      }
       if (FX.motes) {
         var p = FX.motes.geometry.attributes.position;
-        for (i = 0; i < p.count; i++) { var y = p.getY(i) + .004 + (i % 5) * .0009; if (y > 4.6) y = .1; p.setY(i, y); }
+        for (i = 0; i < p.count; i++) { var y = p.getY(i) + .004 + (i % 5) * .0009; if (y > 4.8) y = -.6; p.setY(i, y); }
         p.needsUpdate = true; FX.motes.rotation.y = s * .015;
       }
     }
@@ -110,8 +132,15 @@
     return true;
   }
 
+  // Posición en arco: a = grados alrededor de ti (0 = al frente), r = distancia; el panel mira hacia ti
+  function placed(o) {
+    if (o.a !== undefined) { var t = o.a * Math.PI / 180, r = o.r || 3; o.x = Math.sin(t) * r; o.z = -Math.cos(t) * r; o.ry = -o.a; }
+    return o;
+  }
+
   // o: {w,h,x,y,z,ry,px,id,sheen,state,draw(g,W,H,state),action,onClick}
   function panel(o) {
+    placed(o);
     var PX = Math.max(o.px || 0, 260), cw = Math.round(o.w * PX), ch = Math.round(o.h * PX);   // alta resolución: el texto se lee bien en el visor
     var c = document.createElement('canvas'); c.width = cw; c.height = ch; var g = c.getContext('2d');
     var tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
@@ -121,7 +150,7 @@
     e.setAttribute('position', (o.x || 0) + ' ' + (o.y || 0) + ' ' + (o.z || 0));
     if (o.ry) e.setAttribute('rotation', '0 ' + o.ry + ' 0');
     e.setObject3D('mesh', new THREE.Mesh(new THREE.PlaneGeometry(o.w, o.h), mat));
-    e._st = o.state || {};
+    e._st = o.state || {}; e._base = { x: o.x || 0, y: o.y || 0, z: o.z || 0 }; e._noFly = !!o.noFly; e._ph = Math.random() * 6; if (o.float) FLOAT.push(e);
     e.redraw = function () { g.clearRect(0, 0, cw, ch); g.shadowBlur = 0; g.textBaseline = 'alphabetic'; g.textAlign = 'left'; o.draw(g, cw, ch, e._st); tex.needsUpdate = true; };
     e.upd = function (patch) { for (var k in patch) e._st[k] = patch[k]; e.redraw(); };
     e.redraw();
@@ -142,8 +171,9 @@
   }
 
   function card(o) {
+    placed(o);
     return panel({
-      x: o.x, y: o.y, z: o.z, ry: o.ry, w: o.w, h: o.h, id: o.id, action: o.action, onClick: o.onClick, sheen: true, state: o.state,
+      float: true, x: o.x, y: o.y, z: o.z, ry: o.ry, w: o.w, h: o.h, id: o.id, action: o.action, onClick: o.onClick, sheen: true, state: o.state,
       draw: function (g, W, H) {
         var p = 14; shadow(g, 'rgba(20,34,74,.28)', 22); rr(g, p, p, W - 2 * p, H - 2 * p, 34); g.fillStyle = C.white; g.fill(); shadow(g, 'transparent', 0);
         g.save(); rr(g, p, p, W - 2 * p, H - 2 * p, 34); g.clip(); g.fillStyle = o.color; g.fillRect(p, p, W - 2 * p, H * .34); g.restore();
@@ -169,6 +199,7 @@
   }
 
   function pill(o) {
+    placed(o);
     return panel({
       x: o.x, y: o.y, z: o.z, w: o.w, h: o.h, id: o.id, action: o.action, onClick: o.onClick, clickable: o.clickable, sheen: !!o.sheen, state: { label: o.label },
       draw: function (g, W, H, s) {
@@ -179,6 +210,7 @@
   }
 
   function label(o) {
+    placed(o);
     return panel({
       x: o.x, y: o.y, z: o.z, w: o.w, h: o.h, px: o.px || 180, id: o.id, state: { text: o.text, sub: o.sub, color: o.color },
       draw: function (g, W, H, s) {
@@ -206,37 +238,46 @@
     });
   }
 
-  function avatar(who, x, z, scale) {
+  // Dos personajes únicos que se mueven entre pantallas (a veces aparece uno, a veces el otro, a veces ambos)
+  var ACT = {};
+  function polar(a, r, y) { var t = a * Math.PI / 180; return { x: Math.sin(t) * r, y: y, z: -Math.cos(t) * r }; }
+
+  function makeActor(who) {
+    var w = document.createElement('a-entity');
+    w.setAttribute('position', '0 -2 -4'); w.setAttribute('scale', '0.001 0.001 0.001');
     var e = document.createElement('a-entity');
     e.setAttribute('gltf-model', 'assets/ajolotes/' + who + '.glb');
-    e.setAttribute('position', x + ' 0 ' + z); e.setAttribute('scale', scale + ' ' + scale + ' ' + scale);
     e.setAttribute('look-at', '[camera]');
-    e.setAttribute('animation', 'property:position;to:' + x + ' .05 ' + z + ';dir:alternate;loop:true;dur:2600;easing:easeInOutSine');
-    e._who = who; e._face = UI3D.baseFace[who] || 'neutral';
-    e.setFace = function (face) {
-      e._face = face;
+    e.setAttribute('animation', 'property:position;from:0 0 0;to:0 .1 0;dir:alternate;loop:true;dur:2400;easing:easeInOutSine');
+    w._who = who; w._face = UI3D.baseFace[who] || 'neutral'; w.shown = false;
+    w.setFace = function (face) {
+      w._face = face;
       faceTexture(who, face, function (t) {
-        if (e._face !== face) return;
+        if (w._face !== face) return;
         e.object3D.traverse(function (o) { if (o.isMesh && o.material) { o.material.map = t; o.material.needsUpdate = true; } });
       });
     };
-    e.addEventListener('model-loaded', function () { e.setFace(e._face); });
-    (UI3D.avatars = UI3D.avatars || {})[who] = (UI3D.avatars[who] || []).concat(e);
-    return e;
+    e.addEventListener('model-loaded', function () { w.setFace(w._face); });
+    w.appendChild(e);
+    (UI3D.avatars = UI3D.avatars || {})[who] = [w];
+    ACT[who] = w; return w;
   }
 
-  function pedestal(x, z, col, noBeam) {
-    var g = document.createElement('a-entity'); g.setAttribute('position', x + ' 0 ' + z);
-    g.innerHTML = '<a-cylinder radius=".8" height=".1" position="0 .05 0" color="#ffffff" material="shader:flat"></a-cylinder>' +
-      '<a-torus radius=".8" radius-tubular=".02" rotation="90 0 0" position="0 .11 0" color="' + col + '" material="shader:flat"></a-torus>' +
-      '<a-ring rotation="-90 0 0" position="0 .12 0" radius-inner=".78" radius-outer=".82" color="' + col + '" material="shader:flat;transparent:true;opacity:.7" animation="property:scale;from:1 1 1;to:1.55 1.55 1.55;dur:2400;loop:true;easing:easeOutQuad" animation__f="property:material.opacity;from:.7;to:0;dur:2400;loop:true;easing:easeOutQuad"></a-ring>';
-    if (!noBeam) {
-      var tex = holoTexture(col); tex.repeat.set(1, 3);
-      var beam = new THREE.Mesh(new THREE.CylinderGeometry(.62, .8, 1.5, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false, toneMapped: false }));
-      beam.position.y = .75; var be = document.createElement('a-entity'); be.setObject3D('beam', beam); g.appendChild(be); FX.beams.push(tex);
-    }
-    return g;
-  }
+  // spec: { juan: {a,r,y,s}, ajo: {...} } — lo que no aparece en spec sale de escena
+  UI3D.cast = function (spec) {
+    spec = spec || {};
+    ['juan', 'ajo'].forEach(function (who) {
+      var A = ACT[who]; if (!A) return;
+      var p = spec[who], o = A.object3D;
+      if (!p) { if (A.shown) { A.shown = false; tween(o, { s: .001, y: o.position.y - .4 }, 260, 0, 'in'); } return; }
+      var pos = polar(p.a, p.r || 2.7, p.y === undefined ? .5 : p.y), sc = p.s || 1.15;
+      if (!A.shown) {
+        A.shown = true; var side = p.a < 0 ? -1 : 1;
+        o.position.set(pos.x + side * 1.2, pos.y - .9, pos.z - 1.6); o.scale.set(.001, .001, .001);
+        tween(o, { x: pos.x, y: pos.y, z: pos.z, s: sc }, 950, 120, 'back');
+      } else tween(o, { x: pos.x, y: pos.y, z: pos.z, s: sc }, 750, 0, 'io');
+    });
+  };
 
   // Habla: alterna caras de boca mientras suena el audio
   UI3D.talk = function (who, on) {
@@ -291,88 +332,237 @@
     });
   }
 
-  function buildScreens() {
-    // ── INTRO ──
-    var intro = screen('screen-intro', true);
-    add(intro, label({ x: 0, y: 3.5, z: -3.2, w: 5, h: .3, text: '// ATTRITION DETECTION TRAINING', size: .5, weight: 700, color: '#0a9bd8' }));
-    add(intro, label({ x: 0, y: 3.05, z: -3.2, w: 5, h: .8, text: 'Neural Academy', size: .62 }));
-    add(intro, label({ x: 0, y: 2.55, z: -3.2, w: 5.4, h: .4, text: 'Learn to spot attrition risk — and follow up well', size: .5, weight: 600, color: C.sky }));
-    add(intro, pill({ x: 0, y: 1.6, z: -2.4, w: 1.9, h: .5, label: 'START', bg: C.violet, action: 'start-app', fs: .42, sheen: true }));
-    add(intro, label({ x: 0, y: 1.1, z: -2.4, w: 3.4, h: .3, text: 'Drag to look around · click to select', size: .5, weight: 600, color: C.muted }));
-    add(intro, label({ x: 0, y: .82, z: -2.4, w: 3.4, h: .3, text: 'In VR: point and pull the trigger', size: .5, weight: 600, color: C.muted }));
-    add(intro, pedestal(-2.7, -3.0, C.teal)); add(intro, avatar('juan', -2.7, -3.0, 1.3));
-    add(intro, pedestal(2.7, -3.0, C.blue)); add(intro, avatar('ajo', 2.7, -3.0, 1.3));
+  // Posiciones de los personajes por pantalla (a = grados alrededor de ti; 0 = al frente)
+  var JL = { juan: { a: -43, r: 2.6, y: .5, s: 1.05 } };
+  var AJR = { ajo: { a: 43, r: 2.6, y: .5, s: 1.05 } };
+  var CASTS = {};
+  var CRUMB = { 'screen-welcome': 'HOME', 'screen-interventions': 'HOME  ›  INTERVENTIONS', 'screen-technique-list': 'HOME  ›  TECHNIQUES', 'screen-learn-work-practice': 'CHOOSE A MODE',
+                'screen-level-selector': 'CHOOSE A LEVEL', 'screen-intervention-briefing': 'BRIEFING', 'screen-active-listening-activity': 'QUICK EXAMPLE', 'screen-eval': 'RESULTS' };
 
-    // ── BIENVENIDA ──
-    var wel = screen('screen-welcome', false);
-    add(wel, label({ x: 0, y: 3.5, z: -3.2, w: 5, h: .3, text: '// ATTRITION DETECTION TRAINING', size: .5, weight: 700, color: '#0a9bd8' }));
-    add(wel, label({ x: 0, y: 3.05, z: -3.2, w: 5, h: .8, text: 'Neural Academy', size: .62 }));
-    add(wel, label({ x: 0, y: 2.58, z: -3.2, w: 5.4, h: .4, text: 'Learn to spot attrition risk — and follow up well', size: .5, weight: 600, color: C.sky }));
-    add(wel, card({ x: -.84, y: 1.45, z: -2.4, w: 1.45, h: 1.35, ry: 6, color: C.teal, icon: '🎯', title: 'Interventions', sub: 'Practice real check-in conversations', action: 'interventions' }));
-    add(wel, card({ x: .84, y: 1.45, z: -2.4, w: 1.45, h: 1.35, ry: -6, color: C.violet, icon: '🧠', title: 'Techniques', sub: '14 tools to run them well', action: 'techniques' }));
-    add(wel, pill({ x: 0, y: .62, z: -2.2, w: 1.3, h: .34, label: 'My progress', bg: '#ffffff', fg: C.navy, action: 'progress' }));
-    var back = add(wel, pill({ id: 'btn-back-activity-previous', x: 0, y: .22, z: -2.2, w: 2.1, h: .3, label: 'Back to previous activity', bg: C.sun, fs: .34, action: 'replay-previous-flow' }));
-    back.setAttribute('visible', 'false');
-    add(wel, pill({ id: 'btn-logout', x: 2.1, y: .28, z: -2.0, w: 1.15, h: .26, label: 'Unpair device', bg: 'rgba(20,34,74,.55)', fs: .34, clickable: true }));
-    add(wel, pedestal(-2.7, -3.0, C.teal)); add(wel, avatar('juan', -2.7, -3.0, 1.3));
-    add(wel, label({ x: -2.85, y: 1.95, z: -3.0, w: 1.3, h: .5, text: 'Juanjolote', sub: 'Your coach', color: C.teal, size: .55 }));
-    add(wel, pedestal(2.7, -3.0, C.blue)); add(wel, avatar('ajo', 2.7, -3.0, 1.3));
-    add(wel, label({ x: 2.85, y: 1.95, z: -3.0, w: 1.3, h: .5, text: 'Ajolín', sub: 'The agent', color: C.blue, size: .55 }));
-
-    // ── INTERVENCIONES ──
-    var iv = screen('screen-interventions', false);
-    add(iv, label({ x: 0, y: 3.0, z: -2.9, w: 5, h: .55, text: 'Interventions', size: .6 }));
-    add(iv, label({ x: 0, y: 2.62, z: -2.9, w: 5.6, h: .34, text: 'Check-ins that help you spot attrition early', size: .5, weight: 600, color: C.sky }));
-    var IV = [['💓', 'Pulse Check', 'Day 30 · First impressions and onboarding', C.teal, 'interv-retencion', 'DAY 30'],
-              ['⚓', 'Anchoring', 'Day 100 · Engagement and belonging', C.blue, 'interv-soporte-critico', 'DAY 100'],
-              ['🗣️', 'Stay Interview', 'Day 121 · Retention risks and unmet needs', C.violet, 'interv-reclamaciones', 'DAY 121'],
-              ['🏅', 'Tenure Renewal', 'Day 365 · Reflection and long-term retention', C.coral, 'interv-tenure-renewal', 'DAY 365']];
-    IV.forEach(function (d, i) {
-      var col = i % 2, row = Math.floor(i / 2);
-      add(iv, card({ x: (col ? 1 : -1) * 1.0, y: 1.95 - row * 1.12, z: -2.6, ry: (col ? -1 : 1) * 5, w: 1.85, h: 1.0, color: d[3], icon: d[0], title: d[1], sub: d[2], chip: d[5], action: d[4], subSize: .082 }));
+  function head(parent, a, title, sub) {
+    add(parent, label({ a: a, r: 3.0, y: 3.2, w: 5, h: .55, text: title, size: .6 }));
+    if (sub) add(parent, label({ a: a, r: 3.0, y: 2.82, w: 5.6, h: .34, text: sub, size: .5, weight: 600, color: C.sky }));
+  }
+  // Globo de texto junto a un personaje
+  function tip(parent, a, y, text, col, r) {
+    var left = a < 0;
+    return add(parent, panel({
+      a: a, r: r || 3.4, y: y, w: 1.4, h: .62, px: 240, float: true, state: { text: text }, noFly: false,
+      draw: function (g, W, H, s) {
+        var p = 10; shadow(g, 'rgba(20,34,74,.25)', 18); rr(g, p, p, W - 2 * p, H - 2 * p - 16, 26); g.fillStyle = '#fff'; g.fill();
+        var tx = W * (left ? .3 : .7); g.beginPath(); g.moveTo(tx - 16, H - 22); g.lineTo(tx + (left ? -6 : 6), H - 3); g.lineTo(tx + 16, H - 22); g.fill(); shadow(g, 'transparent', 0);
+        g.lineWidth = 4; g.strokeStyle = col; rr(g, p, p, W - 2 * p, H - 2 * p - 16, 26); g.stroke();
+        g.fillStyle = C.navy; g.font = '700 ' + (H * .15) + 'px ' + FONT; g.textAlign = 'center'; var ls = lines(g, s.text, W - 60, 3);
+        var y0 = (H - 16) / 2 - (ls.length - 1) * H * .09 + H * .05; ls.forEach(function (l, i) { g.fillText(l, W / 2, y0 + i * H * .18); });
+      }
+    }));
+  }
+  // Fila de ruta (HUD) en la parte baja
+  function hud(parent) {
+    P.hud = add(parent, panel({
+      a: 0, r: 2.6, y: -.16, w: 3.4, h: .3, px: 180, state: { text: '' }, noFly: true,
+      draw: function (g, W, H, s) {
+        if (!s.text) return; var p = 6; shadow(g, 'rgba(20,34,74,.25)', 12); rr(g, p, p, W - 2 * p, H - 2 * p, (H - 2 * p) / 2); g.fillStyle = 'rgba(20,34,74,.82)'; g.fill(); shadow(g, 'transparent', 0);
+        g.strokeStyle = '#19e3ff'; g.lineWidth = 3; rr(g, p, p, W - 2 * p, H - 2 * p, (H - 2 * p) / 2); g.stroke();
+        g.fillStyle = '#19e3ff'; g.beginPath(); g.arc(34, H / 2, 7, 0, 7); g.fill();
+        g.fillStyle = '#fff'; g.font = '800 ' + (H * .4) + 'px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('NEURAL ACADEMY  ·  ' + s.text, W / 2 + 10, H / 2 + 2);
+      }
+    }));
+  }
+  // Ficha pequeña y en relieve, controlada por estado (la usa la presentación)
+  function chip(o) {
+    return panel({
+      a: o.a || 0, r: o.r || 3, y: o.y || 1.6, w: 1.05, h: 1.2, sheen: true, float: true, state: {},
+      draw: function (g, W, H, s) {
+        if (!s.title) return; var p = 12; shadow(g, 'rgba(20,34,74,.28)', 20); rr(g, p, p, W - 2 * p, H - 2 * p, 30); g.fillStyle = '#fff'; g.fill(); shadow(g, 'transparent', 0);
+        g.save(); rr(g, p, p, W - 2 * p, H - 2 * p, 30); g.clip(); g.fillStyle = s.color; g.fillRect(p, p, W - 2 * p, H * .36); g.restore(); neon(g, W, H, p, 30, 3);
+        g.textAlign = 'center'; g.fillStyle = '#fff'; g.font = (H * .22) + 'px ' + FONT; g.fillText(s.icon || '', W / 2, H * .3);
+        g.fillStyle = C.navy; g.font = '800 ' + (H * .105) + 'px ' + FONT; var ls = lines(g, s.title, W * .86, 2); ls.forEach(function (l, i) { g.fillText(l, W / 2, H * .55 + i * H * .115); });
+        if (s.sub) { g.fillStyle = C.muted; g.font = '600 ' + (H * .075) + 'px ' + FONT; drawLines(g, s.sub, W / 2, H * (ls.length > 1 ? .83 : .74), W * .86, H * .09, 2); }
+        if (s.tag) { g.font = '800 ' + (H * .06) + 'px ' + FONT; var tw = g.measureText(s.tag).width + 22; rr(g, W - p - tw - 8, p + 8, tw, H * .09, H * .045); g.fillStyle = 'rgba(255,255,255,.3)'; g.fill(); g.fillStyle = '#fff'; g.fillText(s.tag, W - p - tw / 2 - 8, p + 8 + H * .066); }
+      }
     });
-    add(iv, pill({ x: 0, y: .28, z: -2.2, w: 1.0, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'close-history' }));
+  }
+  // Panel holográfico grande a los lados (como los módulos de la referencia)
+  function holo(o) {
+    return panel({
+      a: o.a, r: o.r || 3, y: o.y || 2.1, w: 1.6, h: 1.5, sheen: true, float: true, state: o.state || {},
+      draw: function (g, W, H, s) {
+        if (!s.title) return; var p = 12; shadow(g, 'rgba(20,34,74,.3)', 22); rr(g, p, p, W - 2 * p, H - 2 * p, 28); g.fillStyle = 'rgba(255,255,255,.93)'; g.fill(); shadow(g, 'transparent', 0);
+        g.save(); rr(g, p, p, W - 2 * p, H - 2 * p, 28); g.clip(); var gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, s.color); gr.addColorStop(1, s.color2 || s.color); g.fillStyle = gr; g.fillRect(p, p, W - 2 * p, H * .2);
+        g.fillStyle = 'rgba(25,227,255,.08)'; for (var y = p; y < H; y += 8) g.fillRect(p, y, W - 2 * p, 2); g.restore(); neon(g, W, H, p, 28, 3);
+        g.textAlign = 'left'; g.fillStyle = '#fff'; g.font = '800 ' + (H * .1) + 'px ' + FONT; g.fillText((s.icon || '') + '  ' + s.title, 36, H * .155);
+        g.fillStyle = C.muted; g.font = '600 ' + (H * .07) + 'px ' + FONT; drawLines(g, s.sub || '', 36, H * .3, W - 72, H * .085, 2);
+        (s.bullets || []).slice(0, 4).forEach(function (b, i) { var y = H * .47 + i * H * .125; rr(g, 36, y, W - 72, H * .098, H * .049); g.fillStyle = '#eef2fb'; g.fill(); g.fillStyle = s.color; g.beginPath(); g.arc(36 + H * .049, y + H * .049, H * .02, 0, 7); g.fill(); g.fillStyle = C.navy; g.font = '700 ' + (H * .06) + 'px ' + FONT; g.fillText(b, 36 + H * .1, y + H * .068); });
+      }
+    });
+  }
+
+  // ───────────────────────── Presentación de bienvenida ─────────────────────────
+  var HELLO = function () {
+    var gid = ''; try { gid = localStorage.getItem('ldr_game_id') || ''; } catch (e) {}
+    var n = gid.split('.')[1]; return 'Hi' + (n && n !== 'VISOR' ? ' ' + n : '') + '! I am Juanjolote, your coach. Welcome to Neural Academy.';
+  };
+  var INTRO = [
+    { title: true },
+    { kicker: 'HELLO', head: 'I\'m Juanjolote', body: 'Your coach at Neural Academy.', voice: HELLO, juan: 'happy' },
+    { kicker: 'THE GOAL', head: 'Spot attrition risk early', body: 'Notice the signs that someone may leave — then follow up the right way.', voice: 'Here you learn to notice when someone on your team may be thinking of leaving, and how to follow up well.', juan: 'open',
+      items: [['👀', 'Notice', 'Spot the signals', C.teal], ['💬', 'Ask', 'Open the conversation', C.blue], ['🗓', 'Follow up', 'Keep the thread alive', C.violet]] },
+    { kicker: 'FOUR CHECK-INS', head: 'One check-in per stage', body: 'Each one has its own goal.', voice: 'We use four check-ins: at day thirty, one hundred, one twenty one, and three sixty five. Each one has its own goal.', juan: 'happy',
+      items: [['💓', 'Pulse Check', 'First impressions', C.teal, 'DAY 30'], ['⚓', 'Anchoring', 'Engagement and belonging', C.blue, 'DAY 100'], ['🗣️', 'Stay Interview', 'Risks and unmet needs', C.violet, 'DAY 121'], ['🏅', 'Tenure Renewal', 'Long-term retention', C.coral, 'DAY 365']] },
+    { kicker: 'THE HOW', head: '14 techniques, 3 ways to learn', body: 'And Ajolín plays the employee you will talk to.', voice: 'Techniques are the how. You can learn each one, work through a real case, or practice live. And this is Ajolín. He plays the employee you will talk to.', juan: 'happy', ajo: true,
+      items: [['📖', 'Learn', 'With your own experience', C.teal], ['🧩', 'Work Together', 'Bring a real case', C.blue], ['🎭', 'Practice', 'Role-play and feedback', C.coral]] },
+    { title: true, ready: true, voice: 'Ready? Let us go.', juan: 'happy', ajo: true }
+  ];
+  var I = UI3D.intro = { n: 0 };
+
+  function introStep(n) {
+    var d = INTRO[n], last = INTRO.length - 1; I.n = n;
+    var showSlide = !d.title;
+    I.gTitle.setAttribute('visible', d.title ? 'true' : 'false');
+    P.slide.setAttribute('visible', showSlide ? 'true' : 'false');
+    function pillShow(p, on) { p.setAttribute('visible', on ? 'true' : 'false'); p.setAttribute('scale', on ? '1 1 1' : '0 0 0'); p.classList.toggle('clickable', on); }
+    pillShow(I.begin, n === 0); pillShow(I.start, n === last); pillShow(I.next, n > 0 && n < last); pillShow(I.skip, n > 0 && n < last);
+    I.hint.setAttribute('visible', n === 0 ? 'true' : 'false');
+    if (typeof refreshAllRaycasters === 'function') refreshAllRaycasters();
+    if (showSlide) {
+      P.slide.upd({ kicker: d.kicker, head: d.head, body: d.body });
+      P.slide.object3D.scale.set(.6, .6, .6); P.slide.object3D.position.y = P.slide._base.y - .3; tween(P.slide.object3D, { s: 1, y: P.slide._base.y }, 700, 0, 'back');
+    }
+    // fichas (relieve): se reparten en arco con distinta profundidad
+    var items = d.items || [], cnt = items.length;
+    I.chips.forEach(function (c, i) {
+      var o = c.object3D;
+      if (i >= cnt) { c.setAttribute('visible', 'false'); o.scale.set(.001, .001, .001); return; }
+      var it = items[i], a = (i - (cnt - 1) / 2) * 18, r = i % 2 ? 2.75 : 3.1, pos = polar(a, r, 1.5 + (i % 2 ? -.08 : .1));
+      c.upd({ icon: it[0], title: it[1], sub: it[2], color: it[3], tag: it[4] || '' });
+      c.setAttribute('visible', 'true'); c._base = pos; o.rotation.y = -a * Math.PI / 180;
+      o.position.set(pos.x * 1.4, pos.y - .7, pos.z - 1.2); o.scale.set(.001, .001, .001);
+      tween(o, { x: pos.x, y: pos.y, z: pos.z, s: 1 }, 800, 250 + i * 130, 'back');
+    });
+    // paneles holográficos de los lados en la pantalla final
+    I.holos.forEach(function (h, i) {
+      var o = h.object3D, on = !!d.ready; h.setAttribute('visible', on ? 'true' : 'false');
+      if (!on) { o.scale.set(.001, .001, .001); return; }
+      var a = (i ? 1 : -1) * 42, pos = polar(a, 3.4, 2.0); o.rotation.y = -a * Math.PI / 180;
+      o.position.set(pos.x * 1.5, pos.y - .5, pos.z - 1.4); o.scale.set(.001, .001, .001); tween(o, { x: pos.x, y: pos.y, z: pos.z, s: 1 }, 900, 200 + i * 150, 'back');
+    });
+    // personajes
+    var cast = {};
+    if (d.juan) cast.juan = { a: n === last ? -30 : -45, r: 2.4, y: n === last ? .55 : .75, s: .9 };
+    if (d.ajo) cast.ajo = { a: n === last ? 30 : 45, r: 2.4, y: n === last ? .55 : .75, s: .9 };
+    UI3D.cast(cast);
+    if (d.juan) UI3D.setFace('juan', d.juan === 'happy' ? 'happy' : d.juan);
+    if (d.ajo) UI3D.setFace('ajo', 'happy');
+    var v = typeof d.voice === 'function' ? d.voice() : d.voice;
+    if (v && typeof speakVR === 'function') speakVR(v, 'daniel');
+  }
+  UI3D.introStep = introStep;
+
+  function buildScreens() {
+    // ── INTRO (presentación) ──
+    var intro = screen('screen-intro', true);
+    I.gTitle = add(intro, document.createElement('a-entity'));
+    add(I.gTitle, label({ a: 0, r: 3.2, y: 3.55, w: 5, h: .3, text: '// ATTRITION DETECTION TRAINING', size: .5, weight: 700, color: '#0a9bd8' }));
+    add(I.gTitle, label({ a: 0, r: 3.2, y: 3.1, w: 5, h: .8, text: 'Neural Academy', size: .62 }));
+    add(I.gTitle, label({ a: 0, r: 3.2, y: 2.62, w: 5.4, h: .4, text: 'Learn to spot attrition risk — and follow up well', size: .5, weight: 600, color: C.sky }));
+    P.slide = add(intro, panel({
+      a: 0, r: 3.0, y: 3.0, w: 3.3, h: 1.3, px: 190, sheen: true, float: true, state: { kicker: '', head: '', body: '' }, noFly: true,
+      draw: function (g, W, H, s) {
+        var p = 12; shadow(g, 'rgba(20,34,74,.3)', 26); rr(g, p, p, W - 2 * p, H - 2 * p, 32); g.fillStyle = 'rgba(255,255,255,.94)'; g.fill(); shadow(g, 'transparent', 0); neon(g, W, H, p, 32, 4);
+        g.fillStyle = 'rgba(25,227,255,.06)'; for (var y = p + 4; y < H - p; y += 8) g.fillRect(p + 4, y, W - 2 * p - 8, 2);
+        g.textAlign = 'left'; g.fillStyle = C.blue; g.font = '800 ' + (H * .085) + 'px ' + FONT; g.fillText('//  ' + (s.kicker || ''), 44, H * .2);
+        g.fillStyle = C.navy; g.font = '800 ' + (H * .17) + 'px ' + FONT; drawLines(g, s.head, 44, H * .46, W - 88, H * .19, 1);
+        g.fillStyle = C.muted; g.font = '600 ' + (H * .094) + 'px ' + FONT; drawLines(g, s.body, 44, H * .66, W - 88, H * .12, 2);
+      }
+    }));
+    P.slide.setAttribute('visible', 'false');
+    I.chips = []; for (var k = 0; k < 4; k++) { var ch = add(intro, chip({ a: 0, r: 3, y: 1.6 })); ch._noFly = true; ch.setAttribute('visible', 'false'); I.chips.push(ch); }
+    I.holos = [
+      add(intro, holo({ a: -40, state: { icon: '🎯', title: 'INTERVENTIONS', sub: 'Practice real check-in conversations', color: C.teal, color2: C.blue, bullets: ['Day 30 · Pulse Check', 'Day 100 · Anchoring', 'Day 121 · Stay Interview', 'Day 365 · Tenure Renewal'] } })),
+      add(intro, holo({ a: 40, state: { icon: '🧠', title: 'TECHNIQUES', sub: '14 tools to run them well', color: C.violet, color2: '#ff5cc8', bullets: ['Active Listening', 'Powerful Questions', 'Motivational Interviewing', '+ 11 more tools'] } }))
+    ];
+    I.holos.forEach(function (h) { h._noFly = true; h.setAttribute('visible', 'false'); });
+    I.begin = add(intro, pill({ a: 0, r: 2.5, y: 1.7, w: 2.2, h: .5, label: 'Tap to begin  ▶', bg: C.violet, sheen: true, fs: .4, onClick: function () { introStep(1); } }));
+    I.start = add(intro, pill({ a: 0, r: 2.5, y: 1.7, w: 1.9, h: .55, label: 'START', bg: C.violet, action: 'start-app', fs: .44, sheen: true }));
+    I.next = add(intro, pill({ a: 6, r: 2.4, y: .7, w: 1.4, h: .4, label: 'Next  ▶', bg: C.violet, sheen: true, fs: .4, onClick: function () { introStep(Math.min(INTRO.length - 1, I.n + 1)); } }));
+    I.skip = add(intro, pill({ a: 34, r: 2.4, y: .7, w: 1.0, h: .3, label: 'Skip ›', bg: 'rgba(20,34,74,.55)', fs: .38, onClick: function () { if (typeof stopVoice === 'function') stopVoice(); introStep(INTRO.length - 1); } }));
+    [I.begin, I.start, I.next, I.skip].forEach(function (p) { p._noFly = true; });
+    I.hint = add(intro, document.createElement('a-entity'));
+    add(I.hint, label({ a: 0, r: 2.5, y: 1.2, w: 3.4, h: .3, text: 'Drag to look around · click to select', size: .5, weight: 600, color: C.muted }));
+    add(I.hint, label({ a: 0, r: 2.5, y: .92, w: 3.4, h: .3, text: 'In VR: point and pull the trigger', size: .5, weight: 600, color: C.muted }));
+    I.skip.setAttribute('visible', 'false'); I.next.setAttribute('visible', 'false'); I.start.setAttribute('visible', 'false');
+    I.start.setAttribute('scale', '0 0 0'); I.next.setAttribute('scale', '0 0 0'); I.skip.setAttribute('scale', '0 0 0');
+
+    // ── BIENVENIDA (Juanjolote presenta) ──
+    var wel = screen('screen-welcome', false); CASTS['screen-welcome'] = JL;
+    add(wel, label({ a: 10, r: 3.2, y: 3.55, w: 5, h: .3, text: '// ATTRITION DETECTION TRAINING', size: .5, weight: 700, color: '#0a9bd8' }));
+    add(wel, label({ a: 10, r: 3.2, y: 3.1, w: 5, h: .8, text: 'Neural Academy', size: .62 }));
+    add(wel, label({ a: 10, r: 3.2, y: 2.62, w: 5.4, h: .4, text: 'Where do you want to start?', size: .5, weight: 600, color: C.sky }));
+    add(wel, card({ a: -9, r: 2.8, y: 1.55, w: 1.65, h: 1.85, color: C.teal, icon: '🎯', title: 'Interventions', sub: 'Practice real check-in conversations', action: 'interventions', subSize: .075 }));
+    add(wel, card({ a: 29, r: 2.8, y: 1.55, w: 1.65, h: 1.85, color: C.violet, icon: '🧠', title: 'Techniques', sub: '14 tools to run them well', action: 'techniques', subSize: .075 }));
+    add(wel, pill({ a: 10, r: 2.5, y: .8, w: 1.3, h: .34, label: 'My progress', bg: '#ffffff', fg: C.navy, action: 'progress' }));
+    var back = add(wel, pill({ id: 'btn-back-activity-previous', a: 10, r: 2.5, y: .42, w: 2.1, h: .3, label: 'Back to previous activity', bg: C.sun, fs: .34, action: 'replay-previous-flow' }));
+    back.setAttribute('visible', 'false');
+    add(wel, pill({ id: 'btn-logout', a: 36, r: 2.4, y: .5, w: 1.15, h: .26, label: 'Unpair device', bg: 'rgba(20,34,74,.55)', fs: .34, clickable: true }));
+    tip(wel, -40, 1.95, 'Pick a path — I\'ll guide you.', C.teal);
+
+    // ── INTERVENCIONES (aparece Ajolín) ──
+    var iv = screen('screen-interventions', false); CASTS['screen-interventions'] = AJR;
+    head(iv, -8, 'Interventions', 'Check-ins that help you spot attrition early');
+    var IV = [['💓', 'Pulse Check', 'First impressions and onboarding', C.teal, 'interv-retencion', 'DAY 30'],
+              ['⚓', 'Anchoring', 'Engagement and belonging', C.blue, 'interv-soporte-critico', 'DAY 100'],
+              ['🗣️', 'Stay Interview', 'Retention risks and unmet needs', C.violet, 'interv-reclamaciones', 'DAY 121'],
+              ['🏅', 'Tenure Renewal', 'Long-term retention', C.coral, 'interv-tenure-renewal', 'DAY 365']];
+    IV.forEach(function (d, i) {
+      add(iv, card({ a: -9 + (i - 1.5) * 20, r: i % 2 ? 2.9 : 3.05, y: 1.75 + (i % 2 ? -.08 : .06), w: 1.08, h: 1.6, color: d[3], icon: d[0], title: d[1], sub: d[2], chip: d[5], action: d[4], subSize: .07 }));
+    });
+    add(iv, pill({ a: -8, r: 2.5, y: .55, w: 1.0, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'close-history' }));
+    tip(iv, 40, 1.95, 'I\'m the employee. Pick a check-in.', C.blue);
 
     // ── MODO (Learn / Work Together / Practice) ──
-    var md = screen('screen-learn-work-practice', false);
-    P.modeTitle = add(md, label({ x: 0, y: 3.0, z: -2.9, w: 5.6, h: .55, text: 'Choose a mode', size: .6 }));
-    P.modeSub = add(md, label({ x: 0, y: 2.62, z: -2.9, w: 5.6, h: .34, text: '', size: .5, weight: 600, color: C.sky }));
+    var md = screen('screen-learn-work-practice', false); CASTS['screen-learn-work-practice'] = JL;
+    P.modeTitle = add(md, label({ a: 10, r: 3.0, y: 3.2, w: 5.6, h: .55, text: 'Choose a mode', size: .6 }));
+    P.modeSub = add(md, label({ a: 10, r: 3.0, y: 2.82, w: 5.6, h: .34, text: '', size: .5, weight: 600, color: C.sky }));
     var MD = [['📖', 'Learn', 'Juanjolote teaches using your own experience', C.teal, 'learn-intervention'],
               ['🧩', 'Work Together', 'Bring a real case and find the answer yourself', C.blue, 'work-together-intervention'],
               ['🎭', 'Practice', 'Role-play with an agent and get feedback', C.coral, 'practice-intervention']];
-    MD.forEach(function (d, i) { add(md, card({ x: (i - 1) * 1.62, y: 1.6, z: -2.7, ry: (1 - i) * 7, w: 1.5, h: 1.45, color: d[3], icon: d[0], title: d[1], sub: d[2], action: d[4], subSize: .084 })); });
-    add(md, pill({ x: 0, y: .42, z: -2.3, w: 1.0, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-technicas' }));
+    MD.forEach(function (d, i) { add(md, card({ a: 10 + (i - 1) * 25, r: i === 1 ? 3.0 : 2.75, y: 1.65 + (i === 1 ? .1 : 0), w: 1.4, h: 1.6, color: d[3], icon: d[0], title: d[1], sub: d[2], action: d[4], subSize: .075 })); });
+    add(md, pill({ a: 10, r: 2.5, y: .55, w: 1.0, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-technicas' }));
+    tip(md, -40, 1.95, 'How do you want to work today?', C.teal);
 
-    // ── TÉCNICAS ──
-    var tl = screen('screen-technique-list', false);
-    add(tl, label({ x: 0, y: 3.0, z: -2.9, w: 5, h: .55, text: 'Choose a technique', size: .6 }));
-    add(tl, label({ x: 0, y: 2.62, z: -2.9, w: 5.6, h: .34, text: 'Quick example · guided lesson · practice', size: .5, weight: 600, color: C.sky }));
+    // ── TÉCNICAS (Juanjolote) ──
+    var tl = screen('screen-technique-list', false); CASTS['screen-technique-list'] = JL;
+    add(tl, label({ a: 10, r: 3.0, y: 3.2, w: 5, h: .55, text: 'Choose a technique', size: .6 }));
+    add(tl, label({ a: 10, r: 3.0, y: 2.82, w: 5.6, h: .34, text: 'Quick example · guided lesson · practice', size: .5, weight: 600, color: C.sky }));
     techList().forEach(function (t, i) {
       var pg = Math.floor(i / TECH_PER_PAGE), k = i % TECH_PER_PAGE, col = k % 3, row = Math.floor(k / 3);
-      var cd = card({ x: (col - 1) * 1.62, y: 1.98 - row * 1.1, z: -2.7, ry: (1 - col) * 7, w: 1.5, h: .98, color: t.color, icon: t.icon, title: t.title, action: t.action });
+      var cd = card({ a: 12 + (col - 1) * 22, r: col === 1 ? 3.05 : 2.9, y: 2.2 - row * 1.12 + (col === 1 ? .06 : 0), w: 1.3, h: 1.0, color: t.color, icon: t.icon, title: t.title, action: t.action });
       cd._page = pg; add(tl, cd); TECH_CARDS.push(cd);
     });
-    add(tl, pill({ id: 'btn-tech-list-back', x: -1.1, y: .28, z: -2.2, w: .9, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-technicas' }));
-    P.techPage = add(tl, label({ id: 'tech-page-indicator', x: 0, y: .28, z: -2.2, w: 1.4, h: .3, text: '1 / 3', size: .5, weight: 700, color: C.navy }));
+    add(tl, pill({ id: 'btn-tech-list-back', a: -8, r: 2.5, y: .5, w: .9, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-technicas' }));
+    P.techPage = add(tl, label({ id: 'tech-page-indicator', a: 10, r: 2.5, y: .5, w: 1.2, h: .3, text: '1 / 3', size: .5, weight: 700, color: C.navy }));
     // El código antiguo le escribe un 'text' a este id; se ignora para que no aparezca un texto duplicado
     (function (el) { var orig = el.setAttribute.bind(el); el.setAttribute = function (n) { if (n === 'text') return; return orig.apply(null, arguments); }; })(P.techPage);
-    add(tl, pill({ x: .55, y: .28, z: -2.2, w: .75, h: .3, label: '‹', bg: C.navy, onClick: function () { UI3D.techPage(-1); } }));
-    add(tl, pill({ x: 1.35, y: .28, z: -2.2, w: .75, h: .3, label: '›', bg: C.navy, onClick: function () { UI3D.techPage(1); } }));
+    add(tl, pill({ a: 29, r: 2.5, y: .5, w: .6, h: .3, label: '‹', bg: C.navy, onClick: function () { UI3D.techPage(-1); } }));
+    add(tl, pill({ a: 39, r: 2.5, y: .5, w: .6, h: .3, label: '›', bg: C.navy, onClick: function () { UI3D.techPage(1); } }));
+    tip(tl, -40, 1.95, 'These are my tools. Pick one!', C.teal);
 
-    // ── NIVEL ──
-    var lv = screen('screen-level-selector', false);
-    add(lv, label({ x: 0, y: 3.0, z: -2.9, w: 5, h: .55, text: 'Select your level', size: .6 }));
-    add(lv, label({ x: 0, y: 2.62, z: -2.9, w: 5.6, h: .34, text: 'Choose how challenging the agent will be', size: .5, weight: 600, color: C.sky }));
+    // ── NIVEL (Ajolín) ──
+    var lv = screen('screen-level-selector', false); CASTS['screen-level-selector'] = AJR;
+    add(lv, label({ a: -10, r: 3.0, y: 3.2, w: 5, h: .55, text: 'Select your level', size: .6 }));
+    add(lv, label({ a: -10, r: 3.0, y: 2.82, w: 5.6, h: .34, text: 'Choose how challenging I will be', size: .5, weight: 600, color: C.sky }));
     var LV = [['🌱', 'Beginner', 'Guides on screen · open, receptive agent', C.green, 'level-novice'],
               ['⚖️', 'Intermediate', 'Less help · realistic reactions', C.sun, 'level-intermediate'],
               ['🔥', 'Expert', 'No help · guarded or emotional agent', C.coral, 'level-expert']];
-    LV.forEach(function (d, i) { add(lv, card({ x: (i - 1) * 1.62, y: 1.6, z: -2.7, ry: (1 - i) * 7, w: 1.5, h: 1.45, color: d[3], icon: d[0], title: d[1], sub: d[2], action: d[4], subSize: .084 })); });
-    add(lv, pill({ id: 'btn-level-back', x: 0, y: .42, z: -2.3, w: 1.0, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-to-learn-work' }));
+    LV.forEach(function (d, i) { add(lv, card({ a: -10 + (i - 1) * 25, r: i === 1 ? 3.0 : 2.75, y: 1.65 + (i === 1 ? .1 : 0), w: 1.4, h: 1.6, color: d[3], icon: d[0], title: d[1], sub: d[2], action: d[4], subSize: .075 })); });
+    add(lv, pill({ id: 'btn-level-back', a: -10, r: 2.5, y: .55, w: 1.0, h: .3, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-to-learn-work' }));
+    tip(lv, 40, 1.95, 'Be gentle… or not.', C.blue);
 
-    // ── BRIEFING ──
-    var br = screen('screen-intervention-briefing', false);
+    // ── BRIEFING (Ajolín, con misterio) ──
+    var br = screen('screen-intervention-briefing', false); CASTS['screen-intervention-briefing'] = { ajo: { a: 50, r: 2.6, y: .45, s: 1.1 } };
     P.briefing = add(br, panel({
-      x: 0, y: 1.75, z: -2.7, w: 3.7, h: 2.5, px: 150, sheen: true, state: { title: '', trap: '', level: '', scenario: '', tags: [] },
+      a: -12, r: 2.8, y: 1.85, w: 3.5, h: 2.4, px: 150, sheen: true, state: { title: '', trap: '', level: '', scenario: '', tags: [] },
       draw: function (g, W, H, s) {
         var p = 14; shadow(g, 'rgba(20,34,74,.3)', 26); rr(g, p, p, W - 2 * p, H - 2 * p, 36); g.fillStyle = '#fff'; g.fill(); shadow(g, 'transparent', 0); neon(g, W, H, p, 36, 4);
         g.textAlign = 'left'; g.fillStyle = C.blue; g.font = '800 ' + (H * .05) + 'px ' + FONT; g.fillText('BRIEFING' + (s.level ? '  ·  ' + s.level : ''), 46, H * .105);
@@ -385,16 +575,17 @@
         drawLines(g, '⚠  ' + String(s.trap || '').replace(/^TRAP:\s*/i, 'Watch out: '), 66, H - H * .118, W - 132, H * .045, 2);
       }
     }));
-    add(br, pill({ x: -.95, y: .36, z: -2.4, w: 1.1, h: .34, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-to-learn-work' }));
-    add(br, pill({ x: .85, y: .36, z: -2.4, w: 2.0, h: .38, label: 'Start practice  ➔', bg: C.teal, action: 'start-briefed-practice', sheen: true }));
+    add(br, pill({ a: -30, r: 2.6, y: .5, w: 1.1, h: .34, label: '‹ Back', bg: '#ffffff', fg: C.navy, action: 'back-to-learn-work' }));
+    add(br, pill({ a: 0, r: 2.6, y: .5, w: 2.0, h: .38, label: 'Start practice  ➔', bg: C.teal, action: 'start-briefed-practice', sheen: true }));
+    tip(br, 42, 1.95, 'Read the case… then meet me.', C.blue);
     stub(br, 'briefing-title', function (v) { S.briefing.title = v; refreshBriefing(); });
     stub(br, 'briefing-trap', function (v) { S.briefing.trap = v; refreshBriefing(); });
     stub(br, 'briefing-tags', function (v) { S.briefing.raw = v; refreshBriefing(); });
 
     // ── EJEMPLO "CÓMO NO / CÓMO SÍ" (reemplaza la pantalla vieja, que usaba el mismo id) ──
     var pv = screen('screen-active-listening-activity', false);
-    add(pv, pedestal(-2.2, -3.0, C.teal, true)); add(pv, avatar('juan', -2.2, -3.0, 1.25));
-    add(pv, pedestal(2.2, -3.0, C.blue, true)); add(pv, avatar('ajo', 2.2, -3.0, 1.25));
+    CASTS['screen-active-listening-activity'] = { juan: { a: -46, r: 2.7, y: .45, s: 1.1 }, ajo: { a: 46, r: 2.7, y: .45, s: 1.1 } };
+    hud(ROOT);
     P.pvHead = add(pv, panel({
       x: 0, y: 3.12, z: -3.0, w: 5.4, h: .85, px: 200, state: PV,
       draw: function (g, W, H, s) {
@@ -450,8 +641,6 @@
 
     // ── PRÁCTICA ──
     var pr = screen('screen-practice', false);
-    UI3D.pedAgent = add(pr, pedestal(0, -2.9, C.blue, true)); UI3D.avAgent = add(pr, avatar('ajo', 0, -2.9, 1.35));
-    UI3D.pedCoach = add(pr, pedestal(0, -2.9, C.teal, true)); UI3D.avCoach = add(pr, avatar('juan', 0, -2.9, 1.35)); UI3D.pedCoach.setAttribute('visible', 'false'); UI3D.avCoach.setAttribute('visible', 'false');
     P.bubble = add(pr, panel({
       id: 'dialog-panel', x: 0, y: 2.55, z: -2.9, w: 3.3, h: 1.0, px: 160, sheen: true, state: S,
       draw: function (g, W, H, s) {
@@ -533,8 +722,7 @@
     stub(ev, 'eval-mood', function () {}); stub(ev, 'juan-eval-img', function () {});
     add(ev, pill({ id: 'btn-practice-again', x: -.35, y: .32, z: -2.3, w: 1.45, h: .36, label: 'Practice again', bg: C.teal, clickable: true, sheen: true }));
     add(ev, pill({ id: 'btn-new-session', x: 1.35, y: .32, z: -2.3, w: 1.45, h: .36, label: 'Back to menu', bg: C.navy, clickable: true }));
-    add(ev, pedestal(-2.2, -2.5, C.teal)); add(ev, avatar('juan', -2.2, -2.5, 1.5));
-    add(ev, label({ x: -2.2, y: 2.0, z: -2.5, w: 1.8, h: .5, text: 'Juanjolote', sub: 'Your coach', color: C.teal, size: .55 }));
+    CASTS['screen-eval'] = JL;
     stub(ev, 'juan-img', function () {});
   }
 
@@ -610,14 +798,25 @@
 
   UI3D.setStage = function (mode) {
     UI3D.stage = mode; var coach = mode === 'coach';
-    UI3D.avAgent.setAttribute('visible', coach ? 'false' : 'true'); UI3D.pedAgent.setAttribute('visible', coach ? 'false' : 'true');
-    UI3D.avCoach.setAttribute('visible', coach ? 'true' : 'false'); UI3D.pedCoach.setAttribute('visible', coach ? 'true' : 'false');
+    UI3D.cast(coach ? { juan: { a: 0, r: 2.7, y: .35, s: 1.65 } } : { ajo: { a: 0, r: 2.7, y: .35, s: 1.65 } });
     P.gauge.setAttribute('visible', coach ? 'false' : 'true'); P.you.setAttribute('visible', 'true');
     if (P.bubble) P.bubble.redraw();
   };
 
   // Etapa de la lección ("STEP 2/4 · WHAT IT IS") que se muestra en la burbuja de Juanjolote
   UI3D.setLearnStage = function (label) { S.stageLabel = label || ''; if (P.bubble) P.bubble.redraw(); };
+
+  // Los elementos de la pantalla llegan volando, uno tras otro (da relieve y sensación de movimiento)
+  function flyIn(list) {
+    var n = 0;
+    list.forEach(function (k) {
+      if (!k._base || k._noFly) return; var o = k.object3D, b = k._base;
+      if (o.visible === false || o.scale.x === 0) return;
+      o.position.set(b.x * 1.35, b.y - .5, b.z * 1.35 - .6); o.scale.set(.01, .01, .01);
+      tween(o, { x: b.x, y: b.y, z: b.z, s: 1 }, 700, n++ * 65, 'back');
+    });
+  }
+  UI3D.enter = function (id) { var sc = screens[id]; if (sc) flyIn(Array.prototype.slice.call(sc.children)); };
 
   UI3D.onShow = function (id) {
     if (id === 'screen-learn-work-practice') {
@@ -632,28 +831,43 @@
       UI3D.setStage(inPractice ? 'agent' : 'coach'); P.gauge.redraw(); P.you.upd({ you: '' });
     } else if (id === 'screen-welcome' || id === 'screen-intro') { UI3D.setFace('juan', 'happy'); UI3D.setFace('ajo', 'neutral');
     } else if (id === 'screen-eval') { S.evalRaw = ''; P.eval.upd({ rows: null, text: 'Analyzing your conversation…' }); UI3D.setFace('juan', 'happy'); }
+    if (id === 'screen-intro') introStep(0);
+    else if (id !== 'screen-practice') UI3D.cast(CASTS[id] || {});
+    if (P.hud) P.hud.upd({ text: CRUMB[id] || '' });
+    UI3D.enter(id);
   };
 
   // ───────────────────────── Ambiente ─────────────────────────
+  // Cielo de amanecer con nebulosa y estrellas, nubes abajo (sin piso: flotas entre nubes) y esferas de luz en distintas profundidades
   function buildEnvironment() {
-    var c = document.createElement('canvas'); c.width = 2048; c.height = 1024; var g = c.getContext('2d'), W = c.width, H = c.height;
+    var c = document.createElement('canvas'); c.width = 2048; c.height = 1024; var g = c.getContext('2d'), W = c.width, H = c.height, i, x, y, r, rg;
     var gr = g.createLinearGradient(0, 0, 0, H);
-    gr.addColorStop(0, '#2b6fd6'); gr.addColorStop(.45, '#6ec1ff'); gr.addColorStop(.68, '#bfe6ff'); gr.addColorStop(.8, '#ffe3bd'); gr.addColorStop(1, '#fff1dc');
+    gr.addColorStop(0, '#0f1a68'); gr.addColorStop(.28, '#2c4acb'); gr.addColorStop(.46, '#5a74ec'); gr.addColorStop(.53, '#9a8cf4'); gr.addColorStop(.62, '#eaa8ec'); gr.addColorStop(.74, '#ffd6ee'); gr.addColorStop(1, '#f4e8ff');
     g.fillStyle = gr; g.fillRect(0, 0, W, H);
-    for (var i = 0; i < 14; i++) { var x = Math.random() * W, y = H * (.12 + Math.random() * .38), r = 40 + Math.random() * 70; var rg = g.createRadialGradient(x, y, 2, x, y, r); rg.addColorStop(0, 'rgba(255,255,255,.75)'); rg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = rg; g.beginPath(); g.ellipse(x, y, r * 1.9, r * .8, 0, 0, 7); g.fill(); }
+    function blob(x, y, r, col, a, sx) { var q = g.createRadialGradient(x, y, 2, x, y, r); q.addColorStop(0, col.replace('A', a)); q.addColorStop(1, col.replace('A', 0)); g.fillStyle = q; g.beginPath(); g.ellipse(x, y, r * (sx || 1), r, 0, 0, 7); g.fill(); }
+    for (i = 0; i < 22; i++) blob(Math.random() * W, H * (.08 + Math.random() * .42), 120 + Math.random() * 230, ['rgba(25,227,255,A)', 'rgba(255,92,200,A)', 'rgba(123,92,255,A)'][i % 3], .32, 1.6);
+    for (i = 0; i < 520; i++) { x = Math.random() * W; y = Math.random() * H * .52; r = Math.random() < .06 ? 3.2 : Math.random() * 1.4 + .4; g.fillStyle = 'rgba(255,255,255,' + (.35 + Math.random() * .6) + ')'; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+    for (i = 0; i < 46; i++) blob(Math.random() * W, H * (.58 + Math.random() * .3), 70 + Math.random() * 130, 'rgba(255,255,255,A)', .85, 2.1);
+    for (i = 0; i < 10; i++) blob(Math.random() * W, H * (.42 + Math.random() * .1), 50 + Math.random() * 70, 'rgba(255,255,255,A)', .55, 2.4);
     var env = document.createElement('a-entity'); env.setAttribute('id', 'ui3d-env'); env.setAttribute('fx-clock', '');
     var sky = document.createElement('a-sky'); sky.setAttribute('src', c.toDataURL('image/jpeg', .92)); sky.setAttribute('material', 'fog:false'); env.appendChild(sky);
-    env.insertAdjacentHTML('beforeend',
-      '<a-circle rotation="-90 0 0" radius="16" color="#fff1dc" material="shader:flat"></a-circle>' +
-      '<a-ring rotation="-90 0 0" position="0 .01 0" radius-inner="3.3" radius-outer="3.36" color="#ffc58a" material="shader:flat;opacity:.9;transparent:true"></a-ring>' +
-      '<a-ring rotation="-90 0 0" position="0 .01 0" radius-inner="6.0" radius-outer="6.05" color="#ffd9aa" material="shader:flat;opacity:.8;transparent:true"></a-ring>');
     SCENE.appendChild(env);
     function fx() {
-      var sc = SCENE.object3D;
-      var fl = new THREE.Mesh(new THREE.CircleGeometry(9, 96), new THREE.MeshBasicMaterial({ map: polarGrid(), transparent: true, opacity: .6, depthWrite: false, toneMapped: false }));
-      fl.rotation.x = -Math.PI / 2; fl.position.y = .008; sc.add(fl); FX.floor = fl;
-      var n = 170, pos = new Float32Array(n * 3), col = new Float32Array(n * 3), pal = [[.1, .89, 1], [.48, .36, 1], [1, .36, .78], [1, 1, 1]];
-      for (var i = 0; i < n; i++) { var a = Math.random() * 6.283, r = 1.5 + Math.random() * 7; pos[i * 3] = Math.cos(a) * r; pos[i * 3 + 1] = Math.random() * 4.6; pos[i * 3 + 2] = Math.sin(a) * r - 1; col.set(pal[i % 4], i * 3); }
+      var sc = SCENE.object3D, grp = new THREE.Group(), glow = glowTexture(), pal = [0x19e3ff, 0x7b5cff, 0xff5cc8, 0xffffff, 0xffd166];
+      FX.bokeh = []; FX.rings = [];
+      for (var i = 0; i < 28; i++) {
+        var a = Math.random() * 6.283, rad = 5 + Math.random() * 7, sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, color: pal[i % 5], transparent: true, opacity: .25 + Math.random() * .3, depthWrite: false, toneMapped: false }));
+        var s = .6 + Math.random() * 1.9; sp.scale.set(s, s, 1); sp.position.set(Math.cos(a) * rad, -.5 + Math.random() * 6.5, Math.sin(a) * rad);
+        sp.userData = { y0: sp.position.y, sp: .3 + Math.random() * .5, ph: Math.random() * 6, amp: .15 + Math.random() * .4 }; grp.add(sp); FX.bokeh.push(sp);
+      }
+      for (i = 0; i < 6; i++) {
+        var a2 = i / 6 * 6.283 + Math.random(), rad2 = 6 + Math.random() * 3;
+        var rg2 = new THREE.Mesh(new THREE.TorusGeometry(.5 + Math.random() * .8, .012, 8, 64), new THREE.MeshBasicMaterial({ color: pal[i % 3], transparent: true, opacity: .55, toneMapped: false }));
+        rg2.position.set(Math.cos(a2) * rad2, 1 + Math.random() * 4, Math.sin(a2) * rad2); grp.add(rg2); FX.rings.push(rg2);
+      }
+      sc.add(grp); FX.sky = grp;
+      var n = 190, pos = new Float32Array(n * 3), col = new Float32Array(n * 3), pl = [[.1, .89, 1], [.48, .36, 1], [1, .36, .78], [1, 1, 1]];
+      for (i = 0; i < n; i++) { var aa = Math.random() * 6.283, r = 1.5 + Math.random() * 7; pos[i * 3] = Math.cos(aa) * r; pos[i * 3 + 1] = Math.random() * 5; pos[i * 3 + 2] = Math.sin(aa) * r - 1; col.set(pl[i % 4], i * 3); }
       var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
       var pts = new THREE.Points(geo, new THREE.PointsMaterial({ size: .07, vertexColors: true, transparent: true, opacity: .85, depthWrite: false, toneMapped: false })); sc.add(pts); FX.motes = pts;
     }
@@ -715,6 +929,8 @@
   // Construcción inmediata (antes del script principal de world.html)
   buildEnvironment();
   buildScreens();
+  ROOT.appendChild(makeActor('juan')); ROOT.appendChild(makeActor('ajo'));
   SCENE.appendChild(ROOT);
   UI3D.techPage(0);
+  introStep(0);
 })();

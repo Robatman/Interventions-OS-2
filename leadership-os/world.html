@@ -86,12 +86,7 @@ function stopVoice() {
 
 // Qué se dice según lo que elige el staff. Más adelante cada clave puede apuntar a un audio pregrabado.
 var VOICE_LINES = {
-  welcome: function () {
-    var gameId = ''; try { gameId = localStorage.getItem('ldr_game_id') || ''; } catch (e) {}
-    var name = gameId.split('.')[1];
-    return 'Welcome' + (name && name !== 'VISOR' ? ' ' + name : '') + '. I am Juanjolote. ' +
-      'Choose a path: Interventions, to practice real check-in conversations, or Techniques, to build the skills to run them well.';
-  },
+  welcome: 'Where shall we start? Interventions, to practice real check-in conversations, or Techniques, to build the skills to run them well.',
   interventions: 'These are the check-ins that help you spot attrition early. Pick the one you want to practice.',
   techniques: 'These are your tools. Pick one and I will show you a quick before and after example.'
 };
