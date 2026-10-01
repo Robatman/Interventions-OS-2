@@ -1,156 +1,70 @@
-# Leadership Learning OS
+# Centris Neural Academy (Leadership OS)
 
-> Simulador de entrenamiento de liderazgo con avatares para supervisores.  
-> Anti-attrition · Conversational practice · No login required.
+Simulador de entrenamiento para staff (coaches, supervisores, administrativos): aprender a **detectar posible attrition y dar seguimiento** con conversaciones realistas contra un agente simulado.
 
----
+Funciona en **Meta Quest 3** (WebXR) y también **sin visor**, en el navegador de una computadora (arrastrar el mouse para mirar, clic en los botones).
 
-## Stack
+## Qué se aprende
 
-| Layer | Tech |
-|---|---|
-| Frontend | HTML/CSS/JS puro — sin frameworks |
-| AI | Groq API · Llama 3.3 70B |
-| Hosting | GitHub Pages (HTTPS) |
-| Progress | Supabase — sesión anónima por browser |
-| Voice | Web Speech API (Chrome + Meta Quest 3) |
+| Intervención | Hito | Objetivo |
+|---|---|---|
+| Pulse Check | 30 días | Primeras impresiones y onboarding |
+| Anchoring | 100 días | Engagement y pertenencia |
+| Stay Interview | 121 días | Riesgos de retención y necesidades no cubiertas |
+| Tenure Renewal | 365 días | Reflexión y retención a largo plazo |
 
----
+Las **14 técnicas** (Active Listening, Powerful Questions, etc.) son las herramientas para ejecutar esas conversaciones. Cada técnica tiene tres modos: Learn, Work Together y Practice.
 
-## Architecture
+La evaluación mide el balance entre **cumplir el objetivo de la empresa** y **aplicar la técnica** (sin ser solapador), la detección de señales de riesgo y el seguimiento.
+
+## Estructura
 
 ```
 leadership-os/
-  index.html          ← Shell HTML — all screens, loads all modules
-  css/
-    styles.css        ← All styles — CSS variables, components
+  index.html          Redirige a login-vr.html
+  login-vr.html       Emparejamiento del visor/computadora con un código
+  world.html          La app (escena A-Frame)
   js/
-    archetypes.js     ← Employee avatar data objects (Carlos, Valeria, Miguel, Sandra)
-    techniques.js     ← Technique data (Active Listening, Powerful Questions)
-    prompts.js        ← System prompt generators — built from archetype + technique + level
-    api.js            ← Groq callGroq() + Supabase saveSessionProgress()
-    ui.js             ← DOM helpers, voice, chat render, mood/box meters, glossary
-    app.js            ← State + all mode logic (learn, work, practice, eval)
-  README.md
+    interventions.js  Las 4 intervenciones: objetivo, criterios, escenarios
+    archetypes.js     Agentes simulados (Carlos, Valeria, Miguel, Sandra, Karen)
+    techniques.js     Las 14 técnicas
+    preview.js        Ejemplos "cómo no / cómo sí" de cada técnica
+    prompts.js        Prompts del avatar, del coach y de la evaluación
+    case-engine.js    Crea UN caso por práctica (agente, escenario, ánimo, giros)
+    device-auth.js    Token del dispositivo emparejado (authFetch)
+  api/                Funciones serverless (Vercel)
+    _auth.js          Código de emparejamiento y token firmado (sin base de datos)
+    pair.js           Cambia un código válido por un token
+    groq.js           Chat (modelos permitidos, límites)
+    transcribe.js     Voz a texto (Whisper)
+    groq_speakvr.js   Texto a voz y traducción
+  scripts/
+    pairing-code.mjs  Genera el código de emparejamiento
 ```
 
-**Load order**: `archetypes → techniques → prompts → api → ui → app`  
-Each module depends on globals set by earlier modules.
+## Acceso (sin cuentas)
 
----
+1. En Vercel define la variable **`VR_TOKEN_SECRET`** (cadena larga y aleatoria, 32+ caracteres) en Production, Preview y Development. También `GROQ_API_KEY`.
+2. Genera un código (dura 10 minutos):
+   ```powershell
+   $env:VR_TOKEN_SECRET = "<el mismo valor que en Vercel>"
+   node scripts/pairing-code.mjs
+   ```
+3. Abre `login-vr.html` en el visor (o en la computadora), escribe el código y pulsa **EMPAREJAR**. Cada dispositivo se empareja una sola vez (el token dura 180 días).
+4. Si se pierde un dispositivo: cambia `VR_TOKEN_EPOCH` en Vercel (por ejemplo a `2`) y vuelve a emparejar los demás.
 
-## Features (v4)
+Todos los endpoints `/api/*` exigen el token. El límite de uso por token es por instancia de Vercel (red de seguridad, no garantía).
 
-### Modes
-- **Learn** — Alex teaches the technique conversationally (Socratic, 4 stages)
-- **Work Together** — Socratic thinking partner for real supervisor cases
-  - Submode: Deep reflection (Socratic)
-  - Submode: Urgent (direct, action-first)
-- **Practice** — Conversation simulator with dynamic employee avatar
+## Variables de entorno
 
-### Practice System
-- **3 levels**: Novice / Practitioner / Fieldwork
-- **Dynamic briefings** — random per level, different starting states
-- **Pre-reflection** — one conversational question before entering
-- **Mood tracking** — non-linear, can go back down
-- **Box indicator** — in/out-of-box (Arbinger framework)
-- **Hinge moments** — personal doors the avatar opens
-- **Yes-but pattern** — realistic resistance behavior
-- **Conversation can close** (Fieldwork only)
-- **AI evaluation** — 4 sections + technique recap
+| Variable | Para qué |
+|---|---|
+| `VR_TOKEN_SECRET` | Firma de tokens y códigos (obligatoria) |
+| `VR_TOKEN_EPOCH` | Invalida todos los tokens al cambiarla (opcional, por defecto `1`) |
+| `GROQ_API_KEY` | Modelos de chat, voz a texto y texto a voz |
 
-### Architecture wins over v3
-- **No hardcoded character names** in prompts — all from archetype data
-- **No hardcoded technique names** in prompts — all from technique data
-- **Briefings live in archetypes.js** — easy to add scenarios
-- **Prompts are functions** — `PROMPTS.learn()`, `PROMPTS.avatar(level)` etc.
-- **Supabase scaffold ready** — just add URL + anon key
+## Pendientes conocidos
 
----
-
-## Archetypes
-
-| Avatar | Trait | Status |
-|---|---|---|
-| Carlos Mendoza | Defensive | ✅ Active |
-| Valeria Reyes | Withdrawn | 🔒 v4.1 |
-| Miguel Torres | Anxious | 🔒 v4.1 |
-| Sandra Okafor | Burned out | 🔒 v4.1 |
-
----
-
-## Techniques
-
-| Technique | Philosophy | Status |
-|---|---|---|
-| Active Listening | Leadership & Self-Deception (Arbinger) | ✅ Active |
-| Powerful Questions | Co-Active Coaching / Immunity to Change | 🔒 v4.1 |
-
----
-
-## Supabase Setup
-
-1. Create project at supabase.com
-2. Run this SQL:
-
-```sql
-create table sessions (
-  id uuid default gen_random_uuid() primary key,
-  session_id text not null,
-  archetype text,
-  technique text,
-  level text,
-  mood_final int,
-  box_final text,
-  completed_at timestamptz default now(),
-  eval_summary text
-);
-
--- Enable anonymous inserts
-alter table sessions enable row level security;
-create policy "anon insert" on sessions for insert to anon with check (true);
-create policy "own read" on sessions for select to anon using (session_id = current_setting('request.jwt.claims', true)::json->>'sub');
-```
-
-3. Fill in `api.js`:
-```js
-const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
-```
-
----
-
-## GitHub Pages Deploy
-
-```bash
-git init
-git add .
-git commit -m "Leadership OS v4"
-gh repo create leadership-os --public --push --source=.
-# Then: Settings → Pages → Deploy from main branch /root
-```
-
----
-
-## Roadmap
-
-### v4.1 — Unlock archetypes + second technique
-- [ ] Valeria, Miguel, Sandra (data already in archetypes.js)
-- [ ] Powerful Questions technique (data already in techniques.js)
-- [ ] Technique selector UI on welcome screen
-- [ ] Archetype selector on level screen
-
-### v4.2 — Supabase progress
-- [ ] Fill SUPABASE_URL + SUPABASE_ANON_KEY
-- [ ] Progress dashboard — past sessions by archetype/technique
-- [ ] Streak tracking
-
-### v4.3 — WebXR (Meta Quest 3)
-- [ ] WebXR scene for immersive practice
-- [ ] Spatial audio for TTS
-- [ ] Hand tracking for navigation
-
-### v5 — Multi-supervisor cohort
-- [ ] Team progress view (Supabase shared)
-- [ ] Manager assigns scenarios to team
-- [ ] Leaderboard (opt-in)
+- Integrar los avatares 3D (GLB) con caras por estado de ánimo y boca sincronizada.
+- Rediseño visual 360 (paleta clara y viva).
+- Voz más natural (streaming, turnos cortos, interrupciones).

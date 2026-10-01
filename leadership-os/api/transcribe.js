@@ -1,4 +1,13 @@
+import { requireAuth } from './_auth.js';
+
+const MAX_AUDIO_BYTES = 8 * 1024 * 1024; // ~8 MB
+
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+  if (!requireAuth(req, res, { perMinute: 30 })) return;
+
   const API_KEY = process.env.GROQ_API_KEY;
 
   if (!API_KEY) {
@@ -6,8 +15,8 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Internal server error: Missing API configuration." });
   }
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+  if (Number(req.headers["content-length"] || 0) > MAX_AUDIO_BYTES) {
+    return res.status(413).json({ error: "Audio demasiado largo." });
   }
 
   try {

@@ -22,9 +22,8 @@
 </style>
 </head>
 <body>
-<script>
-(function(){const t=localStorage.getItem("ldr_session_token");if(!t)window.location.href="login-vr.html";})();
-</script>
+<script src="js/device-auth.js"></script>
+<script>requireDeviceToken();</script>
 
 
 
@@ -79,7 +78,8 @@ function refreshAllRaycasters() {
   var raycasters = document.querySelectorAll('[raycaster]');
   for (var i = 0; i < raycasters.length; i++) {
     var comp = raycasters[i].components && raycasters[i].components.raycaster;
-    if (comp && typeof comp.refreshObjects === 'function') {
+    // comp.data aún no existe si el rayo se acaba de crear (evita el TypeError 'objects')
+    if (comp && comp.data && typeof comp.refreshObjects === 'function') {
       comp.refreshObjects();
     }
   }
@@ -226,16 +226,18 @@ function mostrarBriefingIntervencion() {
       trapEl.setAttribute('value', `TRAP: ${trapText}`);
     }
 
-    // 4. Buscar dentro de 'scenarios' según el nivel
-    let scenarioData = null;
+    // 4. UN solo caso (agente + escenario) para briefing Y práctica.
+    //    Antes se mostraba siempre scenarios[nivel][0] y la práctica sorteaba otro agente.
+    const caso = CaseEngine.build({ interventionId: dataIntervencion.id, level: nivel });
+    appState.caso = caso;
+    let scenarioData = caso && caso.mode === 'intervention' ? caso.scenario : null;
 
-    if (dataIntervencion.scenarios) {
-      const arrayNivel = dataIntervencion.scenarios[nivel] || 
+    if (!scenarioData && dataIntervencion.scenarios) {
+      const arrayNivel = dataIntervencion.scenarios[nivel] ||
                          dataIntervencion.scenarios[nivel === 'mid' ? 'intermediate' : nivel];
 
       if (Array.isArray(arrayNivel) && arrayNivel.length > 0) {
-        // Tomamos el primer escenario del arreglo para ese nivel (ej. pc_mid_1)
-        scenarioData = arrayNivel[0]; 
+        scenarioData = arrayNivel[0];
       } else if (typeof arrayNivel === 'object') {
         scenarioData = arrayNivel;
       }
@@ -299,25 +301,16 @@ function mostrarBriefingTecnica() {
   // 1. Get current level ('novice', 'mid', 'adv')
   const nivel = appState.flujoReciente?.nivelSeleccionado || appState.currentLevel || 'novice';
 
-  // 2. Get list of available archetypes
-  const objetoArquetipos = typeof ARCHETYPES !== 'undefined' ? ARCHETYPES : (window.ARCHETYPES || {});
-  const listaIdsArquetipos = Object.keys(objetoArquetipos).filter(id => objetoArquetipos[id].available !== false);
-
-  if (listaIdsArquetipos.length === 0) {
+  // 2-3. UN solo caso (agente + escenario) para briefing Y práctica
+  const caso = CaseEngine.build({ techniqueId: appState.tecnicaSeleccionada, level: nivel });
+  if (!caso) {
     console.error("❌ ERROR: No available archetypes found.");
     return;
   }
+  appState.caso = caso;
 
-  // 3. Archetype Selection
-  let arquetipoId = appState.arquetipoSeleccionado || appState.agenteSeleccionado;
-
-  if (!arquetipoId || !objetoArquetipos[arquetipoId]) {
-    const indiceArquetipoAzar = Math.floor(Math.random() * listaIdsArquetipos.length);
-    arquetipoId = listaIdsArquetipos[indiceArquetipoAzar];
-    console.log(`🎲 Random archetype selected: ${arquetipoId.toUpperCase()}`);
-  }
-
-  const dataArquetipo = objetoArquetipos[arquetipoId];
+  const arquetipoId = caso.archetype.id;
+  const dataArquetipo = caso.archetype;
 
   // DOM / A-Frame References
   const titleEl = document.getElementById('briefing-title');
@@ -339,18 +332,8 @@ function mostrarBriefingTecnica() {
       trapEl.setAttribute('value', traitInfo);
     }
 
-    // C. Get briefings per level
-    let listaBriefings = [];
-    if (dataArquetipo.briefings && dataArquetipo.briefings[nivel]) {
-      listaBriefings = dataArquetipo.briefings[nivel];
-    }
-
-    let briefingSeleccionado = null;
-
-    if (listaBriefings.length > 0) {
-      const indiceBriefingAzar = Math.floor(Math.random() * listaBriefings.length);
-      briefingSeleccionado = listaBriefings[indiceBriefingAzar];
-    }
+    // C. El escenario ya viene definido en el caso (el mismo que usará la práctica)
+    let briefingSeleccionado = caso.scenario && caso.scenario.text ? caso.scenario : null;
 
     // D. Text & Tags extraction
     let scriptTexto = null;
@@ -813,12 +796,14 @@ function ejecutarFlujoGuardado() {
 <script src="js/archetypes.js"></script>
 <script src="js/techniques.js"></script>
 <script src="js/prompts.js"></script>
+<script src="js/case-engine.js"></script>
 <script src="js/preview.js"></script>
 <div id="voice-hud"><div id="voice-dot" class="idle"></div><span id="voice-label">Starting Neural Academy...</span></div>
 <button id="mic-btn" title="Hablar">&#127908;</button>
 <!-- <a-scene vr-mode-ui="enabled:true" background="color:#060818" renderer="antialias:true;colorManagement:true;alpha:true" fog="type:exponential;color:#060818;density:0.018"> -->
-<a-scene vr-mode-ui="enabled:true" 
-         background="color:#04060d" 
+<a-scene vr-mode-ui="enabled:true"
+         cursor="rayOrigin: mouse" raycaster="objects: .clickable, .sub-tecnica"
+         background="color:#04060d"
          renderer="antialias:true;colorManagement:true;alpha:true" 
          fog="type:exponential;color:#070a14;density:0.025">
            <a-assets>
@@ -1881,28 +1866,28 @@ function ejecutarFlujoGuardado() {
       <a-torus position="0 0.06 0" radius="0.75" radius-tubular="0.012" rotation="-90 0 0" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" animation="property:rotation;from:-90 0 0;to:-90 360 0;loop:true;dur:8000;easing:linear"></a-torus>
     </a-entity>
 
-   <a-entity position="0.8 1.5 -2.5">
-      <a-plane width="2.8" height="2.2" color="#080e2a" material="opacity:0.96;shader:flat;side:double"></a-plane>
-      <a-plane width="2.84" height="2.24" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
-      <a-text anchor="center" baseline="center" value="SESSION COMPLETE" position="0 0.95 0.01" align="center" color="#00e5c0" width="4.5" font="mozillavr"></a-text>
-      <a-text anchor="left" baseline="center" value="Openness final:" position="-1.25 0.65 0.01" align="left" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr"></a-text>
-      <a-text anchor="right" baseline="center" id="eval-mood" value="--%"  position="1.25 0.65 0.01" align="right" color="#00e5c0" width="2" font="mozillavr"></a-text>
-      <a-plane width="2.4" height="0.004" color="#2a3a7a" material="shader:flat" position="0 0.48 0.01"></a-plane>
-      <a-text anchor="center" baseline="center" id="eval-feedback" value="Analyzing conversation..." position="0 -0.15 0.01" align="center" color="#e8eeff" width="4.8" wrap-count="50" font="mozillavr"></a-text>
+   <a-entity position="1.0 1.55 -2.5">
+      <a-plane width="3.4" height="2.7" color="#080e2a" material="opacity:0.96;shader:flat;side:double"></a-plane>
+      <a-plane width="3.44" height="2.74" color="#00e5c0" material="opacity:0.3;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
+      <a-text anchor="center" baseline="center" value="SESSION COMPLETE" position="0 1.15 0.01" align="center" color="#00e5c0" width="4.5" font="mozillavr"></a-text>
+      <a-text anchor="left" baseline="center" value="Openness final:" position="-1.5 0.85 0.01" align="left" color="#c8d8ff" width="3" opacity="0.6" font="mozillavr"></a-text>
+      <a-text anchor="right" baseline="center" id="eval-mood" value="--%"  position="1.5 0.85 0.01" align="right" color="#00e5c0" width="2" font="mozillavr"></a-text>
+      <a-plane width="3.0" height="0.004" color="#2a3a7a" material="shader:flat" position="0 0.68 0.01"></a-plane>
+      <a-text anchor="left" baseline="top" id="eval-feedback" value="Analyzing conversation..." position="-1.5 0.6 0.01" align="left" color="#e8eeff" width="3.0" wrap-count="52" font="mozillavr"></a-text>
 
       <a-plane id="btn-new-session" 
                handler-botones-vr="mensaje: Regresando al inicio y activando reanudación; tecnica: go-welcome-reset"
                width="1.1" height="0.22" 
                color="#0d2060" 
                material="opacity:0.9;shader:flat;side:double" 
-               position="-0.65 -0.88 0.01" 
+               position="-0.65 -1.15 0.01" 
                class="clickable">
         <a-plane width="1.12" height="0.24" color="#4466ff" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text anchor="center" baseline="center" value="New Session" color="#4466ff" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
       </a-plane>
 
 
-       <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -0.88 0.01" class="clickable">
+       <a-plane id="btn-practice-again" width="1.1" height="0.22" color="#0d2a20" material="opacity:0.9;shader:flat;side:double" position="0.65 -1.15 0.01" class="clickable">
         <a-plane width="1.12" height="0.24" color="#00e5c0" material="opacity:0.4;transparent:true;shader:flat" position="0 0 -0.005"></a-plane>
         <a-text anchor="center" baseline="center" value="Practice Again" color="#00e5c0" align="center" width="3.5" position="0 0 0.01" font="mozillavr"></a-text>
       </a-plane> 
@@ -2271,8 +2256,6 @@ function ejecutarFlujoGuardado() {
 </a-scene>
 
 <script>
-const SUPA_URL = 'https://biebfwwkukmxulzwpjya.supabase.co';
-const SUPA_KEY = 'sb_publishable_X13ybEk5Wl0a3e-XHhM5ew_IQcDk3wu';
 
 let appState = {
   screen: 'welcome',
@@ -2631,12 +2614,23 @@ function goPractice(){
     }
   }, 50);
 
-  var arch = pickRandomArchetype();
-  // console.log("👤 Arquetipo elegido al azar:", arch ? arch.name : "¡NINGUNO!");
-  
-  // Enviamos la técnica como tercer parámetro
-  var scenario = pickRandomScenario(arch, appState.currentLevel, appState.tecnicaSeleccionada);
-  // console.log("🎬 Escenario final devuelto por pickRandomScenario:", scenario ? scenario.title || "Tiene datos pero no propiedad title" : "❌ ¡NULL/VACÍO!");
+  // Usa el MISMO caso que mostró el briefing (agente + escenario + nivel).
+  // Solo si no hubo briefing (o ya se usó) se crea uno nuevo.
+  var caso = (appState.caso && !appState.caso.used) ? appState.caso : CaseEngine.build({
+    interventionId: (appState.tecnicaSeleccionada || '').indexOf('interv_') === 0 ? appState.tecnicaSeleccionada : null,
+    techniqueId: appState.tecnicaSeleccionada,
+    level: appState.currentLevel
+  });
+  caso.used = true;
+  appState.caso = caso;
+  appState.currentLevel = caso.level;
+
+  var arch = caso.archetype;
+  var scenario = caso.scenario;
+
+  // El prompt del avatar (prompts.js) lee estas globales para saber QUÉ conversación es
+  window.activeMenu = caso.mode === 'intervention' ? 'interventions' : 'techniques';
+  currentIntervention = caso.intervention;
 
   appState.currentArchetype = arch;
   appState.currentScenario = scenario;
@@ -2664,7 +2658,7 @@ function goPractice(){
     if (traitEl) traitEl.setAttribute('value', arch.trait ? `Trait: ${arch.trait}` : '');
   }
   
-  var opener = pickRandomOpener(arch, scenario);
+  var opener = caso.opener;
   // console.log("💬 Opener generado para el inicio:", opener);
 
   appState.agentHistory.push({role:'assistant', content:opener});
@@ -2690,7 +2684,7 @@ function updateAgentAvatar(arch){
   var imgEl=document.getElementById('agent-img'),halo=document.getElementById('agent-halo'),ring=document.getElementById('agent-ring');
   if(nameEl)nameEl.setAttribute('text','value',arch.name);
   if(roleEl)roleEl.setAttribute('text','value',arch.role);
-  var colors={carlos:'#ff5ca0',valeria:'#9d5cff',miguel:'#00e5c0',sandra:'#f5a623'};
+  var colors={carlos:'#ff5ca0',valeria:'#9d5cff',miguel:'#00e5c0',sandra:'#f5a623',karen:'#34d399'};
   var col=colors[arch.id]||'#9d5cff';
   if(halo)halo.setAttribute('color',col);
   if(ring)ring.setAttribute('color',col);
@@ -2762,7 +2756,7 @@ async function callGroqLLM(mode) {
       'Even if the user inputs text in Spanish, you MUST reply ONLY in English.';
   }
 
-  var res = await fetch('/api/groq', {
+  var res = await authFetch('/api/groq', {
 
     method: 'POST',
 
@@ -3079,28 +3073,23 @@ async function goEval() {
 
   setJuanMood('talking');
 
+  // Evaluador que conoce el caso: objetivo de la empresa, técnica, señales reales y lo que el agente sentía
+  var evalTechId = (typeof TECHNIQUES !== 'undefined' && TECHNIQUES[appState.tecnicaSeleccionada]) ? appState.tecnicaSeleccionada : null;
+  var evalSystem = (appState.caso && typeof PROMPTS.evalVR === 'function')
+    ? PROMPTS.evalVR(appState.caso, { techniqueId: evalTechId, level: appState.currentLevel, mood: appState.vrMood })
+    : 'You are Juanjolote, a direct and honest coach. Evaluate this practice conversation in English, plain ASCII, max 4 sentences.';
+
+  var transcript = appState.agentHistory.slice(-30).map(function (m) {
+    return (m.role === 'user' ? 'SUPERVISOR: ' : 'AGENT: ') + String(m.content || '').replace(/\[[A-Z]+:[^\]]*\]/g, '').slice(0, 300);
+  }).join('\n');
+
   var evalText =
-    'Analyze this practice conversation. ' +
-    'Agent: ' +
-    ((appState.currentArchetype &&
-      appState.currentArchetype.name) || 'Agent') +
-    ' (' +
-    ((appState.currentArchetype &&
-      appState.currentArchetype.trait) || '') +
-    '). ' +
-    'Final mood: ' +
-    appState.vrMood +
-    '/100. ' +
-    'History: ' +
-    appState.agentHistory.length +
-    ' turns. ' +
-    'Give feedback in 3 concrete points in English, maximum 4 sentences total. ' +
-    'Be direct and specific. Do not use generic coaching language. ' +
-    'Return ONLY the final feedback. Do not show analysis, reasoning, thinking, or explanations of your process.';
+    'TRANSCRIPT (' + appState.agentHistory.length + ' messages, most recent last):\n' + transcript +
+    '\n\nEvaluate it now using the exact required format.';
 
   try {
 
-    var res = await fetch('/api/groq', {
+    var res = await authFetch('/api/groq', {
 
       method: 'POST',
 
@@ -3117,23 +3106,16 @@ async function goEval() {
           {
             role: 'system',
 
-            content:
-              'You are Juanjolote, a direct and honest coach. ' +
-              'Evaluate leadership practice conversations. ' +
-              'English. Concrete. No formalities. ' +
-              'Return ONLY the final answer for the user. ' +
-              'Do NOT reveal reasoning, analysis, chain of thought, thinking process, or internal deliberation.'
+            content: evalSystem
           },
 
           {
             role: 'user',
             content: evalText
-          },
-
-          ...appState.agentHistory.slice(-8)
+          }
         ],
 
-        max_tokens: 200,
+        max_tokens: 420,
 
         temperature: 0.7,
 
@@ -3165,6 +3147,14 @@ async function goEval() {
       feedback = 'Session completed.';
     }
 
+    // Separa lo que se muestra en el panel de lo que Juanjolote dice en voz alta
+    var spoken = '';
+    var spokenMatch = feedback.match(/SPOKEN:\s*([\s\S]*)$/i);
+    if (spokenMatch) {
+      spoken = spokenMatch[1].trim();
+      feedback = feedback.slice(0, spokenMatch.index).trim() || feedback;
+    }
+
     var feedbackEl =
       document.getElementById('eval-feedback');
 
@@ -3177,7 +3167,7 @@ async function goEval() {
     }
 
     speakVR(
-      feedback,
+      spoken || feedback.slice(0, 280),
       getVoice('juan')
     );
 
@@ -3200,7 +3190,7 @@ async function goEval() {
 
 
 async function translateToEnglish(text) {
-  const res = await fetch('/api/groq_speakvr', {
+  const res = await authFetch('/api/groq_speakvr', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -3230,7 +3220,7 @@ async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
   // const englishText = await translateToEnglish(text);
 
   // pedir audio
-  const speechResponse = await fetch('/api/groq_speakvr', {
+  const speechResponse = await authFetch('/api/groq_speakvr', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -3407,7 +3397,7 @@ async function transcribeAudio(blob) {
 
   // console.log('[Frontend] Enviando audio a nuestro backend seguro...');
   try {
-    var res = await fetch('/api/transcribe', {
+    var res = await authFetch('/api/transcribe', {
       method: 'POST',
       body: form // 👈 ¡ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ AQUÍ!
     });
@@ -3953,8 +3943,7 @@ if (btnNewSession) {
 }
   var btnLogout=document.getElementById('btn-logout');
   if(btnLogout)btnLogout.addEventListener('click',function(){
-    localStorage.removeItem('ldr_session_token');
-    localStorage.removeItem('ldr_refresh_token');
+    clearDeviceToken();
     window.location.href='login-vr.html';
   });
 

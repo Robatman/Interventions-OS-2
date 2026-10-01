@@ -1,4 +1,13 @@
+import { requireAuth } from './_auth.js';
+
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      error: "Method not allowed"
+    });
+  }
+  if (!requireAuth(req, res)) return;
+
   // Jalamos la variable de entorno de Groq
   const API_KEY = process.env.GROQ_API_KEY;
 
@@ -10,14 +19,12 @@ export default async function handler(req, res) {
     });
   }
 
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      error: "Method not allowed"
-    });
-  }
-
   try {
-    const { type, text, voice } = req.body;
+    const body = req.body && typeof req.body === "object" ? req.body : {};
+    const type = body.type;
+    const text = String(body.text || "").slice(0, 1000);
+    const voice = body.voice ? String(body.voice).slice(0, 40) : undefined;
+    if (!text) return res.status(400).json({ error: "Texto vacío." });
 
     // =========================
     // TRADUCCIÓN
