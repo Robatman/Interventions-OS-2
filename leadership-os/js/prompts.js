@@ -262,7 +262,7 @@ DYNAMIC RESPONSE RULES (these drive your behavior):
 
 ${levelRules[level] || levelRules.novice}
 
-Keep replies 2-3 sentences. Casual, real language — how a real call center agent talks. No corporate speak.
+Keep replies to 1-2 short sentences (about 30 words at most), like a real spoken answer. Casual, real language — how a real call center agent talks. No corporate speak.
 Respond in the same language the supervisor uses — if they speak Spanish, respond in Spanish.`;
   },
 

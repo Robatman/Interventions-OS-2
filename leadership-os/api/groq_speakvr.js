@@ -85,9 +85,10 @@ export default async function handler(req, res) {
 
       if (!response.ok) {
         const err = await response.text();
-        console.error("GROQ ERROR:", err);
-        return res.status(500).json({
-          error: err
+        console.error("GROQ ERROR:", response.status, err.slice(0, 300));
+        // 429 = límite de uso: el cliente lo distingue para usar la voz del navegador
+        return res.status(response.status === 429 ? 429 : 500).json({
+          error: response.status === 429 ? "Límite de voz alcanzado." : "No se pudo generar el audio."
         });
       }
 

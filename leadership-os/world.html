@@ -2790,7 +2790,9 @@ async function callGroqLLM(mode) {
 
   if (data.error) {
     console.error('[Groq Error]', data.error);
-    throw new Error(typeof data.error === 'string' ? data.error : (data.error.message || 'Groq API error'));
+    var llmErr = new Error(typeof data.error === 'string' ? data.error : (data.error.message || 'Groq API error'));
+    llmErr.status = res.status;   // 429 = límite de uso del plan gratuito
+    throw llmErr;
   }
 
   var rawContent =
@@ -2817,11 +2819,23 @@ function parseAgentReply(raw){
   return {msg:msg,newMood:moodMatch?parseInt(moodMatch[1]):appState.vrMood,boxState:boxMatch?boxMatch[1]:appState.boxState};
 }
 
+// Tope de turnos por práctica: una conversación real de seguimiento es corta, y así el gasto por práctica tiene un máximo
+var MAX_PRACTICE_TURNS = 10;
+
 async function handleVRSpeech(text) {
   if (!text.trim()) return;
   var mode = appState.currentArchetype ? 'practice' : 'learn';
+
+  if (mode === 'practice') {
+    var userTurns = appState.agentHistory.filter(function (m) { return m.role === 'user'; }).length;
+    if (userTurns >= MAX_PRACTICE_TURNS) {
+      setHUD('ready', 'Practice time is up - press Finish to see your evaluation');
+      return;
+    }
+  }
+
   appState.agentHistory.push({ role: 'user', content: text });
-  
+
   try {
     var reply = await callGroqLLM(mode === 'practice' ? 'practice' : appState.activeMenu ? 'learn' : 'work');
     var parsed = mode === 'practice' ? parseAgentReply(reply) : { msg: reply, newMood: appState.vrMood, boxState: 'out' };
@@ -2854,7 +2868,13 @@ async function handleVRSpeech(text) {
 
   } catch (e) {
     console.error('[LLM]', e);
-    setHUD('ready', 'Error, intenta de nuevo');
+    // El último mensaje del usuario no obtuvo respuesta: se quita para no desajustar el historial
+    if (appState.agentHistory.length && appState.agentHistory[appState.agentHistory.length - 1].role === 'user') {
+      appState.agentHistory.pop();
+    }
+    setHUD('ready', e && e.status === 429
+      ? 'Free daily limit reached - try again in a few minutes'
+      : 'Error, intenta de nuevo');
   }
 }
 
@@ -3212,42 +3232,68 @@ function getVoice(character) {
   }[character] || "Fritz-PlayAI";
 }
 
-async function speakVR(text, voice = "Fritz-PlayAI", callback = null) {
-
-  // ❌ ELIMINA O COMENTA ESTA LÍNEA (Ya no necesitas traducir un texto que ya viene en inglés):
-  // const englishText = await translateToEnglish(text);
-
-  // pedir audio
-  const speechResponse = await authFetch('/api/groq_speakvr', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      type: 'speech',
-      text: text, //  <-- CAMBIA 'englishText' por 'text' para usar el texto original directo
-      voice: voice
-    })
-  });
-
-  if (!speechResponse.ok) {
-    const err = await speechResponse.text();
-    console.error("TTS ERROR:", err);
-    return;
+// Voz gratuita del navegador: se usa cuando la voz de Groq falla o llega a su límite de uso
+function speakBrowser(text, done) {
+  try {
+    if (!('speechSynthesis' in window)) { done(); return; }
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    var voices = window.speechSynthesis.getVoices() || [];
+    var en = voices.filter(function (v) { return /^en[-_]/i.test(v.lang); })[0];
+    if (en) u.voice = en;
+    u.onend = done;
+    u.onerror = done;
+    window.speechSynthesis.speak(u);
+    // Seguro: si el navegador nunca avisa que terminó, no dejamos la pantalla esperando
+    setTimeout(done, Math.min(20000, 1500 + text.length * 90));
+  } catch (e) {
+    done();
   }
+}
 
-  const blob = await speechResponse.blob();
-  const url = URL.createObjectURL(blob);
-  const audio = new Audio(url);
-
-  audio.onended = () => {
-    URL.revokeObjectURL(url);
-    if (callback) {
-      callback();
-    }
+async function speakVR(text, voice = "daniel", callback = null) {
+  // 'done' se ejecuta una sola vez, pase lo que pase (así el indicador nunca se queda en "Thinking...")
+  var finished = false;
+  var done = function () {
+    if (finished) return;
+    finished = true;
+    if (callback) callback();
   };
 
-  await audio.play();
+  text = String(text || '').trim();
+  if (!text) { done(); return; }
+
+  // Si la voz de Groq alcanzó su límite hace poco, no se vuelve a intentar durante unos minutos
+  if (!appState.ttsPausedUntil || Date.now() > appState.ttsPausedUntil) {
+    try {
+      var speechResponse = await authFetch('/api/groq_speakvr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'speech', text: text, voice: voice })
+      });
+
+      if (speechResponse.ok) {
+        var blob = await speechResponse.blob();
+        var url = URL.createObjectURL(blob);
+        var audio = new Audio(url);
+        audio.onended = function () { URL.revokeObjectURL(url); done(); };
+        audio.onerror = function () { URL.revokeObjectURL(url); speakBrowser(text, done); };
+        await audio.play();
+        return;
+      }
+
+      console.warn('[TTS] Groq respondió', speechResponse.status, '- usando la voz del navegador');
+      if (speechResponse.status === 429) {
+        appState.ttsPausedUntil = Date.now() + 10 * 60 * 1000;
+        setHUD('ready', 'Voice limit reached - using basic voice');
+      }
+    } catch (e) {
+      console.warn('[TTS] Error de voz, usando la voz del navegador:', e);
+    }
+  }
+
+  speakBrowser(text, done);
 }
 
 async function setupMic(){
