@@ -2766,7 +2766,6 @@ async function callGroqLLM(mode) {
 
     body: JSON.stringify({
 
-      model: 'qwen/qwen3.6-27b',
 
       messages: [
         {
@@ -2791,7 +2790,7 @@ async function callGroqLLM(mode) {
 
   if (data.error) {
     console.error('[Groq Error]', data.error);
-    throw new Error(data.error.message || 'Groq API error');
+    throw new Error(typeof data.error === 'string' ? data.error : (data.error.message || 'Groq API error'));
   }
 
   var rawContent =
@@ -3099,7 +3098,6 @@ async function goEval() {
 
       body: JSON.stringify({
 
-        model: 'qwen/qwen3.6-27b',
 
         messages: [
 
@@ -3130,7 +3128,7 @@ async function goEval() {
 
     if (data.error) {
       console.error('[Groq Error]', data.error);
-      throw new Error(data.error.message || 'Groq API error');
+      throw new Error(typeof data.error === 'string' ? data.error : (data.error.message || 'Groq API error'));
     }
 
     var feedback =

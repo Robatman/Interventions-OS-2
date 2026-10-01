@@ -43,7 +43,11 @@ export default async function handler(req, res) {
     const groqForm = new FormData();
     groqForm.append("file", audioBlob, "rec.webm");
     groqForm.append("model", "whisper-large-v3");
-    groqForm.append("language", "es");
+    // Idioma: se detecta solo (el staff puede hablar inglés o español). Antes estaba fijo en "es",
+    // lo que "traducía" el inglés a español. El cliente puede forzarlo con el campo "language".
+    const lang = String(formDataClient.get("language") || "");
+    if (/^[a-z]{2}$/.test(lang)) groqForm.append("language", lang);
+    groqForm.append("prompt", "Coaching conversation between a call center supervisor and an agent, in English or Spanish.");
     groqForm.append("response_format", "json");
 
     // 4. Enviamos la petición a Groq

@@ -1,14 +1,26 @@
 import { requireAuth } from './_auth.js';
 
-// Solo estos modelos pueden usarse desde los visores.
+// El modelo lo decide el servidor (variable GROQ_CHAT_MODEL, o el valor por defecto).
+// El cliente ya no depende de un nombre de modelo: si un modelo se retira, solo se cambia aquí.
+// Por defecto un modelo de producción (los "preview" de Groq pueden retirarse sin aviso).
+const DEFAULT_MODEL = process.env.GROQ_CHAT_MODEL || 'llama-3.3-70b-versatile';
 const ALLOWED_MODELS = new Set([
-  'qwen/qwen3.6-27b',
-  'openai/gpt-oss-120b',
   'llama-3.3-70b-versatile',
+  'llama-3.1-8b-instant',
+  'openai/gpt-oss-120b',
+  'openai/gpt-oss-20b',
+  'qwen/qwen3.8-27b',
 ]);
 const MAX_TOKENS_CAP = 600;
 const MAX_MESSAGES   = 40;
 const MAX_CHARS      = 24000;
+
+// Cada familia de modelos acepta parámetros de razonamiento distintos
+function reasoningParams(model) {
+  if (model.startsWith('qwen/')) return { reasoning_effort: 'none', reasoning_format: 'hidden' };
+  if (model.startsWith('openai/gpt-oss')) return { reasoning_effort: 'low', include_reasoning: false };
+  return {};
+}
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -17,11 +29,11 @@ export default async function handler(req, res) {
   if (!requireAuth(req, res)) return;
 
   const body = req.body && typeof req.body === "object" ? req.body : {};
-  const { model, messages } = body;
+  const { messages } = body;
 
-  if (!ALLOWED_MODELS.has(model)) {
-    return res.status(400).json({ error: "Modelo no permitido." });
-  }
+  // Un nombre de modelo ausente, retirado o desconocido cae en el modelo por defecto
+  const model = ALLOWED_MODELS.has(body.model) ? body.model : DEFAULT_MODEL;
+
   if (!Array.isArray(messages) || messages.length === 0 || messages.length > MAX_MESSAGES) {
     return res.status(400).json({ error: "Mensajes inválidos." });
   }
@@ -41,9 +53,8 @@ export default async function handler(req, res) {
     messages: messages.map((m) => ({ role: String(m.role), content: String(m.content ?? "") })),
     max_tokens: Math.min(Number(body.max_tokens) || 300, MAX_TOKENS_CAP),
     temperature: Math.min(Math.max(Number(body.temperature) || 0.8, 0), 1.5),
+    ...reasoningParams(model),
   };
-  if (body.reasoning_effort) groqBody.reasoning_effort = String(body.reasoning_effort);
-  if (body.reasoning_format) groqBody.reasoning_format = String(body.reasoning_format);
 
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -56,6 +67,7 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+    if (!response.ok) console.error("[groq] Groq respondió", response.status, JSON.stringify(data).slice(0, 300));
     return res.status(response.status).json(data);
   } catch (err) {
     console.error("[groq]", err);
