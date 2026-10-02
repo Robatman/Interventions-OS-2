@@ -117,6 +117,18 @@
         for (i = 0; i < FX.bokeh.length; i++) { var b = FX.bokeh[i]; b.position.y = b.userData.y0 + Math.sin(s * b.userData.sp + b.userData.ph) * b.userData.amp; }
         for (i = 0; i < FX.rings.length; i++) { FX.rings[i].rotation.x += .0016; FX.rings[i].rotation.y += .0022; }
       }
+      if (FX.crystals) {
+        for (i = 0; i < FX.crystals.length; i++) { var cr = FX.crystals[i], u = cr.userData; cr.rotation.y += u.rot * .01; cr.rotation.x += u.rot * .004; cr.position.y = u.y0 + Math.sin(s * u.sp + u.ph) * .25; }
+        FX.net.rotation.y = s * .02; FX.orbit.rotation.z = .3 + s * .03; FX.orbiter.position.set(Math.cos(s * .5) * 8, Math.sin(s * .5) * 8, 0);
+        for (i = 0; i < FX.beams3.length; i++) { var bm = FX.beams3[i]; bm.material.opacity = .07 + .06 * Math.sin(s * .8 + bm.userData.ph); }
+        var sh = FX.shoot;
+        if (s >= sh.next && !sh.on) { sh.on = true; sh.t0 = s; sh.az = Math.random() * 360; sh.y = 4 + Math.random() * 4; sh.dir = Math.random() < .5 ? 1 : -1; }
+        if (sh.on) {
+          var k = (s - sh.t0) / 1.1, az = sh.az * Math.PI / 180;
+          if (k >= 1) { sh.on = false; sh.next = s + 5 + Math.random() * 7; sh.mesh.material.opacity = 0; }
+          else { var off = (k - .5) * 9 * sh.dir; sh.mesh.position.set(Math.sin(az) * 11 + Math.cos(az) * off, sh.y - k * 1.8, -Math.cos(az) * 11 + Math.sin(az) * off); sh.mesh.material.opacity = Math.sin(k * Math.PI) * .9; }
+        }
+      }
       if (FX.motes) {
         var p = FX.motes.geometry.attributes.position;
         for (i = 0; i < p.count; i++) { var y = p.getY(i) + .004 + (i % 5) * .0009; if (y > 4.8) y = -.6; p.setY(i, y); }
@@ -160,11 +172,12 @@
 
   function wireClick(e, o) {
     e.classList.add('clickable');
-    e.addEventListener('mouseenter', function () { if (isActive(e)) e.setAttribute('scale', '1.05 1.05 1.05'); });
+    e.addEventListener('mouseenter', function () { if (isActive(e)) { e.setAttribute('scale', '1.05 1.05 1.05'); if (window.SFX) SFX.hover(); } });
     e.addEventListener('mouseleave', function () { e.setAttribute('scale', '1 1 1'); });
     e.addEventListener('click', function (evt) {
       if (!isActive(e)) return;
       if (typeof unlockAudio === 'function') unlockAudio();
+      if (window.SFX) SFX.click();
       if (o.action) { evt.stopImmediatePropagation(); evt.stopPropagation(); if (typeof ejecutarFuncionPorTecnica === 'function') ejecutarFuncionPorTecnica(o.action); }
       else if (o.onClick) { evt.stopImmediatePropagation(); evt.stopPropagation(); o.onClick(evt); }
       // sin acción ni onClick: los listeners por id de world.html se encargan
@@ -635,6 +648,9 @@
     }));
     // Botón para salir de VR: solo se ve dentro del visor
     P.exitVR = add(ROOT, pill({ a: 62, r: 2.5, y: .55, w: 1.2, h: .38, label: 'Exit VR', bg: C.coral, fs: .4, onClick: function () { try { SCENE.exitVR(); } catch (e) {} } }));
+    P.music = add(ROOT, pill({ a: -62, r: 2.5, y: .55, w: 1.5, h: .38, label: (window.SFX && SFX.musicOn === false) ? '♪ Music OFF' : '♪ Music ON', bg: C.violet, fs: .34,
+      onClick: function () { var on = window.SFX ? SFX.toggleMusic() : false; P.music.upd({ label: on ? '♪ Music ON' : '♪ Music OFF' }); } }));
+    P.music._noFly = true;
     P.exitVR._noFly = true; P.exitVR.setAttribute('visible', 'false'); P.exitVR.setAttribute('scale', '0 0 0');
     SCENE.addEventListener('enter-vr', function () { P.exitVR.setAttribute('visible', 'true'); P.exitVR.setAttribute('scale', '1 1 1'); if (typeof refreshAllRaycasters === 'function') refreshAllRaycasters(); });
     SCENE.addEventListener('exit-vr', function () { P.exitVR.setAttribute('visible', 'false'); P.exitVR.setAttribute('scale', '0 0 0'); });
@@ -923,7 +939,70 @@
         var rg2 = new THREE.Mesh(new THREE.TorusGeometry(.5 + Math.random() * .8, .012, 8, 64), new THREE.MeshBasicMaterial({ color: pal[i % 3], transparent: true, opacity: .55, toneMapped: false }));
         rg2.position.set(Math.cos(a2) * rad2, 1 + Math.random() * 4, Math.sin(a2) * rad2); grp.add(rg2); FX.rings.push(rg2);
       }
+      // Cristales flotantes de vidrio con aristas brillantes
+      FX.crystals = [];
+      for (i = 0; i < 16; i++) {
+        var geo = i % 2 ? new THREE.OctahedronGeometry(1, 0) : new THREE.IcosahedronGeometry(1, 0);
+        var cm = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: pal[i % 5], transparent: true, opacity: .26, depthWrite: false, toneMapped: false }));
+        cm.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: .7, toneMapped: false })));
+        var ca = i / 16 * 6.283 + Math.random() * .3, cr2 = 6.5 + Math.random() * 4;
+        cm.scale.setScalar(.22 + Math.random() * .5); cm.position.set(Math.cos(ca) * cr2, .4 + Math.random() * 4.6, Math.sin(ca) * cr2);
+        cm.userData = { y0: cm.position.y, sp: .3 + Math.random() * .5, ph: Math.random() * 6, rot: .3 + Math.random() * .8 };
+        grp.add(cm); FX.crystals.push(cm);
+      }
+      // Constelación de puntos unidos (una red de personas)
+      var NP = 72, pp = [], lv = [], pa = new Float32Array(NP * 3);
+      for (i = 0; i < NP; i++) { var na = Math.random() * 6.283, nr = 9 + Math.random() * 3, ny = .8 + Math.random() * 7; pp.push([Math.cos(na) * nr, ny, Math.sin(na) * nr]); pa.set(pp[i], i * 3); }
+      for (i = 0; i < NP; i++) for (var j = i + 1; j < NP; j++) { var dx = pp[i][0] - pp[j][0], dy = pp[i][1] - pp[j][1], dz = pp[i][2] - pp[j][2]; if (dx * dx + dy * dy + dz * dz < 11) lv.push(pp[i][0], pp[i][1], pp[i][2], pp[j][0], pp[j][1], pp[j][2]); }
+      var net = new THREE.Group(), lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(lv), 3));
+      net.add(new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0x7cf0ff, transparent: true, opacity: .45, toneMapped: false })));
+      var pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pa, 3));
+      net.add(new THREE.Points(pg, new THREE.PointsMaterial({ size: .3, map: glow, color: 0xffffff, transparent: true, depthWrite: false, toneMapped: false })));
+      grp.add(net); FX.net = net;
+      // Rayos de luz verticales
+      FX.beams3 = [];
+      for (i = 0; i < 7; i++) {
+        var bg = new THREE.Mesh(new THREE.CylinderGeometry(.05, .2, 14, 10, 1, true), new THREE.MeshBasicMaterial({ color: pal[i % 4], transparent: true, opacity: .1, side: THREE.DoubleSide, depthWrite: false, toneMapped: false }));
+        var ba = (80 + i / 6 * 200) * Math.PI / 180, br2 = 8 + Math.random() * 4;   // solo a los lados y detrás, no delante del menú bg.position.set(Math.cos(ba) * br2, 2.5, Math.sin(ba) * br2); bg.userData = { ph: Math.random() * 6 }; grp.add(bg); FX.beams3.push(bg);
+      }
+      // Anillo orbital con un satélite
+      var orbit = new THREE.Group(); orbit.rotation.x = 1.15; orbit.position.y = 2.5;
+      orbit.add(new THREE.Mesh(new THREE.TorusGeometry(8, .02, 8, 160), new THREE.MeshBasicMaterial({ color: 0x7b5cff, transparent: true, opacity: .5, toneMapped: false })));
+      var orbiter = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, color: 0xffd166, transparent: true, depthWrite: false, toneMapped: false })); orbiter.scale.set(1.1, 1.1, 1); orbit.add(orbiter);
+      grp.add(orbit); FX.orbit = orbit; FX.orbiter = orbiter;
+      // Estrella fugaz ocasional
+      var sc2 = document.createElement('canvas'); sc2.width = 128; sc2.height = 8; var sg = sc2.getContext('2d'), sgr = sg.createLinearGradient(0, 0, 128, 0); sgr.addColorStop(0, 'rgba(255,255,255,0)'); sgr.addColorStop(1, 'rgba(255,255,255,1)'); sg.fillStyle = sgr; sg.fillRect(0, 0, 128, 8);
+      var star = new THREE.Mesh(new THREE.PlaneGeometry(1.8, .05), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc2), transparent: true, opacity: 0, depthWrite: false, toneMapped: false, side: THREE.DoubleSide }));
+      grp.add(star); FX.shoot = { mesh: star, on: false, next: 3 };
       sc.add(grp); FX.sky = grp;
+      // Tableros holográficos de datos a los lados y detrás de ti
+      var DASH = [], DT = { pulse: 'PULSE CHECK · LIVE', bars: 'ENGAGEMENT', ring: 'RETENTION', net: 'TEAM NETWORK' };
+      function dash(a, kind, accent) {
+        var d = panel({ a: a, r: 7, y: 2.4, w: 2.6, h: 1.5, px: 120, float: true, noFly: true, state: { t: 0 },
+          draw: function (g, W, H, st) {
+            glass(g, W, H, 8, 22, accent); var t = st.t;
+            g.fillStyle = '#7cf0ff'; g.font = '800 ' + (H * .085) + 'px ' + FONT; g.textAlign = 'left'; g.fillText(DT[kind], 28, H * .17);
+            if (kind === 'pulse') {
+              g.strokeStyle = '#7cf0ff'; g.lineWidth = 3; g.beginPath();
+              for (var x = 28; x < W - 28; x += 3) { var p = ((x - 28) / (W - 56) * 3 - t * .6) % 1; if (p < 0) p += 1; var yv = p < .06 ? -Math.sin(p / .06 * Math.PI) * .3 : (p > .11 && p < .17 ? Math.sin((p - .11) / .06 * Math.PI) * .13 : 0); x === 28 ? g.moveTo(x, H * .6 + yv * H) : g.lineTo(x, H * .6 + yv * H); }
+              g.stroke();
+            } else if (kind === 'bars') {
+              for (var b = 0; b < 8; b++) { var bh = (.25 + .55 * Math.abs(Math.sin(t * .7 + b * .8))) * H * .55, bx = 30 + b * (W - 60) / 8; g.fillStyle = b % 2 ? '#7b5cff' : '#19e3ff'; g.fillRect(bx, H * .86 - bh, (W - 60) / 8 - 10, bh); }
+            } else if (kind === 'ring') {
+              var pc = .6 + .3 * Math.sin(t * .4), cx = W / 2, cy = H * .56, rr0 = H * .3;
+              g.lineWidth = 12; g.strokeStyle = 'rgba(255,255,255,.2)'; g.beginPath(); g.arc(cx, cy, rr0, 0, 7); g.stroke();
+              g.strokeStyle = '#2fbf71'; g.beginPath(); g.arc(cx, cy, rr0, -Math.PI / 2, -Math.PI / 2 + pc * 6.283); g.stroke();
+              g.fillStyle = '#fff'; g.textAlign = 'center'; g.font = '800 ' + (H * .17) + 'px ' + FONT; g.fillText(Math.round(pc * 100) + '%', cx, cy + H * .06);
+            } else {
+              var nodes = []; for (var q = 0; q < 9; q++) nodes.push([W * (.15 + .7 * ((q * 37 % 9) / 9)) + Math.sin(t * .6 + q) * 10, H * (.35 + .5 * ((q * 53 % 7) / 7)) + Math.cos(t * .5 + q) * 8]);
+              g.strokeStyle = 'rgba(124,240,255,.6)'; g.lineWidth = 2; for (q = 0; q < 9; q++) { g.beginPath(); g.moveTo(nodes[q][0], nodes[q][1]); g.lineTo(nodes[(q + 2) % 9][0], nodes[(q + 2) % 9][1]); g.stroke(); }
+              nodes.forEach(function (n, k2) { g.fillStyle = k2 === 4 ? '#ff6b6b' : '#fff'; g.beginPath(); g.arc(n[0], n[1], k2 === 4 ? 9 : 6, 0, 7); g.fill(); });
+            }
+          } });
+        SCENE.appendChild(d); DASH.push(d); return d;
+      }
+      dash(105, 'bars', '#19e3ff'); dash(150, 'pulse', '#ff5cc8'); dash(180, 'ring', '#2fbf71'); dash(-150, 'net', '#7b5cff'); dash(-105, 'pulse', '#19e3ff');
+      setInterval(function () { var tt = performance.now() / 1000; DASH.forEach(function (d) { d.upd({ t: tt }); }); }, 140);
       var n = 190, pos = new Float32Array(n * 3), col = new Float32Array(n * 3), pl = [[.1, .89, 1], [.48, .36, 1], [1, .36, .78], [1, 1, 1]];
       for (i = 0; i < n; i++) { var aa = Math.random() * 6.283, r = 1.5 + Math.random() * 7; pos[i * 3] = Math.cos(aa) * r; pos[i * 3 + 1] = Math.random() * 5; pos[i * 3 + 2] = Math.sin(aa) * r - 1; col.set(pl[i % 4], i * 3); }
       var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
@@ -973,15 +1052,13 @@
       var who = voice === 'daniel' ? 'juan' : 'ajo';
       var token = UI3D.talkToken = (UI3D.talkToken || 0) + 1;
       // Primero arranca speakVR (que corta el audio anterior) y DESPUÉS se enciende la boca
-      var p = origSpeak(text, voice, function () { if (UI3D.talkToken === token) UI3D.talk(who, false); if (cb) cb(); });
-      UI3D.talk(who, true);
-      return p;
+      return origSpeak(text, voice, function () { if (UI3D.talkToken === token) UI3D.talk(who, false); if (cb) cb(); });
     };
     var origStop = window.stopVoice;
     window.stopVoice = function () { if (origStop) origStop(); UI3D.talk('juan', false); UI3D.talk('ajo', false); };
     // Al mostrar cada pantalla
     var origCambiar = window.cambiarPantallaVR;
-    window.cambiarPantallaVR = function (id) { var r = origCambiar(id); UI3D.onShow(id); return r; };
+    window.cambiarPantallaVR = function (id) { var r = origCambiar(id); UI3D.onShow(id); if (window.SFX) { SFX.whoosh(); if (id === 'screen-eval') SFX.chime(); } return r; };
   };
 
   // Construcción inmediata (antes del script principal de world.html)

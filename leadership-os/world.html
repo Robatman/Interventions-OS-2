@@ -81,6 +81,7 @@ var _voice = { seq: 0, audio: null, el: null, unlocked: false };
 // El navegador del visor solo deja sonar el audio si "se desbloqueó" con un toque real.
 // Se crea UN elemento de audio, se desbloquea en el primer toque/clic y se reutiliza siempre.
 function unlockAudio() {
+  if (window.SFX) SFX.unlock();      // sonidos y música (también necesitan un toque real)
   if (_voice.unlocked) return;
   try {
     var a = _voice.el || (_voice.el = new Audio());
@@ -91,6 +92,8 @@ function unlockAudio() {
   } catch (e) {}
 }
 ['pointerdown', 'click', 'touchstart', 'keydown'].forEach(function (ev) { document.addEventListener(ev, unlockAudio, true); });
+// La boca del avatar se mueve SOLO cuando el sonido realmente empieza
+function speakingNow(who) { try { if (window.UI3D) UI3D.talk(who, true); } catch (e) {} }
 function voiceNote(msg) { console.warn('[Voz]', msg); try { if (window.UI3D) UI3D.toast(msg); } catch (e) {} }
 
 function stopVoice() {
@@ -960,6 +963,7 @@ function ejecutarFlujoGuardado() {
   </a-camera>
 </a-scene>
 
+<script src="js/sfx.js"></script>
 <script src="js/ui3d.js"></script>
 <script>
 
@@ -1922,7 +1926,7 @@ function getVoice(character) {
 }
 
 // Voz gratuita del navegador: se usa cuando la voz de Groq falla o llega a su límite de uso
-function speakBrowser(text, done) {
+function speakBrowser(text, done, who) {
   try {
     if (!('speechSynthesis' in window)) { voiceNote('No voice available on this device'); done(); return; }
     window.speechSynthesis.cancel();
@@ -1932,6 +1936,7 @@ function speakBrowser(text, done) {
     var en = voices.filter(function (v) { return /^en[-_]/i.test(v.lang); })[0];
     if (!voices.length) voiceNote('No basic voice on this device - text only');
     if (en) u.voice = en;
+    u.onstart = function () { if (who && voices.length) speakingNow(who); };
     u.onend = done;
     u.onerror = done;
     window.speechSynthesis.speak(u);
@@ -1950,11 +1955,14 @@ async function speakVR(text, voice = "daniel", callback = null) {
   var done = function () {
     if (finished) return;
     finished = true;
+    if (mySeq === _voice.seq && window.SFX) SFX.duck(false);   // la música sube otra vez
     if (callback) callback();
   };
 
   text = String(text || '').trim();
   if (!text) { done(); return; }
+  var who = voice === 'daniel' ? 'juan' : 'ajo';
+  if (window.SFX) SFX.duck(true);   // la música baja mientras habla el personaje
 
   // Si la voz de Groq alcanzó su límite hace poco, no se vuelve a intentar durante unos minutos
   if (!appState.ttsPausedUntil || Date.now() > appState.ttsPausedUntil) {
@@ -1976,16 +1984,20 @@ async function speakVR(text, voice = "daniel", callback = null) {
         audio.src = url;
         _voice.audio = audio;
         audio.onended = function () { URL.revokeObjectURL(url); if (_voice.audio === audio) _voice.audio = null; done(); };
-        audio.onerror = function () { URL.revokeObjectURL(url); if (mySeq === _voice.seq) { voiceNote('Voice: audio error - using basic voice'); speakBrowser(text, done); } else done(); };
-        try { await audio.play(); } catch (pe) { voiceNote('Voice blocked by the browser (touch the screen once)'); if (mySeq === _voice.seq) speakBrowser(text, done); else done(); }
+        audio.onerror = function () { URL.revokeObjectURL(url); if (mySeq === _voice.seq) { voiceNote('Voice: audio error - using basic voice'); speakBrowser(text, done, who); } else done(); };
+        try { await audio.play(); if (mySeq === _voice.seq) speakingNow(who); } catch (pe) { voiceNote('Voice blocked by the browser (touch the screen once)'); if (mySeq === _voice.seq) speakBrowser(text, done, who); else done(); }
         return;
       }
 
       console.warn('[TTS] Groq respondió', speechResponse.status, '- usando la voz del navegador');
-      voiceNote(speechResponse.status === 401 ? 'Voice: device not paired' : speechResponse.status === 429 ? 'Voice: usage limit reached' : 'Voice: server error ' + speechResponse.status);
+      var info = {}; try { info = await speechResponse.json(); } catch (je) {}
       if (speechResponse.status === 429) {
-        appState.ttsPausedUntil = Date.now() + 10 * 60 * 1000;
-        setHUD('ready', 'Voice limit reached - using basic voice');
+        // Se espera lo que indica el servicio (entre 20 s y 15 min) y se vuelve a intentar: antes eran 10 min de silencio fijos
+        var wait = Math.min(900, Math.max(20, Number(info.retryAfter) || 60));
+        appState.ttsPausedUntil = Date.now() + wait * 1000;
+        voiceNote('Voice limit reached - back in ' + (wait >= 120 ? Math.round(wait / 60) + ' min' : wait + ' s'));
+      } else {
+        voiceNote(speechResponse.status === 401 ? 'Voice: device not paired' : 'Voice: server error ' + speechResponse.status);
       }
     } catch (e) {
       console.warn('[TTS] Error de voz, usando la voz del navegador:', e);
@@ -1994,7 +2006,7 @@ async function speakVR(text, voice = "daniel", callback = null) {
   }
 
   if (mySeq !== _voice.seq) { done(); return; }
-  speakBrowser(text, done);
+  speakBrowser(text, done, who);
 }
 
 async function setupMic(){

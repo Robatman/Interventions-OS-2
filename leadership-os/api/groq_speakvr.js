@@ -86,10 +86,16 @@ export default async function handler(req, res) {
       if (!response.ok) {
         const err = await response.text();
         console.error("GROQ ERROR:", response.status, err.slice(0, 300));
-        // 429 = límite de uso: el cliente lo distingue para usar la voz del navegador
-        return res.status(response.status === 429 ? 429 : 500).json({
-          error: response.status === 429 ? "Límite de voz alcanzado." : "No se pudo generar el audio."
-        });
+        // 429 = límite de uso: el cliente lo distingue y espera `retryAfter` segundos antes de volver a pedir voz
+        if (response.status === 429) {
+          let retryAfter = Number(response.headers.get("retry-after")) || 0;
+          if (!retryAfter) {
+            const m = /try again in\s+(?:(\d+)m)?\s*(?:(\d+(?:\.\d+)?)s)?/i.exec(err);
+            if (m) retryAfter = Math.ceil((Number(m[1] || 0) * 60) + Number(m[2] || 0));
+          }
+          return res.status(429).json({ error: "Límite de voz alcanzado.", retryAfter });
+        }
+        return res.status(500).json({ error: "No se pudo generar el audio." });
       }
 
       const buffer = await response.arrayBuffer();
