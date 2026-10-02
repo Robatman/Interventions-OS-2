@@ -242,7 +242,7 @@
     var r = h / 2, sh = new THREE.Shape();
     sh.moveTo(-w / 2 + r, -h / 2); sh.lineTo(w / 2 - r, -h / 2); sh.absarc(w / 2 - r, 0, r, -Math.PI / 2, Math.PI / 2, false);
     sh.lineTo(-w / 2 + r, h / 2); sh.absarc(-w / 2 + r, 0, r, Math.PI / 2, Math.PI * 1.5, false);
-    var g = new THREE.ExtrudeGeometry(sh, { depth: depth, bevelEnabled: false, curveSegments: 20 }); g.translate(0, 0, -depth);
+    var g = new THREE.ExtrudeGeometry(sh, { depth: depth, bevelEnabled: false, curveSegments: 20 }); g.translate(0, 0, -depth - .015);
     return new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: color, toneMapped: false }));
   }
 
@@ -326,7 +326,7 @@
       var A = ACT[who]; if (!A) return;
       var p = spec[who], o = A.object3D;
       if (!p) { if (A.shown) { A.shown = false; tween(o, { s: .001, y: o.position.y - .4 }, 260, 0, 'in'); } return; }
-      var pos = polar(p.a, p.r || 2.7, p.y === undefined ? .5 : p.y), sc = p.s || 1.15, ry = p.a * .15 * Math.PI / 180;
+      var pos = polar(p.a, p.r || 2.7, p.y === undefined ? .5 : p.y), sc = p.s || 1.15, ry = 0;
       if (!A.shown) {
         A.shown = true; var side = p.a < 0 ? -1 : 1;
         o.position.set(pos.x + side * 1.2, pos.y - .9, pos.z - 1.6); o.scale.set(.001, .001, .001); o.rotation.y = ry;
@@ -540,7 +540,7 @@
     I.begin = add(intro, pill({ a: 0, r: 2.5, y: 1.7, w: 2.2, h: .5, label: 'Tap to begin  ▶', bg: C.violet, sheen: true, fs: .4, onClick: function () { introStep(1); } }));
     I.start = add(intro, pill({ a: 0, r: 2.5, y: 1.7, w: 1.9, h: .55, label: 'START', bg: C.violet, action: 'start-app', fs: .44, sheen: true }));
     I.next = add(intro, pill({ a: 6, r: 2.4, y: .7, w: 1.4, h: .4, label: 'Next  ▶', bg: C.violet, sheen: true, fs: .4, onClick: function () { introStep(Math.min(INTRO.length - 1, I.n + 1)); } }));
-    I.skip = add(intro, pill({ a: 34, r: 2.4, y: .7, w: 1.0, h: .3, label: 'Skip ›', bg: 'rgba(20,34,74,.55)', fs: .38, onClick: function () { if (typeof stopVoice === 'function') stopVoice(); introStep(INTRO.length - 1); } }));
+    I.skip = add(intro, pill({ a: 34, r: 2.4, y: .7, w: 1.0, h: .3, label: 'Skip ›', bg: '#5b6b8c', fs: .38, onClick: function () { if (typeof stopVoice === 'function') stopVoice(); introStep(INTRO.length - 1); } }));
     [I.begin, I.start, I.next, I.skip].forEach(function (p) { p._noFly = true; });
     I.hint = add(intro, document.createElement('a-entity'));
     add(I.hint, label({ a: 0, r: 2.5, y: 1.2, w: 3.4, h: .3, text: 'Drag to look around · click to select', size: .5, weight: 600, color: C.muted }));

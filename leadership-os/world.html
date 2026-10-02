@@ -99,6 +99,7 @@ function voiceNote(msg) { console.warn('[Voz]', msg); try { if (window.UI3D) UI3
 function stopVoice() {
   _voice.seq++;
   if (_voice.audio) { try { _voice.audio.pause(); } catch (e) {} _voice.audio = null; }
+  if (_voice.stopCb) { var f = _voice.stopCb; _voice.stopCb = null; try { f(); } catch (e) {} }
   try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch (e) {}
 }
 
@@ -108,6 +109,38 @@ var VOICE_LINES = {
   interventions: 'These are the check-ins that help you spot attrition early. Pick the one you want to practice.',
   techniques: 'These are your tools. Pick one and I will show you a quick before and after example.'
 };
+
+// Parte el texto en trozos de máximo ~170 caracteres, cortando en frases (el modelo de voz solo acepta 200 por petición)
+function splitForTTS(text) {
+  var MAX = 170, sentences = text.match(/[^.!?…]+[.!?…]+["')\]]*\s*|[^.!?…]+$/g) || [text], out = [], cur = '';
+  sentences.forEach(function (st) {
+    st = st.trim(); if (!st) return;
+    while (st.length > MAX) {
+      var cut = st.lastIndexOf(',', MAX); if (cut < 60) cut = st.lastIndexOf(' ', MAX); if (cut < 1) cut = MAX;
+      if (cur) { out.push(cur); cur = ''; }
+      out.push(st.slice(0, cut + 1).trim()); st = st.slice(cut + 1).trim();
+    }
+    if ((cur + ' ' + st).trim().length <= MAX) cur = (cur + ' ' + st).trim(); else { if (cur) out.push(cur); cur = st; }
+  });
+  if (cur) out.push(cur);
+  return out.length ? out : [String(text).slice(0, MAX)];
+}
+
+// Reproduce un trozo de audio y avisa cuando termina (o cuando lo cortan)
+function playBlob(blob, mySeq, who) {
+  return new Promise(function (resolve, reject) {
+    var url = URL.createObjectURL(blob), audio = _voice.el || (_voice.el = new Audio());
+    audio.src = url; audio.defaultPlaybackRate = 1.12; audio.playbackRate = 1.12;   // un poco más ágil (el tono se conserva)
+    _voice.audio = audio;
+    var fin = function (err) { audio.onended = audio.onerror = null; _voice.stopCb = null; URL.revokeObjectURL(url); err ? reject(err) : resolve(); };
+    _voice.stopCb = function () { fin(); };
+    audio.onended = function () { fin(); };
+    audio.onerror = function () { fin(new Error('audio error')); };
+    var p = audio.play();
+    if (p && p.then) p.then(function () { audio.playbackRate = 1.12; if (mySeq === _voice.seq) speakingNow(who); }).catch(fin);
+    else if (mySeq === _voice.seq) speakingNow(who);
+  });
+}
 
 function sayLine(key) {
   var t = VOICE_LINES[key];
@@ -1964,41 +1997,47 @@ async function speakVR(text, voice = "daniel", callback = null) {
   var who = voice === 'daniel' ? 'juan' : 'ajo';
   if (window.SFX) SFX.duck(true);   // la música baja mientras habla el personaje
 
-  // Si la voz de Groq alcanzó su límite hace poco, no se vuelve a intentar durante unos minutos
+  // Si la voz de Groq alcanzó su límite hace poco, se espera lo que indicó el servicio antes de volver a intentar
   if (!appState.ttsPausedUntil || Date.now() > appState.ttsPausedUntil) {
     try {
-      var speechResponse = await authFetch('/api/groq_speakvr', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'speech', text: text, voice: voice })
-      });
-
-      // Si mientras llegaba el audio el staff cambió de pantalla o pidió otro, este ya no se reproduce
-      if (mySeq !== _voice.seq) { done(); return; }
-
-      if (speechResponse.ok) {
-        var blob = await speechResponse.blob();
+      var chunks = splitForTTS(text), dir = voice === 'daniel' ? '[cheerful] ' : '';   // la indicación de tono da más energía a Juanjolote
+      var fetchOne = function (i) {
+        return authFetch('/api/groq_speakvr', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'speech', text: dir + chunks[i], voice: voice })
+        }).then(function (r) {
+          if (r.ok) return r.blob().then(function (bl) { return { ok: true, blob: bl }; });
+          return r.json().catch(function () { return {}; }).then(function (info) { return { ok: false, status: r.status, info: info }; });
+        });
+      };
+      var failure = function (res) {
+        console.warn('[TTS] Groq respondió', res.status, '- usando la voz del navegador');
+        if (res.status === 429) {
+          // Se espera lo que indica el servicio (entre 20 s y 15 min) y se vuelve a intentar
+          var wait = Math.min(900, Math.max(20, Number(res.info && res.info.retryAfter) || 60));
+          appState.ttsPausedUntil = Date.now() + wait * 1000;
+          voiceNote('Voice limit reached - back in ' + (wait >= 120 ? Math.round(wait / 60) + ' min' : wait + ' s'));
+        } else {
+          voiceNote(res.status === 401 ? 'Voice: device not paired' : 'Voice: server error ' + res.status);
+        }
+      };
+      var next = fetchOne(0), finishedAll = false;
+      for (var i = 0; i < chunks.length; i++) {
+        var res = await next;
         if (mySeq !== _voice.seq) { done(); return; }
-        var url = URL.createObjectURL(blob);
-        var audio = _voice.el || (_voice.el = new Audio());
-        audio.src = url;
-        _voice.audio = audio;
-        audio.onended = function () { URL.revokeObjectURL(url); if (_voice.audio === audio) _voice.audio = null; done(); };
-        audio.onerror = function () { URL.revokeObjectURL(url); if (mySeq === _voice.seq) { voiceNote('Voice: audio error - using basic voice'); speakBrowser(text, done, who); } else done(); };
-        try { await audio.play(); if (mySeq === _voice.seq) speakingNow(who); } catch (pe) { voiceNote('Voice blocked by the browser (touch the screen once)'); if (mySeq === _voice.seq) speakBrowser(text, done, who); else done(); }
-        return;
+        if (!res.ok) {
+          failure(res);
+          if (i > 0) { done(); return; }   // la voz ya había empezado: no se cambia a la voz básica a mitad de frase
+          break;
+        }
+        if (i + 1 < chunks.length) next = fetchOne(i + 1);
+        try { await playBlob(res.blob, mySeq, who); }
+        catch (pe) { voiceNote('Voice blocked by the browser (touch the screen once)'); if (mySeq === _voice.seq) speakBrowser(text, done, who); else done(); return; }
+        if (mySeq !== _voice.seq) { done(); return; }
+        if (i === chunks.length - 1) finishedAll = true;
       }
-
-      console.warn('[TTS] Groq respondió', speechResponse.status, '- usando la voz del navegador');
-      var info = {}; try { info = await speechResponse.json(); } catch (je) {}
-      if (speechResponse.status === 429) {
-        // Se espera lo que indica el servicio (entre 20 s y 15 min) y se vuelve a intentar: antes eran 10 min de silencio fijos
-        var wait = Math.min(900, Math.max(20, Number(info.retryAfter) || 60));
-        appState.ttsPausedUntil = Date.now() + wait * 1000;
-        voiceNote('Voice limit reached - back in ' + (wait >= 120 ? Math.round(wait / 60) + ' min' : wait + ' s'));
-      } else {
-        voiceNote(speechResponse.status === 401 ? 'Voice: device not paired' : 'Voice: server error ' + speechResponse.status);
-      }
+      if (finishedAll) { done(); return; }
     } catch (e) {
       console.warn('[TTS] Error de voz, usando la voz del navegador:', e);
       voiceNote('Voice: connection error - using basic voice');
